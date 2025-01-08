@@ -8,8 +8,8 @@
     "fishstiz"
   ],
   "contact": {
-    "homepage": "",
-    "sources": ""
+    "sources": "https://github.com/fishstiz/minecraft-cursor",
+    "issues": "https://github.com/fishstiz/minecraft-cursor/issues"
   },
   "license": "MIT",
   "icon": "assets/minecraft-cursor/icon.png",
@@ -20,6 +20,9 @@
     ],
     "client": [
       "io.github.fishstiz.minecraftcursor.MinecraftCursorClient"
+    ],
+    "modmenu": [
+      "io.github.fishstiz.minecraftcursor.MinecraftCursorModMenuApiImpl"
     ]
   },
   "mixins": [],
