@@ -28,6 +28,7 @@ public class MinecraftCursorSimpleOptions {
         this.enabled.setValue(configManager.getEnabled());
         this.scale.setValue(configManager.getScale());
         this.xhot.setValue(configManager.getXhot());
+        this.yhot.setValue(configManager.getYhot());
     }
 
     private void createWidgets() {
@@ -56,7 +57,6 @@ public class MinecraftCursorSimpleOptions {
                 new SimpleOption.ValidatingIntSliderCallbacks(0, cursorHandler.getWidth()),
                 MinecraftCursorConfigDefinition.X_HOTSPOT.defaultValue,
                 value -> cursorHandler.updateCursor(this.scale.getValue(), value, this.getYhot().getValue())
-
         );
         this.yhot = new SimpleOption<>(
                 "minecraft-cursor.options.yhot",
@@ -65,7 +65,6 @@ public class MinecraftCursorSimpleOptions {
                 new SimpleOption.ValidatingIntSliderCallbacks(0, cursorHandler.getWidth()),
                 MinecraftCursorConfigDefinition.Y_HOTSPOT.defaultValue,
                 value -> cursorHandler.updateCursor(this.scale.getValue(), this.getXhot().getValue(), value)
-
         );
         Text hotspotSessionTooltipText = Text.translatable("minecraft-cursor.options.hot.tooltip");
         int showHotspotMax = HotspotVisibility.values.length;
@@ -86,7 +85,6 @@ public class MinecraftCursorSimpleOptions {
                 new SimpleOption.MaxSuppliableIntCallbacks(1, () -> hotspotColorsMax, hotspotColorsMax),
                 1,
                 value -> this.cursorHotspot.setColor(MinecraftCursorHotspot.Color.getColor(value))
-
         );
     }
 
