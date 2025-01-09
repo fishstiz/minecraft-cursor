@@ -1,5 +1,6 @@
 package io.github.fishstiz.minecraftcursor;
 
+import io.github.fishstiz.minecraftcursor.config.MinecraftCursorConfigManager;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
@@ -12,9 +13,15 @@ import java.io.InputStream;
 
 import java.util.Optional;
 
-class MinecraftCursorResourceReloadListener implements SimpleSynchronousResourceReloadListener {
-    private static final String PATH = "cursor.png";
-    private final MinecraftCursorHandler cursorHandler = new MinecraftCursorHandler();
+public class MinecraftCursorResourceReloadListener implements SimpleSynchronousResourceReloadListener {
+    public static final String PATH = "textures/cursor.png";
+    private final MinecraftCursorHandler cursorHandler;
+    private final MinecraftCursorConfigManager configManager;
+
+    public MinecraftCursorResourceReloadListener(MinecraftCursorHandler cursorHandler, MinecraftCursorConfigManager configManager) {
+        this.configManager = configManager;
+        this.cursorHandler = cursorHandler;
+    }
 
     @Override
     public Identifier getFabricId() {
@@ -31,7 +38,7 @@ class MinecraftCursorResourceReloadListener implements SimpleSynchronousResource
 
         try (InputStream cursorStream = cursorOptionalResource.get().getInputStream()) {
             BufferedImage cursorImage = ImageIO.read(cursorStream);
-            cursorHandler.setCursor(cursorImage, 1, 0,0);
+            cursorHandler.loadImage(cursorImage, configManager.getScale(), configManager.getXhot(),configManager.getYhot(), configManager.getEnabled());
             cursorImage.flush();
         } catch (IOException e) {
             MinecraftCursor.LOGGER.error("Error occurred while loading cursor: {}", String.valueOf(e));

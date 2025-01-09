@@ -1,0 +1,20 @@
+{
+  "minecraft-cursor.options": "Minecraft Cursor Options",
+  "minecraft-cursor.options.enabled": "Enabled",
+  "minecraft-cursor.options.scale": "Scale",
+  "minecraft-cursor.options.xhot": "Hotspot X",
+  "minecraft-cursor.options.xhot.tooltip": "Horizontal offset of the cursor's hotspot/click point from the left.\n\nScales automatically with the scale option.",
+  "minecraft-cursor.options.yhot": "Hotspot Y",
+  "minecraft-cursor.options.yhot.tooltip": "Vertical offset of the cursor's hotspot/click point from the top.\n\nScales automatically with the scale option.",
+  "minecraft-cursor.options.hot": "Hotspot Aid",
+  "minecraft-cursor.options.hot.tooltip": "Visible only in this menu to aid configuration of hotspot.",
+  "minecraft-cursor.options.hot.modified": "When Modified",
+  "minecraft-cursor.options.hot.always": "Always Visible",
+  "minecraft-cursor.options.hot.hide": "Hide",
+  "minecraft-cursor.options.hot.color": "Hotspot Aid Color",
+  "minecraft-cursor.options.hot.color.red": "Red",
+  "minecraft-cursor.options.hot.color.green": "Green",
+  "minecraft-cursor.options.hot.color.blue": "Blue",
+  "minecraft-cursor.options.hot.color.black": "Black",
+  "minecraft-cursor.options.hot.color.white": "White"
+}
