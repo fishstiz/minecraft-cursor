@@ -28,7 +28,7 @@ public class Cursor {
             create(image, scale, xhot, yhot);
             image.flush();
         } catch (IOException e) {
-            MinecraftCursor.LOGGER.error("Error updating {}: {}", type, e.toString());
+            MinecraftCursor.LOGGER.error("Error updating image of {}: {}", type, e);
         }
     }
 
