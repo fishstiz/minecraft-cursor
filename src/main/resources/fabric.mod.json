@@ -25,7 +25,12 @@
       "io.github.fishstiz.minecraftcursor.MinecraftCursorModMenuApiImpl"
     ]
   },
-  "mixins": [],
+  "mixins": [
+    {
+      "config": "minecraft-cursor.client.mixins.json",
+      "environment": "client"
+    }
+  ],
   "depends": {
     "fabricloader": ">=0.16.9",
     "minecraft": ">=1.21",
