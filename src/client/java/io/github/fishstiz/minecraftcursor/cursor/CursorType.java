@@ -10,25 +10,25 @@ public enum CursorType {
     POINTER("pointer"),
     TEXT("text");
 
-    private final String name;
+    private final String key;
 
     static final Map<String, CursorType> CURSOR_TYPES = new HashMap<>();
 
-    CursorType(String name) {
-        this.name = name;
+    CursorType(String key) {
+        this.key = key;
     }
 
-    public String getName() {
-        return name;
+    public String getKey() {
+        return key;
     }
 
     static {
         for (CursorType cursorType : CursorType.values())
-            CURSOR_TYPES.put(cursorType.getName(), cursorType);
+            CURSOR_TYPES.put(cursorType.key, cursorType);
     }
 
     @Nullable
-    public static CursorType getCursorTypeOrNull(String name) {
-        return CURSOR_TYPES.get(name);
+    public static CursorType getCursorTypeOrNull(String key) {
+        return CURSOR_TYPES.get(key);
     }
 }

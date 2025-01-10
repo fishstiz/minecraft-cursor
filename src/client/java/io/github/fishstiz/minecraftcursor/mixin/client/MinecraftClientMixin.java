@@ -24,7 +24,7 @@ public abstract class MinecraftClientMixin {
 
     @Inject(method = "run", at = @At("HEAD"))
     public void init(CallbackInfo ci) {
-        cursorManager = MinecraftCursorClient.getManager();
+        cursorManager = MinecraftCursorClient.getCursorManager();
     }
 
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/Screen;tick()V"))

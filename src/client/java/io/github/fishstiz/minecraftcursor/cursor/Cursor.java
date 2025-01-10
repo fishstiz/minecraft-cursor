@@ -12,7 +12,10 @@ public class Cursor {
     private final CursorType type;
     private String base64Image;
     private long id = 0;
-    private boolean enabled = true;
+    private double scale;
+    private int xhot;
+    private int yhot;
+    private boolean enabled;
 
     public Cursor(CursorType type) {
         this.type = type;
@@ -59,6 +62,9 @@ public class Cursor {
         }
 
         this.id = id;
+        this.scale = scale;
+        this.xhot = xhot;
+        this.yhot = yhot;
     }
 
     public void destroy() {
@@ -90,5 +96,21 @@ public class Cursor {
 
     public CursorType getType() {
         return type;
+    }
+
+    public double getScale() {
+        return scale;
+    }
+
+    public int getXhot() {
+        return xhot;
+    }
+
+    public int getYhot() {
+        return yhot;
+    }
+
+    public boolean getEnabled() {
+        return enabled;
     }
 }

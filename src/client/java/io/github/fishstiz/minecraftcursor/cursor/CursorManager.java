@@ -1,7 +1,7 @@
 package io.github.fishstiz.minecraftcursor.cursor;
 
-import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
+import io.github.fishstiz.minecraftcursor.config.CursorConfigService;
 import net.minecraft.client.MinecraftClient;
 import org.lwjgl.glfw.GLFW;
 
@@ -10,13 +10,13 @@ import java.io.IOException;
 import java.util.EnumMap;
 
 public class CursorManager {
-    private final CursorConfig config;
+    private final CursorConfigService config;
     private final MinecraftClient client;
     private final EnumMap<CursorType, Cursor> cursors = new EnumMap<>(CursorType.class);
     private Cursor currentCursor;
     private long previousCursorId;
 
-    public CursorManager(CursorConfig config, MinecraftClient client) {
+    public CursorManager(CursorConfigService config, MinecraftClient client) {
         this.config = config;
         this.client = client;
 
@@ -27,7 +27,8 @@ public class CursorManager {
 
     public void loadCursorImage(CursorType type, BufferedImage image) throws IOException {
         Cursor cursor = cursors.get(type);
-        cursor.loadImage(image, 1, 0, 0, true); // TODO: get values from config
+        CursorConfig.Settings settings = config.getSettings(type);
+        cursor.loadImage(image, settings.getScale(), settings.getXHot(), settings.getYHot(), settings.getEnabled());
 
         if (currentCursor == null) {
             return;
