@@ -10,15 +10,15 @@ public class CursorConfig {
     @JsonProperty
     private final Map<String, Settings> settings = new HashMap<>();
 
-    protected void createSettings(CursorType type) {
+    protected void createCursorSettings(CursorType type) {
         settings.put(type.getKey(), new Settings(Defaults.SCALE, Defaults.X_HOT, Defaults.Y_HOT, Defaults.ENABLED));
     }
 
-    protected Settings getSettings(CursorType type) {
+    protected Settings getCursorSettings(CursorType type) {
         return settings.computeIfAbsent(type.getKey(), k -> new Settings(Defaults.SCALE, Defaults.X_HOT, Defaults.Y_HOT, Defaults.ENABLED));
     }
 
-    protected void updateSettings(CursorType type, Settings settings) {
+    protected void updateCursorSettings(CursorType type, Settings settings) {
         this.settings.get(type.getKey()).update(settings.scale, settings.xhot, settings.yhot, settings.enabled);
     }
 
@@ -35,7 +35,11 @@ public class CursorConfig {
         private int yhot;
         private boolean enabled;
 
-        public Settings(double scale, int xhot, int yhot, boolean enabled) {
+        public Settings(
+                @JsonProperty("scale") double scale,
+                @JsonProperty("xhot") int xhot,
+                @JsonProperty("yhot") int yhot,
+                @JsonProperty("enabled") boolean enabled) {
             update(scale, xhot, yhot, enabled);
         }
 
