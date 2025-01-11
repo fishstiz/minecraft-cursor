@@ -35,7 +35,6 @@ public class Cursor {
         }
     }
 
-    // TODO: validate cursor size
     public void loadImage(BufferedImage image, double scale, int xhot, int yhot, boolean enabled) throws IOException {
         this.base64Image = BufferedImageUtils.compressImageToBase64(image);
         this.enabled = enabled;
