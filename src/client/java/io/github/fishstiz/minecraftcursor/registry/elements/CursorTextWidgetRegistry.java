@@ -1,4 +1,4 @@
-package io.github.fishstiz.minecraftcursor.registry.widgets;
+package io.github.fishstiz.minecraftcursor.registry.elements;
 
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
 import net.minecraft.client.gui.Element;

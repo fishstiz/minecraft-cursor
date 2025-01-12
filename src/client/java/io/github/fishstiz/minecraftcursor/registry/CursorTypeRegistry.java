@@ -1,10 +1,10 @@
 package io.github.fishstiz.minecraftcursor.registry;
 
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
-import io.github.fishstiz.minecraftcursor.registry.widgets.EntryListWidgetCursorRegistry;
-import io.github.fishstiz.minecraftcursor.registry.widgets.CursorPointerWidgetRegistry;
-import io.github.fishstiz.minecraftcursor.registry.widgets.CursorTextWidgetRegistry;
-import io.github.fishstiz.minecraftcursor.registry.widgets.WorldListWidgetCursorRegistry;
+import io.github.fishstiz.minecraftcursor.registry.elements.EntryListWidgetCursorRegistry;
+import io.github.fishstiz.minecraftcursor.registry.elements.CursorPointerWidgetRegistry;
+import io.github.fishstiz.minecraftcursor.registry.elements.CursorTextWidgetRegistry;
+import io.github.fishstiz.minecraftcursor.registry.elements.WorldListWidgetCursorRegistry;
 import net.minecraft.client.gui.Element;
 
 import java.util.AbstractMap;
