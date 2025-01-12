@@ -1,12 +1,14 @@
 package io.github.fishstiz.minecraftcursor.registry;
 
 import io.github.fishstiz.minecraftcursor.registry.screen.CreativeInventoryScreenCursorRegistry;
+import io.github.fishstiz.minecraftcursor.registry.screen.InventoryScreenCursorRegistry;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 
 public class ScreenCursorRegistry extends CursorTypeRegistry {
     public ScreenCursorRegistry() {
         new CreativeInventoryScreenCursorRegistry(this);
+        new InventoryScreenCursorRegistry(this);
     }
 
     @Override
