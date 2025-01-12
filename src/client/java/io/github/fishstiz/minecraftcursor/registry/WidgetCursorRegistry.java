@@ -1,19 +1,21 @@
 package io.github.fishstiz.minecraftcursor.registry;
 
+import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.registry.widget.CursorPointerWidgetRegistry;
 import io.github.fishstiz.minecraftcursor.registry.widget.CursorTextWidgetRegistry;
-import io.github.fishstiz.minecraftcursor.registry.widget.EntryListWidgetCursorRegistry;
 import io.github.fishstiz.minecraftcursor.registry.widget.WorldListWidgetCursorRegistry;
 import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.ParentElement;
+import net.minecraft.client.gui.widget.EntryListWidget;
 
 public class WidgetCursorRegistry extends CursorTypeRegistry {
     private final CursorPointerWidgetRegistry pointerRegistry;
     private final CursorTextWidgetRegistry textRegistry;
 
     public WidgetCursorRegistry() {
+        registerParentElement(EntryListWidget.class);
         this.pointerRegistry = new CursorPointerWidgetRegistry(this);
         this.textRegistry = new CursorTextWidgetRegistry(this);
-        new EntryListWidgetCursorRegistry(this);
         new WorldListWidgetCursorRegistry(this);
     }
 
@@ -31,5 +33,18 @@ public class WidgetCursorRegistry extends CursorTypeRegistry {
 
     public void registerText(Class<? extends Element> widgetClass) {
         textRegistry.register(widgetClass);
+    }
+
+    public void registerParentElement(Class<? extends ParentElement> parentElement) {
+        this.register(parentElement, this::parentElementGetChildCursorType);
+    }
+
+    public CursorType parentElementGetChildCursorType(Element parentElement, double mouseX, double mouseY, float delta) {
+        for (Element entry : ((EntryListWidget<?>) parentElement).children()) {
+            if (entry.isMouseOver(mouseX, mouseY)) {
+                return getCursorType(entry, mouseX, mouseY, delta);
+            }
+        }
+        return CursorType.DEFAULT;
     }
 }
