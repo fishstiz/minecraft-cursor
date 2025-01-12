@@ -51,12 +51,15 @@ public abstract class ScreenMixin extends AbstractParentElement implements Drawa
             return;
         }
 
-        CursorType cursorType = CursorType.DEFAULT;
+        CursorType screenCursorType = screenCursorRegistry.getCursorType(this, mouseX, mouseY, delta);
+
+        CursorType widgetCursorType = CursorType.DEFAULT;
         Optional<? extends Element> hoveredElementOpt = this.hoveredElement(mouseX, mouseY);
         if (hoveredElementOpt.isPresent()) {
             Element hoveredElement = hoveredElementOpt.get();
-            cursorType = widgetCursorRegistry.getCursorType(hoveredElement, mouseX, mouseY, delta);
+            widgetCursorType = widgetCursorRegistry.getCursorType(hoveredElement, mouseX, mouseY, delta);
         }
-        cursorManager.setCurrentCursor(cursorType);
+
+        cursorManager.setCurrentCursor(screenCursorType != CursorType.DEFAULT ? screenCursorType : widgetCursorType);
     }
 }
