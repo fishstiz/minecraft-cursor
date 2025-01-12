@@ -7,9 +7,8 @@ public class CursorConfigService {
     private final CursorConfigLoader loader;
 
     public CursorConfigService(String path) {
-        if (!path.endsWith(CursorConfigLoader.FILE_EXTENSION)) {
-            throw new IllegalArgumentException("File not supported. Must be: " + CursorConfigLoader.FILE_EXTENSION);
-        }
+        assert path.endsWith(CursorConfigLoader.FILE_EXTENSION)
+                : "File not supported. Must be: " + CursorConfigLoader.FILE_EXTENSION;
 
         this.loader = new CursorConfigLoader(path);
     }
