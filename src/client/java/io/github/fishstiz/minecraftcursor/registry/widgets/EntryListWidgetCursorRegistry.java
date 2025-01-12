@@ -5,7 +5,7 @@ import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.EntryListWidget;
 
-public class EntryListWidgetRegistry {
+public class EntryListWidgetCursorRegistry {
     public static CursorType getCursorTypeFromEntryListWidgetEntry(Element entryListWidget, double mouseX, double mouseY, float delta) {
         for (Element entry : ((EntryListWidget<?>) entryListWidget).children()) {
             if (entry.isMouseOver(mouseX, mouseY)) {
@@ -16,6 +16,6 @@ public class EntryListWidgetRegistry {
     }
     
     public static void init() {
-        CursorTypeRegistry.register(EntryListWidget.class, EntryListWidgetRegistry::getCursorTypeFromEntryListWidgetEntry);
+        CursorTypeRegistry.register(EntryListWidget.class, EntryListWidgetCursorRegistry::getCursorTypeFromEntryListWidgetEntry);
     }
 }

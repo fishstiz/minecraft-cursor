@@ -12,7 +12,7 @@ import net.minecraft.client.option.SimpleOption;
 import java.lang.reflect.Field;
 import java.util.Map;
 
-public class PointerWidgetRegistry {
+public class CursorPointerWidgetRegistry {
     public static void register(String fullyQualifiedClassName) {
         CursorTypeRegistry.register(fullyQualifiedClassName, CursorTypeRegistry::elementToPointer);
     }
@@ -27,7 +27,7 @@ public class PointerWidgetRegistry {
         register(ControlsListWidget.Entry.class);
         register("net.minecraft.client.gui.screen.option.LanguageOptionsScreen$LanguageSelectionListWidget$LanguageEntry");
         register("net.minecraft.client.gui.widget.OptionListWidget$WidgetEntry");
-        CursorTypeRegistry.register("net.minecraft.client.gui.widget.OptionListWidget$OptionWidgetEntry", PointerWidgetRegistry::optionEntryCursor);
+        CursorTypeRegistry.register("net.minecraft.client.gui.widget.OptionListWidget$OptionWidgetEntry", CursorPointerWidgetRegistry::optionEntryCursor);
     }
 
     @SuppressWarnings("unchecked")

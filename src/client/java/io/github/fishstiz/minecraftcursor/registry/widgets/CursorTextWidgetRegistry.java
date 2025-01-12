@@ -5,7 +5,7 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 
-public class TextWidgetRegistry {
+public class CursorTextWidgetRegistry {
     public static void register(String fullyQualifiedClassName) {
         CursorTypeRegistry.register(fullyQualifiedClassName, CursorTypeRegistry::elementToText);
     }

@@ -1,10 +1,10 @@
 package io.github.fishstiz.minecraftcursor.registry;
 
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
-import io.github.fishstiz.minecraftcursor.registry.widgets.EntryListWidgetRegistry;
-import io.github.fishstiz.minecraftcursor.registry.widgets.PointerWidgetRegistry;
-import io.github.fishstiz.minecraftcursor.registry.widgets.TextWidgetRegistry;
-import io.github.fishstiz.minecraftcursor.registry.widgets.WorldListWidgetRegistry;
+import io.github.fishstiz.minecraftcursor.registry.widgets.EntryListWidgetCursorRegistry;
+import io.github.fishstiz.minecraftcursor.registry.widgets.CursorPointerWidgetRegistry;
+import io.github.fishstiz.minecraftcursor.registry.widgets.CursorTextWidgetRegistry;
+import io.github.fishstiz.minecraftcursor.registry.widgets.WorldListWidgetCursorRegistry;
 import net.minecraft.client.gui.Element;
 
 import java.util.AbstractMap;
@@ -51,10 +51,10 @@ public class CursorTypeRegistry {
     }
 
     public static void init() {
-        PointerWidgetRegistry.init();
-        TextWidgetRegistry.init();
-        EntryListWidgetRegistry.init();
-        WorldListWidgetRegistry.init();
+        CursorPointerWidgetRegistry.init();
+        CursorTextWidgetRegistry.init();
+        EntryListWidgetCursorRegistry.init();
+        WorldListWidgetCursorRegistry.init();
     }
 
     public static CursorType elementToDefault(Element ignoreElement, double ignoreMouseX, double ignoreMouseY, float ignoreDelta) {

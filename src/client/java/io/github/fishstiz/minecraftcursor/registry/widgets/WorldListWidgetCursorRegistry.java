@@ -5,7 +5,7 @@ import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
 
-public class WorldListWidgetRegistry {
+public class WorldListWidgetCursorRegistry {
     public static CursorType getCursorTypeFromWorld(Element element, double mouseX, double mouseY, float delta) {
         WorldListWidget worldListWidget = (WorldListWidget) element;
         int x = (int) Math.floor((double) worldListWidget.getWidth() / 2 - (double) worldListWidget.getRowWidth() / 2);
@@ -18,6 +18,6 @@ public class WorldListWidgetRegistry {
     }
 
     public static void init() {
-        CursorTypeRegistry.register(WorldListWidget.class, WorldListWidgetRegistry::getCursorTypeFromWorld);
+        CursorTypeRegistry.register(WorldListWidget.class, WorldListWidgetCursorRegistry::getCursorTypeFromWorld);
     }
 }
