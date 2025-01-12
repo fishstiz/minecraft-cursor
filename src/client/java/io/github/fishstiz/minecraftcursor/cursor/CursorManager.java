@@ -8,11 +8,13 @@ import org.lwjgl.glfw.GLFW;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.EnumMap;
+import java.util.TreeMap;
 
 public class CursorManager {
     private final CursorConfigService config;
     private final MinecraftClient client;
     private final EnumMap<CursorType, Cursor> cursors = new EnumMap<>(CursorType.class);
+    private final TreeMap<Integer, CursorType> currentCursorOverrides = new TreeMap<>();
     private Cursor currentCursor;
     private long previousCursorId;
 
@@ -40,7 +42,7 @@ public class CursorManager {
     }
 
     public void setCurrentCursor(CursorType type) {
-        Cursor cursor = cursors.get(type);
+        Cursor cursor = cursors.get(currentCursorOverrides.isEmpty() ? type : currentCursorOverrides.lastEntry().getValue());
 
         if (cursor == null || (type != CursorType.DEFAULT && cursor.getId() == 0)) {
             cursor = cursors.get(CursorType.DEFAULT);
@@ -53,6 +55,14 @@ public class CursorManager {
         currentCursor = cursor;
         previousCursorId = cursor.getId();
         GLFW.glfwSetCursor(client.getWindow().getHandle(), currentCursor.getId());
+    }
+
+    public void overrideCurrentCursor(CursorType type, int index) {
+        currentCursorOverrides.put(index, type);
+    }
+
+    public void removeOverride(int index) {
+        currentCursorOverrides.remove(index);
     }
 
     public void reloadCursor() {
