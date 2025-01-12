@@ -32,6 +32,8 @@ public class CursorResourceReloadListener implements SimpleSynchronousResourceRe
 
     @Override
     public void reload(ResourceManager manager) {
+        cursorManager.setCurrentCursor(CursorType.DEFAULT);
+
         for (Map.Entry<Identifier, Resource> entry : manager.findResources(getFabricId().getPath(), id -> getCursorTypeByIdentifierOrNull(id) != null).entrySet()) {
             CursorType cursorType = getCursorTypeByIdentifierOrNull(entry.getKey());
 
