@@ -3,6 +3,7 @@ package io.github.fishstiz.minecraftcursor;
 import io.github.fishstiz.minecraftcursor.config.CursorConfigLoader;
 import io.github.fishstiz.minecraftcursor.config.CursorConfigService;
 import io.github.fishstiz.minecraftcursor.cursor.CursorManager;
+import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.MinecraftClient;
@@ -21,5 +22,6 @@ public class MinecraftCursorClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(RESOURCE_RELOAD_LISTENER);
+        CursorTypeRegistry.init();
     }
 }
