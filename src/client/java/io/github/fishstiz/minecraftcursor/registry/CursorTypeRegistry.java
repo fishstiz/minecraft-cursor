@@ -6,11 +6,10 @@ import net.minecraft.client.gui.Element;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class CursorTypeRegistry {
-    private final List<Map.Entry<Class<? extends Element>, ElementCursorTypeFunction>> registry = new ArrayList<>();
+    private final List<AbstractMap.SimpleImmutableEntry<Class<? extends Element>, ElementCursorTypeFunction>> registry = new ArrayList<>();
     private final ConcurrentHashMap<String, ElementCursorTypeFunction> cachedRegistry = new ConcurrentHashMap<>();
 
     @SuppressWarnings("unchecked")
@@ -30,7 +29,7 @@ public abstract class CursorTypeRegistry {
     }
 
     public void register(Class<? extends Element> elementClass, ElementCursorTypeFunction elementToCursorType) {
-        registry.add(new AbstractMap.SimpleEntry<>(elementClass, elementToCursorType));
+        registry.add(new AbstractMap.SimpleImmutableEntry<>(elementClass, elementToCursorType));
     }
 
     public CursorType getCursorType(Element element, double mouseX, double mouseY, float delta) {
