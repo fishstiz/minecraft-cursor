@@ -3,7 +3,8 @@ package io.github.fishstiz.minecraftcursor;
 import io.github.fishstiz.minecraftcursor.config.CursorConfigLoader;
 import io.github.fishstiz.minecraftcursor.config.CursorConfigService;
 import io.github.fishstiz.minecraftcursor.cursor.CursorManager;
-import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
+import io.github.fishstiz.minecraftcursor.registry.ScreenCursorRegistry;
+import io.github.fishstiz.minecraftcursor.registry.WidgetCursorRegistry;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.MinecraftClient;
@@ -14,14 +15,23 @@ public class MinecraftCursorClient implements ClientModInitializer {
     private static final CursorConfigService CONFIG = new CursorConfigService(String.format("config/%s%s", MinecraftCursor.MOD_ID, CursorConfigLoader.FILE_EXTENSION));
     private static final CursorManager CURSOR_MANAGER = new CursorManager(CONFIG, CLIENT);
     private static final CursorResourceReloadListener RESOURCE_RELOAD_LISTENER = new CursorResourceReloadListener(CURSOR_MANAGER, MinecraftCursor.MOD_ID);
+    private static final ScreenCursorRegistry SCREEN_CURSOR_REGISTRY = new ScreenCursorRegistry();
+    private static final WidgetCursorRegistry WIDGET_CURSOR_REGISTRY = new WidgetCursorRegistry();
 
     public static CursorManager getCursorManager() {
         return CURSOR_MANAGER;
     }
 
+    public static ScreenCursorRegistry getScreenCursorRegistry() {
+        return SCREEN_CURSOR_REGISTRY;
+    }
+
+    public static WidgetCursorRegistry getWidgetCursorRegistry() {
+        return WIDGET_CURSOR_REGISTRY;
+    }
+
     @Override
     public void onInitializeClient() {
         ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(RESOURCE_RELOAD_LISTENER);
-        CursorTypeRegistry.init();
     }
 }

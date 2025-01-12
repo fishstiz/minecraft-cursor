@@ -3,7 +3,8 @@ package io.github.fishstiz.minecraftcursor.mixin.client;
 import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
 import io.github.fishstiz.minecraftcursor.cursor.CursorManager;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
-import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
+import io.github.fishstiz.minecraftcursor.registry.ScreenCursorRegistry;
+import io.github.fishstiz.minecraftcursor.registry.WidgetCursorRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.AbstractParentElement;
 import net.minecraft.client.gui.DrawContext;
@@ -24,6 +25,10 @@ import java.util.Optional;
 public abstract class ScreenMixin extends AbstractParentElement implements Drawable {
     @Unique
     private CursorManager cursorManager;
+    @Unique
+    private ScreenCursorRegistry screenCursorRegistry;
+    @Unique
+    private WidgetCursorRegistry widgetCursorRegistry;
 
     @Shadow
     @Nullable
@@ -32,6 +37,8 @@ public abstract class ScreenMixin extends AbstractParentElement implements Drawa
     @Inject(method = "<init>", at = @At("TAIL"))
     private void init(CallbackInfo ci) {
         cursorManager = MinecraftCursorClient.getCursorManager();
+        screenCursorRegistry = MinecraftCursorClient.getScreenCursorRegistry();
+        widgetCursorRegistry = MinecraftCursorClient.getWidgetCursorRegistry();
     }
 
     @Inject(method = "render", at = @At("TAIL"))
@@ -48,7 +55,7 @@ public abstract class ScreenMixin extends AbstractParentElement implements Drawa
         Optional<? extends Element> hoveredElementOpt = this.hoveredElement(mouseX, mouseY);
         if (hoveredElementOpt.isPresent()) {
             Element hoveredElement = hoveredElementOpt.get();
-            cursorType = CursorTypeRegistry.getCursorType(hoveredElement, mouseX, mouseY, delta);
+            cursorType = widgetCursorRegistry.getCursorType(hoveredElement, mouseX, mouseY, delta);
         }
         cursorManager.setCurrentCursor(cursorType);
     }

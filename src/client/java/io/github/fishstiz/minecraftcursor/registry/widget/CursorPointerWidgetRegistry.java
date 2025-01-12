@@ -1,7 +1,8 @@
-package io.github.fishstiz.minecraftcursor.registry.elements;
+package io.github.fishstiz.minecraftcursor.registry.widget;
 
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
+import io.github.fishstiz.minecraftcursor.registry.WidgetCursorRegistry;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.option.ControlsListWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
@@ -13,25 +14,29 @@ import java.lang.reflect.Field;
 import java.util.Map;
 
 public class CursorPointerWidgetRegistry {
-    public static void register(String fullyQualifiedClassName) {
-        CursorTypeRegistry.register(fullyQualifiedClassName, CursorTypeRegistry::elementToPointer);
-    }
+    private final WidgetCursorRegistry cursorTypeRegistry;
 
-    public static void register(Class<? extends Element> widget) {
-        CursorTypeRegistry.register(widget, CursorTypeRegistry::elementToPointer);
-    }
+    public CursorPointerWidgetRegistry(WidgetCursorRegistry cursorTypeRegistry) {
+        this.cursorTypeRegistry= cursorTypeRegistry;
 
-    public static void init() {
         register(PressableWidget.class);
         register(OptionSliderWidget.class);
         register(ControlsListWidget.Entry.class);
         register("net.minecraft.client.gui.screen.option.LanguageOptionsScreen$LanguageSelectionListWidget$LanguageEntry");
         register("net.minecraft.client.gui.widget.OptionListWidget$WidgetEntry");
-        CursorTypeRegistry.register("net.minecraft.client.gui.widget.OptionListWidget$OptionWidgetEntry", CursorPointerWidgetRegistry::optionEntryCursor);
+        cursorTypeRegistry.register("net.minecraft.client.gui.widget.OptionListWidget$OptionWidgetEntry", CursorPointerWidgetRegistry::optionEntryCursor);
+    }
+
+    public void register(String fullyQualifiedClassName) {
+        cursorTypeRegistry.register(fullyQualifiedClassName, CursorTypeRegistry::elementToPointer);
+    }
+
+    public void register(Class<? extends Element> widget) {
+        cursorTypeRegistry.register(widget, CursorTypeRegistry::elementToPointer);
     }
 
     @SuppressWarnings("unchecked")
-    public static CursorType optionEntryCursor(Element entry, double mouseX, double mouseY, float delta) {
+    private static CursorType optionEntryCursor(Element entry, double mouseX, double mouseY, float delta) {
         try {
             Field optionWidgetsField = entry.getClass().getField("optionWidgets");
             Map<SimpleOption<?>, ClickableWidget> optionWidgets = (Map<SimpleOption<?>, ClickableWidget>) optionWidgetsField.get(entry);
