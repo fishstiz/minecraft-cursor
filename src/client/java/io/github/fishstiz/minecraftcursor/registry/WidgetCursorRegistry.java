@@ -40,9 +40,9 @@ public class WidgetCursorRegistry extends CursorTypeRegistry {
     }
 
     public CursorType parentElementGetChildCursorType(Element parentElement, double mouseX, double mouseY, float delta) {
-        for (Element entry : ((EntryListWidget<?>) parentElement).children()) {
-            if (entry.isMouseOver(mouseX, mouseY)) {
-                return getCursorType(entry, mouseX, mouseY, delta);
+        for (Element child : ((ParentElement) parentElement).children()) {
+            if (child.isMouseOver(mouseX, mouseY)) {
+                return getCursorType(child, mouseX, mouseY, delta);
             }
         }
         return CursorType.DEFAULT;
