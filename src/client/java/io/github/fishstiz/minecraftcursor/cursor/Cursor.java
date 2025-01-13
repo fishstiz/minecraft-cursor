@@ -2,6 +2,7 @@ package io.github.fishstiz.minecraftcursor.cursor;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.utils.BufferedImageUtils;
+import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWImage;
 
@@ -10,12 +11,14 @@ import java.io.IOException;
 
 public class Cursor {
     private final CursorType type;
+    private Identifier sprite;
     private String base64Image;
     private long id = 0;
     private double scale;
     private int xhot;
     private int yhot;
     private boolean enabled;
+    private boolean loaded;
 
     public Cursor(CursorType type) {
         this.type = type;
@@ -35,7 +38,8 @@ public class Cursor {
         }
     }
 
-    public void loadImage(BufferedImage image, double scale, int xhot, int yhot, boolean enabled) throws IOException {
+    public void loadImage(Identifier sprite, BufferedImage image, double scale, int xhot, int yhot, boolean enabled) throws IOException {
+        this.sprite = sprite;
         this.base64Image = BufferedImageUtils.compressImageToBase64(image);
         this.enabled = enabled;
 
@@ -60,6 +64,7 @@ public class Cursor {
             destroy();
         }
 
+        loaded = true;
         this.id = id;
         this.scale = scale;
         this.xhot = xhot;
@@ -79,6 +84,10 @@ public class Cursor {
         } else {
             disable();
         }
+    }
+
+    public Identifier getSprite() {
+        return sprite;
     }
 
     public void enable() {
@@ -111,5 +120,9 @@ public class Cursor {
 
     public boolean getEnabled() {
         return enabled;
+    }
+
+    public boolean isLoaded() {
+        return loaded;
     }
 }

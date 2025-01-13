@@ -3,11 +3,14 @@ package io.github.fishstiz.minecraftcursor.cursor;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.config.CursorConfigService;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.TreeMap;
 
 public class CursorManager {
@@ -27,10 +30,10 @@ public class CursorManager {
         }
     }
 
-    public void loadCursorImage(CursorType type, BufferedImage image) throws IOException {
+    public void loadCursorImage(CursorType type, Identifier sprite, BufferedImage image) throws IOException {
         Cursor cursor = cursors.get(type);
         CursorConfig.Settings settings = config.getSettings(type);
-        cursor.loadImage(image, settings.getScale(), settings.getXHot(), settings.getYHot(), settings.getEnabled());
+        cursor.loadImage(sprite, image, settings.getScale(), settings.getXHot(), settings.getYHot(), settings.getEnabled());
 
         if (currentCursor == null) {
             return;
@@ -75,5 +78,15 @@ public class CursorManager {
 
     public Cursor getCursor(CursorType type) {
         return cursors.get(type);
+    }
+
+    public List<Cursor> getLoadedCursors() {
+        List<Cursor> activeCursors = new ArrayList<>();
+        for (Cursor cursor : cursors.values()) {
+            if (cursor.isLoaded()) {
+                activeCursors.add(cursor);
+            }
+        }
+        return activeCursors;
     }
 }
