@@ -22,11 +22,11 @@ public class CursorPointerWidgetRegistry {
     public CursorPointerWidgetRegistry(WidgetCursorRegistry cursorTypeRegistry) {
         this.cursorTypeRegistry = cursorTypeRegistry;
 
-        register(PressableWidget.class);
+        cursorTypeRegistry.register(PressableWidget.class, CursorPointerWidgetRegistry::pressableWidgetCursor);
         register(OptionSliderWidget.class);
         register("net.minecraft.client.gui.screen.option.LanguageOptionsScreen$LanguageSelectionListWidget$LanguageEntry");
         cursorTypeRegistry.register(ControlsListWidget.KeyBindingEntry.class, CursorPointerWidgetRegistry::keyBindingEntryCursor);
-        cursorTypeRegistry.register("net.minecraft.client.gui.widget.OptionListWidget$WidgetEntry", CursorPointerWidgetRegistry::widgetEntryCursor);
+        cursorTypeRegistry.register("net.minecraft.client.gui.widget.OptionListWidget$WidgetEntry", CursorPointerWidgetRegistry::optionWidgetEntryCursor);
         cursorTypeRegistry.register("net.minecraft.client.gui.widget.OptionListWidget$OptionWidgetEntry", CursorPointerWidgetRegistry::optionEntryCursor);
     }
 
@@ -36,6 +36,11 @@ public class CursorPointerWidgetRegistry {
 
     public void register(Class<? extends Element> widget) {
         cursorTypeRegistry.register(widget, CursorTypeRegistry::elementToPointer);
+    }
+
+    private static CursorType pressableWidgetCursor(Element entry, double mouseX, double mouseY, float delta) {
+        PressableWidget button = (PressableWidget) entry;
+        return button.isHovered() && button.active ? CursorType.POINTER : CursorType.DEFAULT;
     }
 
     private static CursorType keyBindingEntryCursor(Element entry, double mouseX, double mouseY, float delta) {
@@ -50,9 +55,14 @@ public class CursorPointerWidgetRegistry {
         return CursorType.DEFAULT;
     }
 
-    private static CursorType widgetEntryCursor(Element entry, double mouseX, double mouseY, float delta) {
-        boolean isHovered = ((ParentElement) entry).children().stream().anyMatch(element -> ((ClickableWidget) element).isHovered());
-        return isHovered ? CursorType.POINTER : CursorType.DEFAULT;
+    private static CursorType optionWidgetEntryCursor(Element entry, double mouseX, double mouseY, float delta) {
+        for (Element child : ((ParentElement) entry).children()) {
+            ClickableWidget button = (ClickableWidget) child;
+            if (button.isHovered() && button.active) {
+                return CursorType.POINTER;
+            }
+        }
+        return CursorType.DEFAULT;
     }
 
     @SuppressWarnings("unchecked")
@@ -60,7 +70,12 @@ public class CursorPointerWidgetRegistry {
         try {
             Field optionWidgetsField = entry.getClass().getField("optionWidgets");
             Map<SimpleOption<?>, ClickableWidget> optionWidgets = (Map<SimpleOption<?>, ClickableWidget>) optionWidgetsField.get(entry);
-            return optionWidgets.values().stream().anyMatch(ClickableWidget::isHovered) ? CursorType.POINTER : CursorType.DEFAULT;
+            for (ClickableWidget button : optionWidgets.values()) {
+                if (button.isHovered() && button.active) {
+                    return CursorType.POINTER;
+                }
+            }
+            return CursorType.DEFAULT;
         } catch (NoSuchFieldException e) {
             MinecraftCursor.LOGGER.error("No such field optionWidgets exist on net.minecraft.client.gui.widget.OptionListWidget$OptionWidgetEntry", e);
         } catch (IllegalAccessException e) {
