@@ -1,9 +1,11 @@
 package io.github.fishstiz.minecraftcursor.registry.widget;
 
+import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
 import io.github.fishstiz.minecraftcursor.registry.WidgetCursorRegistry;
 import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.ParentElement;
 import net.minecraft.client.gui.screen.option.ControlsListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
@@ -23,8 +25,8 @@ public class CursorPointerWidgetRegistry {
         register(PressableWidget.class);
         register(OptionSliderWidget.class);
         register("net.minecraft.client.gui.screen.option.LanguageOptionsScreen$LanguageSelectionListWidget$LanguageEntry");
-        register("net.minecraft.client.gui.widget.OptionListWidget$WidgetEntry");
         cursorTypeRegistry.register(ControlsListWidget.KeyBindingEntry.class, CursorPointerWidgetRegistry::keyBindingEntryCursor);
+        cursorTypeRegistry.register("net.minecraft.client.gui.widget.OptionListWidget$WidgetEntry", CursorPointerWidgetRegistry::widgetEntryCursor);
         cursorTypeRegistry.register("net.minecraft.client.gui.widget.OptionListWidget$OptionWidgetEntry", CursorPointerWidgetRegistry::optionEntryCursor);
     }
 
@@ -48,15 +50,22 @@ public class CursorPointerWidgetRegistry {
         return CursorType.DEFAULT;
     }
 
+    private static CursorType widgetEntryCursor(Element entry, double mouseX, double mouseY, float delta) {
+        boolean isHovered = ((ParentElement) entry).children().stream().anyMatch(element -> ((ClickableWidget) element).isHovered());
+        return isHovered ? CursorType.POINTER : CursorType.DEFAULT;
+    }
+
     @SuppressWarnings("unchecked")
     private static CursorType optionEntryCursor(Element entry, double mouseX, double mouseY, float delta) {
         try {
             Field optionWidgetsField = entry.getClass().getField("optionWidgets");
             Map<SimpleOption<?>, ClickableWidget> optionWidgets = (Map<SimpleOption<?>, ClickableWidget>) optionWidgetsField.get(entry);
-            ClickableWidget optionWidget = (ClickableWidget) optionWidgets.values().toArray()[optionWidgets.size() - 1];
-            return optionWidget.active ? CursorType.POINTER : CursorType.DEFAULT;
-        } catch (Exception e) {
-            return CursorType.DEFAULT;
+            return optionWidgets.values().stream().anyMatch(ClickableWidget::isHovered) ? CursorType.POINTER : CursorType.DEFAULT;
+        } catch (NoSuchFieldException e) {
+            MinecraftCursor.LOGGER.error("No such field optionWidgets exist on net.minecraft.client.gui.widget.OptionListWidget$OptionWidgetEntry", e);
+        } catch (IllegalAccessException e) {
+            MinecraftCursor.LOGGER.error("Cannot access field optionWidgets on net.minecraft.client.gui.widget.OptionListWidget$OptionWidgetEntry", e);
         }
+        return CursorType.DEFAULT;
     }
 }
