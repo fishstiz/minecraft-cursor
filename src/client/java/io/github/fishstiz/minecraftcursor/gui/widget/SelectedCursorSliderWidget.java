@@ -47,8 +47,13 @@ public class SelectedCursorSliderWidget extends SliderWidget {
 
     @Override
     protected void applyValue() {
+        double previousTranslatedValue = translatedValue;
+
         translateValue();
-        onApply.accept(translatedValue);
+
+        if (previousTranslatedValue != translatedValue) {
+            onApply.accept(translatedValue);
+        }
     }
 
     @Override
