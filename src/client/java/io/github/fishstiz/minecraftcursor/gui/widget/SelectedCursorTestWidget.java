@@ -1,6 +1,7 @@
 package io.github.fishstiz.minecraftcursor.gui.widget;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
+import io.github.fishstiz.minecraftcursor.cursor.Cursor;
 import io.github.fishstiz.minecraftcursor.cursor.CursorManager;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import net.minecraft.client.gui.DrawContext;
@@ -34,20 +35,26 @@ public class SelectedCursorTestWidget extends ClickableWidget {
 
     @Override
     protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+        Cursor cursor = optionsWidget.optionsScreen.getSelectedCursor();
         context.drawTexture(RenderLayer::getGuiTextured, BACKGROUND, getX(), getY(), 0, 0, width, height, width, height);
-        hoverButton.render(context, mouseX, mouseY, delta);
-        renderRuler(context, mouseX, mouseY);
+
+        if (cursor.getEnabled()) {
+            hoverButton.render(context, mouseX, mouseY, delta);
+            renderRuler(context, mouseX, mouseY, cursor.getType());
+        } else {
+            context.fill(getX(), getY(), getRight(), getBottom(), 0x7F000000); // 50% black overlay
+        }
+
         context.drawBorder(getX(), getY(), getWidth(), getHeight(), 0xFF000000);
     }
 
-    private void renderRuler(DrawContext context, int mouseX, int mouseY) {
+    private void renderRuler(DrawContext context, int mouseX, int mouseY, CursorType type) {
         CursorManager cursorManager = optionsWidget.optionsScreen.getCursorManager();
-        CursorType cursorType = optionsWidget.optionsScreen.getSelectedCursor().getType();
 
         if (isMouseOver(mouseX, mouseY)) {
             context.drawHorizontalLine(getX(), getRight() - 1, mouseY, HOTSPOT_RULER_COLOR);
             context.drawVerticalLine(mouseX, getY(), getBottom(), HOTSPOT_RULER_COLOR);
-            cursorManager.overrideCurrentCursor(cursorType, -1);
+            cursorManager.overrideCurrentCursor(type, -1);
         } else {
             cursorManager.removeOverride(-1);
         }
