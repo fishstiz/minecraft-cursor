@@ -1,5 +1,6 @@
 package io.github.fishstiz.minecraftcursor.registry;
 
+import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.ParentElement;
@@ -13,6 +14,9 @@ public abstract class CursorTypeRegistry {
     private final List<AbstractMap.SimpleImmutableEntry<Class<? extends Element>, ElementCursorTypeFunction>> registry = new ArrayList<>();
     private final ConcurrentHashMap<String, ElementCursorTypeFunction> cachedRegistry = new ConcurrentHashMap<>();
 
+    /**
+     * Use with caution. May not work when out of dev environment
+     */
     @SuppressWarnings("unchecked")
     public void register(String fullyQualifiedClassName, ElementCursorTypeFunction elementToCursorType) {
         try {
@@ -25,7 +29,7 @@ public abstract class CursorTypeRegistry {
                 register((Class<? extends Element>) elementClass, elementToCursorType);
             }
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException("Class not found: " + fullyQualifiedClassName, e);
+            MinecraftCursor.LOGGER.error("Error registering widget cursor type. Class not found: {}", fullyQualifiedClassName, e);
         }
     }
 

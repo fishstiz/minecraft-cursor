@@ -27,10 +27,10 @@ public class CursorPointerWidgetRegistry {
         // Minecraft Classes
         cursorTypeRegistry.register(PressableWidget.class, CursorPointerWidgetRegistry::pressableWidgetCursor);
         register(OptionSliderWidget.class);
-        register("net.minecraft.client.gui.screen.option.LanguageOptionsScreen$LanguageSelectionListWidget$LanguageEntry");
         cursorTypeRegistry.register(ControlsListWidget.KeyBindingEntry.class, CursorPointerWidgetRegistry::keyBindingEntryCursor);
-        cursorTypeRegistry.register("net.minecraft.client.gui.widget.OptionListWidget$WidgetEntry", CursorPointerWidgetRegistry::optionWidgetEntryCursor);
-        cursorTypeRegistry.register("net.minecraft.client.gui.widget.OptionListWidget$OptionWidgetEntry", CursorPointerWidgetRegistry::optionEntryCursor);
+
+        // TODO
+        //  register("net.minecraft.client.gui.screen.option.LanguageOptionsScreen$LanguageSelectionListWidget$LanguageEntry");
 
         // minecraft-cursor Classes
         register(SelectedCursorSliderWidget.class);

@@ -14,6 +14,10 @@ import net.minecraft.client.gui.widget.ToggleButtonWidget;
 import java.lang.reflect.Field;
 import java.util.List;
 
+/**
+ * TODO no reflection
+ * only works in dev
+ */
 public class InventoryScreenCursorRegistry {
     private Field recipeBookField;
     private Field searchFieldField;

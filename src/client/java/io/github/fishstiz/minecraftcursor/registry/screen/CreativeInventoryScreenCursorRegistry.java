@@ -13,6 +13,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+/**
+ * TODO no reflection
+ * only works in dev
+ */
 public class CreativeInventoryScreenCursorRegistry {
     private Field selectedTabField;
     private Method getTabXMethod;

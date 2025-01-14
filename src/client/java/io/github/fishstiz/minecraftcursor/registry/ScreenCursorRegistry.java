@@ -1,16 +1,26 @@
 package io.github.fishstiz.minecraftcursor.registry;
 
-import io.github.fishstiz.minecraftcursor.registry.screen.CreativeInventoryScreenCursorRegistry;
-import io.github.fishstiz.minecraftcursor.registry.screen.InventoryScreenCursorRegistry;
+import io.github.fishstiz.minecraftcursor.MinecraftCursor;
+import io.github.fishstiz.minecraftcursor.registry.screen.ModScreenCursorRegistry;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 
 public class ScreenCursorRegistry extends CursorTypeRegistry {
     public ScreenCursorRegistry() {
-        new CreativeInventoryScreenCursorRegistry(this);
-        new InventoryScreenCursorRegistry(this);
+        // Needs work
+//        new CreativeInventoryScreenCursorRegistry(this);
+//        new InventoryScreenCursorRegistry(this);
+
+        try {
+            // Mod Menu
+            new ModScreenCursorRegistry(this);
+        } catch (NoClassDefFoundError ignored) {
+        }
     }
 
+    /**
+     * Use with caution. May not work when out of dev environment
+     */
     @Override
     @SuppressWarnings("unchecked")
     public void register(String fullyQualifiedClassName, ElementCursorTypeFunction elementToCursorType) {
@@ -24,7 +34,7 @@ public class ScreenCursorRegistry extends CursorTypeRegistry {
                 register((Class<? extends Screen>) screenClass, elementToCursorType);
             }
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException("Class not found: " + fullyQualifiedClassName, e);
+            MinecraftCursor.LOGGER.error("Error registering screen cursor type. Class not found: {}", fullyQualifiedClassName, e);
         }
     }
 
