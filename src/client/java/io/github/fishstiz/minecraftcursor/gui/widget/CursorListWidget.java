@@ -33,10 +33,6 @@ public class CursorListWidget extends ElementListWidget<CursorListWidget.CursorW
             CursorWidgetEntry entry = new CursorWidgetEntry(cursors.get(i), y, width, itemHeight, client, optionsScreen);
             entries.add(entry);
             this.addEntry(entry);
-
-            if (i == 0) {
-                entry.setFocused(true);
-            }
         }
     }
 
@@ -108,7 +104,8 @@ public class CursorListWidget extends ElementListWidget<CursorListWidget.CursorW
             renderTexture(context);
             renderMessage(context);
 
-            context.drawBorder(getX(), getY(), getWidth(), getHeight(), isSelected() ? BORDER_COLOR : 0xFF000000);
+            context.drawBorder(getX(), getY(), getWidth(), getHeight(),
+                    isSelected() || cursor == optionsScreen.getSelectedCursor() ? BORDER_COLOR : 0xFF000000);
         }
 
         private void renderBox(DrawContext context) {
