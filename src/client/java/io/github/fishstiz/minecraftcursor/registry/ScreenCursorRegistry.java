@@ -1,15 +1,14 @@
 package io.github.fishstiz.minecraftcursor.registry;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
+import io.github.fishstiz.minecraftcursor.registry.screen.LanguageOptionsScreenCursorRegistry;
 import io.github.fishstiz.minecraftcursor.registry.screen.ModScreenCursorRegistry;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 
 public class ScreenCursorRegistry extends CursorTypeRegistry {
     public ScreenCursorRegistry() {
-        // Needs work
-//        new CreativeInventoryScreenCursorRegistry(this);
-//        new InventoryScreenCursorRegistry(this);
+        new LanguageOptionsScreenCursorRegistry(this);
 
         try {
             // Mod Menu
