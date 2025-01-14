@@ -22,8 +22,8 @@ public class SelectedCursorHotspotWidget extends ClickableWidget {
     protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
         drawTexture(context, BACKGROUND);
         drawTexture(context, optionsWidget.optionsScreen.getSelectedCursor().getSprite());
-        context.drawBorder(getX(), getY(), getWidth(), getHeight(), 0xFF000000);
         renderRuler(context);
+        context.drawBorder(getX(), getY(), getWidth(), getHeight(), 0xFF000000);
     }
 
     private void drawTexture(DrawContext context, Identifier sprite) {
