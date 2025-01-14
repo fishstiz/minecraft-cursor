@@ -15,10 +15,25 @@ public class CursorConfigService {
 
     public void saveSettings(Cursor cursor) {
         CursorConfig.Settings settings = new CursorConfig.Settings(cursor.getScale(), cursor.getXhot(), cursor.getYhot(), cursor.getEnabled());
-        this.loader.config().updateCursorSettings(cursor.getType(), settings);
+
+        if (hasChanges(loader.config().getCursorSettings(cursor.getType()), settings)) {
+            this.loader.config().updateCursorSettings(cursor.getType(), settings);
+            this.loader.save();
+        }
     }
 
     public CursorConfig.Settings getSettings(CursorType type) {
         return this.loader.config().getCursorSettings(type);
+    }
+
+    public static boolean hasChanges(CursorConfig.Settings oldSettings, CursorConfig.Settings newSettings) {
+        boolean isChanged = false;
+
+        isChanged |= oldSettings.getEnabled() != newSettings.getEnabled();
+        isChanged |= oldSettings.getScale() != newSettings.getScale();
+        isChanged |= oldSettings.getXHot() != newSettings.getXHot();
+        isChanged |= oldSettings.getYHot() != newSettings.getYHot();
+
+        return isChanged;
     }
 }
