@@ -69,8 +69,7 @@ public class CursorOptionsScreen extends Screen {
 
     public void selectCursor(Cursor cursor) {
         selectedCursor = cursor;
-        this.body.selectedCursorColumn.children().forEach(b -> b.setFocused(false));
-        this.body.selectedCursorColumn.refreshWidgetValues();
+        this.body.selectedCursorColumn.refreshWidgets();
     }
 
     public Cursor getSelectedCursor() {

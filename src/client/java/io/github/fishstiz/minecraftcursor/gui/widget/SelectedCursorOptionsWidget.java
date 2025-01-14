@@ -16,8 +16,15 @@ public class SelectedCursorOptionsWidget extends ContainerWidget {
     private static final int BOX_WIDGET_TEXTURE_SIZE = 96;
     private static final Text ENABLED_TEXT = Text.translatable("minecraft-cursor.options.enabled");
     private static final Text SCALE_TEXT = Text.translatable("minecraft-cursor.options.scale");
+    private static final double SCALE_MIN = 1.0;
+    private static final double SCALE_MAX = 3.0;
+    private static final double SCALE_STEP = .25;
     private static final Text XHOT_TEXT = Text.translatable("minecraft-cursor.options.xhot");
     private static final Text YHOT_TEXT = Text.translatable("minecraft-cursor.options.yhot");
+    private static final int HOT_MIN = 0;
+    private static final int HOT_MAX = 31;
+    private static final int HOT_STEP = 1;
+    private static final String HOT_UNIT = "px";
     protected ButtonWidget enableButton;
     protected SelectedCursorSliderWidget scaleSlider;
     protected SelectedCursorSliderWidget xhotSlider;
@@ -36,13 +43,14 @@ public class SelectedCursorOptionsWidget extends ContainerWidget {
         Cursor cursor = optionsScreen.getSelectedCursor();
 
         enableButton = ButtonWidget.builder(ENABLED_TEXT, optionsScreen::onPressEnabled).build();
-        scaleSlider = new SelectedCursorSliderWidget(SCALE_TEXT, cursor.getScale(), 1, 3, .25, optionsScreen::onChangeScale, this);
-        xhotSlider = new SelectedCursorSliderWidget(XHOT_TEXT, cursor.getXhot(), 0, 32, 1, "px", optionsScreen::onChangeXHot, this);
-        yhotSlider = new SelectedCursorSliderWidget(YHOT_TEXT, cursor.getYhot(), 0, 32, 1, "px", optionsScreen::onChangeYHot, this);
+        scaleSlider = new SelectedCursorSliderWidget(SCALE_TEXT, cursor.getScale(), SCALE_MIN, SCALE_MAX, SCALE_STEP, optionsScreen::onChangeScale, this);
+        xhotSlider = new SelectedCursorSliderWidget(XHOT_TEXT, cursor.getXhot(), HOT_MIN, HOT_MAX, HOT_STEP, HOT_UNIT, optionsScreen::onChangeXHot, this);
+        yhotSlider = new SelectedCursorSliderWidget(YHOT_TEXT, cursor.getYhot(), HOT_MIN, HOT_MAX, HOT_STEP, HOT_UNIT, optionsScreen::onChangeYHot, this);
         cursorHotspot = new SelectedCursorHotspotWidget(BOX_WIDGET_TEXTURE_SIZE, this);
         cursorTest = new SelectedCursorTestWidget(BOX_WIDGET_TEXTURE_SIZE, this);
 
         placeWidgets();
+        refreshWidgets();
     }
 
     private void placeWidgets() {
@@ -67,11 +75,14 @@ public class SelectedCursorOptionsWidget extends ContainerWidget {
         widget.setY(getY() + (OPTIONS_HEIGHT * (gridY)));
     }
 
-    public void refreshWidgetValues() {
+    public void refreshWidgets() {
         Cursor cursor = optionsScreen.getSelectedCursor();
+
         scaleSlider.setValue(cursor.getScale());
         xhotSlider.setValue(cursor.getXhot());
         yhotSlider.setValue(cursor.getYhot());
+
+        children().forEach(widget -> widget.setFocused(false));
     }
 
     @Override
