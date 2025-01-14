@@ -89,4 +89,8 @@ public class CursorManager {
         }
         return activeCursors;
     }
+
+    public void saveCursor(CursorType type) {
+        config.saveSettings(getCursor(type));
+    }
 }

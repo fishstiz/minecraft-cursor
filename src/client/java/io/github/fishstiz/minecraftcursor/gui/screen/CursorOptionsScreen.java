@@ -52,22 +52,23 @@ public class CursorOptionsScreen extends Screen {
     }
 
     public void onPressEnabled(boolean value) {
-
+        selectedCursor.enable(value);
     }
 
     public void onChangeScale(double value) {
-
+        selectedCursor.setScale(value);
     }
 
     public void onChangeXHot(double value) {
-
+        selectedCursor.setXhot((int) value);
     }
 
     public void onChangeYHot(double value) {
-
+        selectedCursor.setYhot((int) value);
     }
 
     public void selectCursor(Cursor cursor) {
+        cursorManager.saveCursor(selectedCursor.getType());
         selectedCursor = cursor;
         this.body.selectedCursorColumn.refreshWidgets();
     }
@@ -87,6 +88,7 @@ public class CursorOptionsScreen extends Screen {
     @Override
     public void close() {
         cursorManager.removeOverride(-1);
+        cursorManager.saveCursor(selectedCursor.getType());
 
         if (this.client != null) {
             this.client.setScreen(previousScreen);
