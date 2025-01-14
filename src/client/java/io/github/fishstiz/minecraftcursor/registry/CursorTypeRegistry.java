@@ -2,6 +2,7 @@ package io.github.fishstiz.minecraftcursor.registry;
 
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.ParentElement;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -42,7 +43,22 @@ public abstract class CursorTypeRegistry {
                 return registry.get(i).getValue();
             }
         }
+        if (element instanceof ParentElement) {
+            return this::parentElementGetChildCursorType;
+        }
         return CursorTypeRegistry::elementToDefault;
+    }
+
+    public CursorType parentElementGetChildCursorType(Element parentElement, double mouseX, double mouseY, float delta) {
+        for (Element child : ((ParentElement) parentElement).children()) {
+            if (child instanceof ParentElement) {
+                parentElementGetChildCursorType(child, mouseX, mouseY, delta);
+            }
+            if (child.isMouseOver(mouseX, mouseY)) {
+                return getCursorType(child, mouseX, mouseY, delta);
+            }
+        }
+        return CursorType.DEFAULT;
     }
 
     public static CursorType elementToDefault(Element ignoreElement, double ignoreMouseX, double ignoreMouseY, float ignoreDelta) {
