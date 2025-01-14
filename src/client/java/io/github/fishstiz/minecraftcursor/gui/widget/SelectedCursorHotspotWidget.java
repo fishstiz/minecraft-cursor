@@ -22,8 +22,8 @@ public class SelectedCursorHotspotWidget extends ClickableWidget {
     protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
         drawTexture(context, BACKGROUND);
         drawTexture(context, optionsWidget.optionsScreen.getSelectedCursor().getSprite());
-        renderRuler(context);
         context.drawBorder(getX(), getY(), getWidth(), getHeight(), 0xFF000000);
+        renderRuler(context);
     }
 
     private void drawTexture(DrawContext context, Identifier sprite) {
@@ -35,17 +35,13 @@ public class SelectedCursorHotspotWidget extends ClickableWidget {
         int yhot = (int) optionsWidget.yhotSlider.getTranslatedValue();
 
         int rulerSize = getWidth() / 32;
-        int xhotX1 = (getX() + xhot * rulerSize) - rulerSize;
-        int xhotX2 = (getX() + xhot * rulerSize);
-        int yhotY1 = (getY() + yhot * rulerSize) - rulerSize;
-        int yhotY2 = (getY() + yhot * rulerSize);
+        int xhotX1 = (getX() + xhot * rulerSize);
+        int xhotX2 = (getX() + xhot * rulerSize) + rulerSize;
+        int yhotY1 = (getY() + yhot * rulerSize);
+        int yhotY2 = (getY() + yhot * rulerSize) + rulerSize;
 
-        if (xhot > 0) {
-            context.fill(xhotX1, getY(), xhotX2, getBottom(), HOTSPOT_RULER_COLOR);
-        }
-        if (yhot > 0) {
-            context.fill(getX(), yhotY1, getRight(), yhotY2, HOTSPOT_RULER_COLOR);
-        }
+        context.fill(xhotX1, getY(), xhotX2, getBottom(), HOTSPOT_RULER_COLOR);
+        context.fill(getX(), yhotY1, getRight(), yhotY2, HOTSPOT_RULER_COLOR);
     }
 
     @Override
