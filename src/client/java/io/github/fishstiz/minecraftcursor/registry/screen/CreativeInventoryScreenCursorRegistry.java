@@ -50,15 +50,19 @@ public class CreativeInventoryScreenCursorRegistry {
 
     private boolean isTabHoveredAndUnselected(CreativeInventoryScreen creativeInventoryScreen, double mouseX, double mouseY) {
         try {
-            for (ItemGroup itemGroup : ItemGroups.getGroupsToDisplay()) {
+            for (ItemGroup itemGroup : ItemGroups.getGroups()) {
+                // taken directly from net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen.renderTabTooltipIfHovered
                 int i = (int) getTabXMethod.invoke(creativeInventoryScreen, itemGroup);
                 int j = (int) getTabYMethod.invoke(creativeInventoryScreen, itemGroup);
                 boolean isPointWithinBounds = (boolean) isPointWithinBoundsMethod.invoke(creativeInventoryScreen, i + 3, j + 3, 21, 27, mouseX, mouseY);
                 boolean isTabSelected = selectedTabField.get(creativeInventoryScreen) == itemGroup;
-                return isPointWithinBounds && !isTabSelected;
+
+                if (isPointWithinBounds && !isTabSelected) {
+                    return true;
+                }
             }
         } catch (InvocationTargetException | IllegalAccessException e) {
-            MinecraftCursor.LOGGER.error("Could check if tab is hovered", e);
+            MinecraftCursor.LOGGER.error("Could not check if tab is hovered on CreativeInventoryScreen", e);
         }
         return false;
     }
