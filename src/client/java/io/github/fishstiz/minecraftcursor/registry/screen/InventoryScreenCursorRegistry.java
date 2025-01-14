@@ -46,19 +46,25 @@ public class InventoryScreenCursorRegistry {
             InventoryScreen inventoryScreen = (InventoryScreen) element;
             RecipeBookWidget<?> recipeBook = (RecipeBookWidget<?>) recipeBookField.get(inventoryScreen);
 
-            if (((TextFieldWidget) searchFieldField.get(recipeBook)).isHovered()) {
+            TextFieldWidget searchField = (TextFieldWidget) searchFieldField.get(recipeBook);
+            if (searchField != null && searchField.isHovered()) {
                 return CursorType.TEXT;
             }
 
-            if (((ToggleButtonWidget) toggleCraftableButtonField.get(recipeBook)).isHovered()) {
+            ToggleButtonWidget toggleCraftableButton = (ToggleButtonWidget) toggleCraftableButtonField.get(recipeBook);
+            if (toggleCraftableButton != null && toggleCraftableButton.isHovered()) {
                 return CursorType.POINTER;
             }
 
             List<RecipeGroupButtonWidget> tabButtons = (List<RecipeGroupButtonWidget>) tabButtonsField.get(recipeBook);
-            RecipeGroupButtonWidget currentTab = (RecipeGroupButtonWidget) currentTabField.get(recipeBook);
-            for (RecipeGroupButtonWidget tabButton : tabButtons) {
-                if (tabButton.isHovered() && tabButton != currentTab) {
-                    return CursorType.POINTER;
+            if (tabButtons != null) {
+                RecipeGroupButtonWidget currentTab = (RecipeGroupButtonWidget) currentTabField.get(recipeBook);
+                if (currentTab != null) {
+                    for (RecipeGroupButtonWidget tabButton : tabButtons) {
+                        if (tabButton != null && tabButton.isHovered() && tabButton != currentTab) {
+                            return CursorType.POINTER;
+                        }
+                    }
                 }
             }
         } catch (IllegalAccessException e) {
