@@ -3,7 +3,6 @@ package io.github.fishstiz.minecraftcursor.config;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,11 +14,11 @@ public class CursorConfig {
     private String _hash;
 
     protected void createCursorSettings(CursorType type) {
-        settings.put(type.getKey(), new Settings(Defaults.SCALE, Defaults.X_HOT, Defaults.Y_HOT, Defaults.ENABLED));
+        settings.put(type.getKey(), Settings.create(Defaults.SCALE, Defaults.X_HOT, Defaults.Y_HOT, Defaults.ENABLED));
     }
 
     public Settings getCursorSettings(CursorType type) {
-        return settings.computeIfAbsent(type.getKey(), k -> new Settings(Defaults.SCALE, Defaults.X_HOT, Defaults.Y_HOT, Defaults.ENABLED));
+        return settings.computeIfAbsent(type.getKey(), k -> Settings.create(Defaults.SCALE, Defaults.X_HOT, Defaults.Y_HOT, Defaults.ENABLED));
     }
 
     protected void updateCursorSettings(CursorType type, Settings settings) {
@@ -48,17 +47,16 @@ public class CursorConfig {
     }
 
     public static class Settings {
-        private @Nullable Double scale;
-        private @Nullable Integer xhot;
-        private @Nullable Integer yhot;
-        private @Nullable Boolean enabled;
+        private double scale;
+        private int xhot;
+        private int yhot;
+        private boolean enabled;
 
-        public Settings(
-                @JsonProperty("scale") double scale,
-                @JsonProperty("xhot") int xhot,
-                @JsonProperty("yhot") int yhot,
-                @JsonProperty("enabled") boolean enabled) {
-            update(scale, xhot, yhot, enabled);
+        public Settings() {
+            this.scale = Defaults.SCALE;
+            this.xhot = Defaults.X_HOT;
+            this.yhot = Defaults.Y_HOT;
+            this.enabled = Defaults.ENABLED;
         }
 
         public void update(double scale, int xhot, int yhot, boolean enabled) {
@@ -69,26 +67,30 @@ public class CursorConfig {
         }
 
         public double getScale() {
-            double scale = this.scale != null ? this.scale : Defaults.SCALE;
-            scale = Math.round(scale * Defaults.SCALE_STEP) / Defaults.SCALE_STEP;
+            double scale = Math.round(this.scale * Defaults.SCALE_STEP) / Defaults.SCALE_STEP;
             scale = Math.max(Defaults.SCALE_MIN, Math.min(Defaults.SCALE_MAX, scale));
             return scale;
         }
 
         public int getXHot() {
-            int xhot = this.xhot != null ? this.xhot : Defaults.X_HOT;
-            xhot = Math.max(Defaults.HOT_MIN, Math.min(Defaults.HOT_MAX, xhot));
-            return xhot;
+            return Math.max(Defaults.HOT_MIN, Math.min(Defaults.HOT_MAX, this.xhot));
         }
 
         public int getYHot() {
-            int yhot = this.yhot != null ? this.yhot : Defaults.X_HOT;
-            yhot = Math.max(Defaults.HOT_MIN, Math.min(Defaults.HOT_MAX, yhot));
-            return yhot;
+            return Math.max(Defaults.HOT_MIN, Math.min(Defaults.HOT_MAX, this.yhot));
         }
 
         public boolean getEnabled() {
-            return enabled != null ? enabled : Defaults.ENABLED;
+            return enabled;
+        }
+
+        public static Settings create(double scale, int xhot, int yhot, boolean enabled) {
+            Settings settings = new Settings();
+            settings.scale = scale;
+            settings.xhot = xhot;
+            settings.yhot = yhot;
+            settings.enabled = enabled;
+            return settings;
         }
     }
 }
