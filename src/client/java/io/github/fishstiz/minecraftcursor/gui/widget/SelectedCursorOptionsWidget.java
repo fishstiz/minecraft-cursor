@@ -25,7 +25,7 @@ public class SelectedCursorOptionsWidget extends ContainerWidget {
     private static final int HOT_MAX = 31;
     private static final int HOT_STEP = 1;
     private static final String HOT_UNIT = "px";
-    protected ButtonWidget enableButton;
+    protected SelectedCursorToggleWidget enableButton;
     protected SelectedCursorSliderWidget scaleSlider;
     protected SelectedCursorSliderWidget xhotSlider;
     protected SelectedCursorSliderWidget yhotSlider;
@@ -42,10 +42,18 @@ public class SelectedCursorOptionsWidget extends ContainerWidget {
     private void initWidgets() {
         Cursor cursor = optionsScreen.getSelectedCursor();
 
-        enableButton = ButtonWidget.builder(ENABLED_TEXT, optionsScreen::onPressEnabled).build();
-        scaleSlider = new SelectedCursorSliderWidget(SCALE_TEXT, cursor.getScale(), SCALE_MIN, SCALE_MAX, SCALE_STEP, optionsScreen::onChangeScale, this);
-        xhotSlider = new SelectedCursorSliderWidget(XHOT_TEXT, cursor.getXhot(), HOT_MIN, HOT_MAX, HOT_STEP, HOT_UNIT, optionsScreen::onChangeXHot, this);
-        yhotSlider = new SelectedCursorSliderWidget(YHOT_TEXT, cursor.getYhot(), HOT_MIN, HOT_MAX, HOT_STEP, HOT_UNIT, optionsScreen::onChangeYHot, this);
+        enableButton = SelectedCursorToggleWidget.build(
+                ENABLED_TEXT, cursor.getEnabled(), optionsScreen::onPressEnabled);
+        scaleSlider = new SelectedCursorSliderWidget(
+                SCALE_TEXT, cursor.getScale(), SCALE_MIN, SCALE_MAX, SCALE_STEP,
+                optionsScreen::onChangeScale, this);
+        xhotSlider = new SelectedCursorSliderWidget(
+                XHOT_TEXT, cursor.getXhot(), HOT_MIN, HOT_MAX, HOT_STEP, HOT_UNIT,
+                optionsScreen::onChangeXHot, this);
+        yhotSlider = new SelectedCursorSliderWidget(
+                YHOT_TEXT, cursor.getYhot(),
+                HOT_MIN, HOT_MAX, HOT_STEP, HOT_UNIT,
+                optionsScreen::onChangeYHot, this);
         cursorHotspot = new SelectedCursorHotspotWidget(BOX_WIDGET_TEXTURE_SIZE, this);
         cursorTest = new SelectedCursorTestWidget(BOX_WIDGET_TEXTURE_SIZE, this);
 
@@ -78,6 +86,7 @@ public class SelectedCursorOptionsWidget extends ContainerWidget {
     public void refreshWidgets() {
         Cursor cursor = optionsScreen.getSelectedCursor();
 
+        enableButton.setValue(cursor.getEnabled());
         scaleSlider.setValue(cursor.getScale());
         xhotSlider.setValue(cursor.getXhot());
         yhotSlider.setValue(cursor.getYhot());

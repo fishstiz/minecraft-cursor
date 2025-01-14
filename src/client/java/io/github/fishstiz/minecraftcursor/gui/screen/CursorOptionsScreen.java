@@ -51,7 +51,7 @@ public class CursorOptionsScreen extends Screen {
         }
     }
 
-    public void onPressEnabled(ButtonWidget enableButton) {
+    public void onPressEnabled(boolean value) {
 
     }
 
