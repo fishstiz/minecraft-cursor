@@ -24,7 +24,15 @@ public class Cursor {
         this.type = type;
     }
 
-    public void updateImage(double scale, int xhot, int yhot) {
+    public void loadImage(Identifier sprite, BufferedImage image, double scale, int xhot, int yhot, boolean enabled) throws IOException {
+        this.sprite = sprite;
+        this.base64Image = BufferedImageUtils.compressImageToBase64(image);
+        this.enabled = enabled;
+
+        create(image, scale, xhot, yhot);
+    }
+
+    private void updateImage(double scale, int xhot, int yhot) {
         if (id == 0) {
             return;
         }
@@ -38,14 +46,6 @@ public class Cursor {
         }
     }
 
-    public void loadImage(Identifier sprite, BufferedImage image, double scale, int xhot, int yhot, boolean enabled) throws IOException {
-        this.sprite = sprite;
-        this.base64Image = BufferedImageUtils.compressImageToBase64(image);
-        this.enabled = enabled;
-
-        create(image, scale, xhot, yhot);
-    }
-
     private void create(BufferedImage image, double scale, int xhot, int yhot) {
         BufferedImage scaledImage = scale == 1 ? image : BufferedImageUtils.scaleImage(image, scale);
         int scaledXHot = scale == 1 ? xhot : (int) Math.round(xhot * scale);
@@ -55,7 +55,7 @@ public class Cursor {
         GLFWImage.Buffer glfwImageBuffer = GLFWImage.create(1);
         glfwImageBuffer.width(scaledImage.getWidth());
         glfwImageBuffer.height(scaledImage.getHeight());
-        glfwImageBuffer.pixels(BufferedImageUtils.getPixelsRGBA(image));
+        glfwImageBuffer.pixels(BufferedImageUtils.getPixelsRGBA(scaledImage));
         scaledImage.flush();
 
         long id = GLFW.glfwCreateCursor(glfwImageBuffer.get(), scaledXHot, scaledYHot);
