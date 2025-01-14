@@ -110,12 +110,24 @@ public class Cursor {
         return scale;
     }
 
+    public void setScale(double scale) {
+        updateImage(scale, getXhot(), getYhot());
+    }
+
     public int getXhot() {
         return xhot;
     }
 
+    public void setXhot(int xhot) {
+        updateImage(getScale(), xhot, getYhot());
+    }
+
     public int getYhot() {
         return yhot;
+    }
+
+    public void setYhot(int yhot) {
+        updateImage(getScale(), getXhot(), yhot);
     }
 
     public boolean getEnabled() {
