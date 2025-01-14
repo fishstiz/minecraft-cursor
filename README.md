@@ -1,22 +1,60 @@
-# Minecraft Cursor Mod
+# Minecraft Cursor
 
 A Fabric mod that replaces the boring old default system cursor with a Minecraft-themed cursor.
 
-## Features
-
-- **Minecraft-Themed Cursor**
-- **Resource Pack Support**: Customize the cursor via resource packs `assets/minecraft-cursor/textures/cursor.png`.
-  - The image size is unrestricted; however, the recommended size is 32x32 pixels.
-- **Customization with [Mod Menu](https://modrinth.com/mod/modmenu)** *(optional)*: 
-  - Enable or disable the custom cursor in-game.
-  - Customize cursor scale.
-      - Minimum: 0.25
-      - Maximum: 3.00
-  - Adjust X and Y hotspot/click location.
-      - The maximum values for X and Y are equal to the image's width and height, respectively.
-      - Adjusts automatically with the scale option.
-
 ## Requirements
+- Fabric for Minecraft 1.21.4
+- Compatible with [Mod Menu](https://modrinth.com/mod/modmenu)
 
-- Fabric for Minecraft 1.21.x
-- Compatible with [Mod Menu](https://modrinth.com/mod/modmenu) *(optional for in-game customization)*.
+## Multiple Cursors
+![default](https://github.com/user-attachments/assets/6c632b54-e284-47a0-8634-f4ba1ef03f29)
+![pointer](https://github.com/user-attachments/assets/83a41d81-5a0b-4399-8d70-61ca421117c0)
+![text](https://github.com/user-attachments/assets/049fc447-6f3f-4c7a-a0a2-b87d0348c593)
+
+## Configure
+- Configure from Mod Menu (if installed)
+- Configure from Options > Controls > Mouse Settings... > Cursor Settings...
+
+<img src="https://github.com/user-attachments/assets/c5626cec-f332-40d2-bcd1-6103f7fca745" style="width:600px;"/>
+
+## Resource Pack Support
+### Image Format
+- 32x32 pixels
+- png
+
+### File Structure
+```
+└── minecraft-cursor/  
+    ├── atlases/  
+    │   └── cursors.json  
+    └── textures/  
+        ├── default.png  
+        ├── pointer.png  
+        └── text.png
+```
+### cursors.json  
+**Example**:
+```json
+{
+  "settings": {
+    "default": {
+      "yhot": 3
+    },
+    "pointer": {
+      "xhot": 7,
+      "yhot": 3,
+      "scale": 1.25
+    },
+    "text": {
+      "xhot": 12,
+      "yhot": 3
+    }
+  }
+}
+```
+**Properties**:
+- `enabled`: `true`/`false`
+- `scale`: `1.00` - `3.00` (incrementing in 0.25)
+- `xhot`: `0` - `31`
+- `yhot`: `0` - `31`
+    
