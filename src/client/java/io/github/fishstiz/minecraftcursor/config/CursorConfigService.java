@@ -1,7 +1,6 @@
 package io.github.fishstiz.minecraftcursor.config;
 
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
-import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 
 public class CursorConfigService {
     private final CursorConfigLoader loader;
@@ -22,8 +21,8 @@ public class CursorConfigService {
         }
     }
 
-    public CursorConfig.Settings getSettings(CursorType type) {
-        return this.loader.config().getCursorSettings(type);
+    public CursorConfig get() {
+        return this.loader.config();
     }
 
     public static boolean hasChanges(CursorConfig.Settings oldSettings, CursorConfig.Settings newSettings) {

@@ -1,39 +1,57 @@
 package io.github.fishstiz.minecraftcursor.config;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class CursorConfig {
     @JsonProperty
-    private final Map<String, Settings> settings = new HashMap<>();
+    protected final Map<String, Settings> settings = new HashMap<>();
+    @JsonProperty
+    private String _hash;
 
     protected void createCursorSettings(CursorType type) {
         settings.put(type.getKey(), new Settings(Defaults.SCALE, Defaults.X_HOT, Defaults.Y_HOT, Defaults.ENABLED));
     }
 
-    protected Settings getCursorSettings(CursorType type) {
+    public Settings getCursorSettings(CursorType type) {
         return settings.computeIfAbsent(type.getKey(), k -> new Settings(Defaults.SCALE, Defaults.X_HOT, Defaults.Y_HOT, Defaults.ENABLED));
     }
 
     protected void updateCursorSettings(CursorType type, Settings settings) {
-        this.settings.get(type.getKey()).update(settings.scale, settings.xhot, settings.yhot, settings.enabled);
+        this.settings.get(type.getKey()).update(settings.getScale(), settings.getXHot(), settings.getYHot(), settings.getEnabled());
+    }
+
+    @JsonGetter("_hash")
+    public String get_hash() {
+        return _hash;
+    }
+
+    public void set_hash(String hash) {
+        _hash = hash;
     }
 
     public static class Defaults {
         public static final double SCALE = 1.0;
+        public static final double SCALE_MIN = 1.0;
+        public static final double SCALE_MAX = 3.0;
+        public static final double SCALE_STEP = 0.25;
         public static final int X_HOT = 0;
         public static final int Y_HOT = 0;
+        public static final int HOT_MIN = 0;
+        public static final int HOT_MAX = 31;
         public static final boolean ENABLED = true;
     }
 
     public static class Settings {
-        private double scale;
-        private int xhot;
-        private int yhot;
-        private boolean enabled;
+        private @Nullable Double scale;
+        private @Nullable Integer xhot;
+        private @Nullable Integer yhot;
+        private @Nullable Boolean enabled;
 
         public Settings(
                 @JsonProperty("scale") double scale,
@@ -51,19 +69,26 @@ public class CursorConfig {
         }
 
         public double getScale() {
+            double scale = this.scale != null ? this.scale : Defaults.SCALE;
+            scale = Math.round(scale * Defaults.SCALE_STEP) / Defaults.SCALE_STEP;
+            scale = Math.max(Defaults.SCALE_MIN, Math.min(Defaults.SCALE_MAX, scale));
             return scale;
         }
 
         public int getXHot() {
+            int xhot = this.xhot != null ? this.xhot : Defaults.X_HOT;
+            xhot = Math.max(Defaults.HOT_MIN, Math.min(Defaults.HOT_MAX, xhot));
             return xhot;
         }
 
         public int getYHot() {
+            int yhot = this.yhot != null ? this.yhot : Defaults.X_HOT;
+            yhot = Math.max(Defaults.HOT_MIN, Math.min(Defaults.HOT_MAX, yhot));
             return yhot;
         }
 
         public boolean getEnabled() {
-            return enabled;
+            return enabled != null ? enabled : Defaults.ENABLED;
         }
     }
 }

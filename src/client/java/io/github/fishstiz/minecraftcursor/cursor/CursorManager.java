@@ -30,9 +30,8 @@ public class CursorManager {
         }
     }
 
-    public void loadCursorImage(CursorType type, Identifier sprite, BufferedImage image) throws IOException {
+    public void loadCursorImage(CursorType type, Identifier sprite, BufferedImage image, CursorConfig.Settings settings) throws IOException {
         Cursor cursor = cursors.get(type);
-        CursorConfig.Settings settings = config.getSettings(type);
         cursor.loadImage(sprite, image, settings.getScale(), settings.getXHot(), settings.getYHot(), settings.getEnabled());
 
         if (currentCursor == null) {
