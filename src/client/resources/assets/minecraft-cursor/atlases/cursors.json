@@ -1,7 +1,16 @@
 {
-  "settings" : {
+  "settings": {
+    "default": {
+      "xhot": 7,
+      "yhot": 3
+    },
+    "pointer": {
+      "xhot": 7,
+      "yhot": 3
+    },
     "text": {
-      "xhot": 15.0
+      "xhot": 12,
+      "yhot": 3
     }
   }
 }
