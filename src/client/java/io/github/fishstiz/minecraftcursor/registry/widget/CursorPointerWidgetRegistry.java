@@ -2,6 +2,8 @@ package io.github.fishstiz.minecraftcursor.registry.widget;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
+import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorHotspotWidget;
+import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorSliderWidget;
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
 import io.github.fishstiz.minecraftcursor.registry.WidgetCursorRegistry;
 import net.minecraft.client.gui.Element;
@@ -22,12 +24,17 @@ public class CursorPointerWidgetRegistry {
     public CursorPointerWidgetRegistry(WidgetCursorRegistry cursorTypeRegistry) {
         this.cursorTypeRegistry = cursorTypeRegistry;
 
+        // Minecraft Classes
         cursorTypeRegistry.register(PressableWidget.class, CursorPointerWidgetRegistry::pressableWidgetCursor);
         register(OptionSliderWidget.class);
         register("net.minecraft.client.gui.screen.option.LanguageOptionsScreen$LanguageSelectionListWidget$LanguageEntry");
         cursorTypeRegistry.register(ControlsListWidget.KeyBindingEntry.class, CursorPointerWidgetRegistry::keyBindingEntryCursor);
         cursorTypeRegistry.register("net.minecraft.client.gui.widget.OptionListWidget$WidgetEntry", CursorPointerWidgetRegistry::optionWidgetEntryCursor);
         cursorTypeRegistry.register("net.minecraft.client.gui.widget.OptionListWidget$OptionWidgetEntry", CursorPointerWidgetRegistry::optionEntryCursor);
+
+        // minecraft-cursor Classes
+        register(SelectedCursorSliderWidget.class);
+        register(SelectedCursorHotspotWidget.class);
     }
 
     public void register(String fullyQualifiedClassName) {
