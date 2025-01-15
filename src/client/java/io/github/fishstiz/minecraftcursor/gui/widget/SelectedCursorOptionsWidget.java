@@ -21,13 +21,13 @@ public class SelectedCursorOptionsWidget extends ContainerWidget {
     private static final Text XHOT_TEXT = Text.translatable("minecraft-cursor.options.xhot");
     private static final Text YHOT_TEXT = Text.translatable("minecraft-cursor.options.yhot");
     private static final String HOT_UNIT = "px";
-    protected SelectedCursorToggleWidget enableButton;
-    protected SelectedCursorSliderWidget scaleSlider;
-    protected SelectedCursorSliderWidget xhotSlider;
-    protected SelectedCursorSliderWidget yhotSlider;
-    protected SelectedCursorHotspotWidget cursorHotspot;
-    protected SelectedCursorTestWidget cursorTest;
     protected final CursorOptionsScreen optionsScreen;
+    public SelectedCursorToggleWidget enableButton;
+    public SelectedCursorSliderWidget scaleSlider;
+    public SelectedCursorSliderWidget xhotSlider;
+    public SelectedCursorSliderWidget yhotSlider;
+    public SelectedCursorHotspotWidget cursorHotspot;
+    public SelectedCursorTestWidget cursorTest;
 
     public SelectedCursorOptionsWidget(int width, CursorOptionsScreen optionsScreen) {
         super(0, optionsScreen.layout.getHeaderHeight(), width, optionsScreen.layout.getContentHeight(), Text.empty());
@@ -42,7 +42,7 @@ public class SelectedCursorOptionsWidget extends ContainerWidget {
                 ENABLED_TEXT, cursor.getEnabled(), optionsScreen::onPressEnabled);
         scaleSlider = new SelectedCursorSliderWidget(
                 SCALE_TEXT, cursor.getScale(), SCALE_MIN, SCALE_MAX, SCALE_STEP,
-                optionsScreen::onChangeScale, this);
+                optionsScreen::onChangeScale, optionsScreen::removeOverride, this);
         xhotSlider = new SelectedCursorSliderWidget(
                 XHOT_TEXT, cursor.getXhot(),
                 HOT_MIN, HOT_MAX, 1, HOT_UNIT,

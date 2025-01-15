@@ -2,6 +2,7 @@ package io.github.fishstiz.minecraftcursor.gui.widget;
 
 import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.text.Text;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
@@ -12,13 +13,46 @@ public class SelectedCursorSliderWidget extends SliderWidget {
     private final double step;
     private final String suffix;
     private final Consumer<Double> onApply;
+    private final @Nullable Runnable onRelease;
     private double translatedValue;
 
-    SelectedCursorSliderWidget(Text text, double defaultValue, double min, double max, double step, Consumer<Double> onApply, SelectedCursorOptionsWidget optionsWidget) {
-        this(text, defaultValue, min, max, step, "", onApply, optionsWidget);
+    SelectedCursorSliderWidget(
+            Text text,
+            double defaultValue,
+            double min,
+            double max,
+            double step,
+            Consumer<Double> onApply,
+            Runnable onRelease,
+            SelectedCursorOptionsWidget optionsWidget
+    ) {
+        this(text, defaultValue, min, max, step, "", onApply, onRelease, optionsWidget);
     }
 
-    SelectedCursorSliderWidget(Text text, double defaultValue, double min, double max, double step, String suffix, Consumer<Double> onApply, SelectedCursorOptionsWidget optionsWidget) {
+    SelectedCursorSliderWidget(
+            Text text,
+            double defaultValue,
+            double min,
+            double max,
+            double step,
+            String suffix,
+            Consumer<Double> onApply,
+            SelectedCursorOptionsWidget optionsWidget
+    ) {
+        this(text, defaultValue, min, max, step, suffix, onApply, null, optionsWidget);
+    }
+
+    SelectedCursorSliderWidget(
+            Text text,
+            double defaultValue,
+            double min,
+            double max,
+            double step,
+            String suffix,
+            Consumer<Double> onApply,
+            @Nullable Runnable onRelease,
+            SelectedCursorOptionsWidget optionsWidget
+    ) {
         super(optionsWidget.getX(), optionsWidget.getY(), optionsWidget.getWidth() / 2, SelectedCursorOptionsWidget.OPTIONS_HEIGHT, text, defaultValue);
 
         this.prefix = text;
@@ -27,6 +61,7 @@ public class SelectedCursorSliderWidget extends SliderWidget {
         this.step = step;
         this.suffix = suffix;
         this.onApply = onApply;
+        this.onRelease = onRelease;
 
         translateValue();
         updateMessage();
@@ -64,5 +99,15 @@ public class SelectedCursorSliderWidget extends SliderWidget {
 
     public double getTranslatedValue() {
         return translatedValue;
+    }
+
+    @Override
+    public void onRelease(double mouseX, double mouseY) {
+        super.onRelease(mouseX, mouseY);
+        setFocused(false);
+
+        if (this.onRelease != null) {
+            this.onRelease.run();
+        }
     }
 }

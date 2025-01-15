@@ -68,11 +68,16 @@ public class CursorManager {
     }
 
     public void reloadCursor() {
-        GLFW.glfwSetCursor(client.getWindow().getHandle(), currentCursor.getId());
+        long id = currentCursorOverrides.isEmpty() ?
+                currentCursor.getId() :
+                getCursor(currentCursorOverrides.lastEntry().getValue()).getId();
+
+        GLFW.glfwSetCursor(client.getWindow().getHandle(), id);
     }
 
     public Cursor getCurrentCursor() {
-        return currentCursor;
+        return currentCursorOverrides.isEmpty() ? currentCursor :
+                getCursor(currentCursorOverrides.lastEntry().getValue());
     }
 
     public Cursor getCursor(CursorType type) {

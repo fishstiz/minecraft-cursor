@@ -53,4 +53,10 @@ public class SelectedCursorToggleWidget extends ButtonWidget {
 
         setMessage(message);
     }
+
+    @Override
+    public void onRelease(double mouseX, double mouseY) {
+        super.onRelease(mouseX, mouseY);
+        setFocused(false);
+    }
 }

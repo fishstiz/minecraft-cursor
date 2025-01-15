@@ -54,9 +54,9 @@ public class SelectedCursorTestWidget extends ClickableWidget {
         if (isMouseOver(mouseX, mouseY)) {
             context.drawHorizontalLine(getX(), getRight() - 1, mouseY, HOTSPOT_RULER_COLOR);
             context.drawVerticalLine(mouseX, getY(), getBottom(), HOTSPOT_RULER_COLOR);
-            cursorManager.overrideCurrentCursor(type, -1);
+            cursorManager.overrideCurrentCursor(type, -2);
         } else {
-            cursorManager.removeOverride(-1);
+            cursorManager.removeOverride(-2);
         }
     }
 

@@ -56,21 +56,31 @@ public class CursorOptionsScreen extends Screen {
     }
 
     public void onChangeScale(double value) {
-        selectedCursor.setScale(value);
+        selectedCursor.setScale(value, this::onUpdate);
+        cursorManager.overrideCurrentCursor(selectedCursor.getType(), -1);
     }
 
     public void onChangeXHot(double value) {
-        selectedCursor.setXhot((int) value);
+        selectedCursor.setXhot((int) value, this::onUpdate);
     }
 
     public void onChangeYHot(double value) {
-        selectedCursor.setYhot((int) value);
+        selectedCursor.setYhot((int) value, this::onUpdate);
     }
 
     public void selectCursor(Cursor cursor) {
         cursorManager.saveCursor(selectedCursor.getType());
         selectedCursor = cursor;
-        this.body.selectedCursorColumn.refreshWidgets();
+
+        if (body != null) {
+            body.selectedCursorColumn.refreshWidgets();
+        }
+    }
+
+    private void onUpdate() {
+        if (selectedCursor == cursorManager.getCurrentCursor()) {
+            cursorManager.reloadCursor();
+        }
     }
 
     public Cursor getSelectedCursor() {
@@ -87,12 +97,17 @@ public class CursorOptionsScreen extends Screen {
 
     @Override
     public void close() {
-        cursorManager.removeOverride(-1);
+        removeOverride();
         cursorManager.saveCursor(selectedCursor.getType());
 
         if (this.client != null) {
             this.client.setScreen(previousScreen);
         }
+    }
+
+    public void removeOverride() {
+        cursorManager.removeOverride(-1);
+        cursorManager.removeOverride(-2);
     }
 
     public class CursorOptionsBody extends ContainerWidget {

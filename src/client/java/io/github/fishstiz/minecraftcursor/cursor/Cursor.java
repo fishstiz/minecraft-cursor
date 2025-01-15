@@ -3,6 +3,7 @@ package io.github.fishstiz.minecraftcursor.cursor;
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.utils.BufferedImageUtils;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWImage;
 
@@ -29,24 +30,24 @@ public class Cursor {
         this.base64Image = BufferedImageUtils.compressImageToBase64(image);
         this.enabled = enabled;
 
-        create(image, scale, xhot, yhot);
+        create(image, scale, xhot, yhot, null);
     }
 
-    private void updateImage(double scale, int xhot, int yhot) {
+    private void updateImage(double scale, int xhot, int yhot, Runnable onUpdate) {
         if (id == 0) {
             return;
         }
 
         try {
             BufferedImage image = BufferedImageUtils.decompressBase64ToImage(base64Image);
-            create(image, scale, xhot, yhot);
+            create(image, scale, xhot, yhot, onUpdate);
             image.flush();
         } catch (IOException e) {
             MinecraftCursor.LOGGER.error("Error updating image of {}: {}", type, e);
         }
     }
 
-    private void create(BufferedImage image, double scale, int xhot, int yhot) {
+    private void create(BufferedImage image, double scale, int xhot, int yhot, @Nullable Runnable onCreate) {
         BufferedImage scaledImage = scale == 1 ? image : BufferedImageUtils.scaleImage(image, scale);
         int scaledXHot = scale == 1 ? xhot : (int) Math.round(xhot * scale);
         int scaledYHot = scale == 1 ? yhot : (int) Math.round(yhot * scale);
@@ -58,24 +59,21 @@ public class Cursor {
         glfwImageBuffer.pixels(BufferedImageUtils.getPixelsRGBA(scaledImage));
         scaledImage.flush();
 
-        long id = GLFW.glfwCreateCursor(glfwImageBuffer.get(), scaledXHot, scaledYHot);
+        long previousId = this.id;
+        this.id = GLFW.glfwCreateCursor(glfwImageBuffer.get(), scaledXHot, scaledYHot);
 
-        if (this.id != 0 && this.id != id) {
-            destroy();
+        if (onCreate != null) {
+            onCreate.run();
+        }
+
+        if (previousId != 0 && this.id != previousId) {
+            GLFW.glfwDestroyCursor(previousId);
         }
 
         loaded = true;
-        this.id = id;
         this.scale = scale;
         this.xhot = xhot;
         this.yhot = yhot;
-    }
-
-    public void destroy() {
-        if (id != 0) {
-            GLFW.glfwDestroyCursor(id);
-            id = 0;
-        }
     }
 
     public void enable(boolean enabled) {
@@ -110,24 +108,24 @@ public class Cursor {
         return scale;
     }
 
-    public void setScale(double scale) {
-        updateImage(scale, getXhot(), getYhot());
+    public void setScale(double scale, @Nullable Runnable onUpdate) {
+        updateImage(scale, getXhot(), getYhot(), onUpdate);
     }
 
     public int getXhot() {
         return xhot;
     }
 
-    public void setXhot(int xhot) {
-        updateImage(getScale(), xhot, getYhot());
+    public void setXhot(int xhot, @Nullable Runnable onUpdate) {
+        updateImage(getScale(), xhot, getYhot(), onUpdate);
     }
 
     public int getYhot() {
         return yhot;
     }
 
-    public void setYhot(int yhot) {
-        updateImage(getScale(), getXhot(), yhot);
+    public void setYhot(int yhot, @Nullable Runnable onUpdate) {
+        updateImage(getScale(), getXhot(), yhot, onUpdate);
     }
 
     public boolean getEnabled() {
