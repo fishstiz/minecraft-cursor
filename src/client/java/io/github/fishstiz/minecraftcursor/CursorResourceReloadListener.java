@@ -74,7 +74,7 @@ public class CursorResourceReloadListener implements SimpleSynchronousResourceRe
             BufferedImage image = null;
             try (InputStream stream = entry.getValue().getInputStream()) {
                 image = ImageIO.read(stream);
-                cursorManager.loadCursorImage(cursorType, entry.getKey(), image, config.getCursorSettings(cursorType));
+                cursorManager.loadCursorImage(cursorType, entry.getKey(), image, config.getOrCreateCursorSettings(cursorType));
             } catch (IOException e) {
                 MinecraftCursor.LOGGER.error("Failed to load image {}", entry.getKey().getPath(), e);
             } finally {

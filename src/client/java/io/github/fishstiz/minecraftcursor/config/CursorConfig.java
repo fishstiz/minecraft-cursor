@@ -13,12 +13,8 @@ public class CursorConfig {
     @JsonProperty
     private String _hash;
 
-    protected void createCursorSettings(CursorType type) {
-        settings.put(type.getKey(), Settings.create(Defaults.SCALE, Defaults.X_HOT, Defaults.Y_HOT, Defaults.ENABLED));
-    }
-
-    public Settings getCursorSettings(CursorType type) {
-        return settings.computeIfAbsent(type.getKey(), k -> Settings.create(Defaults.SCALE, Defaults.X_HOT, Defaults.Y_HOT, Defaults.ENABLED));
+    public Settings getOrCreateCursorSettings(CursorType type) {
+        return settings.computeIfAbsent(type.getKey(), k -> new Settings());
     }
 
     protected void updateCursorSettings(CursorType type, Settings settings) {

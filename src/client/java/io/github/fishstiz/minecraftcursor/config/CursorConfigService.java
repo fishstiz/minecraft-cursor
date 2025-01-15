@@ -15,7 +15,7 @@ public class CursorConfigService {
     public void saveSettings(Cursor cursor) {
         CursorConfig.Settings settings = CursorConfig.Settings.create(cursor.getScale(), cursor.getXhot(), cursor.getYhot(), cursor.getEnabled());
 
-        if (hasChanges(loader.config().getCursorSettings(cursor.getType()), settings)) {
+        if (hasChanges(loader.config().getOrCreateCursorSettings(cursor.getType()), settings)) {
             this.loader.config().updateCursorSettings(cursor.getType(), settings);
             this.loader.save();
         }
