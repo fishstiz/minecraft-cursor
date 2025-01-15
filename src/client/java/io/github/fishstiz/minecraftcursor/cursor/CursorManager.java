@@ -67,6 +67,10 @@ public class CursorManager {
         currentCursorOverrides.remove(index);
     }
 
+    public void clearOverrides() {
+        currentCursorOverrides.clear();
+    }
+
     public void reloadCursor() {
         long id = currentCursorOverrides.isEmpty() ?
                 currentCursor.getId() :

@@ -56,8 +56,11 @@ public class CursorOptionsScreen extends Screen {
     }
 
     public void onChangeScale(double value) {
+        if (selectedCursor.getScale() != value && body != null) {
+            cursorManager.overrideCurrentCursor(selectedCursor.getType(), -1);
+        }
+
         selectedCursor.setScale(value, this::onUpdate);
-        cursorManager.overrideCurrentCursor(selectedCursor.getType(), -1);
     }
 
     public void onChangeXHot(double value) {
@@ -106,8 +109,7 @@ public class CursorOptionsScreen extends Screen {
     }
 
     public void removeOverride() {
-        cursorManager.removeOverride(-1);
-        cursorManager.removeOverride(-2);
+        cursorManager.clearOverrides();
     }
 
     public class CursorOptionsBody extends ContainerWidget {
