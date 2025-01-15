@@ -1,13 +1,13 @@
-package io.github.fishstiz.minecraftcursor.registry.widget.world;
+package io.github.fishstiz.minecraftcursor.registry.gui.world;
 
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
-import io.github.fishstiz.minecraftcursor.registry.WidgetCursorRegistry;
+import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
 
-public class WorldListWidgetCursorRegistry {
-    public WorldListWidgetCursorRegistry(WidgetCursorRegistry widgetCursorRegistry) {
-        widgetCursorRegistry.register(WorldListWidget.class, WorldListWidgetCursorRegistry::getCursorTypeFromWorld);
+public class WorldListWidgetCursor {
+    public static void register(CursorTypeRegistry cursorTypeRegistry) {
+        cursorTypeRegistry.register(WorldListWidget.class, WorldListWidgetCursor::getCursorTypeFromWorld);
     }
 
     private static CursorType getCursorTypeFromWorld(Element element, double mouseX, double mouseY, float delta) {

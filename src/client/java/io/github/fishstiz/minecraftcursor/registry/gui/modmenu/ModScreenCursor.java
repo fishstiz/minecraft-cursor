@@ -1,20 +1,20 @@
-package io.github.fishstiz.minecraftcursor.registry.modmenu;
+package io.github.fishstiz.minecraftcursor.registry.gui.modmenu;
 
 import com.terraformersmc.modmenu.gui.ModsScreen;
 import com.terraformersmc.modmenu.gui.widget.ModListWidget;
 import com.terraformersmc.modmenu.gui.widget.entries.ModListEntry;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
-import io.github.fishstiz.minecraftcursor.registry.ScreenCursorRegistry;
+import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
 import net.minecraft.client.gui.Element;
 
 import java.util.Optional;
 
-public class ModScreenCursorRegistry {
+public class ModScreenCursor {
     private static final int ICON_SIZE = 32;
     private static final int ENTRY_OFFSET_X = 5;
 
-    public ModScreenCursorRegistry(ScreenCursorRegistry screenCursorRegistry) {
-        screenCursorRegistry.register(ModsScreen.class, ModScreenCursorRegistry::getCursorModScreen);
+    public static void register(CursorTypeRegistry cursorTypeRegistry) {
+        cursorTypeRegistry.register(ModsScreen.class, ModScreenCursor::getCursorModScreen);
     }
 
     private static CursorType getCursorModScreen(Element element, double mouseX, double mouseY, float delta) {
