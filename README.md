@@ -24,13 +24,14 @@ A Fabric mod that replaces the boring old default system cursor with a Minecraft
 
 ### File Structure
 ```
-└── minecraft-cursor/  
-    ├── atlases/  
-    │   └── cursors.json  
-    └── textures/  
-        ├── default.png  
-        ├── pointer.png  
-        └── text.png
+└── minecraft-cursor/
+    ├── atlases/
+    │   └── cursors.json
+    └── textures/
+        └── cursors/
+            ├── default.png
+            ├── pointer.png
+            └── text.png
 ```
 ### cursors.json  
 **Example**:
