@@ -10,7 +10,7 @@ public class WorldListWidgetCursor {
         cursorTypeRegistry.register(WorldListWidget.class, WorldListWidgetCursor::getCursorTypeFromWorld);
     }
 
-    private static CursorType getCursorTypeFromWorld(Element element, double mouseX, double mouseY, float delta) {
+    private static CursorType getCursorTypeFromWorld(Element element, double mouseX, double mouseY) {
         WorldListWidget worldListWidget = (WorldListWidget) element;
         int x = (int) Math.floor((double) worldListWidget.getWidth() / 2 - (double) worldListWidget.getRowWidth() / 2);
         for (WorldListWidget.Entry entry : worldListWidget.children()) {

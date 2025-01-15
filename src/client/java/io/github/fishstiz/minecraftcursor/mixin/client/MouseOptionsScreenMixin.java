@@ -17,9 +17,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(MouseOptionsScreen.class)
 public abstract class MouseOptionsScreenMixin extends GameOptionsScreen {
     @Unique
-    private ButtonWidget cursorSettingsButton = ButtonWidget.builder(Text.of("Cursor Settings..."), button -> {
+    private final ButtonWidget cursorSettingsButton = ButtonWidget.builder(Text.of("Cursor Settings..."), button -> {
         if (this.client != null) {
-            this.client.setScreen(new CursorOptionsScreen(this, MinecraftCursorClient.getCursorManager()));
+            this.client.setScreen(new CursorOptionsScreen(this, MinecraftCursorClient.CURSOR_MANAGER));
         }
     }).build();
 

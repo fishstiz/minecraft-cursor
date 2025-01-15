@@ -24,6 +24,10 @@ public class CursorTypeRegistry {
     private final List<AbstractMap.SimpleImmutableEntry<Class<? extends Element>, ElementCursorTypeFunction>> registry = new ArrayList<>();
     private final ConcurrentHashMap<String, ElementCursorTypeFunction> cachedRegistry = new ConcurrentHashMap<>();
 
+    public CursorTypeRegistry() {
+        init();
+    }
+
     public void init() {
         initPointerElements();
         initTextElements();
@@ -74,8 +78,8 @@ public class CursorTypeRegistry {
         registry.add(new AbstractMap.SimpleImmutableEntry<>(elementClass, elementToCursorType));
     }
 
-    public CursorType getCursorType(Element element, double mouseX, double mouseY, float delta) {
-        return cachedRegistry.computeIfAbsent(element.getClass().getName(), k -> computeCursorType(element)).apply(element, mouseX, mouseY, delta);
+    public CursorType getCursorType(Element element, double mouseX, double mouseY) {
+        return cachedRegistry.computeIfAbsent(element.getClass().getName(), k -> computeCursorType(element)).apply(element, mouseX, mouseY);
     }
 
     private ElementCursorTypeFunction computeCursorType(Element element) {
@@ -90,31 +94,31 @@ public class CursorTypeRegistry {
         return CursorTypeRegistry::elementToDefault;
     }
 
-    public CursorType parentElementGetChildCursorType(Element parentElement, double mouseX, double mouseY, float delta) {
+    public CursorType parentElementGetChildCursorType(Element parentElement, double mouseX, double mouseY) {
         for (Element child : ((ParentElement) parentElement).children()) {
             if (child instanceof ParentElement) {
-                parentElementGetChildCursorType(child, mouseX, mouseY, delta);
+                parentElementGetChildCursorType(child, mouseX, mouseY);
             }
             if (child.isMouseOver(mouseX, mouseY)) {
-                return getCursorType(child, mouseX, mouseY, delta);
+                return getCursorType(child, mouseX, mouseY);
             }
         }
         return CursorType.DEFAULT;
     }
 
-    public static CursorType elementToDefault(Element ignoreElement, double ignoreMouseX, double ignoreMouseY, float ignoreDelta) {
+    public static CursorType elementToDefault(Element ignoreElement, double ignoreMouseX, double ignoreMouseY) {
         return CursorType.DEFAULT;
     }
 
-    public static CursorType elementToPointer(Element ignoreElement, double ignoreMouseX, double ignoreMouseY, float ignoreDelta) {
+    public static CursorType elementToPointer(Element ignoreElement, double ignoreMouseX, double ignoreMouseY) {
         return CursorType.POINTER;
     }
 
-    public static CursorType elementToText(Element ignoreElement, double ignoreMouseX, double ignoreMouseY, float ignoreDelta) {
+    public static CursorType elementToText(Element ignoreElement, double ignoreMouseX, double ignoreMouseY) {
         return CursorType.TEXT;
     }
 
-    private static CursorType pressableWidgetCursor(Element entry, double mouseX, double mouseY, float delta) {
+    private static CursorType pressableWidgetCursor(Element entry, double mouseX, double mouseY) {
         PressableWidget button = (PressableWidget) entry;
         return button.isHovered() && button.active ? CursorType.POINTER : CursorType.DEFAULT;
     }

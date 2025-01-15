@@ -17,7 +17,7 @@ public class ModScreenCursor {
         cursorTypeRegistry.register(ModsScreen.class, ModScreenCursor::getCursorModScreen);
     }
 
-    private static CursorType getCursorModScreen(Element element, double mouseX, double mouseY, float delta) {
+    private static CursorType getCursorModScreen(Element element, double mouseX, double mouseY) {
         ModsScreen modsScreen = (ModsScreen) element;
         Optional<Element> hoveredElementOpt = modsScreen.hoveredElement(mouseX, mouseY);
 

@@ -1,9 +1,9 @@
 package io.github.fishstiz.minecraftcursor.registry.utils;
 
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
-import io.github.fishstiz.minecraftcursor.utils.QuadFunction;
 import net.minecraft.client.gui.Element;
 
 @FunctionalInterface
-public interface ElementCursorTypeFunction extends QuadFunction<Element, Double, Double, Float, CursorType> {
+public interface ElementCursorTypeFunction {
+    CursorType apply(Element element, double mouseX, double mouseY);
 }

@@ -6,7 +6,7 @@ import io.github.fishstiz.minecraftcursor.gui.screen.CursorOptionsScreen;
 
 public class MinecraftCursorModMenuApiImpl implements ModMenuApi {
     @Override
-    public ConfigScreenFactory<?> getModConfigScreenFactory() {
-        return screen -> new CursorOptionsScreen(screen, MinecraftCursorClient.getCursorManager());
+    public ConfigScreenFactory<CursorOptionsScreen> getModConfigScreenFactory() {
+        return screen -> new CursorOptionsScreen(screen, MinecraftCursorClient.CURSOR_MANAGER);
     }
 }
