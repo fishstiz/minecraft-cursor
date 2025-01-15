@@ -3,8 +3,9 @@
   "package": "io.github.fishstiz.minecraftcursor.mixin.client",
   "compatibilityLevel": "JAVA_21",
   "client": [
+    "CreativeInventoryScreenMixin",
     "MouseOptionsScreenMixin",
-    "CreativeInventoryScreenMixin"
+    "RecipeBookWidgetMixin"
   ],
   "injectors": {
     "defaultRequire": 1
