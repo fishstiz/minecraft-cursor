@@ -29,12 +29,14 @@ public class MinecraftCursorClient implements ClientModInitializer {
 
     public void tick(MinecraftClient client) {
         if (client.currentScreen != null) {
+            double scale = client.getWindow().getScaleFactor();
+
             CursorType cursorType = CURSOR_REGISTRY.getCursorType(
                     client.currentScreen,
-                    client.mouse.getX() / 2,
-                    client.mouse.getY() / 2);
+                    client.mouse.getX() / scale,
+                    client.mouse.getY() / scale);
+
             CURSOR_MANAGER.setCurrentCursor(cursorType);
         }
     }
-
 }
