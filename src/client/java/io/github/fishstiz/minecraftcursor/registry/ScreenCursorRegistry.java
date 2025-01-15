@@ -1,7 +1,8 @@
 package io.github.fishstiz.minecraftcursor.registry;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
-import io.github.fishstiz.minecraftcursor.registry.screen.ModScreenCursorRegistry;
+import io.github.fishstiz.minecraftcursor.registry.modmenu.ModScreenCursorRegistry;
+import io.github.fishstiz.minecraftcursor.registry.utils.ElementCursorTypeFunction;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 

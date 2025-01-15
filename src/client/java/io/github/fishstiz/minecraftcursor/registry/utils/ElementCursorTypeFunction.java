@@ -1,4 +1,4 @@
-package io.github.fishstiz.minecraftcursor.registry;
+package io.github.fishstiz.minecraftcursor.registry.utils;
 
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.utils.QuadFunction;

@@ -1,4 +1,4 @@
-package io.github.fishstiz.minecraftcursor.registry.screen;
+package io.github.fishstiz.minecraftcursor.registry.modmenu;
 
 import com.terraformersmc.modmenu.gui.ModsScreen;
 import com.terraformersmc.modmenu.gui.widget.ModListWidget;

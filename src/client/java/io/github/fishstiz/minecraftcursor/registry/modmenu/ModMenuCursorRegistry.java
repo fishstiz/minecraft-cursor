@@ -1,4 +1,4 @@
-package io.github.fishstiz.minecraftcursor.registry.widget;
+package io.github.fishstiz.minecraftcursor.registry.modmenu;
 
 import io.github.fishstiz.minecraftcursor.registry.WidgetCursorRegistry;
 

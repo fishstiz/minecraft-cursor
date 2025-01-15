@@ -2,8 +2,8 @@ package io.github.fishstiz.minecraftcursor.registry;
 
 import io.github.fishstiz.minecraftcursor.registry.widget.CursorPointerWidgetRegistry;
 import io.github.fishstiz.minecraftcursor.registry.widget.CursorTextWidgetRegistry;
-import io.github.fishstiz.minecraftcursor.registry.widget.ModMenuCursorRegistry;
-import io.github.fishstiz.minecraftcursor.registry.widget.WorldListWidgetCursorRegistry;
+import io.github.fishstiz.minecraftcursor.registry.modmenu.ModMenuCursorRegistry;
+import io.github.fishstiz.minecraftcursor.registry.widget.world.WorldListWidgetCursorRegistry;
 import net.minecraft.client.gui.Element;
 
 public class WidgetCursorRegistry extends CursorTypeRegistry {

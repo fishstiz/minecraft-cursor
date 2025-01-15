@@ -1,4 +1,4 @@
-package io.github.fishstiz.minecraftcursor.registry.widget;
+package io.github.fishstiz.minecraftcursor.registry.widget.world;
 
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.registry.WidgetCursorRegistry;
