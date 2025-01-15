@@ -32,9 +32,9 @@ public class CursorConfig {
 
     public static class Defaults {
         public static final double SCALE = 1.0;
-        public static final double SCALE_MIN = 1.0;
+        public static final double SCALE_MIN = 0.5;
         public static final double SCALE_MAX = 3.0;
-        public static final double SCALE_STEP = 0.25;
+        public static final double SCALE_STEP = 0.05;
         public static final int X_HOT = 0;
         public static final int Y_HOT = 0;
         public static final int HOT_MIN = 0;
@@ -63,17 +63,19 @@ public class CursorConfig {
         }
 
         public double getScale() {
-            double scale = Math.round(this.scale * Defaults.SCALE_STEP) / Defaults.SCALE_STEP;
-            scale = Math.max(Defaults.SCALE_MIN, Math.min(Defaults.SCALE_MAX, scale));
-            return scale;
+            double scale = Math.max(Defaults.SCALE_MIN, Math.min(Defaults.SCALE_MAX, this.scale));
+            this.scale = Math.round(scale / Defaults.SCALE_STEP) * Defaults.SCALE_STEP;
+            return this.scale;
         }
 
         public int getXHot() {
-            return Math.max(Defaults.HOT_MIN, Math.min(Defaults.HOT_MAX, this.xhot));
+            xhot = Math.max(Defaults.HOT_MIN, Math.min(Defaults.HOT_MAX, this.xhot));
+            return xhot;
         }
 
         public int getYHot() {
-            return Math.max(Defaults.HOT_MIN, Math.min(Defaults.HOT_MAX, this.yhot));
+            yhot = Math.max(Defaults.HOT_MIN, Math.min(Defaults.HOT_MAX, this.yhot));
+            return yhot;
         }
 
         public boolean getEnabled() {
