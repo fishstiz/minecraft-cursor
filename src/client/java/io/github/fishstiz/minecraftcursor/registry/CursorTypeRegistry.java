@@ -39,9 +39,6 @@ public class CursorTypeRegistry {
         register(OptionSliderWidget.class, CursorTypeRegistry::elementToPointer);
         register(SelectedCursorSliderWidget.class, CursorTypeRegistry::elementToPointer);
         register(SelectedCursorHotspotWidget.class, CursorTypeRegistry::elementToPointer);
-
-        register(SelectedCursorSliderWidget.class, CursorTypeRegistry::elementToPointer);
-        register(SelectedCursorHotspotWidget.class, CursorTypeRegistry::elementToPointer);
     }
 
     public void initTextElements() {
