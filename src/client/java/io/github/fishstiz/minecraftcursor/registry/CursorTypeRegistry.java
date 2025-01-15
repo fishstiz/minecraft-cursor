@@ -29,7 +29,7 @@ public abstract class CursorTypeRegistry {
                 register((Class<? extends Element>) elementClass, elementToCursorType);
             }
         } catch (ClassNotFoundException e) {
-            MinecraftCursor.LOGGER.error("Error registering widget cursor type. Class not found: {}", fullyQualifiedClassName, e);
+            MinecraftCursor.LOGGER.error("Error registering widget cursor type. Class not found: {}", fullyQualifiedClassName);
         }
     }
 
