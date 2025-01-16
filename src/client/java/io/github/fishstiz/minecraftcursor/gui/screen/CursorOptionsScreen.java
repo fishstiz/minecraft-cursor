@@ -40,7 +40,10 @@ public class CursorOptionsScreen extends Screen {
         this.body = this.layout.addBody(new CursorOptionsBody(this));
         this.layout.addFooter(ButtonWidget.builder(ScreenTexts.DONE, button -> this.close()).width(200).build());
         this.layout.forEachChild(this::addDrawableChild);
-        this.refreshWidgetPositions();
+
+        if (this.body != null) {
+            this.refreshWidgetPositions();
+        }
     }
 
     @Override
