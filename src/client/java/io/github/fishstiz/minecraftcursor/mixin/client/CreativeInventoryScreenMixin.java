@@ -1,14 +1,11 @@
 package io.github.fishstiz.minecraftcursor.mixin.client;
 
-import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
-import io.github.fishstiz.minecraftcursor.registry.screen.CreativeInventoryScreenCursorRegistry;
+import io.github.fishstiz.minecraftcursor.registry.gui.ingame.CreativeInventoryScreenCursor;
 import net.fabricmc.fabric.api.client.itemgroup.v1.FabricCreativeInventoryScreen;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemGroups;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -20,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(CreativeInventoryScreen.class)
 public abstract class CreativeInventoryScreenMixin extends HandledScreen<CreativeInventoryScreen.CreativeScreenHandler> implements FabricCreativeInventoryScreen {
     @Unique
-    private CreativeInventoryScreenCursorRegistry cursorRegistry;
+    private CreativeInventoryScreenCursor cursorHandler;
 
     @Shadow
     protected abstract int getTabX(ItemGroup group);
@@ -33,23 +30,17 @@ public abstract class CreativeInventoryScreenMixin extends HandledScreen<Creativ
 
     @Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;init()V"))
     public void init(CallbackInfo ci) {
-        cursorRegistry = MinecraftCursorClient.getScreenCursorRegistry().creativeInventoryScreenRegistry;
+        cursorHandler = CreativeInventoryScreenCursor.getInstance();
+        cursorHandler.reflect = this::reflectProperties;
+        reflectProperties();
     }
 
-    @Inject(method = "render", at = @At("TAIL"))
-    public void render(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        boolean isHovered = false;
-
-        for (ItemGroup itemGroup : ItemGroups.getGroupsToDisplay()) {
-            int i = this.getTabX(itemGroup);
-            int j = this.getTabY(itemGroup);
-
-            if (this.isPointWithinBounds(i + 3, j + 3, 21, 27, mouseX, mouseY) && itemGroup != selectedTab) {
-                isHovered = true;
-            }
-        }
-
-        cursorRegistry.setIsUnselectedTabHovered(isHovered);
+    @Unique
+    public void reflectProperties() {
+        cursorHandler.getTabX = this::getTabX;
+        cursorHandler.getTabY = this::getTabY;
+        cursorHandler.isPointWithinBounds = this::isPointWithinBounds;
+        CreativeInventoryScreenCursor.selectedTab = selectedTab;
     }
 
     public CreativeInventoryScreenMixin(CreativeInventoryScreen.CreativeScreenHandler handler, PlayerInventory inventory, Text title) {

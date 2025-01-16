@@ -4,6 +4,7 @@ import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorHotspotWidget;
 import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorSliderWidget;
+import io.github.fishstiz.minecraftcursor.registry.gui.ingame.CreativeInventoryScreenCursor;
 import io.github.fishstiz.minecraftcursor.registry.gui.modmenu.ModMenuWidgetsCursor;
 import io.github.fishstiz.minecraftcursor.registry.gui.modmenu.ModScreenCursor;
 import io.github.fishstiz.minecraftcursor.registry.gui.ingame.recipebook.RecipeBookScreenCursor;
@@ -51,6 +52,7 @@ public class CursorTypeRegistry {
     public void initGuis() {
         WorldListWidgetCursor.register(this);
         RecipeBookScreenCursor.register(this);
+        CreativeInventoryScreenCursor.register(this);
 
         try {
             if (FabricLoader.getInstance().isModLoaded("modmenu")) {
