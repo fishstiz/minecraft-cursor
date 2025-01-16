@@ -1,9 +1,7 @@
 package io.github.fishstiz.minecraftcursor.mixin.client;
 
-import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
-import io.github.fishstiz.minecraftcursor.registry.screen.RecipeBookScreenCursorRegistry;
+import io.github.fishstiz.minecraftcursor.registry.gui.recipebook.RecipeBookScreenCursor;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.recipebook.RecipeBookWidget;
 import net.minecraft.client.gui.screen.recipebook.RecipeGroupButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -22,44 +20,32 @@ import java.util.List;
 @Mixin(RecipeBookWidget.class)
 public abstract class RecipeBookWidgetMixin {
     @Unique
-    private RecipeBookScreenCursorRegistry cursorRegistry;
-
+    private RecipeBookScreenCursor cursorHandler;
     @Shadow
     public abstract boolean isOpen();
-
     @Shadow
     private @Nullable TextFieldWidget searchField;
-
     @Shadow
     protected ToggleButtonWidget toggleCraftableButton;
-
     @Shadow
     @Final
     private List<RecipeGroupButtonWidget> tabButtons;
-
     @Shadow
     private @Nullable RecipeGroupButtonWidget currentTab;
 
     @Inject(method = "initialize", at = @At("TAIL"))
     public void init(int parentWidth, int parentHeight, MinecraftClient client, boolean narrow, CallbackInfo ci) {
-        cursorRegistry = MinecraftCursorClient.getScreenCursorRegistry().recipeBookScreenCursorRegistry;
+        cursorHandler = RecipeBookScreenCursor.getInstance();
+        cursorHandler.reflectRecipeBookWidget = this::reflectProperties;
+        reflectProperties();
     }
 
-    @Inject(method = "render", at = @At("TAIL"))
-    public void render(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        if (!isOpen()) {
-            return;
-        }
-
-        cursorRegistry.setSearchFieldHovered(searchField != null && searchField.isHovered());
-        cursorRegistry.setToggleCraftableButtonHovered(toggleCraftableButton.isHovered());
-
-        boolean isUnselectedTabHovered = false;
-        for (RecipeGroupButtonWidget button : tabButtons) {
-            if (button.isHovered() && button != currentTab) {
-                isUnselectedTabHovered = true;
-            }
-        }
-        cursorRegistry.setUnselectedTabHovered(isUnselectedTabHovered);
+    @Unique
+    private void reflectProperties() {
+        cursorHandler.isOpen = this::isOpen;
+        cursorHandler.searchField = this.searchField;
+        cursorHandler.toggleCraftableButton = this.toggleCraftableButton;
+        cursorHandler.tabButtons = this.tabButtons;
+        cursorHandler.currentTab = this.currentTab;
     }
 }
