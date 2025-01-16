@@ -9,6 +9,7 @@ import io.github.fishstiz.minecraftcursor.registry.gui.modmenu.ModScreenCursor;
 import io.github.fishstiz.minecraftcursor.registry.gui.recipebook.RecipeBookScreenCursor;
 import io.github.fishstiz.minecraftcursor.registry.gui.world.WorldListWidgetCursor;
 import io.github.fishstiz.minecraftcursor.registry.utils.ElementCursorTypeFunction;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.ParentElement;
 import net.minecraft.client.gui.screen.ChatScreen;
@@ -52,8 +53,10 @@ public class CursorTypeRegistry {
         RecipeBookScreenCursor.register(this);
 
         try {
-            ModMenuWidgetsCursor.register(this);
-            ModScreenCursor.register(this);
+            if (FabricLoader.getInstance().isModLoaded("modmenu")) {
+                ModMenuWidgetsCursor.register(this);
+                ModScreenCursor.register(this);
+            }
         } catch (NoClassDefFoundError ignore) {
         }
     }
