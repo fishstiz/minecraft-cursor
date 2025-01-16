@@ -1,26 +1,17 @@
 package io.github.fishstiz.minecraftcursor.registry.gui.recipebook;
 
+import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ingame.RecipeBookScreen;
-import net.minecraft.client.gui.screen.recipebook.RecipeGroupButtonWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.gui.widget.ToggleButtonWidget;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.client.gui.widget.ClickableWidget;
 
-import java.util.List;
-import java.util.function.Supplier;
-
+// knees weak
 public class RecipeBookScreenCursor {
     private static RecipeBookScreenCursor instance;
 
-    public Runnable reflectRecipeBookWidget;
-    public Supplier<Boolean> isOpen;
-    public @Nullable TextFieldWidget searchField;
-    public @Nullable ToggleButtonWidget toggleCraftableButton;
-    public List<RecipeGroupButtonWidget> tabButtons;
-    public @Nullable RecipeGroupButtonWidget currentTab;
+    public RecipeBookWidgetReflect recipeBook = new RecipeBookWidgetReflect();
 
     private RecipeBookScreenCursor() {
     }
@@ -37,21 +28,38 @@ public class RecipeBookScreenCursor {
     }
 
     private CursorType getCursorType(Element element, double mouseX, double mouseY) {
-        if (isOpen == null || !isOpen.get()) {
-            return CursorType.DEFAULT;
-        }
-        reflectRecipeBookWidget.run();
+        try {
+            if (recipeBook.isOpen == null || !recipeBook.isOpen.get()) {
+                return CursorType.DEFAULT;
+            }
+            RecipeBookResultsReflect recipes = recipeBook.recipesArea;
+            recipeBook.reflect.run();
+            recipes.reflect.run();
 
-        if (searchField != null && searchField.isHovered()) {
-            return CursorType.TEXT;
-        }
-        if (toggleCraftableButton != null && toggleCraftableButton.isHovered()) {
-            return CursorType.POINTER;
-        }
-        boolean isUnselectedTabHovered = tabButtons.stream()
-                .anyMatch(button -> button.isHovered() && button != currentTab);
-        if (isUnselectedTabHovered) {
-            return CursorType.POINTER;
+            if (recipes.alternatesWidget.isVisible.get()) {
+                return recipes.alternatesWidget.alternativeButtons.stream().anyMatch(ClickableWidget::isHovered)
+                        ? CursorType.POINTER
+                        : CursorType.DEFAULT;
+            }
+            recipes.alternatesWidget.clear();
+
+            boolean isButtonHovered = recipes.prevPageButton.isHovered()
+                    || recipes.nextPageButton.isHovered()
+                    || recipeBook.toggleCraftableButton.isHovered()
+                    || recipes.hoveredResultButton != null;
+            if (isButtonHovered) {
+                return CursorType.POINTER;
+            }
+
+            if (recipeBook.searchField.isHovered()) {
+                return CursorType.TEXT;
+            }
+
+            boolean isUnselectedTabHovered = recipeBook.tabButtons.stream()
+                    .anyMatch(button -> button.isHovered() && button != recipeBook.currentTab);
+            return isUnselectedTabHovered ? CursorType.POINTER : CursorType.DEFAULT;
+        } catch (NullPointerException e) {
+            MinecraftCursor.LOGGER.error("Error occurred while computing cursor type in RecipeBookScreen", e);
         }
         return CursorType.DEFAULT;
     }

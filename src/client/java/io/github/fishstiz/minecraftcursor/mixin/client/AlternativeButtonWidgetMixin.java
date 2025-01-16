@@ -1,8 +1,7 @@
 package io.github.fishstiz.minecraftcursor.mixin.client;
 
-import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
-import io.github.fishstiz.minecraftcursor.registry.screen.RecipeBookScreenCursorRegistry;
-import net.minecraft.client.gui.DrawContext;
+import io.github.fishstiz.minecraftcursor.registry.gui.recipebook.RecipeAlternativesWidgetReflect;
+import io.github.fishstiz.minecraftcursor.registry.gui.recipebook.RecipeBookScreenCursor;
 import net.minecraft.client.gui.screen.recipebook.RecipeAlternativesWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.recipe.NetworkRecipeId;
@@ -17,19 +16,15 @@ import java.util.List;
 
 @Mixin(targets = "net.minecraft.client.gui.screen.recipebook.RecipeAlternativesWidget$AlternativeButtonWidget")
 public abstract class AlternativeButtonWidgetMixin extends ClickableWidget {
-    @Unique
-    private RecipeBookScreenCursorRegistry cursorRegistry;
-
     @Inject(method = "<init>", at = @At("TAIL"))
     public void init(RecipeAlternativesWidget recipeAlternativesWidget, int x, int y, NetworkRecipeId recipeId, boolean craftable, List<?> inputSlots, CallbackInfo ci) {
-        cursorRegistry = MinecraftCursorClient.getScreenCursorRegistry().recipeBookScreenCursorRegistry;
+        RecipeAlternativesWidgetReflect alternatesWidget = RecipeBookScreenCursor.getInstance().recipeBook.recipesArea.alternatesWidget;
+        reflectButton(alternatesWidget);
     }
 
-    @Inject(method = "renderWidget", at = @At("TAIL"))
-    public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-//        if (this.isMouseOver(mouseX, mouseY)) {
-//            cursorRegistry.setRecipeAlternativeHovered(true);
-//        }
+    @Unique
+    public void reflectButton(RecipeAlternativesWidgetReflect alternatesWidget) {
+        alternatesWidget.alternativeButtons.add(this);
     }
 
     public AlternativeButtonWidgetMixin(int x, int y, int width, int height, Text message) {

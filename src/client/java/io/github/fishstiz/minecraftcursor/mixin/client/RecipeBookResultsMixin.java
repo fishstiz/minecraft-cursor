@@ -1,9 +1,7 @@
 package io.github.fishstiz.minecraftcursor.mixin.client;
 
-import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
-import io.github.fishstiz.minecraftcursor.registry.screen.RecipeBookScreenCursorRegistry;
+import io.github.fishstiz.minecraftcursor.registry.gui.recipebook.RecipeBookScreenCursor;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.recipebook.AnimatedResultButton;
 import net.minecraft.client.gui.screen.recipebook.RecipeAlternativesWidget;
 import net.minecraft.client.gui.screen.recipebook.RecipeBookResults;
@@ -22,35 +20,33 @@ import java.util.List;
 @Mixin(RecipeBookResults.class)
 public abstract class RecipeBookResultsMixin {
     @Unique
-    private RecipeBookScreenCursorRegistry cursorRegistry;
-
+    private RecipeBookScreenCursor cursorHandler;
     @Shadow
     private @Nullable AnimatedResultButton hoveredResultButton;
-
     @Shadow
     private ToggleButtonWidget prevPageButton;
-
     @Shadow
     private ToggleButtonWidget nextPageButton;
-
     @Shadow
     @Final
     private RecipeAlternativesWidget alternatesWidget;
-
     @Shadow
     @Final
     private List<AnimatedResultButton> resultButtons;
 
     @Inject(method = "initialize", at = @At("TAIL"))
     public void init(MinecraftClient client, int parentLeft, int parentTop, CallbackInfo ci) {
-        cursorRegistry = MinecraftCursorClient.getScreenCursorRegistry().recipeBookScreenCursorRegistry;
+        cursorHandler = RecipeBookScreenCursor.getInstance();
+        cursorHandler.recipeBook.recipesArea.reflect = this::reflectProperties;
+        reflectProperties();
     }
 
-    @Inject(method = "draw", at = @At("TAIL"))
-    public void draw(DrawContext context, int x, int y, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        cursorRegistry.setRecipeAlternativesVisible(alternatesWidget.isVisible());
-        cursorRegistry.setRecipeResultHovered(hoveredResultButton != null);
-        cursorRegistry.setPageButtonHovered(prevPageButton.isMouseOver(mouseX, mouseY)
-                || nextPageButton.isMouseOver(mouseX, mouseY));
+    @Unique
+    public void reflectProperties() {
+        cursorHandler.recipeBook.recipesArea.nextPageButton = this.nextPageButton;
+        cursorHandler.recipeBook.recipesArea.prevPageButton = this.prevPageButton;
+        cursorHandler.recipeBook.recipesArea.hoveredResultButton = this.hoveredResultButton;
+        cursorHandler.recipeBook.recipesArea.resultButtons = this.resultButtons;
+        cursorHandler.recipeBook.recipesArea.alternatesWidget.isVisible = this.alternatesWidget::isVisible;
     }
 }

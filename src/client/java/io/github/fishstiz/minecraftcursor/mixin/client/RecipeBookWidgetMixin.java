@@ -36,16 +36,16 @@ public abstract class RecipeBookWidgetMixin {
     @Inject(method = "initialize", at = @At("TAIL"))
     public void init(int parentWidth, int parentHeight, MinecraftClient client, boolean narrow, CallbackInfo ci) {
         cursorHandler = RecipeBookScreenCursor.getInstance();
-        cursorHandler.reflectRecipeBookWidget = this::reflectProperties;
+        cursorHandler.recipeBook.reflect = this::reflectProperties;
         reflectProperties();
     }
 
     @Unique
     private void reflectProperties() {
-        cursorHandler.isOpen = this::isOpen;
-        cursorHandler.searchField = this.searchField;
-        cursorHandler.toggleCraftableButton = this.toggleCraftableButton;
-        cursorHandler.tabButtons = this.tabButtons;
-        cursorHandler.currentTab = this.currentTab;
+        cursorHandler.recipeBook.isOpen = this::isOpen;
+        cursorHandler.recipeBook.searchField = this.searchField;
+        cursorHandler.recipeBook.toggleCraftableButton = this.toggleCraftableButton;
+        cursorHandler.recipeBook.tabButtons = this.tabButtons;
+        cursorHandler.recipeBook.currentTab = this.currentTab;
     }
 }
