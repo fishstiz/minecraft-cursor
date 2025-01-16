@@ -13,7 +13,6 @@ import io.github.fishstiz.minecraftcursor.registry.utils.ElementCursorTypeFuncti
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.ParentElement;
-import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.widget.OptionSliderWidget;
 import net.minecraft.client.gui.widget.PressableWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -46,7 +45,6 @@ public class CursorTypeRegistry {
 
     public void initTextElements() {
         register(TextFieldWidget.class, CursorTypeRegistry::elementToText);
-        register(ChatScreen.class, CursorTypeRegistry::elementToText);
     }
 
     public void initGuis() {
