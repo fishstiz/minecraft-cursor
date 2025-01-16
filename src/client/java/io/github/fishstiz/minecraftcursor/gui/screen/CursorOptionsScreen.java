@@ -154,7 +154,6 @@ public class CursorOptionsScreen extends Screen {
 
             cursorsColumn.setX(cursorsColumnX - leftShift - COLUMN_GAP / 2);
             selectedCursorColumn.setX(selectedCursorColumnX - leftShift + COLUMN_GAP / 2);
-            this.refreshScroll();
         }
 
         @Override
