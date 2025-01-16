@@ -1,4 +1,4 @@
-package io.github.fishstiz.minecraftcursor.registry.gui.recipebook;
+package io.github.fishstiz.minecraftcursor.registry.gui.ingame.recipebook;
 
 import net.minecraft.client.gui.widget.ClickableWidget;
 

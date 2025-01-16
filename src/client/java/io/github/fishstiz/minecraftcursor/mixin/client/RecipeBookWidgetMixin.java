@@ -1,6 +1,6 @@
 package io.github.fishstiz.minecraftcursor.mixin.client;
 
-import io.github.fishstiz.minecraftcursor.registry.gui.recipebook.RecipeBookScreenCursor;
+import io.github.fishstiz.minecraftcursor.registry.gui.ingame.recipebook.RecipeBookScreenCursor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.recipebook.RecipeBookWidget;
 import net.minecraft.client.gui.screen.recipebook.RecipeGroupButtonWidget;

@@ -1,4 +1,4 @@
-package io.github.fishstiz.minecraftcursor.registry.gui.recipebook;
+package io.github.fishstiz.minecraftcursor.registry.gui.ingame.recipebook;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
