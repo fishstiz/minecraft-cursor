@@ -42,7 +42,7 @@ public class CursorTypeRegistry {
     }
 
     public void initTextElements() {
-        register(TextFieldWidget.class, CursorTypeRegistry::elementToText);
+        register(TextFieldWidget.class, CursorTypeRegistry::textFieldWidgetCursor);
     }
 
     public void initGuis() {
@@ -129,5 +129,10 @@ public class CursorTypeRegistry {
         SliderWidget slider = (SliderWidget) element;
         return slider.active && slider.visible && slider.isHovered() ?
                 CursorType.POINTER : CursorType.DEFAULT;
+    }
+
+    private static CursorType textFieldWidgetCursor(Element element, double mouseX, double mouseY) {
+        TextFieldWidget textField = (TextFieldWidget) element;
+        return textField.visible && textField.isHovered() ? CursorType.TEXT : CursorType.DEFAULT;
     }
 }
