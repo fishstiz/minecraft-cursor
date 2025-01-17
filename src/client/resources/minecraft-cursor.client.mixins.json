@@ -3,10 +3,7 @@
   "package": "io.github.fishstiz.minecraftcursor.mixin.client",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "AlternativeButtonWidgetMixin",
-    "MouseOptionsScreenMixin",
-    "RecipeBookResultsMixin",
-    "RecipeBookWidgetMixin"
+    "MouseOptionsScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1
