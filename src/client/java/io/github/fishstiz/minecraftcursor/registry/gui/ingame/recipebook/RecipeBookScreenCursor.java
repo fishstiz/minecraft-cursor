@@ -43,8 +43,8 @@ public class RecipeBookScreenCursor {
             }
             recipes.alternatesWidget.clear();
 
-            boolean isButtonHovered = recipes.prevPageButton.isHovered()
-                    || recipes.nextPageButton.isHovered()
+            boolean isButtonHovered = recipes.prevPageButton.isHovered() && recipes.prevPageButton.visible
+                    || recipes.nextPageButton.isHovered() && recipes.nextPageButton.visible
                     || recipeBook.toggleCraftableButton.isHovered()
                     || recipes.hoveredResultButton != null;
             if (isButtonHovered) {
