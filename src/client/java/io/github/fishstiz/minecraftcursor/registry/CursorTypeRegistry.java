@@ -3,7 +3,6 @@ package io.github.fishstiz.minecraftcursor.registry;
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorHotspotWidget;
-import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorSliderWidget;
 import io.github.fishstiz.minecraftcursor.registry.gui.ingame.CreativeInventoryScreenCursor;
 import io.github.fishstiz.minecraftcursor.registry.gui.modmenu.ModMenuWidgetsCursor;
 import io.github.fishstiz.minecraftcursor.registry.gui.modmenu.ModScreenCursor;
@@ -13,8 +12,8 @@ import io.github.fishstiz.minecraftcursor.registry.utils.ElementCursorTypeFuncti
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.ParentElement;
-import net.minecraft.client.gui.widget.OptionSliderWidget;
 import net.minecraft.client.gui.widget.PressableWidget;
+import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 
 import java.util.AbstractMap;
@@ -38,8 +37,7 @@ public class CursorTypeRegistry {
 
     public void initPointerElements() {
         register(PressableWidget.class, CursorTypeRegistry::pressableWidgetCursor);
-        register(OptionSliderWidget.class, CursorTypeRegistry::elementToPointer);
-        register(SelectedCursorSliderWidget.class, CursorTypeRegistry::elementToPointer);
+        register(SliderWidget.class, CursorTypeRegistry::elementToPointer);
         register(SelectedCursorHotspotWidget.class, CursorTypeRegistry::elementToPointer);
     }
 
