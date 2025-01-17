@@ -37,7 +37,7 @@ public class CursorTypeRegistry {
 
     public void initPointerElements() {
         register(PressableWidget.class, CursorTypeRegistry::pressableWidgetCursor);
-        register(SliderWidget.class, CursorTypeRegistry::elementToPointer);
+        register(SliderWidget.class, CursorTypeRegistry::sliderWidgetCursor);
         register(SelectedCursorHotspotWidget.class, CursorTypeRegistry::elementToPointer);
     }
 
@@ -121,6 +121,13 @@ public class CursorTypeRegistry {
 
     private static CursorType pressableWidgetCursor(Element entry, double mouseX, double mouseY) {
         PressableWidget button = (PressableWidget) entry;
-        return button.isHovered() && button.active ? CursorType.POINTER : CursorType.DEFAULT;
+        return button.isHovered() && button.active && button.visible ?
+                CursorType.POINTER : CursorType.DEFAULT;
+    }
+
+    private static CursorType sliderWidgetCursor(Element element, double mouseX, double mouseY) {
+        SliderWidget slider = (SliderWidget) element;
+        return slider.active && slider.visible && slider.isHovered() ?
+                CursorType.POINTER : CursorType.DEFAULT;
     }
 }
