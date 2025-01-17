@@ -1,53 +1,68 @@
 package io.github.fishstiz.minecraftcursor.registry.gui.ingame;
 
+import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
-import io.github.fishstiz.minecraftcursor.registry.utils.PointWithinBoundsFunction;
+import io.github.fishstiz.minecraftcursor.registry.utils.LookupUtils;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemGroups;
 
-import java.util.function.Function;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.VarHandle;
 
-// arms are heavy
 public class CreativeInventoryScreenCursor {
-    public Runnable reflect;
-    public Function<ItemGroup, Integer> getTabX;
-    public Function<ItemGroup, Integer> getTabY;
-    public static ItemGroup selectedTab;
-    public PointWithinBoundsFunction isPointWithinBounds;
-
-    private static CreativeInventoryScreenCursor instance;
-
-    private CreativeInventoryScreenCursor() {
-    }
-
-    public static CreativeInventoryScreenCursor getInstance() {
-        if (instance == null) {
-            instance = new CreativeInventoryScreenCursor();
-        }
-        return instance;
-    }
+    public static final String ITEM_GROUP_NAME = "net/minecraft/class_1761";
+    public static final String GET_TAB_X_NAME = "method_47422";
+    public static final String GET_TAB_X_DESC = String.format("(L%s;)I", ITEM_GROUP_NAME);
+    public static MethodHandle getTabX;
+    public static final String GET_TAB_Y_NAME = "method_47423";
+    public static final String GET_TAB_Y_DESC = String.format("(L%s;)I", ITEM_GROUP_NAME);
+    public static MethodHandle getTabY;
+    public static final String SELECTED_TAB_NAME = "field_2896";
+    public static final String SELECTED_TAB_DESC = String.format("L%s;", ITEM_GROUP_NAME);
+    public static VarHandle selectedTab;
+    public static final String POINT_W_BOUNDS_NAME = "method_2378";
+    public static final String POINT_W_BOUNDS_DESC = "(IIIIDD)Z";
+    public static MethodHandle isPointWithinBounds;
 
     public static void register(CursorTypeRegistry cursorTypeRegistry) {
-        cursorTypeRegistry.register(CreativeInventoryScreen.class, CreativeInventoryScreenCursor.getInstance()::getCursorType);
+        try {
+            initHandles();
+            cursorTypeRegistry.register(CreativeInventoryScreen.class, CreativeInventoryScreenCursor::getCursorType);
+        } catch (NoSuchFieldException | IllegalAccessException | NoSuchMethodException e) {
+            MinecraftCursor.LOGGER.warn("Could not register cursor type for CreativeInventoryScreen");
+        }
     }
 
-    private CursorType getCursorType(Element element, double mouseX, double mouseY) {
-        if (reflect == null) {
-            return CursorType.DEFAULT;
-        }
-        reflect.run();
+    private static void initHandles() throws IllegalAccessException, NoSuchMethodException, NoSuchFieldException {
+        Class<CreativeInventoryScreen> targetClass = CreativeInventoryScreen.class;
+        getTabX = LookupUtils.getMethodHandle(targetClass, GET_TAB_X_NAME, GET_TAB_X_DESC, int.class, ItemGroup.class);
+        getTabY = LookupUtils.getMethodHandle(targetClass, GET_TAB_Y_NAME, GET_TAB_Y_DESC, int.class, ItemGroup.class);
+        selectedTab = LookupUtils.getStaticVarHandle(targetClass, SELECTED_TAB_NAME, SELECTED_TAB_DESC, ItemGroup.class);
+        isPointWithinBounds = LookupUtils.getMethodHandle(HandledScreen.class, POINT_W_BOUNDS_NAME, POINT_W_BOUNDS_DESC,
+                boolean.class, int.class, int.class, int.class, int.class, double.class, double.class
+        );
+    }
 
-        boolean isHovered = false;
-        for (ItemGroup itemGroup : ItemGroups.getGroupsToDisplay()) {
-            int i = getTabX.apply(itemGroup);
-            int j = getTabY.apply(itemGroup);
-            if (isPointWithinBounds.apply(i + 3, j + 3, 21, 27, mouseX, mouseY) && itemGroup != selectedTab) {
-                isHovered = true;
+    private static CursorType getCursorType(Element element, double mouseX, double mouseY) {
+        try {
+            boolean isHovered = false;
+            for (ItemGroup itemGroup : ItemGroups.getGroupsToDisplay()) {
+                int i = (int) getTabX.invoke(element, itemGroup);
+                int j = (int) getTabY.invoke(element, itemGroup);
+
+                ItemGroup selectedTab = (ItemGroup) CreativeInventoryScreenCursor.selectedTab.get();
+                if ((boolean) isPointWithinBounds.invoke(element, i + 3, j + 3, 21, 27, mouseX, mouseY) && itemGroup != selectedTab) {
+                    isHovered = true;
+                }
             }
+            return isHovered ? CursorType.POINTER : CursorType.DEFAULT;
+        } catch (Throwable e) {
+            MinecraftCursor.LOGGER.warn("Cannot get cursor type for CreativeInventoryScreen");
         }
-        return isHovered ? CursorType.POINTER : CursorType.DEFAULT;
+        return CursorType.DEFAULT;
     }
 }
