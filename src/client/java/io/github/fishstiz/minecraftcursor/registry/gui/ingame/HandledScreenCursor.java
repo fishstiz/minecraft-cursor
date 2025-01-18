@@ -14,6 +14,10 @@ public class HandledScreenCursor {
     protected static VarHandle backgroundHeight;
     protected static final String HANDLER_NAME = "field_2797";
     protected static VarHandle screenHandler;
+    protected static final String X_NAME = "field_2776";
+    protected static VarHandle x;
+    protected static final String Y_NAME = "field_2800";
+    protected static VarHandle y;
 
     public static void register() {
         try {
@@ -28,5 +32,7 @@ public class HandledScreenCursor {
         screenHandler = LookupUtils.getVarHandle(targetClass, HANDLER_NAME, ScreenHandler.class);
         backgroundWidth = LookupUtils.getVarHandle(targetClass, BACKGROUND_WIDTH_NAME, int.class);
         backgroundHeight = LookupUtils.getVarHandle(targetClass, BACKGROUND_HEIGHT_NAME, int.class);
+        x = LookupUtils.getVarHandle(targetClass, X_NAME, int.class);
+        y = LookupUtils.getVarHandle(targetClass, Y_NAME, int.class);
     }
 }
