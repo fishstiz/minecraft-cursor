@@ -3,17 +3,15 @@ package io.github.fishstiz.minecraftcursor.registry.gui.ingame;
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
-import io.github.fishstiz.minecraftcursor.registry.utils.LookupUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ingame.EnchantmentScreen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.screen.EnchantmentScreenHandler;
 
-import java.lang.invoke.VarHandle;
-
 import static io.github.fishstiz.minecraftcursor.registry.gui.ingame.HandledScreenCursor.screenHandler;
+import static io.github.fishstiz.minecraftcursor.registry.gui.ingame.HandledScreenCursor.backgroundWidth;
+import static io.github.fishstiz.minecraftcursor.registry.gui.ingame.HandledScreenCursor.backgroundHeight;
 
 public class EnchantmentScreenCursor {
     // Derived from EnchantmentScreen.drawBackground()
@@ -22,25 +20,12 @@ public class EnchantmentScreenCursor {
     public static final int ENCHANTMENT_BTN_OFFSET_X = 60;
     public static final int ENCHANTMENT_BTN_OFFSET_Y = 14;
 
-    // EnchantmentScreenHandler
-    private static final String BACKGROUND_WIDTH_NAME = "field_2792";
-    private static VarHandle backgroundWidth;
-    private static final String BACKGROUND_HEIGHT_NAME = "field_2779";
-    private static VarHandle backgroundHeight;
-
     public static void register(CursorTypeRegistry cursorTypeRegistry) {
-        try {
-            initHandles();
-            cursorTypeRegistry.register(EnchantmentScreen.class, EnchantmentScreenCursor::getCursorType);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
+        if (screenHandler == null || backgroundWidth == null || backgroundHeight == null) {
             MinecraftCursor.LOGGER.warn("Could not register cursor type for EnchantmentScreen");
+            return;
         }
-    }
-
-    private static void initHandles() throws NoSuchFieldException, IllegalAccessException {
-        Class<?> targetClass = HandledScreen.class;
-        backgroundWidth = LookupUtils.getVarHandle(targetClass, BACKGROUND_WIDTH_NAME, int.class);
-        backgroundHeight = LookupUtils.getVarHandle(targetClass, BACKGROUND_HEIGHT_NAME, int.class);
+        cursorTypeRegistry.register(EnchantmentScreen.class, EnchantmentScreenCursor::getCursorType);
     }
 
     private static CursorType getCursorType(Element element, double mouseX, double mouseY) {
