@@ -3,7 +3,7 @@
 A Fabric mod that replaces the boring old default system cursor with a Minecraft-themed cursor.
 
 ## Requirements
-- Fabric for Minecraft 1.21.2-1.21.4
+- Fabric for Minecraft 1.21.2+
 - Compatible with [Mod Menu](https://modrinth.com/mod/modmenu) (optional)
 
 ## Multiple Cursors
@@ -13,6 +13,9 @@ A Fabric mod that replaces the boring old default system cursor with a Minecraft
 
 - Context-aware cursors when hovering over buttons and text fields (limited to common GUI elements only)
 - If you think an element should or shouldn't change the cursor's state then open an issue and I might look into it.
+- Mods that shift the positions of the in-game GUIs may lead to unexpected state changes with the cursor. 
+
+  Unfortunately, most elements from in-game GUIs are not actually elements and are drawn directly on the screen, with their sizes and positions obfuscated and/or hardcoded
 
 ## Configure Cursors
 - Configure from Mod Menu (if installed)
