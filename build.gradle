@@ -39,6 +39,13 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
+
+	implementation "com.fasterxml.jackson.core:jackson-core:${project.jackson_version}"
+	implementation "com.fasterxml.jackson.core:jackson-databind:${project.jackson_version}.2"
+	implementation "com.fasterxml.jackson.core:jackson-annotations:${project.jackson_version}"
+	include "com.fasterxml.jackson.core:jackson-core:${project.jackson_version}"
+	include  "com.fasterxml.jackson.core:jackson-databind:${project.jackson_version}.2"
+	include "com.fasterxml.jackson.core:jackson-annotations:${project.jackson_version}"
 }
 
 processResources {

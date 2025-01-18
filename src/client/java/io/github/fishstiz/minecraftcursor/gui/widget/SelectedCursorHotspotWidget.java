@@ -4,7 +4,6 @@ import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -27,7 +26,7 @@ public class SelectedCursorHotspotWidget extends ClickableWidget {
     }
 
     private void drawTexture(DrawContext context, Identifier sprite) {
-        context.drawTexture(RenderLayer::getGuiTextured, sprite, getX(), getY(), 0, 0, width, height, width, height);
+        context.drawTexture(sprite, getX(), getY(), 0, 0, width, height, width, height);
     }
 
     private void renderRuler(DrawContext context) {

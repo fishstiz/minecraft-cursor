@@ -5,7 +5,9 @@ import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
 import io.github.fishstiz.minecraftcursor.registry.utils.LookupUtils;
 import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.screen.ingame.RecipeBookScreen;
+import net.minecraft.client.gui.screen.ingame.AbstractFurnaceScreen;
+import net.minecraft.client.gui.screen.ingame.CraftingScreen;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.gui.screen.recipebook.*;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -15,9 +17,13 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.VarHandle;
 import java.util.List;
 
-public class RecipeBookScreenCursor {
-    public static final String RECIPE_BOOK_NAME = "field_54474";
-    public static VarHandle recipeBook;
+abstract public class RecipeBookScreenCursor {
+    public static final String INVENTORY_RECIPE_BOOK_NAME = "field_2929";
+    public static VarHandle inventoryRecipeBook;
+    public static final String CRAFTING_RECIPE_BOOK_NAME = "field_2880";
+    public static VarHandle craftingRecipeBook;
+    public static final String FURNACE_RECIPE_BOOK_NAME = "field_2924";
+    public static VarHandle furnaceRecipeBook;
 
     // RecipeBookWidget
     public static final String IS_OPEN_NAME = "method_2605";
@@ -56,14 +62,18 @@ public class RecipeBookScreenCursor {
             initWidgetHandles();
             initResultsHandles();
             initAlternativesHandles();
-            cursorRegistry.register(RecipeBookScreen.class, RecipeBookScreenCursor::getCursorType);
+            cursorRegistry.register(InventoryScreen.class, RecipeBookScreenCursor::getCursorType);
+            cursorRegistry.register(CraftingScreen.class, RecipeBookScreenCursor::getCursorType);
+            cursorRegistry.register(AbstractFurnaceScreen.class, RecipeBookScreenCursor::getCursorType);
         } catch (IllegalAccessException | NoSuchMethodException | NoSuchFieldException e) {
-            MinecraftCursor.LOGGER.warn("Could not register cursor type for RecipeBookScreen");
+            MinecraftCursor.LOGGER.warn("Could not register cursor type for RecipeBookScreen", e);
         }
     }
 
     private static void initScreenHandles() throws NoSuchFieldException, IllegalAccessException {
-        recipeBook = LookupUtils.getVarHandle(RecipeBookScreen.class, RECIPE_BOOK_NAME, RecipeBookWidget.class);
+        inventoryRecipeBook = LookupUtils.getVarHandle(InventoryScreen.class, INVENTORY_RECIPE_BOOK_NAME, RecipeBookWidget.class);
+        craftingRecipeBook = LookupUtils.getVarHandle(CraftingScreen.class, CRAFTING_RECIPE_BOOK_NAME, RecipeBookWidget.class);
+        furnaceRecipeBook = LookupUtils.getVarHandle(AbstractFurnaceScreen.class, FURNACE_RECIPE_BOOK_NAME, AbstractFurnaceRecipeBookScreen.class);
     }
 
     private static void initWidgetHandles() throws IllegalAccessException, NoSuchMethodException, NoSuchFieldException {
@@ -92,7 +102,16 @@ public class RecipeBookScreenCursor {
     @SuppressWarnings("unchecked")
     private static CursorType getCursorType(Element element, double mouseX, double mouseY) {
         try {
-            RecipeBookWidget<?> recipeBook = (RecipeBookWidget<?>) RecipeBookScreenCursor.recipeBook.get(element);
+            RecipeBookWidget recipeBook;
+            switch (element) {
+                case InventoryScreen inventory -> recipeBook = (RecipeBookWidget) inventoryRecipeBook.get(inventory);
+                case CraftingScreen crafting -> recipeBook = (RecipeBookWidget) craftingRecipeBook.get(crafting);
+                case AbstractFurnaceScreen<?> furnace ->
+                        recipeBook = (AbstractFurnaceRecipeBookScreen) furnaceRecipeBook.get(furnace);
+                case null, default -> {
+                    return CursorType.DEFAULT;
+                }
+            }
 
             if (!((boolean) isOpen.invoke(recipeBook))) {
                 return CursorType.DEFAULT;

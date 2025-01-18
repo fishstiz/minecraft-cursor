@@ -9,7 +9,6 @@ import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ElementListWidget;
 import net.minecraft.client.gui.widget.PressableWidget;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.text.Text;
 
 import java.util.ArrayList;
@@ -117,7 +116,7 @@ public class CursorListWidget extends ElementListWidget<CursorListWidget.CursorW
         private void renderTexture(DrawContext context) {
             int x = getX() + PADDING_LEFT;
             int y = getY() + (getHeight() / 2) - (TEXTURE_SIZE / 2);
-            context.drawTexture(RenderLayer::getGuiTextured, cursor.getSprite(), x, y, 0, 0, TEXTURE_SIZE, TEXTURE_SIZE, TEXTURE_SIZE, TEXTURE_SIZE);
+            context.drawTexture(cursor.getSprite(), x, y, 0, 0, TEXTURE_SIZE, TEXTURE_SIZE, TEXTURE_SIZE, TEXTURE_SIZE);
         }
 
         private void renderMessage(DrawContext context) {

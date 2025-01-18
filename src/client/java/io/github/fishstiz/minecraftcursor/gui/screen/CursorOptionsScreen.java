@@ -46,7 +46,6 @@ public class CursorOptionsScreen extends Screen {
         }
     }
 
-    @Override
     protected void refreshWidgetPositions() {
         this.layout.refreshPositions();
         if (this.body != null) {
@@ -154,16 +153,6 @@ public class CursorOptionsScreen extends Screen {
 
             cursorsColumn.setX(cursorsColumnX - leftShift - COLUMN_GAP / 2);
             selectedCursorColumn.setX(selectedCursorColumnX - leftShift + COLUMN_GAP / 2);
-        }
-
-        @Override
-        protected int getContentsHeightWithPadding() {
-            return 0;
-        }
-
-        @Override
-        protected double getDeltaYPerScroll() {
-            return 0;
         }
 
         @Override

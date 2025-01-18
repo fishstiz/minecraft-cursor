@@ -5,6 +5,7 @@ import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorHotspotWidget;
 import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorSliderWidget;
 import io.github.fishstiz.minecraftcursor.registry.gui.ingame.*;
+import io.github.fishstiz.minecraftcursor.registry.gui.ingame.RecipeBookScreenCursor;
 import io.github.fishstiz.minecraftcursor.registry.gui.modmenu.ModMenuWidgetsCursor;
 import io.github.fishstiz.minecraftcursor.registry.gui.modmenu.ModScreenCursor;
 import io.github.fishstiz.minecraftcursor.registry.gui.world.WorldListWidgetCursor;
