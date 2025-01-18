@@ -14,6 +14,12 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.VarHandle;
 
 public class CreativeInventoryScreenCursor {
+    // Derived from CreativeInventoryScreen.renderTabTooltipIfHovered()
+    public static final int TAB_WIDTH = 21;
+    public static final int TAB_HEIGHT = 27;
+    public static final int TAB_OFFSET_X = 3;
+    public static final int TAB_OFFSET_Y = 3;
+
     public static final String ITEM_GROUP_NAME = "net/minecraft/class_1761";
     public static final String GET_TAB_X_NAME = "method_47422";
     public static final String GET_TAB_X_DESC = String.format("(L%s;)I", ITEM_GROUP_NAME);
@@ -55,7 +61,17 @@ public class CreativeInventoryScreenCursor {
                 int j = (int) getTabY.invoke(element, itemGroup);
 
                 ItemGroup selectedTab = (ItemGroup) CreativeInventoryScreenCursor.selectedTab.get();
-                if ((boolean) isPointWithinBounds.invoke(element, i + 3, j + 3, 21, 27, mouseX, mouseY) && itemGroup != selectedTab) {
+
+                boolean isMouseOver = (boolean) isPointWithinBounds.invoke(element,
+                        i + TAB_OFFSET_X,
+                        j + TAB_OFFSET_Y,
+                        TAB_WIDTH,
+                        TAB_HEIGHT,
+                        mouseX,
+                        mouseY
+                );
+
+                if (isMouseOver && itemGroup != selectedTab) {
                     isHovered = true;
                 }
             }
