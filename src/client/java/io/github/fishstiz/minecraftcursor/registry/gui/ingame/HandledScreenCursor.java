@@ -4,6 +4,7 @@ import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.registry.utils.LookupUtils;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.slot.Slot;
 
 import java.lang.invoke.VarHandle;
 
@@ -18,6 +19,8 @@ public class HandledScreenCursor {
     protected static VarHandle x;
     protected static final String Y_NAME = "field_2800";
     protected static VarHandle y;
+    protected static final String FOCUSED_SLOT_NAME = "field_2787";
+    protected static VarHandle focusedSlot;
 
     public static void register() {
         try {
@@ -34,5 +37,6 @@ public class HandledScreenCursor {
         backgroundHeight = LookupUtils.getVarHandle(targetClass, BACKGROUND_HEIGHT_NAME, int.class);
         x = LookupUtils.getVarHandle(targetClass, X_NAME, int.class);
         y = LookupUtils.getVarHandle(targetClass, Y_NAME, int.class);
+        focusedSlot = LookupUtils.getVarHandle(targetClass, FOCUSED_SLOT_NAME, Slot.class);
     }
 }
