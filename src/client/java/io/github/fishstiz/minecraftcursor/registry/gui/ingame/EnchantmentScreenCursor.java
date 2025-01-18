@@ -10,9 +10,10 @@ import net.minecraft.client.gui.screen.ingame.EnchantmentScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.screen.EnchantmentScreenHandler;
-import net.minecraft.screen.ScreenHandler;
 
 import java.lang.invoke.VarHandle;
+
+import static io.github.fishstiz.minecraftcursor.registry.gui.ingame.HandledScreenCursor.screenHandler;
 
 public class EnchantmentScreenCursor {
     // Derived from EnchantmentScreen.drawBackground()
@@ -26,8 +27,6 @@ public class EnchantmentScreenCursor {
     private static VarHandle backgroundWidth;
     private static final String BACKGROUND_HEIGHT_NAME = "field_2779";
     private static VarHandle backgroundHeight;
-    private static final String HANDLER_NAME = "field_2797";
-    private static VarHandle screenHandler; // EnchantmentScreenHandler
 
     public static void register(CursorTypeRegistry cursorTypeRegistry) {
         try {
@@ -42,7 +41,6 @@ public class EnchantmentScreenCursor {
         Class<?> targetClass = HandledScreen.class;
         backgroundWidth = LookupUtils.getVarHandle(targetClass, BACKGROUND_WIDTH_NAME, int.class);
         backgroundHeight = LookupUtils.getVarHandle(targetClass, BACKGROUND_HEIGHT_NAME, int.class);
-        screenHandler = LookupUtils.getVarHandle(targetClass, HANDLER_NAME, ScreenHandler.class);
     }
 
     private static CursorType getCursorType(Element element, double mouseX, double mouseY) {
@@ -53,7 +51,7 @@ public class EnchantmentScreenCursor {
 
         EnchantmentScreen enchantmentScreen = (EnchantmentScreen) element;
         EnchantmentScreenHandler handler =
-                (EnchantmentScreenHandler) EnchantmentScreenCursor.screenHandler.get(enchantmentScreen);
+                (EnchantmentScreenHandler) screenHandler.get(enchantmentScreen);
 
         for (int i = 0; i < handler.enchantmentPower.length; i++) {
             int enchantmentPower = handler.enchantmentPower[i];
