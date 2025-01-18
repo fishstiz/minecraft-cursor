@@ -54,6 +54,7 @@ public class CursorTypeRegistry {
         BookEditScreenCursor.register(this);
         EnchantmentScreenCursor.register(this);
         StonecutterScreenCursor.register(this);
+        LoomScreenCursor.register(this);
 
         try {
             if (FabricLoader.getInstance().isModLoaded("modmenu")) {
