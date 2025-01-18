@@ -12,8 +12,10 @@ import io.github.fishstiz.minecraftcursor.registry.utils.ElementCursorTypeFuncti
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.ParentElement;
+import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.PressableWidget;
 import net.minecraft.client.gui.widget.SliderWidget;
+import net.minecraft.client.gui.widget.TabButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 
 import java.util.AbstractMap;
@@ -38,7 +40,8 @@ public class CursorTypeRegistry {
     }
 
     public void initPointerElements() {
-        register(PressableWidget.class, CursorTypeRegistry::pressableWidgetCursor);
+        register(PressableWidget.class, CursorTypeRegistry::clickableWidgetCursor);
+        register(TabButtonWidget.class, CursorTypeRegistry::tabButtonWidgetCursor);
         register(SliderWidget.class, CursorTypeRegistry::sliderWidgetCursor);
         register(SelectedCursorSliderWidget.class, CursorTypeRegistry::elementToPointer);
         register(SelectedCursorHotspotWidget.class, CursorTypeRegistry::elementToPointer);
@@ -134,9 +137,15 @@ public class CursorTypeRegistry {
         return CursorType.TEXT;
     }
 
-    private static CursorType pressableWidgetCursor(Element entry, double mouseX, double mouseY) {
-        PressableWidget button = (PressableWidget) entry;
+    private static CursorType clickableWidgetCursor(Element element, double mouseX, double mouseY) {
+        ClickableWidget button = (ClickableWidget) element;
         return button.isHovered() && button.active && button.visible ?
+                CursorType.POINTER : CursorType.DEFAULT;
+    }
+
+    private static CursorType tabButtonWidgetCursor(Element element, double mouseX, double mouseY) {
+        TabButtonWidget button = (TabButtonWidget) element;
+        return button.isHovered() && button.active && button.visible && !button.isCurrentTab() ?
                 CursorType.POINTER : CursorType.DEFAULT;
     }
 
