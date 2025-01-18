@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static io.github.fishstiz.minecraftcursor.registry.utils.LookupUtils.RESOLVER;
+
 public class CursorTypeRegistry {
     private final List<AbstractMap.SimpleImmutableEntry<Class<? extends Element>, ElementCursorTypeFunction>> registry = new ArrayList<>();
     private final ConcurrentHashMap<String, ElementCursorTypeFunction> cachedRegistry = new ConcurrentHashMap<>();
@@ -87,7 +89,13 @@ public class CursorTypeRegistry {
     }
 
     public CursorType getCursorType(Element element, double mouseX, double mouseY) {
-        return cachedRegistry.computeIfAbsent(element.getClass().getName(), k -> computeCursorType(element)).apply(element, mouseX, mouseY);
+        try {
+            return cachedRegistry.computeIfAbsent(element.getClass().getName(), k -> computeCursorType(element)).apply(element, mouseX, mouseY);
+        } catch (Exception e) {
+            MinecraftCursor.LOGGER.warn("Could not get cursor type for element: {}",
+                    RESOLVER.unmapClassName("named", element.getClass().getName()));
+        }
+        return CursorType.DEFAULT;
     }
 
     private ElementCursorTypeFunction computeCursorType(Element element) {
