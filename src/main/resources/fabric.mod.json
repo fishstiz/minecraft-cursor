@@ -3,7 +3,7 @@
   "id": "minecraft-cursor",
   "version": "${version}",
   "name": "Minecraft Cursor",
-  "description": "Customizable cursor for Minecraft",
+  "description": "Configurable cursor for Minecraft",
   "authors": [
     "fishstiz"
   ],
