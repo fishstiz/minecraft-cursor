@@ -9,9 +9,14 @@ import net.minecraft.client.gui.screen.ingame.BookEditScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 
 public class BookEditScreenCursor {
+    // From BookEditScreen.WIDTH
     private static final int WIDTH = 192;
+    // Manually set values from testing in game
     private static final int MAX_POS_X = 115;
     private static final int MAX_POS_Y = 125;
+    // Derived from BookEditScreen.screenPositionToAbsolutePosition()
+    private static final int BOOK_OFFSET_X = 36;
+    private static final int BOOK_OFFSET_Y = 32;
 
     public static void register(CursorTypeRegistry cursorTypeRegistry) {
         cursorTypeRegistry.register(BookEditScreen.class, BookEditScreenCursor::getBookScreenCursor);
@@ -45,6 +50,6 @@ public class BookEditScreenCursor {
     }
 
     public static Position screenPositionToAbsolutePosition(Screen screen, int mouseX, int mouseY) {
-        return new Position(mouseX - (screen.width - WIDTH) / 2 - 36, mouseY - 32);
+        return new Position(mouseX - (screen.width - WIDTH) / 2 - BOOK_OFFSET_X, mouseY - BOOK_OFFSET_Y);
     }
 }
