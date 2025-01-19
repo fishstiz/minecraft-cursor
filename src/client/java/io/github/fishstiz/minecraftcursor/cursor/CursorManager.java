@@ -46,7 +46,7 @@ public class CursorManager {
     public void setCurrentCursor(CursorType type) {
         Cursor cursor = cursors.get(currentCursorOverrides.isEmpty() ? type : currentCursorOverrides.lastEntry().getValue());
 
-        if (cursor == null || (type != CursorType.DEFAULT && cursor.getId() == 0)) {
+        if (cursor == null || (type != CursorType.DEFAULT && cursor.getId() == 0) || !cursor.getEnabled()) {
             cursor = cursors.get(CursorType.DEFAULT);
         }
 
@@ -60,7 +60,11 @@ public class CursorManager {
     }
 
     public void overrideCurrentCursor(CursorType type, int index) {
-        currentCursorOverrides.put(index, type);
+        if (getCursor(type).getEnabled()) {
+            currentCursorOverrides.put(index, type);
+        } else {
+            currentCursorOverrides.remove(index);
+        }
     }
 
     public void removeOverride(int index) {
