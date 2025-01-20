@@ -2,6 +2,7 @@ package io.github.fishstiz.minecraftcursor.registry.gui.ingame;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
+import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
 import io.github.fishstiz.minecraftcursor.registry.utils.LookupUtils;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -24,9 +25,10 @@ public class HandledScreenCursor {
     protected static final String FOCUSED_SLOT_NAME = "field_2787";
     protected static VarHandle focusedSlot;
 
-    public static void register() {
+    public static void register(CursorTypeRegistry cursorTypeRegistry) {
         try {
             initHandles();
+            cursorTypeRegistry.register(HandledScreen.class, HandledScreenCursor::getCursorType);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             MinecraftCursor.LOGGER.warn("Could not register cursor type for HandledScreen");
         }
@@ -43,6 +45,18 @@ public class HandledScreenCursor {
     }
 
     public static CursorType getCursorType(Element element, double mouseX, double mouseY) {
+        HandledScreen<?> handledScreen = (HandledScreen<?>) element;
+        ScreenHandler handler = (ScreenHandler) screenHandler.get(handledScreen);
+        Slot focusedSlot = (Slot) HandledScreenCursor.focusedSlot.get(handledScreen);
+        if (handler.getCursorStack().isEmpty()
+                && focusedSlot != null
+                && focusedSlot.hasStack()
+                && focusedSlot.canBeHighlighted()) {
+            return CursorType.POINTER;
+        }
+        if (!handler.getCursorStack().isEmpty()) {
+            return CursorType.GRABBING;
+        }
         return CursorType.DEFAULT;
     }
 }
