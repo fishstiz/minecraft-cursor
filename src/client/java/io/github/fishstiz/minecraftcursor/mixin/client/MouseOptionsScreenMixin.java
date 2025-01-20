@@ -9,20 +9,12 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(MouseOptionsScreen.class)
 public abstract class MouseOptionsScreenMixin extends GameOptionsScreen {
-    @Unique
-    private final ButtonWidget cursorSettingsButton = ButtonWidget.builder(Text.of("Cursor Settings..."), button -> {
-        if (this.client != null) {
-            this.client.setScreen(new CursorOptionsScreen(this, MinecraftCursorClient.CURSOR_MANAGER));
-        }
-    }).build();
-
     public MouseOptionsScreenMixin(Screen parent, GameOptions gameOptions, Text title) {
         super(parent, gameOptions, title);
     }
@@ -33,10 +25,19 @@ public abstract class MouseOptionsScreenMixin extends GameOptionsScreen {
             return;
         }
 
-        ButtonWidget buttonWidget = ButtonWidget.builder(Text.empty(), button -> {
+        ButtonWidget settingsBtn = ButtonWidget.builder(
+                Text.translatable("minecraft-cursor.options").append("..."),
+                btn -> {
+                    if (this.client != null) {
+                        this.client.setScreen(new CursorOptionsScreen(this, MinecraftCursorClient.CURSOR_MANAGER));
+                    }
+                }).build();
+
+        ButtonWidget fillerBtn = ButtonWidget.builder(Text.empty(), button -> {
         }).build();
-        buttonWidget.visible = false;
-        buttonWidget.active = false;
-        this.body.addWidgetEntry(cursorSettingsButton, buttonWidget);
+        fillerBtn.visible = false;
+        fillerBtn.active = false;
+
+        this.body.addWidgetEntry(settingsBtn, fillerBtn);
     }
 }
