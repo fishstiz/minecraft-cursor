@@ -14,7 +14,7 @@ import net.minecraft.item.ItemGroups;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.VarHandle;
 
-public class CreativeInventoryScreenCursor {
+public class CreativeInventoryScreenCursor extends HandledScreenCursor {
     // Derived from CreativeInventoryScreen.renderTabTooltipIfHovered()
     public static final int TAB_WIDTH = 21;
     public static final int TAB_HEIGHT = 27;
@@ -54,7 +54,12 @@ public class CreativeInventoryScreenCursor {
         );
     }
 
-    private static CursorType getCursorType(Element element, double mouseX, double mouseY) {
+    public static CursorType getCursorType(Element element, double mouseX, double mouseY) {
+        CursorType handledScreenCursor = HandledScreenCursor.getCursorType(element, mouseX, mouseY);
+        if (handledScreenCursor != CursorType.DEFAULT) {
+            return handledScreenCursor;
+        }
+
         if (!MinecraftCursorClient.CONFIG.get().isCreativeTabsEnabled()) return CursorType.DEFAULT;
 
         try {

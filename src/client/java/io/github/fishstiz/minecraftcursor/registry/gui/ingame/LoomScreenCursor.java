@@ -14,9 +14,7 @@ import net.minecraft.screen.LoomScreenHandler;
 import java.lang.invoke.VarHandle;
 import java.util.List;
 
-import static io.github.fishstiz.minecraftcursor.registry.gui.ingame.HandledScreenCursor.*;
-
-public class LoomScreenCursor {
+public class LoomScreenCursor extends HandledScreenCursor {
     // Derived from LoomScreen.drawBackground()
     public static final int PATTERNS_OFFSET_X = 60;
     public static final int PATTERNS_OFFSET_Y = 13;
@@ -34,7 +32,7 @@ public class LoomScreenCursor {
                 throw new NoSuchFieldException();
             }
             initHandles();
-            cursorTypeRegistry.register(LoomScreen.class, LoomScreenCursor::getLoomScreenCursorType);
+            cursorTypeRegistry.register(LoomScreen.class, LoomScreenCursor::getCursorType);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             MinecraftCursor.LOGGER.warn("Could not register cursor type for LoomScreen");
         }
@@ -46,7 +44,12 @@ public class LoomScreenCursor {
         visibleTopRow = LookupUtils.getVarHandle(targetClass, VISIBLE_TOP_ROW_NAME, int.class);
     }
 
-    private static CursorType getLoomScreenCursorType(Element element, double mouseX, double mouseY) {
+    public static CursorType getCursorType(Element element, double mouseX, double mouseY) {
+        CursorType handledScreenCursor = HandledScreenCursor.getCursorType(element, mouseX, mouseY);
+        if (handledScreenCursor != CursorType.DEFAULT) {
+            return handledScreenCursor;
+        }
+
         if (!MinecraftCursorClient.CONFIG.get().isLoomPatternsEnabled()) return CursorType.DEFAULT;
 
         LoomScreen loomScreen = (LoomScreen) element;

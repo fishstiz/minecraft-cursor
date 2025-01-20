@@ -15,7 +15,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.VarHandle;
 import java.util.List;
 
-public class RecipeBookScreenCursor {
+public class RecipeBookScreenCursor extends HandledScreenCursor {
     public static final String RECIPE_BOOK_NAME = "field_54474";
     public static VarHandle recipeBook;
 
@@ -90,8 +90,13 @@ public class RecipeBookScreenCursor {
     }
 
     @SuppressWarnings("unchecked")
-    private static CursorType getCursorType(Element element, double mouseX, double mouseY) {
+    public static CursorType getCursorType(Element element, double mouseX, double mouseY) {
         try {
+            CursorType handledScreenCursor = HandledScreenCursor.getCursorType(element, mouseX, mouseY);
+            if (handledScreenCursor != CursorType.DEFAULT) {
+                return handledScreenCursor;
+            }
+
             RecipeBookWidget<?> recipeBook = (RecipeBookWidget<?>) RecipeBookScreenCursor.recipeBook.get(element);
 
             if (!((boolean) isOpen.invoke(recipeBook))) {

@@ -1,7 +1,9 @@
 package io.github.fishstiz.minecraftcursor.registry.gui.ingame;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
+import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.registry.utils.LookupUtils;
+import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
@@ -30,7 +32,7 @@ public class HandledScreenCursor {
         }
     }
 
-    public static void initHandles() throws NoSuchFieldException, IllegalAccessException {
+    private static void initHandles() throws NoSuchFieldException, IllegalAccessException {
         Class<?> targetClass = HandledScreen.class;
         screenHandler = LookupUtils.getVarHandle(targetClass, HANDLER_NAME, ScreenHandler.class);
         backgroundWidth = LookupUtils.getVarHandle(targetClass, BACKGROUND_WIDTH_NAME, int.class);
@@ -38,5 +40,9 @@ public class HandledScreenCursor {
         x = LookupUtils.getVarHandle(targetClass, X_NAME, int.class);
         y = LookupUtils.getVarHandle(targetClass, Y_NAME, int.class);
         focusedSlot = LookupUtils.getVarHandle(targetClass, FOCUSED_SLOT_NAME, Slot.class);
+    }
+
+    public static CursorType getCursorType(Element element, double mouseX, double mouseY) {
+        return CursorType.DEFAULT;
     }
 }
