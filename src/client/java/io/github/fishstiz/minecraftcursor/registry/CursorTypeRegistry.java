@@ -52,7 +52,7 @@ public class CursorTypeRegistry {
     }
 
     public void initGuis() {
-        HandledScreenCursor.register();
+        HandledScreenCursor.register(this);
         WorldListWidgetCursor.register(this);
         RecipeBookScreenCursor.register(this);
         CreativeInventoryScreenCursor.register(this);
