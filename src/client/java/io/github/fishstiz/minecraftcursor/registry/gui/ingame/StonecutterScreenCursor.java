@@ -11,9 +11,7 @@ import net.minecraft.screen.StonecutterScreenHandler;
 
 import java.lang.invoke.VarHandle;
 
-import static io.github.fishstiz.minecraftcursor.registry.gui.ingame.HandledScreenCursor.*;
-
-public class StonecutterScreenCursor {
+public class StonecutterScreenCursor extends HandledScreenCursor {
     // Derived from StonecutterScreen.drawBackground()
     public static final int RECIPES_OFFSET_X = 52;
     public static final int RECIPES_OFFSET_Y = 14;
@@ -33,7 +31,7 @@ public class StonecutterScreenCursor {
                 throw new NoSuchFieldException();
             }
             initHandles();
-            cursorTypeRegistry.register(StonecutterScreen.class, StonecutterScreenCursor::getStonecutterCursorType);
+            cursorTypeRegistry.register(StonecutterScreen.class, StonecutterScreenCursor::getCursorType);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             MinecraftCursor.LOGGER.warn("Could not register cursor type for StonecutterScreen");
         }
@@ -43,7 +41,12 @@ public class StonecutterScreenCursor {
         scrollOffset = LookupUtils.getVarHandle(StonecutterScreen.class, SCROLL_OFFSET_NAME, int.class);
     }
 
-    public static CursorType getStonecutterCursorType(Element element, double mouseX, double mouseY) {
+    public static CursorType getCursorType(Element element, double mouseX, double mouseY) {
+        CursorType handledScreenCursor = HandledScreenCursor.getCursorType(element, mouseX, mouseY);
+        if (handledScreenCursor != CursorType.DEFAULT) {
+            return handledScreenCursor;
+        }
+
         if (!MinecraftCursorClient.CONFIG.get().isStonecutterRecipesEnabled()) return CursorType.DEFAULT;
 
         StonecutterScreen stonecutterScreen = (StonecutterScreen) element;

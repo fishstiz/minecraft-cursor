@@ -10,11 +10,7 @@ import net.minecraft.client.gui.screen.ingame.EnchantmentScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.screen.EnchantmentScreenHandler;
 
-import static io.github.fishstiz.minecraftcursor.registry.gui.ingame.HandledScreenCursor.screenHandler;
-import static io.github.fishstiz.minecraftcursor.registry.gui.ingame.HandledScreenCursor.backgroundWidth;
-import static io.github.fishstiz.minecraftcursor.registry.gui.ingame.HandledScreenCursor.backgroundHeight;
-
-public class EnchantmentScreenCursor {
+public class EnchantmentScreenCursor extends HandledScreenCursor {
     // Derived from EnchantmentScreen.drawBackground()
     public static final int ENCHANTMENT_BTN_WIDTH = 108;
     public static final int ENCHANTMENT_BTN_HEIGHT = 19;
@@ -29,7 +25,12 @@ public class EnchantmentScreenCursor {
         cursorTypeRegistry.register(EnchantmentScreen.class, EnchantmentScreenCursor::getCursorType);
     }
 
-    private static CursorType getCursorType(Element element, double mouseX, double mouseY) {
+    public static CursorType getCursorType(Element element, double mouseX, double mouseY) {
+        CursorType handledScreenCursor = HandledScreenCursor.getCursorType(element, mouseX, mouseY);
+        if (handledScreenCursor != CursorType.DEFAULT) {
+            return handledScreenCursor;
+        }
+
         if (!MinecraftCursorClient.CONFIG.get().isEnchantmentsEnabled()) return CursorType.DEFAULT;
 
         ClientPlayerEntity player = MinecraftClient.getInstance().player;

@@ -66,7 +66,7 @@ abstract public class RecipeBookScreenCursor {
             cursorRegistry.register(CraftingScreen.class, RecipeBookScreenCursor::getCursorType);
             cursorRegistry.register(AbstractFurnaceScreen.class, RecipeBookScreenCursor::getCursorType);
         } catch (IllegalAccessException | NoSuchMethodException | NoSuchFieldException e) {
-            MinecraftCursor.LOGGER.warn("Could not register cursor type for RecipeBookScreen", e);
+            MinecraftCursor.LOGGER.warn("Could not register cursor type for RecipeBookScreen");
         }
     }
 
@@ -100,8 +100,13 @@ abstract public class RecipeBookScreenCursor {
     }
 
     @SuppressWarnings("unchecked")
-    private static CursorType getCursorType(Element element, double mouseX, double mouseY) {
+    public static CursorType getCursorType(Element element, double mouseX, double mouseY) {
         try {
+            CursorType handledScreenCursor = HandledScreenCursor.getCursorType(element, mouseX, mouseY);
+            if (handledScreenCursor != CursorType.DEFAULT) {
+                return handledScreenCursor;
+            }
+
             RecipeBookWidget recipeBook;
             switch (element) {
                 case InventoryScreen inventory -> recipeBook = (RecipeBookWidget) inventoryRecipeBook.get(inventory);

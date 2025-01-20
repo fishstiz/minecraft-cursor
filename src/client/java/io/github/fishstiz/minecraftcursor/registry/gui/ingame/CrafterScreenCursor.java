@@ -11,19 +11,21 @@ import net.minecraft.screen.CrafterScreenHandler;
 import net.minecraft.screen.slot.CrafterInputSlot;
 import net.minecraft.screen.slot.Slot;
 
-import static io.github.fishstiz.minecraftcursor.registry.gui.ingame.HandledScreenCursor.screenHandler;
-import static io.github.fishstiz.minecraftcursor.registry.gui.ingame.HandledScreenCursor.focusedSlot;
-
-public class CrafterScreenCursor {
+public class CrafterScreenCursor extends HandledScreenCursor {
     public static void register(CursorTypeRegistry cursorTypeRegistry) {
         if (screenHandler == null || focusedSlot == null) {
             MinecraftCursor.LOGGER.warn("Cannot register cursor type for CrafterScreen");
             return;
         }
-        cursorTypeRegistry.register(CrafterScreen.class, CrafterScreenCursor::getCrafterCursorType);
+        cursorTypeRegistry.register(CrafterScreen.class, CrafterScreenCursor::getCursorType);
     }
 
-    public static CursorType getCrafterCursorType(Element element, double mouseX, double mouseY) {
+    public static CursorType getCursorType(Element element, double mouseX, double mouseY) {
+        CursorType handledScreenCursor = HandledScreenCursor.getCursorType(element, mouseX, mouseY);
+        if (handledScreenCursor != CursorType.DEFAULT) {
+            return handledScreenCursor;
+        }
+
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
         if (player == null) {
             return CursorType.DEFAULT;
