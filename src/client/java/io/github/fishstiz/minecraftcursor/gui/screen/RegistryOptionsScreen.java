@@ -79,7 +79,10 @@ public class RegistryOptionsScreen extends Screen {
     }
 
     public void enableAll(boolean isEnabled) {
-        body.options.forEach(option -> option.toggleButton.active = isEnabled);
+        body.options.forEach(option -> {
+            option.toggleButton.active = isEnabled;
+            option.toggleButton.setValue(isEnabled);
+        });
         cursorManager.setIsAdaptive(isEnabled);
     }
 
@@ -204,6 +207,17 @@ public class RegistryOptionsScreen extends Screen {
         protected void updateMessage() {
             Text message = value ? ScreenTexts.ON : ScreenTexts.OFF;
             setMessage(message);
+        }
+
+        @Override
+        public void setValue(boolean value) {
+            if (value == this.value) {
+                return;
+            }
+
+            this.value = value;
+            updateMessage();
+            onPressConsumer.accept(value);
         }
     }
 }
