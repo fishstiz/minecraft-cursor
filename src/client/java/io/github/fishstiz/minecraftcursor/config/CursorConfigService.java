@@ -11,8 +11,12 @@ public class CursorConfigService {
 
         this.loader = new CursorConfigLoader(path);
     }
-    
+
     public void saveSettings(Cursor... cursors) {
+        saveSettings(false, cursors);
+    }
+
+    public void saveSettings(boolean force, Cursor... cursors) {
         boolean hasApplied = false;
 
         for (Cursor cursor : cursors) {
@@ -23,7 +27,7 @@ public class CursorConfigService {
             }
         }
 
-        if (hasApplied) {
+        if (hasApplied || force) {
             this.loader.save();
         }
     }

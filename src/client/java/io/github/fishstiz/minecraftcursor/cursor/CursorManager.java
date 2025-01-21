@@ -117,7 +117,7 @@ public class CursorManager {
     }
 
     public void saveAll() {
-        config.saveSettings(cursors.values().toArray(new Cursor[0]));
+        config.saveSettings(true, cursors.values().toArray(new Cursor[0]));
     }
 
     public void saveCursor(CursorType type) {
