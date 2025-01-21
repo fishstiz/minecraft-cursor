@@ -8,6 +8,7 @@ import java.util.Map;
 public enum CursorType {
     DEFAULT("default"),
     POINTER("pointer"),
+    GRABBING("grabbing"),
     TEXT("text");
 
     private final String key;
