@@ -25,8 +25,10 @@ import java.util.function.Consumer;
 
 public class RegistryOptionsScreen extends Screen {
     private static final Tooltip ADAPTIVE_CURSOR_TOOLTIP = Tooltip.of(Text.translatable("minecraft-cursor.options.more.adapt.tooltip"));
-    private final static Text ENABLED_TEXT = Text.translatable("minecraft-cursor.options.enabled");
-    private final static Text ADAPTIVE_CURSOR_TEXT = Text.translatable("minecraft-cursor.options.more.adapt");
+    private static final Text ENABLED_TEXT = Text.translatable("minecraft-cursor.options.enabled");
+    private static final Text ADAPTIVE_CURSOR_TEXT = Text.translatable("minecraft-cursor.options.more.adapt");
+    private static final Text ITEM_SLOT_TEXT = Text.translatable("minecraft-cursor.options.item_slot");
+    private static final Text ITEM_GRAB_TEXT = Text.translatable("minecraft-cursor.options.item_grab");
     private static final Text CREATIVE_TABS_TEXT = Text.translatable("minecraft-cursor.options.creative_tabs");
     private static final Text ENCHANTMENTS_TEXT = Text.translatable("minecraft-cursor.options.enchantments");
     private static final Text STONECUTTER_TEXT = Text.translatable("minecraft-cursor.options.stonecutter");
@@ -95,6 +97,14 @@ public class RegistryOptionsScreen extends Screen {
                     ENABLED_TEXT, cursorManager.isAdaptive(), true, ADAPTIVE_CURSOR_TOOLTIP, RegistryOptionsScreen.this::enableAll));
 
             boolean isActive = cursorManager.isAdaptive();
+
+            RegistryEntry itemSlot = new RegistryEntry(ITEM_SLOT_TEXT, config.isItemSlotEnabled(), isActive, config::setItemSlotEnabled);
+            options.add(itemSlot);
+            this.addEntry(itemSlot);
+
+            RegistryEntry itemGrab = new RegistryEntry(ITEM_GRAB_TEXT, config.isItemGrabbingEnabled(), isActive, config::setItemGrabbingEnabled);
+            options.add(itemGrab);
+            this.addEntry(itemGrab);
 
             RegistryEntry creative = new RegistryEntry(CREATIVE_TABS_TEXT, config.isCreativeTabsEnabled(), isActive, config::setCreativeTabsEnabled);
             options.add(creative);

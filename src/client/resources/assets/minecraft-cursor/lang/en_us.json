@@ -11,6 +11,8 @@
   "minecraft-cursor.options.more": "More Cursor Options",
   "minecraft-cursor.options.more.adapt": "Adaptive Cursor",
   "minecraft-cursor.options.more.adapt.tooltip": "Updates the enabled setting on all cursors except for the Default cursor.",
+  "minecraft-cursor.options.item_slot": "Inventory Item Slot",
+  "minecraft-cursor.options.item_grab": "Inventory Item Grab",
   "minecraft-cursor.options.creative_tabs": "Creative Inventory Tabs",
   "minecraft-cursor.options.enchantments": "Enchantment Buttons",
   "minecraft-cursor.options.stonecutter": "Stonecutter Recipe Buttons",
