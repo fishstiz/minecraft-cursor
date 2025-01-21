@@ -25,7 +25,7 @@ public class CursorResourceReloadListener implements SimpleSynchronousResourceRe
     private final CursorManager cursorManager;
     private final String modId;
     private final CursorConfig userConfig;
-    private CursorConfig config;
+    private final CursorConfig config;
 
     CursorResourceReloadListener(CursorManager cursorManager, String modId, CursorConfigService userConfig) {
         this.cursorManager = cursorManager;
@@ -58,11 +58,11 @@ public class CursorResourceReloadListener implements SimpleSynchronousResourceRe
             CursorConfig resourceConfig = new CursorConfigLoader(stream).config();
             if (!resourceConfig.get_hash().equals(userConfig.get_hash())) {
                 userConfig.set_hash(resourceConfig.get_hash());
-                config = resourceConfig;
-                MinecraftCursor.LOGGER.info("Using default cursor config provided by resource");
+                config.setSettings(resourceConfig.getSettings());
+                MinecraftCursor.LOGGER.info("Using default cursor settings provided by resource");
             }
         } catch (IOException e) {
-            MinecraftCursor.LOGGER.error("Failed to load resource config", e);
+            MinecraftCursor.LOGGER.error("Failed to load resource cursor settings", e);
         }
     }
 

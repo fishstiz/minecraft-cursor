@@ -9,9 +9,16 @@ import java.util.Map;
 
 public class CursorConfig {
     @JsonProperty
-    protected final Map<String, Settings> settings = new HashMap<>();
-    @JsonProperty
     private String _hash;
+    private boolean creativeTabsEnabled = true;
+    private boolean enchantmentsEnabled = true;
+    private boolean stonecutterRecipesEnabled = true;
+    private boolean bookEditEnabled = true;
+    private boolean loomPatternsEnabled = true;
+    private boolean worldIconEnabled = true;
+
+    @JsonProperty
+    protected Map<String, Settings> settings = new HashMap<>();
 
     public Settings getOrCreateCursorSettings(CursorType type) {
         return settings.computeIfAbsent(type.getKey(), k -> new Settings());
@@ -28,6 +35,62 @@ public class CursorConfig {
 
     public void set_hash(String hash) {
         _hash = hash;
+    }
+
+    public Map<String, Settings> getSettings() {
+        return settings;
+    }
+
+    public void setSettings(Map<String, Settings> settings) {
+        this.settings = settings;
+    }
+
+    public boolean isCreativeTabsEnabled() {
+        return creativeTabsEnabled;
+    }
+
+    public void setCreativeTabsEnabled(boolean creativeTabsEnabled) {
+        this.creativeTabsEnabled = creativeTabsEnabled;
+    }
+
+    public boolean isEnchantmentsEnabled() {
+        return enchantmentsEnabled;
+    }
+
+    public void setEnchantmentsEnabled(boolean enchantmentsEnabled) {
+        this.enchantmentsEnabled = enchantmentsEnabled;
+    }
+
+    public boolean isStonecutterRecipesEnabled() {
+        return stonecutterRecipesEnabled;
+    }
+
+    public void setStonecutterRecipesEnabled(boolean stonecutterRecipesEnabled) {
+        this.stonecutterRecipesEnabled = stonecutterRecipesEnabled;
+    }
+
+    public boolean isBookEditEnabled() {
+        return bookEditEnabled;
+    }
+
+    public void setBookEditEnabled(boolean bookEditEnabled) {
+        this.bookEditEnabled = bookEditEnabled;
+    }
+
+    public boolean isLoomPatternsEnabled() {
+        return loomPatternsEnabled;
+    }
+
+    public void setLoomPatternsEnabled(boolean loomPatternsEnabled) {
+        this.loomPatternsEnabled = loomPatternsEnabled;
+    }
+
+    public boolean isWorldIconEnabled() {
+        return worldIconEnabled;
+    }
+
+    public void setWorldIconEnabled(boolean worldIconEnabled) {
+        this.worldIconEnabled = worldIconEnabled;
     }
 
     public static class Defaults {
