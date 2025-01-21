@@ -1,6 +1,7 @@
 package io.github.fishstiz.minecraftcursor.registry.gui.ingame;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
+import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
 import io.github.fishstiz.minecraftcursor.registry.utils.LookupUtils;
@@ -46,6 +47,8 @@ public class LoomScreenCursor {
     }
 
     private static CursorType getLoomScreenCursorType(Element element, double mouseX, double mouseY) {
+        if (!MinecraftCursorClient.CONFIG.get().isLoomPatternsEnabled()) return CursorType.DEFAULT;
+
         LoomScreen loomScreen = (LoomScreen) element;
 
         if (!((boolean) canApplyDyePattern.get(loomScreen))) {

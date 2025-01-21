@@ -1,6 +1,7 @@
 package io.github.fishstiz.minecraftcursor.registry.gui.ingame;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
+import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
 import net.minecraft.client.MinecraftClient;
@@ -29,6 +30,8 @@ public class EnchantmentScreenCursor {
     }
 
     private static CursorType getCursorType(Element element, double mouseX, double mouseY) {
+        if (!MinecraftCursorClient.CONFIG.get().isEnchantmentsEnabled()) return CursorType.DEFAULT;
+
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
         if (player == null) {
             return CursorType.DEFAULT;

@@ -1,5 +1,6 @@
 package io.github.fishstiz.minecraftcursor.registry.gui.world;
 
+import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
 import net.minecraft.client.gui.Element;
@@ -11,6 +12,8 @@ public class WorldListWidgetCursor {
     }
 
     private static CursorType getCursorTypeFromWorld(Element element, double mouseX, double mouseY) {
+        if (!MinecraftCursorClient.CONFIG.get().isWorldIconEnabled()) return CursorType.DEFAULT;
+
         WorldListWidget worldListWidget = (WorldListWidget) element;
         int x = (int) Math.floor((double) worldListWidget.getWidth() / 2 - (double) worldListWidget.getRowWidth() / 2);
         for (WorldListWidget.Entry entry : worldListWidget.children()) {

@@ -1,5 +1,6 @@
 package io.github.fishstiz.minecraftcursor.registry.gui.ingame;
 
+import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
 
@@ -23,6 +24,8 @@ public class BookEditScreenCursor {
     }
 
     public static CursorType getBookScreenCursor(Element element, double mouseX, double mouseY) {
+        if (!MinecraftCursorClient.CONFIG.get().isBookEditEnabled()) return CursorType.DEFAULT;
+
         BookEditScreen bookEditScreen = (BookEditScreen) element;
         Position position = screenPositionToAbsolutePosition(bookEditScreen, (int) mouseX, (int) mouseY);
 
