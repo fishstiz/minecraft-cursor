@@ -11,6 +11,10 @@
     "text": {
       "xhot": 12,
       "yhot": 15
+    },
+    "grabbing": {
+      "xhot": 15,
+      "yhot": 7
     }
   }
 }
