@@ -28,24 +28,29 @@ public class MinecraftCursorClient implements ClientModInitializer {
     }
 
     public void tick(MinecraftClient client) {
+        if (client.currentScreen == null) {
+            return;
+        }
         if (!CURSOR_MANAGER.isAdaptive()) {
             CURSOR_MANAGER.setCurrentCursor(CursorType.DEFAULT);
             return;
         }
-
-        if (client.currentScreen != null) {
-            double scale = client.getWindow().getScaleFactor();
-            double x = client.mouse.getX() / scale;
-            double y = client.mouse.getY() / scale;
-
-            CursorType screenCursorType = CURSOR_REGISTRY.getCursorType(client.currentScreen, x, y);
-            CursorType cursorType = (screenCursorType != CursorType.DEFAULT)
-                    ? screenCursorType
-                    : client.currentScreen.hoveredElement(x, y)
-                    .map(element -> CURSOR_REGISTRY.getCursorType(element, x, y))
-                    .orElse(CursorType.DEFAULT);
-
-            CURSOR_MANAGER.setCurrentCursor(cursorType);
+        if (client.currentScreen.isDragging()
+                && CURSOR_MANAGER.getCurrentCursor().getType() == CursorType.GRABBING) {
+            return;
         }
+
+        double scale = client.getWindow().getScaleFactor();
+        double x = client.mouse.getX() / scale;
+        double y = client.mouse.getY() / scale;
+
+        CursorType screenCursorType = CURSOR_REGISTRY.getCursorType(client.currentScreen, x, y);
+        CursorType cursorType = (screenCursorType != CursorType.DEFAULT)
+                ? screenCursorType
+                : client.currentScreen.hoveredElement(x, y)
+                .map(element -> CURSOR_REGISTRY.getCursorType(element, x, y))
+                .orElse(CursorType.DEFAULT);
+
+        CURSOR_MANAGER.setCurrentCursor(cursorType);
     }
 }

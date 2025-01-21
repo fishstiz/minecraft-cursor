@@ -1,6 +1,7 @@
 package io.github.fishstiz.minecraftcursor.registry;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
+import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorHotspotWidget;
 import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorSliderWidget;
@@ -36,15 +37,19 @@ public class CursorTypeRegistry {
     public void init() {
         initPointerElements();
         initTextElements();
+        initGrabbingElements();
         initGuis();
     }
 
     public void initPointerElements() {
         register(PressableWidget.class, CursorTypeRegistry::clickableWidgetCursor);
         register(TabButtonWidget.class, CursorTypeRegistry::tabButtonWidgetCursor);
+    }
+
+    public void initGrabbingElements() {
         register(SliderWidget.class, CursorTypeRegistry::sliderWidgetCursor);
-        register(SelectedCursorSliderWidget.class, CursorTypeRegistry::elementToPointer);
-        register(SelectedCursorHotspotWidget.class, CursorTypeRegistry::elementToPointer);
+        register(SelectedCursorSliderWidget.class, CursorTypeRegistry::sliderWidgetCursor);
+        register(SelectedCursorHotspotWidget.class, CursorTypeRegistry::hotspotWidgetCursor);
     }
 
     public void initTextElements() {
@@ -151,6 +156,11 @@ public class CursorTypeRegistry {
 
     private static CursorType sliderWidgetCursor(Element element, double mouseX, double mouseY) {
         SliderWidget slider = (SliderWidget) element;
+        if (slider.isFocused()
+                && MinecraftCursorClient.CLIENT.currentScreen != null
+                && MinecraftCursorClient.CLIENT.currentScreen.isDragging()) {
+            return CursorType.GRABBING;
+        }
         return slider.active && slider.visible && slider.isHovered() ?
                 CursorType.POINTER : CursorType.DEFAULT;
     }
@@ -158,5 +168,13 @@ public class CursorTypeRegistry {
     private static CursorType textFieldWidgetCursor(Element element, double mouseX, double mouseY) {
         TextFieldWidget textField = (TextFieldWidget) element;
         return textField.visible && textField.isHovered() ? CursorType.TEXT : CursorType.DEFAULT;
+    }
+
+    private static CursorType hotspotWidgetCursor(Element element, double mouseX, double mouseY) {
+        if (MinecraftCursorClient.CLIENT.currentScreen != null
+                && MinecraftCursorClient.CLIENT.currentScreen.isDragging()) {
+            return CursorType.GRABBING;
+        }
+        return CursorType.POINTER;
     }
 }
