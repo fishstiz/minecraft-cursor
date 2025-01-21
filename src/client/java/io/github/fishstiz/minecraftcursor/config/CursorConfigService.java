@@ -11,16 +11,19 @@ public class CursorConfigService {
 
         this.loader = new CursorConfigLoader(path);
     }
+    
+    public void saveSettings(Cursor... cursors) {
+        boolean hasApplied = false;
 
-    public void save() {
-        this.loader.save();
-    }
+        for (Cursor cursor : cursors) {
+            CursorConfig.Settings settings = CursorConfig.Settings.create(cursor.getScale(), cursor.getXhot(), cursor.getYhot(), cursor.getEnabled());
+            if (hasChanges(loader.config().getOrCreateCursorSettings(cursor.getType()), settings)) {
+                this.loader.config().updateCursorSettings(cursor.getType(), settings);
+                hasApplied = true;
+            }
+        }
 
-    public void saveSettings(Cursor cursor) {
-        CursorConfig.Settings settings = CursorConfig.Settings.create(cursor.getScale(), cursor.getXhot(), cursor.getYhot(), cursor.getEnabled());
-
-        if (hasChanges(loader.config().getOrCreateCursorSettings(cursor.getType()), settings)) {
-            this.loader.config().updateCursorSettings(cursor.getType(), settings);
+        if (hasApplied) {
             this.loader.save();
         }
     }

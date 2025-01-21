@@ -19,12 +19,12 @@ public class CursorOptionsScreen extends Screen {
     private static final int SELECTED_CURSOR_COLUMN_WIDTH = 200;
     private static final int COLUMN_GAP = 6;
     private final static Text TITLE_TEXT = Text.translatable("minecraft-cursor.options");
+    private final CursorManager cursorManager;
+    private final List<Cursor> cursors;
+    protected final Screen previousScreen;
     public final ThreePartsLayoutWidget layout = new ThreePartsLayoutWidget(this);
     protected CursorOptionsBody body;
     private Cursor selectedCursor;
-    private final Screen previousScreen;
-    private final CursorManager cursorManager;
-    private final List<Cursor> cursors;
     ButtonWidget moreButton;
     ButtonWidget doneButton;
 
@@ -47,7 +47,7 @@ public class CursorOptionsScreen extends Screen {
         moreButton = ButtonWidget.builder(Text.translatable("minecraft-cursor.options.more").append("..."),
                 btn -> {
                     assert client != null;
-                    client.setScreen(new RegistryOptionsScreen(this));
+                    client.setScreen(new RegistryOptionsScreen(this, cursorManager));
                 }).build();
         this.layout.addFooter(moreButton);
 
