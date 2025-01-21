@@ -10,6 +10,8 @@ import java.util.Map;
 public class CursorConfig {
     @JsonProperty
     private String _hash;
+    private boolean itemSlotEnabled = true;
+    private boolean itemGrabbingEnabled = true;
     private boolean creativeTabsEnabled = true;
     private boolean enchantmentsEnabled = true;
     private boolean stonecutterRecipesEnabled = true;
@@ -91,6 +93,22 @@ public class CursorConfig {
 
     public void setWorldIconEnabled(boolean worldIconEnabled) {
         this.worldIconEnabled = worldIconEnabled;
+    }
+
+    public boolean isItemSlotEnabled() {
+        return itemSlotEnabled;
+    }
+
+    public void setItemSlotEnabled(boolean itemSlotEnabled) {
+        this.itemSlotEnabled = itemSlotEnabled;
+    }
+
+    public boolean isItemGrabbingEnabled() {
+        return itemGrabbingEnabled;
+    }
+
+    public void setItemGrabbingEnabled(boolean itemGrabbingEnabled) {
+        this.itemGrabbingEnabled = itemGrabbingEnabled;
     }
 
     public static class Defaults {
