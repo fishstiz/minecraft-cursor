@@ -59,7 +59,6 @@ public class RegistryOptionsScreen extends Screen {
         this.refreshWidgetPositions();
     }
 
-    @Override
     protected void refreshWidgetPositions() {
         if (this.body != null) {
             this.layout.refreshPositions();
@@ -71,9 +70,12 @@ public class RegistryOptionsScreen extends Screen {
     public void close() {
         if (this.client != null) {
             if (previousScreen instanceof CursorOptionsScreen screen && screen.body != null) {
-                screen.body.selectedCursorColumn.refreshWidgets();
+                CursorOptionsScreen optionsScreen = new CursorOptionsScreen(screen.previousScreen, cursorManager);
+                this.client.setScreen(optionsScreen);
+                optionsScreen.selectCursor(screen.getSelectedCursor());
+            } else {
+                this.client.setScreen(previousScreen);
             }
-            this.client.setScreen(previousScreen);
             cursorManager.saveAll();
         }
     }
@@ -184,7 +186,7 @@ public class RegistryOptionsScreen extends Screen {
                     context.drawText(textRenderer, label, x, itemY, 0xFFFFFFFF, false);
                     toggleButton.render(context, mouseX, mouseY, tickDelta);
                     toggleButton.setX(getRowRight() - BUTTON_WIDTH);
-                    toggleButton.setY(layout.getHeaderHeight() + itemHeight * index + ROW_GAP - (int) Math.round(getScrollY()));
+                    toggleButton.setY(layout.getHeaderHeight() + itemHeight * index + ROW_GAP - (int) Math.round(getScrollAmount()));
                     return;
                 }
                 int titleX = x + (getRowWidth() / 2 - textRenderer.getWidth(label) / 2);
