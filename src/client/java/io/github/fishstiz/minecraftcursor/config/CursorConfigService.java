@@ -12,6 +12,10 @@ public class CursorConfigService {
         this.loader = new CursorConfigLoader(path);
     }
 
+    public void save() {
+        this.loader.save();
+    }
+
     public void saveSettings(Cursor cursor) {
         CursorConfig.Settings settings = CursorConfig.Settings.create(cursor.getScale(), cursor.getXhot(), cursor.getYhot(), cursor.getEnabled());
 

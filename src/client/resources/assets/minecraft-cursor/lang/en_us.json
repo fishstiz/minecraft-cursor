@@ -7,5 +7,12 @@
   "minecraft-cursor.options.cursor-type.default": "Default",
   "minecraft-cursor.options.cursor-type.pointer": "Pointer",
   "minecraft-cursor.options.cursor-type.text": "Text",
-  "minecraft-cursor.options.more": "More Cursor Options"
+  "minecraft-cursor.options.more": "More Cursor Options",
+  "minecraft-cursor.options.more.adapt": "Adaptive Cursor",
+  "minecraft-cursor.options.creative_tabs": "Creative Inventory Tabs",
+  "minecraft-cursor.options.enchantments": "Enchantment Buttons",
+  "minecraft-cursor.options.stonecutter": "Stonecutter Recipe Buttons",
+  "minecraft-cursor.options.book_edit": "Book and Quill Book",
+  "minecraft-cursor.options.loom": "Loom Screen Pattern Buttons",
+  "minecraft-cursor.options.world": "World Icon Play Button"
 }

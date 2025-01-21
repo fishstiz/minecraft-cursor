@@ -7,9 +7,9 @@ import net.minecraft.text.Text;
 import java.util.function.Consumer;
 
 public class SelectedCursorToggleWidget extends ButtonWidget {
-    private boolean value;
-    private Text prefix;
-    private Consumer<Boolean> onPressConsumer;
+    protected boolean value;
+    protected Text prefix;
+    protected Consumer<Boolean> onPressConsumer;
 
     protected SelectedCursorToggleWidget(int x, int y, int width, int height, Text message, PressAction onPress, NarrationSupplier narrationSupplier) {
         super(x, y, width, height, message, onPress, narrationSupplier);
@@ -21,7 +21,7 @@ public class SelectedCursorToggleWidget extends ButtonWidget {
                 .initialize(prefix, defaultValue, onPress);
     }
 
-    private SelectedCursorToggleWidget initialize(Text prefix, boolean defaultValue, Consumer<Boolean> onPress) {
+    protected SelectedCursorToggleWidget initialize(Text prefix, boolean defaultValue, Consumer<Boolean> onPress) {
         this.prefix = prefix;
         this.value = defaultValue;
         this.onPressConsumer = onPress;
@@ -30,13 +30,13 @@ public class SelectedCursorToggleWidget extends ButtonWidget {
         return this;
     }
 
-    private static void onPressButton(ButtonWidget buttonWidget) {
+    protected static void onPressButton(ButtonWidget buttonWidget) {
         SelectedCursorToggleWidget toggleWidget = (SelectedCursorToggleWidget) buttonWidget;
         toggleWidget.toggleValue();
         toggleWidget.onPressConsumer.accept(toggleWidget.value);
     }
 
-    private void toggleValue() {
+    protected void toggleValue() {
         value = !value;
         updateMessage();
     }
@@ -46,7 +46,7 @@ public class SelectedCursorToggleWidget extends ButtonWidget {
         updateMessage();
     }
 
-    private void updateMessage() {
+    protected void updateMessage() {
         Text message = Text.translatable(prefix.getString())
                 .append(": ")
                 .append(value ? ScreenTexts.ON : ScreenTexts.OFF);
