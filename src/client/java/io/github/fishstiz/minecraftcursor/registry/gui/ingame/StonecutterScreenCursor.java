@@ -1,6 +1,7 @@
 package io.github.fishstiz.minecraftcursor.registry.gui.ingame;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
+import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
 import io.github.fishstiz.minecraftcursor.registry.utils.LookupUtils;
@@ -43,6 +44,8 @@ public class StonecutterScreenCursor {
     }
 
     public static CursorType getStonecutterCursorType(Element element, double mouseX, double mouseY) {
+        if (!MinecraftCursorClient.CONFIG.get().isStonecutterRecipesEnabled()) return CursorType.DEFAULT;
+
         StonecutterScreen stonecutterScreen = (StonecutterScreen) element;
         StonecutterScreenHandler handler = (StonecutterScreenHandler) screenHandler.get(stonecutterScreen);
 
