@@ -15,6 +15,9 @@ import net.minecraft.text.Text;
 import java.util.List;
 
 public class CursorOptionsScreen extends Screen {
+    private static final int CURSORS_COLUMN_WIDTH = 96;
+    private static final int SELECTED_CURSOR_COLUMN_WIDTH = 200;
+    private static final int COLUMN_GAP = 6;
     private final static Text TITLE_TEXT = Text.translatable("minecraft-cursor.options");
     public final ThreePartsLayoutWidget layout = new ThreePartsLayoutWidget(this);
     protected CursorOptionsBody body;
@@ -22,6 +25,8 @@ public class CursorOptionsScreen extends Screen {
     private final Screen previousScreen;
     private final CursorManager cursorManager;
     private final List<Cursor> cursors;
+    ButtonWidget moreButton;
+    ButtonWidget doneButton;
 
     public CursorOptionsScreen(Screen previousScreen, CursorManager cursorManager) {
         super(TITLE_TEXT);
@@ -38,7 +43,17 @@ public class CursorOptionsScreen extends Screen {
 
         this.layout.addHeader(this.title, this.textRenderer);
         this.body = this.layout.addBody(new CursorOptionsBody(this));
-        this.layout.addFooter(ButtonWidget.builder(ScreenTexts.DONE, button -> this.close()).width(200).build());
+
+        moreButton = ButtonWidget.builder(Text.translatable("minecraft-cursor.options.more").append("..."),
+                btn -> {
+                    assert client != null;
+                    client.setScreen(new RegistryOptionsScreen(this));
+                }).build();
+        this.layout.addFooter(moreButton);
+
+        doneButton = ButtonWidget.builder(ScreenTexts.DONE, btn -> this.close()).build();
+        this.layout.addFooter(doneButton);
+
         this.layout.forEachChild(this::addDrawableChild);
 
         if (this.body != null) {
@@ -52,6 +67,11 @@ public class CursorOptionsScreen extends Screen {
         if (this.body != null) {
             this.body.position(this.width, this.layout);
         }
+        int bodyWidth = CURSORS_COLUMN_WIDTH + SELECTED_CURSOR_COLUMN_WIDTH + COLUMN_GAP;
+        moreButton.setWidth(bodyWidth / 2 - COLUMN_GAP / 2);
+        moreButton.setX(width / 2 - moreButton.getWidth() - COLUMN_GAP / 2);
+        doneButton.setWidth(bodyWidth / 2 - COLUMN_GAP / 2 - 2);
+        doneButton.setX(width / 2 + COLUMN_GAP / 2);
     }
 
     public void onPressEnabled(boolean value) {
@@ -116,9 +136,6 @@ public class CursorOptionsScreen extends Screen {
     }
 
     public class CursorOptionsBody extends ContainerWidget {
-        private static final int CURSORS_COLUMN_WIDTH = 96;
-        private static final int SELECTED_CURSOR_COLUMN_WIDTH = 200;
-        private static final int COLUMN_GAP = 6;
         public CursorListWidget cursorsColumn;
         public SelectedCursorOptionsWidget selectedCursorColumn;
 

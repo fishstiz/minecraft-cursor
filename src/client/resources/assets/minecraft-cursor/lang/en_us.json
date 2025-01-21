@@ -6,5 +6,6 @@
   "minecraft-cursor.options.yhot": "Offset Y",
   "minecraft-cursor.options.cursor-type.default": "Default",
   "minecraft-cursor.options.cursor-type.pointer": "Pointer",
-  "minecraft-cursor.options.cursor-type.text": "Text"
+  "minecraft-cursor.options.cursor-type.text": "Text",
+  "minecraft-cursor.options.more": "More Cursor Options"
 }
