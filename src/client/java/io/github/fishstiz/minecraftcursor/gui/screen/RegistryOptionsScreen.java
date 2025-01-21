@@ -2,12 +2,14 @@ package io.github.fishstiz.minecraftcursor.gui.screen;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
+import io.github.fishstiz.minecraftcursor.cursor.CursorManager;
 import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorToggleWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ElementListWidget;
 import net.minecraft.client.gui.widget.ThreePartsLayoutWidget;
@@ -16,11 +18,14 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
 
 public class RegistryOptionsScreen extends Screen {
+    private static final Tooltip ADAPTIVE_CURSOR_TOOLTIP = Tooltip.of(Text.translatable("minecraft-cursor.options.more.adapt.tooltip"));
+    private final static Text ENABLED_TEXT = Text.translatable("minecraft-cursor.options.enabled");
     private final static Text ADAPTIVE_CURSOR_TEXT = Text.translatable("minecraft-cursor.options.more.adapt");
     private static final Text CREATIVE_TABS_TEXT = Text.translatable("minecraft-cursor.options.creative_tabs");
     private static final Text ENCHANTMENTS_TEXT = Text.translatable("minecraft-cursor.options.enchantments");
@@ -33,13 +38,14 @@ public class RegistryOptionsScreen extends Screen {
     private static final int ROW_GAP = 6;
     private final ThreePartsLayoutWidget layout = new ThreePartsLayoutWidget(this);
     private final Screen previousScreen;
+    private final CursorManager cursorManager;
     private final CursorConfig config = MinecraftCursorClient.CONFIG.get();
-    private final Runnable save = MinecraftCursorClient.CONFIG::save;
     private RegistryListWidget body;
 
-    protected RegistryOptionsScreen(Screen previousScreen) {
+    protected RegistryOptionsScreen(Screen previousScreen, CursorManager cursorManager) {
         super(Text.translatable("minecraft-cursor.options.more"));
         this.previousScreen = previousScreen;
+        this.cursorManager = cursorManager;
     }
 
     @Override
@@ -62,12 +68,22 @@ public class RegistryOptionsScreen extends Screen {
     @Override
     public void close() {
         if (this.client != null) {
+            if (previousScreen instanceof CursorOptionsScreen screen && screen.body != null) {
+                screen.body.selectedCursorColumn.refreshWidgets();
+            }
             this.client.setScreen(previousScreen);
+            cursorManager.saveAll();
         }
-        save.run();
+    }
+
+    public void enableAll(boolean isEnabled) {
+        body.options.forEach(option -> option.toggleButton.active = isEnabled);
+        cursorManager.setIsAdaptive(isEnabled);
     }
 
     public class RegistryListWidget extends ElementListWidget<RegistryListWidget.RegistryEntry> {
+        public final List<RegistryEntry> options = new ArrayList<>();
+
         public RegistryListWidget(MinecraftClient minecraftClient, RegistryOptionsScreen options) {
             super(minecraftClient, options.width, options.layout.getContentHeight(), options.layout.getHeaderHeight(), ITEM_HEIGHT + ROW_GAP);
             populateEntries();
@@ -75,12 +91,39 @@ public class RegistryOptionsScreen extends Screen {
 
         public void populateEntries() {
             this.addEntry(new RegistryEntry(ADAPTIVE_CURSOR_TEXT));
-            this.addEntry(new RegistryEntry(CREATIVE_TABS_TEXT, config.isCreativeTabsEnabled(), config::setCreativeTabsEnabled));
-            this.addEntry(new RegistryEntry(ENCHANTMENTS_TEXT, config.isEnchantmentsEnabled(), config::setEnchantmentsEnabled));
-            this.addEntry(new RegistryEntry(STONECUTTER_TEXT, config.isStonecutterRecipesEnabled(), config::setStonecutterRecipesEnabled));
-            this.addEntry(new RegistryEntry(BOOK_EDIT_TEXT, config.isBookEditEnabled(), config::setBookEditEnabled));
-            this.addEntry(new RegistryEntry(LOOM_TEXT, config.isLoomPatternsEnabled(), config::setLoomPatternsEnabled));
-            this.addEntry(new RegistryEntry(WORLD_ICON_TEXT, config.isWorldIconEnabled(), config::setWorldIconEnabled));
+            this.addEntry(new RegistryEntry(
+                    ENABLED_TEXT, cursorManager.isAdaptive(), true, ADAPTIVE_CURSOR_TOOLTIP, RegistryOptionsScreen.this::enableAll));
+
+            boolean isActive = cursorManager.isAdaptive();
+
+            RegistryEntry creative = new RegistryEntry(CREATIVE_TABS_TEXT, config.isCreativeTabsEnabled(), isActive, config::setCreativeTabsEnabled);
+            options.add(creative);
+            this.addEntry(creative);
+
+            RegistryEntry enchants = new RegistryEntry(
+                    ENCHANTMENTS_TEXT, config.isEnchantmentsEnabled(), isActive, config::setEnchantmentsEnabled);
+            options.add(enchants);
+            this.addEntry(enchants);
+
+            RegistryEntry stonecutter = new RegistryEntry(
+                    STONECUTTER_TEXT, config.isStonecutterRecipesEnabled(), isActive, config::setStonecutterRecipesEnabled);
+            options.add(stonecutter);
+            this.addEntry(stonecutter);
+
+            RegistryEntry bookEdit = new RegistryEntry(
+                    BOOK_EDIT_TEXT, config.isBookEditEnabled(), isActive, config::setBookEditEnabled);
+            options.add(bookEdit);
+            this.addEntry(bookEdit);
+
+            RegistryEntry loomPatterns = new RegistryEntry(
+                    LOOM_TEXT, config.isLoomPatternsEnabled(), isActive, config::setLoomPatternsEnabled);
+            options.add(loomPatterns);
+            this.addEntry(loomPatterns);
+
+            RegistryEntry worldIcon = new RegistryEntry(
+                    WORLD_ICON_TEXT, config.isWorldIconEnabled(), isActive, config::setWorldIconEnabled);
+            options.add(worldIcon);
+            this.addEntry(worldIcon);
         }
 
         public class RegistryEntry extends ElementListWidget.Entry<RegistryListWidget.RegistryEntry> {
@@ -88,10 +131,14 @@ public class RegistryOptionsScreen extends Screen {
             public RegistryToggleWidget toggleButton;
 
             public RegistryEntry(Text title) {
-                this(Text.translatable(title.getString()).formatted(Formatting.BOLD, Formatting.YELLOW), false, null);
+                this(Text.translatable(title.getString()).formatted(Formatting.BOLD, Formatting.YELLOW), false, false, null);
             }
 
-            public RegistryEntry(Text label, boolean defaultValue, @Nullable Consumer<Boolean> onPress) {
+            public RegistryEntry(Text label, boolean defaultValue, boolean active, @Nullable Consumer<Boolean> onPress) {
+                this(label, defaultValue, active, null, onPress);
+            }
+
+            public RegistryEntry(Text label, boolean defaultValue, boolean active, @Nullable Tooltip tooltip, @Nullable Consumer<Boolean> onPress) {
                 this.label = label;
                 if (onPress != null) {
                     toggleButton = new RegistryToggleWidget(
@@ -100,8 +147,10 @@ public class RegistryOptionsScreen extends Screen {
                             BUTTON_WIDTH,
                             itemHeight - ROW_GAP,
                             defaultValue,
+                            tooltip,
                             onPress
                     );
+                    toggleButton.active = active;
                 }
             }
 
@@ -132,11 +181,13 @@ public class RegistryOptionsScreen extends Screen {
     }
 
     public static class RegistryToggleWidget extends SelectedCursorToggleWidget {
-        protected RegistryToggleWidget(int x, int y, int width, int height, boolean defaultValue, Consumer<Boolean> onPress) {
+        protected RegistryToggleWidget(int x, int y, int width, int height, boolean defaultValue, Tooltip tooltip, Consumer<Boolean> onPress) {
             super(x, y, width, height, Text.empty(), RegistryToggleWidget::onPressButton, ButtonWidget.DEFAULT_NARRATION_SUPPLIER);
             value = defaultValue;
             onPressConsumer = onPress;
             updateMessage();
+
+            if (tooltip != null) setTooltip(tooltip);
         }
 
         @Override

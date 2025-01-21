@@ -102,6 +102,24 @@ public class CursorManager {
         return activeCursors;
     }
 
+    public boolean isAdaptive() {
+        return cursors.values().stream().anyMatch(cursor ->
+                cursor.getEnabled() && CursorType.DEFAULT != cursor.getType()
+        );
+    }
+
+    public void setIsAdaptive(boolean isAdaptive) {
+        cursors.values().forEach(cursor -> {
+            if (cursor.getType() != CursorType.DEFAULT) {
+                cursor.enable(isAdaptive);
+            }
+        });
+    }
+
+    public void saveAll() {
+        config.saveSettings(cursors.values().toArray(new Cursor[0]));
+    }
+
     public void saveCursor(CursorType type) {
         config.saveSettings(getCursor(type));
     }
