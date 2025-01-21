@@ -3,7 +3,7 @@
 A Fabric mod that replaces the boring old default system cursor with a Minecraft-themed cursor.
 
 ## Requirements
-- Fabric for Minecraft 1.21.2+
+- Fabric for Minecraft 1.21.2-1.21.3
 - Compatible with [Mod Menu](https://modrinth.com/mod/modmenu) (optional)
 
 ## Multiple Cursors

@@ -174,16 +174,6 @@ public class CursorOptionsScreen extends Screen {
         }
 
         @Override
-        protected int getContentsHeightWithPadding() {
-            return 0;
-        }
-
-        @Override
-        protected double getDeltaYPerScroll() {
-            return 0;
-        }
-
-        @Override
         protected void appendClickableNarrations(NarrationMessageBuilder builder) {
         }
     }

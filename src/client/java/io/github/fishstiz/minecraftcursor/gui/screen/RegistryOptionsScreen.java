@@ -184,7 +184,7 @@ public class RegistryOptionsScreen extends Screen {
                     context.drawText(textRenderer, label, x, itemY, 0xFFFFFFFF, false);
                     toggleButton.render(context, mouseX, mouseY, tickDelta);
                     toggleButton.setX(getRowRight() - BUTTON_WIDTH);
-                    toggleButton.setY(layout.getHeaderHeight() + itemHeight * index + ROW_GAP - (int) Math.round(getScrollY()));
+                    toggleButton.setY(layout.getHeaderHeight() + itemHeight * index + ROW_GAP - (int) Math.round(getScrollAmount()));
                     return;
                 }
                 int titleX = x + (getRowWidth() / 2 - textRenderer.getWidth(label) / 2);
