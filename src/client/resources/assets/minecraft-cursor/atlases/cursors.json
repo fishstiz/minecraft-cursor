@@ -19,6 +19,10 @@
     "shift": {
       "xhot": 11,
       "yhot": 3
+    },
+    "shift_grabbing": {
+      "xhot": 15,
+      "yhot": 1
     }
   }
 }
