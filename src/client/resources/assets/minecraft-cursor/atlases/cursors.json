@@ -15,6 +15,10 @@
     "grabbing": {
       "xhot": 15,
       "yhot": 3
+    },
+    "shift": {
+      "xhot": 11,
+      "yhot": 3
     }
   }
 }
