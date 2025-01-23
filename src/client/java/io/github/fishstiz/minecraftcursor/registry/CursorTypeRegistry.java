@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static io.github.fishstiz.minecraftcursor.registry.utils.LookupUtils.NAMESPACE;
 import static io.github.fishstiz.minecraftcursor.registry.utils.LookupUtils.RESOLVER;
 
 public class CursorTypeRegistry {
@@ -66,6 +67,7 @@ public class CursorTypeRegistry {
         StonecutterScreenCursor.register(this);
         LoomScreenCursor.register(this);
         CrafterScreenCursor.register(this);
+        MerchantScreen$WidgetButtonPage.register(this);
 
         try {
             if (FabricLoader.getInstance().isModLoaded("modmenu")) {
@@ -79,7 +81,7 @@ public class CursorTypeRegistry {
     @SuppressWarnings("unchecked")
     public void register(String fullyQualifiedClassName, ElementCursorTypeFunction elementToCursorType) {
         try {
-            Class<?> elementClass = Class.forName(fullyQualifiedClassName);
+            Class<?> elementClass = Class.forName(RESOLVER.mapClassName(NAMESPACE, fullyQualifiedClassName));
 
             assert Element.class.isAssignableFrom(elementClass) :
                     fullyQualifiedClassName + " is not an instance of net.minecraft.client.gui.Element";
