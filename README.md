@@ -28,7 +28,7 @@ A Fabric mod that replaces the boring old default system cursor with a Minecraft
 - Configure More Cursor Options from Cursor Settings > More Cursor Options...
 - Disabled cursors will fallback to the default cursor unless it is also disabled.
 
-<img alt="options-menu" src="https://github.com/user-attachments/assets/f45341d7-bacc-4c83-96e2-f03002195830" style="width:600px;"/>  
+<img alt="options-menu" src="https://github.com/user-attachments/assets/6f8ca20a-5950-4d7d-ae0f-9a27996190a6" style="width:600px;"/>  
 
 ![image](https://github.com/user-attachments/assets/74d6e272-78ce-4735-8813-ac50a91f3485)
 
