@@ -1,5 +1,6 @@
 package io.github.fishstiz.minecraftcursor.gui.widget;
 
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
@@ -78,6 +79,12 @@ public class SelectedCursorSliderWidget extends SliderWidget {
     private void translateValue() {
         double scaledValue = min + (value * (max - min));
         translatedValue = Math.round(scaledValue / step) * step;
+    }
+
+    @Override
+    public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.renderWidget(context, mouseX, mouseY, delta);
+        hovered = isMouseOver(mouseX, mouseY);
     }
 
     @Override
