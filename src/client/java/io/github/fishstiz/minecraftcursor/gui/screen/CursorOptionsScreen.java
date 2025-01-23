@@ -17,7 +17,7 @@ import java.util.List;
 public class CursorOptionsScreen extends Screen {
     private static final int CURSORS_COLUMN_WIDTH = 96;
     private static final int SELECTED_CURSOR_COLUMN_WIDTH = 200;
-    private static final int COLUMN_GAP = 6;
+    private static final int COLUMN_GAP = 8;
     private final static Text TITLE_TEXT = Text.translatable("minecraft-cursor.options");
     private final CursorManager cursorManager;
     private final List<Cursor> cursors;
@@ -142,6 +142,15 @@ public class CursorOptionsScreen extends Screen {
             super(optionsScreen.layout.getX(), optionsScreen.layout.getHeaderHeight(), optionsScreen.width, optionsScreen.layout.getContentHeight(), Text.of("BODY"));
             cursorsColumn = new CursorListWidget(client, CURSORS_COLUMN_WIDTH, optionsScreen);
             selectedCursorColumn = new SelectedCursorOptionsWidget(SELECTED_CURSOR_COLUMN_WIDTH, optionsScreen);
+        }
+
+        @Override
+        public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+            boolean isScrolled = super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+            if (isScrolled && cursorsColumn.isMouseOver(mouseX, mouseY)) {
+                cursorsColumn.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+            }
+            return isScrolled;
         }
 
         @Override
