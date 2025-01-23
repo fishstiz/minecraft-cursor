@@ -5,6 +5,7 @@ import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
+import io.github.fishstiz.minecraftcursor.registry.utils.CursorTypeUtils;
 import io.github.fishstiz.minecraftcursor.registry.utils.LookupUtils;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -52,11 +53,16 @@ public class HandledScreenCursor {
         HandledScreen<?> handledScreen = (HandledScreen<?>) element;
         ScreenHandler handler = (ScreenHandler) screenHandler.get(handledScreen);
         Slot focusedSlot = (Slot) HandledScreenCursor.focusedSlot.get(handledScreen);
-        if (config.isItemSlotEnabled()
-                && handler.getCursorStack().isEmpty()
+
+        boolean canClickFocusedSlot = handler.getCursorStack().isEmpty()
                 && focusedSlot != null
                 && focusedSlot.hasStack()
-                && focusedSlot.canBeHighlighted()) {
+                && focusedSlot.canBeHighlighted();
+
+        if (canClickFocusedSlot && CursorTypeUtils.canShift()) {
+            return CursorType.SHIFT;
+        }
+        if (config.isItemSlotEnabled() && canClickFocusedSlot) {
             return CursorType.POINTER;
         }
         if (config.isItemGrabbingEnabled() && !handler.getCursorStack().isEmpty()) {
