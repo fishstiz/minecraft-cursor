@@ -145,13 +145,13 @@ public class CursorTypeRegistry {
 
     private static CursorType clickableWidgetCursor(Element element, double mouseX, double mouseY) {
         ClickableWidget button = (ClickableWidget) element;
-        return button.isHovered() && button.active && button.visible ?
+        return button.active && button.visible ?
                 CursorType.POINTER : CursorType.DEFAULT;
     }
 
     private static CursorType tabButtonWidgetCursor(Element element, double mouseX, double mouseY) {
         TabButtonWidget button = (TabButtonWidget) element;
-        return button.isHovered() && button.active && button.visible && !button.isCurrentTab() ?
+        return button.active && button.visible && !button.isCurrentTab() ?
                 CursorType.POINTER : CursorType.DEFAULT;
     }
 
@@ -162,13 +162,13 @@ public class CursorTypeRegistry {
                 && MinecraftCursorClient.CLIENT.currentScreen.isDragging()) {
             return CursorType.GRABBING;
         }
-        return slider.active && slider.visible && slider.isHovered() ?
+        return slider.active && slider.visible ?
                 CursorType.POINTER : CursorType.DEFAULT;
     }
 
     private static CursorType textFieldWidgetCursor(Element element, double mouseX, double mouseY) {
         TextFieldWidget textField = (TextFieldWidget) element;
-        return textField.visible && textField.isHovered() ? CursorType.TEXT : CursorType.DEFAULT;
+        return textField.visible ? CursorType.TEXT : CursorType.DEFAULT;
     }
 
     private static CursorType hotspotWidgetCursor(Element element, double mouseX, double mouseY) {
