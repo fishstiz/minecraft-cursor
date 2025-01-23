@@ -4,12 +4,13 @@ import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
+import io.github.fishstiz.minecraftcursor.registry.utils.CursorTypeUtils;
 import io.github.fishstiz.minecraftcursor.registry.utils.LookupUtils;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemGroups;
+import net.minecraft.screen.slot.Slot;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.VarHandle;
@@ -31,9 +32,9 @@ public class CreativeInventoryScreenCursor extends HandledScreenCursor {
     public static final String SELECTED_TAB_NAME = "field_2896";
     public static final String SELECTED_TAB_DESC = String.format("L%s;", ITEM_GROUP_NAME);
     public static VarHandle selectedTab;
-    public static final String POINT_W_BOUNDS_NAME = "method_2378";
-    public static final String POINT_W_BOUNDS_DESC = "(IIIIDD)Z";
-    public static MethodHandle isPointWithinBounds;
+
+    private static final String DELETE_SLOT_NAME = "field_2889";
+    private static VarHandle deleteItemSlot;
 
     public static void register(CursorTypeRegistry cursorTypeRegistry) {
         try {
@@ -49,43 +50,55 @@ public class CreativeInventoryScreenCursor extends HandledScreenCursor {
         getTabX = LookupUtils.getMethodHandle(targetClass, GET_TAB_X_NAME, GET_TAB_X_DESC, int.class, ItemGroup.class);
         getTabY = LookupUtils.getMethodHandle(targetClass, GET_TAB_Y_NAME, GET_TAB_Y_DESC, int.class, ItemGroup.class);
         selectedTab = LookupUtils.getStaticVarHandle(targetClass, SELECTED_TAB_NAME, SELECTED_TAB_DESC, ItemGroup.class);
-        isPointWithinBounds = LookupUtils.getMethodHandle(HandledScreen.class, POINT_W_BOUNDS_NAME, POINT_W_BOUNDS_DESC,
-                boolean.class, int.class, int.class, int.class, int.class, double.class, double.class
-        );
+        deleteItemSlot = LookupUtils.getVarHandle(targetClass, DELETE_SLOT_NAME, Slot.class);
     }
 
     public static CursorType getCursorType(Element element, double mouseX, double mouseY) {
-        CursorType handledScreenCursor = HandledScreenCursor.getCursorType(element, mouseX, mouseY);
+        CreativeInventoryScreen creativeInventoryScreen = (CreativeInventoryScreen) element;
+        CursorType handledScreenCursor = HandledScreenCursor.getCursorType(creativeInventoryScreen, mouseX, mouseY);
         if (handledScreenCursor != CursorType.DEFAULT) {
             return handledScreenCursor;
         }
 
-        if (!MinecraftCursorClient.CONFIG.get().isCreativeTabsEnabled()) return CursorType.DEFAULT;
+        CursorType cursorType = getCursorTypeTabs(creativeInventoryScreen, mouseX, mouseY);
+        cursorType = cursorType != CursorType.DEFAULT ? cursorType : getCursorTypeDelete(creativeInventoryScreen);
+        return cursorType;
+    }
 
+    private static CursorType getCursorTypeTabs(CreativeInventoryScreen creativeInventoryScreen, double mouseX, double mouseY) {
+        if (!MinecraftCursorClient.CONFIG.get().isCreativeTabsEnabled()) return CursorType.DEFAULT;
         try {
             boolean isHovered = false;
             for (ItemGroup itemGroup : ItemGroups.getGroupsToDisplay()) {
-                int i = (int) getTabX.invoke(element, itemGroup);
-                int j = (int) getTabY.invoke(element, itemGroup);
-
+                int tabX = (int) getTabX.invoke(creativeInventoryScreen, itemGroup);
+                int tabY = (int) getTabY.invoke(creativeInventoryScreen, itemGroup);
                 ItemGroup selectedTab = (ItemGroup) CreativeInventoryScreenCursor.selectedTab.get();
-
-                boolean isMouseOver = (boolean) isPointWithinBounds.invoke(element,
-                        i + TAB_OFFSET_X,
-                        j + TAB_OFFSET_Y,
+                boolean isTabHovered = (boolean) isPointWithinBounds.invoke(
+                        creativeInventoryScreen,
+                        tabX + TAB_OFFSET_X,
+                        tabY + TAB_OFFSET_Y,
                         TAB_WIDTH,
                         TAB_HEIGHT,
                         mouseX,
                         mouseY
                 );
-
-                if (isMouseOver && itemGroup != selectedTab) {
+                if (isTabHovered && itemGroup != selectedTab) {
                     isHovered = true;
                 }
             }
             return isHovered ? CursorType.POINTER : CursorType.DEFAULT;
         } catch (Throwable e) {
             MinecraftCursor.LOGGER.warn("Cannot get cursor type for CreativeInventoryScreen");
+        }
+        return CursorType.DEFAULT;
+    }
+
+    private static CursorType getCursorTypeDelete(CreativeInventoryScreen creativeInventoryScreen) {
+        Slot focusedSlot = (Slot) HandledScreenCursor.focusedSlot.get(creativeInventoryScreen);
+        if (CursorTypeUtils.canShift()
+                && focusedSlot != null
+                && focusedSlot == deleteItemSlot.get(creativeInventoryScreen)) {
+            return CursorType.SHIFT;
         }
         return CursorType.DEFAULT;
     }

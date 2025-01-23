@@ -12,6 +12,7 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 
+import java.lang.invoke.MethodHandle;
 import java.lang.invoke.VarHandle;
 
 public class HandledScreenCursor {
@@ -27,17 +28,20 @@ public class HandledScreenCursor {
     protected static VarHandle y;
     protected static final String FOCUSED_SLOT_NAME = "field_2787";
     protected static VarHandle focusedSlot;
+    public static final String POINT_W_BOUNDS_NAME = "method_2378";
+    public static final String POINT_W_BOUNDS_DESC = "(IIIIDD)Z";
+    public static MethodHandle isPointWithinBounds;
 
     public static void register(CursorTypeRegistry cursorTypeRegistry) {
         try {
             initHandles();
             cursorTypeRegistry.register(HandledScreen.class, HandledScreenCursor::getCursorType);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
+        } catch (NoSuchFieldException | IllegalAccessException | NoSuchMethodException e) {
             MinecraftCursor.LOGGER.warn("Could not register cursor type for HandledScreen");
         }
     }
 
-    private static void initHandles() throws NoSuchFieldException, IllegalAccessException {
+    private static void initHandles() throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException {
         Class<?> targetClass = HandledScreen.class;
         screenHandler = LookupUtils.getVarHandle(targetClass, HANDLER_NAME, ScreenHandler.class);
         backgroundWidth = LookupUtils.getVarHandle(targetClass, BACKGROUND_WIDTH_NAME, int.class);
@@ -45,6 +49,9 @@ public class HandledScreenCursor {
         x = LookupUtils.getVarHandle(targetClass, X_NAME, int.class);
         y = LookupUtils.getVarHandle(targetClass, Y_NAME, int.class);
         focusedSlot = LookupUtils.getVarHandle(targetClass, FOCUSED_SLOT_NAME, Slot.class);
+        isPointWithinBounds = LookupUtils.getMethodHandle(HandledScreen.class, POINT_W_BOUNDS_NAME, POINT_W_BOUNDS_DESC,
+                boolean.class, int.class, int.class, int.class, int.class, double.class, double.class
+        );
     }
 
     public static CursorType getCursorType(Element element, double mouseX, double mouseY) {
