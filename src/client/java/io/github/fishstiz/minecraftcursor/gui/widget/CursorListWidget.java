@@ -17,28 +17,42 @@ import java.util.List;
 
 public class CursorListWidget extends ElementListWidget<CursorListWidget.CursorWidgetEntry> {
     private static final int ITEM_HEIGHT = 32;
+    private static final int SCROLLBAR_OFFSET = 6;
+    private static final int ROW_GAP = 1;
     private final List<CursorWidgetEntry> entries = new ArrayList<>();
     private final CursorOptionsScreen optionsScreen;
 
     public CursorListWidget(MinecraftClient client, int width, CursorOptionsScreen optionsScreen) {
-        super(client, width, optionsScreen.layout.getContentHeight(), optionsScreen.layout.getHeaderHeight(), ITEM_HEIGHT);
+        super(client, width + SCROLLBAR_OFFSET, optionsScreen.layout.getContentHeight(), optionsScreen.layout.getHeaderHeight(), ITEM_HEIGHT + ROW_GAP);
         this.optionsScreen = optionsScreen;
         populateEntries();
     }
 
     public void populateEntries() {
         List<Cursor> cursors = optionsScreen.getCursors();
-        for (int i = 0; i < cursors.size(); i++) {
-            int y = this.getY() * (i + 1);
-            CursorWidgetEntry entry = new CursorWidgetEntry(cursors.get(i), y, width, itemHeight, client, optionsScreen);
+        for (Cursor cursor : cursors) {
+            CursorWidgetEntry entry = new CursorWidgetEntry(
+                    cursor,
+                    optionsScreen.layout.getHeaderHeight() + itemHeight * getEntryCount(),
+                    width - SCROLLBAR_OFFSET,
+                    ITEM_HEIGHT,
+                    client,
+                    optionsScreen
+            );
             entries.add(entry);
             this.addEntry(entry);
         }
     }
 
     @Override
+    protected int getScrollbarX() {
+        return getRight() - 6;
+    }
+
+    @Override
     public void setX(int x) {
         super.setX(x);
+        refreshScroll();
         for (CursorWidgetEntry entry : entries) {
             entry.button.setX(x);
         }
@@ -52,7 +66,7 @@ public class CursorListWidget extends ElementListWidget<CursorListWidget.CursorW
     public void drawMenuListBackground(DrawContext context) {
     }
 
-    public static class CursorWidgetEntry extends ElementListWidget.Entry<CursorListWidget.CursorWidgetEntry> {
+    public class CursorWidgetEntry extends ElementListWidget.Entry<CursorListWidget.CursorWidgetEntry> {
         public PressableWidget button;
 
         public CursorWidgetEntry(Cursor cursor, int y, int width, int height, MinecraftClient client, CursorOptionsScreen optionsScreen) {
@@ -62,6 +76,7 @@ public class CursorListWidget extends ElementListWidget<CursorListWidget.CursorW
         @Override
         public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float delta) {
             button.render(context, mouseX, mouseY, delta);
+            button.setY(optionsScreen.layout.getHeaderHeight() + (itemHeight + ROW_GAP) * index - (int) Math.round(getScrollAmount()));
         }
 
         @Override
