@@ -3,6 +3,7 @@ package io.github.fishstiz.minecraftcursor.registry.gui.ingame;
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
+import io.github.fishstiz.minecraftcursor.registry.utils.CursorTypeUtils;
 import io.github.fishstiz.minecraftcursor.registry.utils.LookupUtils;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ingame.AbstractFurnaceScreen;
@@ -126,31 +127,34 @@ abstract public class RecipeBookScreenCursor {
             RecipeAlternativesWidget recipeAlternatives = (RecipeAlternativesWidget) alternatesWidget.get(recipeResults);
 
             if (recipeAlternatives.isVisible()) {
-                return ((List<ClickableWidget>) alternativeButtons.get(recipeAlternatives)).stream().anyMatch(ClickableWidget::isHovered)
-                        ? CursorType.POINTER
-                        : CursorType.DEFAULT;
+                if (((List<ClickableWidget>) alternativeButtons.get(recipeAlternatives)).stream().anyMatch(ClickableWidget::isHovered)) {
+                    if (CursorTypeUtils.canShift()) {
+                        return CursorType.SHIFT;
+                    }
+                    return CursorType.POINTER;
+                }
+                return CursorType.DEFAULT;
             }
 
             ToggleButtonWidget prevPageBtn = (ToggleButtonWidget) prevPageButton.get(recipeResults);
             ToggleButtonWidget nextPageBtn = (ToggleButtonWidget) nextPageButton.get(recipeResults);
+            AnimatedResultButton hoveredResultBtn = (AnimatedResultButton) hoveredResultButton.get(recipeResults);
 
-            boolean isButtonHovered = prevPageBtn.isHovered() && prevPageBtn.visible
+            if (hoveredResultBtn != null && CursorTypeUtils.canShift()) {
+                return CursorType.SHIFT;
+            }
+            if (prevPageBtn.isHovered() && prevPageBtn.visible
                     || nextPageBtn.isHovered() && nextPageBtn.visible
                     || ((ToggleButtonWidget) toggleCraftableButton.get(recipeBook)).isHovered()
-                    || ((AnimatedResultButton) hoveredResultButton.get(recipeResults)) != null;
-
-            if (isButtonHovered) {
+                    || hoveredResultBtn != null) {
                 return CursorType.POINTER;
             }
-
             if (((TextFieldWidget) searchField.get(recipeBook)).isHovered()) {
                 return CursorType.TEXT;
             }
-
             boolean isUnselectedTabHovered = ((List<RecipeGroupButtonWidget>) tabButtons.get(recipeBook))
                     .stream()
                     .anyMatch(btn -> btn.isHovered() && btn != currentTab.get(recipeBook));
-
             return isUnselectedTabHovered ? CursorType.POINTER : CursorType.DEFAULT;
         } catch (Throwable e) {
             MinecraftCursor.LOGGER.warn("Could not get cursor type for RecipeBookScreen");
