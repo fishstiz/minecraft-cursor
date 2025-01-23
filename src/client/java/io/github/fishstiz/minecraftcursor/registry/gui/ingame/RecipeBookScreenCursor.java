@@ -94,14 +94,14 @@ public class RecipeBookScreenCursor extends HandledScreenCursor {
     public static CursorType getCursorType(Element element, double mouseX, double mouseY) {
         try {
             CursorType handledScreenCursor = HandledScreenCursor.getCursorType(element, mouseX, mouseY);
-            if (handledScreenCursor != CursorType.DEFAULT) {
+            if (handledScreenCursor != CursorType.DEFAULT && handledScreenCursor != CursorType.GRABBING) {
                 return handledScreenCursor;
             }
+            boolean isGrabbing = handledScreenCursor == CursorType.GRABBING;
 
             RecipeBookWidget<?> recipeBook = (RecipeBookWidget<?>) RecipeBookScreenCursor.recipeBook.get(element);
-
             if (!((boolean) isOpen.invoke(recipeBook))) {
-                return CursorType.DEFAULT;
+                return handledScreenCursor;
             }
 
             RecipeBookResults recipeResults = (RecipeBookResults) RecipeBookScreenCursor.recipesArea.get(recipeBook);
@@ -109,21 +109,25 @@ public class RecipeBookScreenCursor extends HandledScreenCursor {
 
             if (recipeAlternatives.isVisible()) {
                 if (((List<ClickableWidget>) alternativeButtons.get(recipeAlternatives)).stream().anyMatch(ClickableWidget::isHovered)) {
-                    if (CursorTypeUtils.canShift()) {
-                        return CursorType.SHIFT;
+                    if (CursorTypeUtils.canShift(isGrabbing)) {
+                        return isGrabbing ? CursorType.SHIFT_GRABBING : CursorType.SHIFT;
                     }
-                    return CursorType.POINTER;
+                    return isGrabbing ? CursorType.GRABBING : CursorType.POINTER;
                 }
-                return CursorType.DEFAULT;
+                return handledScreenCursor;
+            }
+
+            AnimatedResultButton hoveredResultBtn = (AnimatedResultButton) hoveredResultButton.get(recipeResults);
+            if (hoveredResultBtn != null && CursorTypeUtils.canShift(isGrabbing)) {
+                return isGrabbing ? CursorType.SHIFT_GRABBING : CursorType.SHIFT;
+            }
+            if (isGrabbing) {
+                return CursorType.GRABBING;
             }
 
             ToggleButtonWidget prevPageBtn = (ToggleButtonWidget) prevPageButton.get(recipeResults);
             ToggleButtonWidget nextPageBtn = (ToggleButtonWidget) nextPageButton.get(recipeResults);
-            AnimatedResultButton hoveredResultBtn = (AnimatedResultButton) hoveredResultButton.get(recipeResults);
 
-            if (hoveredResultBtn != null && CursorTypeUtils.canShift()) {
-                return CursorType.SHIFT;
-            }
             if (prevPageBtn.isHovered() && prevPageBtn.visible
                     || nextPageBtn.isHovered() && nextPageBtn.visible
                     || ((ToggleButtonWidget) toggleCraftableButton.get(recipeBook)).isHovered()

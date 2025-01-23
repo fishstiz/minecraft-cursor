@@ -56,13 +56,17 @@ public class CreativeInventoryScreenCursor extends HandledScreenCursor {
     public static CursorType getCursorType(Element element, double mouseX, double mouseY) {
         CreativeInventoryScreen creativeInventoryScreen = (CreativeInventoryScreen) element;
         CursorType handledScreenCursor = HandledScreenCursor.getCursorType(creativeInventoryScreen, mouseX, mouseY);
-        if (handledScreenCursor != CursorType.DEFAULT) {
+        if (handledScreenCursor != CursorType.DEFAULT && handledScreenCursor != CursorType.GRABBING) {
             return handledScreenCursor;
         }
 
-        CursorType cursorType = getCursorTypeTabs(creativeInventoryScreen, mouseX, mouseY);
-        cursorType = cursorType != CursorType.DEFAULT ? cursorType : getCursorTypeDelete(creativeInventoryScreen);
-        return cursorType;
+        boolean isGrabbing = handledScreenCursor == CursorType.GRABBING;
+        CursorType cursorType = handledScreenCursor;
+        if (!isGrabbing) {
+            cursorType = getCursorTypeTabs(creativeInventoryScreen, mouseX, mouseY);
+        }
+        cursorType = cursorType != CursorType.DEFAULT ? cursorType : getCursorTypeDelete(creativeInventoryScreen, isGrabbing);
+        return cursorType != CursorType.DEFAULT && cursorType != CursorType.GRABBING ? cursorType : handledScreenCursor;
     }
 
     private static CursorType getCursorTypeTabs(CreativeInventoryScreen creativeInventoryScreen, double mouseX, double mouseY) {
@@ -93,12 +97,12 @@ public class CreativeInventoryScreenCursor extends HandledScreenCursor {
         return CursorType.DEFAULT;
     }
 
-    private static CursorType getCursorTypeDelete(CreativeInventoryScreen creativeInventoryScreen) {
+    private static CursorType getCursorTypeDelete(CreativeInventoryScreen creativeInventoryScreen, boolean isGrabbing) {
         Slot focusedSlot = (Slot) HandledScreenCursor.focusedSlot.get(creativeInventoryScreen);
-        if (CursorTypeUtils.canShift()
+        if (CursorTypeUtils.canShift(isGrabbing)
                 && focusedSlot != null
                 && focusedSlot == deleteItemSlot.get(creativeInventoryScreen)) {
-            return CursorType.SHIFT;
+            return isGrabbing ? CursorType.SHIFT_GRABBING : CursorType.SHIFT;
         }
         return CursorType.DEFAULT;
     }

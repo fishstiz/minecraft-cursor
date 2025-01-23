@@ -61,20 +61,24 @@ public class HandledScreenCursor {
         ScreenHandler handler = (ScreenHandler) screenHandler.get(handledScreen);
         Slot focusedSlot = (Slot) HandledScreenCursor.focusedSlot.get(handledScreen);
 
-        boolean canClickFocusedSlot = handler.getCursorStack().isEmpty()
-                && focusedSlot != null
+        boolean canClickFocusedSlot = focusedSlot != null
                 && focusedSlot.hasStack()
                 && focusedSlot.canBeHighlighted();
 
-        if (canClickFocusedSlot && CursorTypeUtils.canShift()) {
-            return CursorType.SHIFT;
+        CursorType cursorType = CursorType.DEFAULT;
+        if (config.isItemSlotEnabled() && handler.getCursorStack().isEmpty() && canClickFocusedSlot) {
+            cursorType = CursorType.POINTER;
         }
-        if (config.isItemSlotEnabled() && canClickFocusedSlot) {
-            return CursorType.POINTER;
+        if (canClickFocusedSlot && CursorTypeUtils.canShift(false)) {
+            cursorType = CursorType.SHIFT;
         }
         if (config.isItemGrabbingEnabled() && !handler.getCursorStack().isEmpty()) {
-            return CursorType.GRABBING;
+            if (canClickFocusedSlot && CursorTypeUtils.canShift(true)) {
+                cursorType = CursorType.SHIFT_GRABBING;
+            } else {
+                cursorType = CursorType.GRABBING;
+            }
         }
-        return CursorType.DEFAULT;
+        return cursorType;
     }
 }
