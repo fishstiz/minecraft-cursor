@@ -9,8 +9,8 @@ public enum CursorType {
     DEFAULT("default"),
     POINTER("pointer"),
     GRABBING("grabbing"),
-    SHIFT("shift"),
-    TEXT("text");
+    TEXT("text"),
+    SHIFT("shift");
 
     private final String key;
 
