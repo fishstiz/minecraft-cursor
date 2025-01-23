@@ -80,6 +80,7 @@ public class CursorListWidget extends ElementListWidget<CursorListWidget.CursorW
         private static final int PADDING_LEFT = 8;
         private static final int BACKGROUND_COLOR = 0x7F000000; // black 50%
         private static final int TEXT_COLOR = 0xFFFFFFFF; // white
+        private static final int TEXT_DISABLED_COLOR = 0xFF555555; // dark gray
         private static final int BORDER_COLOR = 0xFFFFFFFF; // white
         private final MinecraftClient client;
         private final CursorOptionsScreen optionsScreen;
@@ -123,7 +124,7 @@ public class CursorListWidget extends ElementListWidget<CursorListWidget.CursorW
             int x = getX() + TEXTURE_SIZE + PADDING_LEFT * 2;
             int y = getY() + (getHeight() / 2) - Math.round(client.textRenderer.fontHeight * 1.5f);
             Text name = Text.translatable(PREFIX_TEXT_KEY + cursor.getType().getKey());
-            context.drawText(client.textRenderer, name, x, y + Math.round(getHeight() / 3.0f), TEXT_COLOR, false);
+            context.drawText(client.textRenderer, name, x, y + Math.round(getHeight() / 3.0f), cursor.getEnabled() ? TEXT_COLOR : TEXT_DISABLED_COLOR, false);
         }
 
         @Override
