@@ -10,6 +10,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.resource.ResourceType;
+import org.lwjgl.glfw.GLFW;
 
 public class MinecraftCursorClient implements ClientModInitializer {
     public static final MinecraftClient CLIENT = MinecraftClient.getInstance();
@@ -36,7 +37,8 @@ public class MinecraftCursorClient implements ClientModInitializer {
             return;
         }
         if (client.currentScreen.isDragging()
-                && CURSOR_MANAGER.getCurrentCursor().getType() == CursorType.GRABBING) {
+                && CURSOR_MANAGER.getCurrentCursor().getType() == CursorType.GRABBING
+                && GLFW.glfwGetMouseButton(CLIENT.getWindow().getHandle(), GLFW.GLFW_MOUSE_BUTTON_1) == GLFW.GLFW_PRESS) {
             return;
         }
 
