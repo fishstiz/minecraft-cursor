@@ -11,6 +11,7 @@ A Fabric mod that replaces the boring old default system cursor with a Minecraft
 ![pointer](https://github.com/user-attachments/assets/83a41d81-5a0b-4399-8d70-61ca421117c0)
 ![grabbing](https://github.com/user-attachments/assets/bdcd6392-a8bb-40af-b2fa-10a465363545)
 ![text](https://github.com/user-attachments/assets/049fc447-6f3f-4c7a-a0a2-b87d0348c593)
+![shift](https://github.com/user-attachments/assets/27f97a5c-be91-45c9-ad5d-91a5e162fb50)
 
 - Adaptive cursors when hovering over buttons, text fields, and when grabbing sliders (limited to common GUI elements only).
 - You may submit an issue if you think this feature should be updated/removed on certain contexts.
@@ -31,9 +32,89 @@ A Fabric mod that replaces the boring old default system cursor with a Minecraft
 
 ![image](https://github.com/user-attachments/assets/74d6e272-78ce-4735-8813-ac50a91f3485)
 
-&nbsp;
 <details>
-  <summary>Resource Pack Support</summary>
+<summary><h2>All Cursors</h2></summary>
+  <table>
+    <thead>
+      <tr>
+        <th>Cursor Name</th>
+        <th>Key</th>
+        <th>Image</th>
+        <th>When it is used</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Default</td>
+        <td><code>default</code></td>
+        <td><img src="https://github.com/user-attachments/assets/6c632b54-e284-47a0-8634-f4ba1ef03f29" width="32" alt="default"/></td>
+        <td>
+          <ul>
+            <li>The default cursor.</li>
+            <li>If another cursor is disabled.</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td>Pointer</td>
+        <td><code>pointer</code></td>
+        <td><img src="https://github.com/user-attachments/assets/83a41d81-5a0b-4399-8d70-61ca421117c0" width="32" alt="pointer" /></td>
+        <td>
+          <span>Hovered over:</span>
+          <ul>
+            <li>Discoverable <code>PressableWidget</code> elements.</li>
+            <li>Inventory slots with item/s.</li>
+            <li>Creative inventory tabs.</li>
+            <li>Recipe book tabs and recipes.</li>
+            <li>Available enchantments in the enchanting table.</li>
+            <li>Available stonecutter recipes.</li>
+            <li>Available loom patterns.</li>
+            <li>Crafter slots.</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td>Text</td>
+        <td><code>text</code></td>
+        <td><img src="https://github.com/user-attachments/assets/049fc447-6f3f-4c7a-a0a2-b87d0348c593" width="32" alt="text"/></td>
+        <td>
+          <ul>
+            <li>Hovered over discoverable <code>TextFieldWidget</code> elements.</li>
+            <li>Hovered inside Book and Quill book.</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td>Grabbing</td>
+        <td><code>grabbing</code></td>
+        <td><img src="https://github.com/user-attachments/assets/bdcd6392-a8bb-40af-b2fa-10a465363545" width="32" alt="grabbing"/></td>
+        <td>
+          <ul>
+            <li>Grabbing items.</li>
+            <li>Dragging the slider in discoverable <code>SliderWidget</code> elements.</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td>Shift</td>
+        <td><code>shift</code></td>
+        <td><img src="https://github.com/user-attachments/assets/27f97a5c-be91-45c9-ad5d-91a5e162fb50" width="32" alt="shift"/></td>
+        <td>
+          <span>Shift is pressed and mouse is hovered over:</span>
+          <ul>
+            <li>Inventory slots with item/s.</li>
+            <li>Creative inventory destroy item slot.</li>
+            <li>Recipe book recipes.</li>
+            <li>Villager trade offers.</li>
+          </ul>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</details>
+
+<details>
+  <summary><h2>Resource Pack Support</h2></summary>
   <h3>Image Format</h3>
   <ul>
     <li>32x32 pixels</li>
@@ -41,7 +122,6 @@ A Fabric mod that replaces the boring old default system cursor with a Minecraft
   </ul>
 
   <h3>File Structure</h3>
-  <p>Missing cursors will automatically be disabled in-game and will not show up in the settings. If <code>default.png</code> is provided, it will use that instead.</p>
   <pre><code>└── minecraft-cursor/
     ├── atlases/
     │   └── cursors.json
@@ -50,6 +130,7 @@ A Fabric mod that replaces the boring old default system cursor with a Minecraft
             ├── default.png
             ├── grabbing.png
             ├── pointer.png
+            ├── shift.png
             └── text.png</code></pre>
 
   <h3>Custom Configuration</h3>
@@ -79,6 +160,10 @@ A Fabric mod that replaces the boring old default system cursor with a Minecraft
     },
     "grabbing": {
       "enabled": false 
+    },
+    "shift": {
+      "xhot": 11,
+      "yhot": 3
     }
   }
 }</code></pre>
@@ -93,7 +178,7 @@ A Fabric mod that replaces the boring old default system cursor with a Minecraft
 </details>
 
 <details>
-<summary>Mod Compatibility</summary>
+<summary><h2>Mod Compatibility</h2></summary>
   <h4>
     Widgets are automatically registered by this mod with the following conditions:&nbsp;
   </h4>
@@ -123,5 +208,4 @@ A Fabric mod that replaces the boring old default system cursor with a Minecraft
      <li><code>LoomScreen</code> patterns</li>
      <li><code>WorldListWidget</code> world icon play button</li>
    </ul>
-  <a href="https://github.com/fishstiz/minecraft-cursor/blob/master/src/client/java/io/github/fishstiz/minecraftcursor/registry/CursorTypeRegistry.java" target="_blank">See More</a>
 </details>
