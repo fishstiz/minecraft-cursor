@@ -5,7 +5,11 @@
   "client": [
     "CreativeInventoryScreenAccessor",
     "HandledScreenAccessor",
-    "MouseOptionsScreenMixin"
+    "MouseOptionsScreenMixin",
+    "RecipeAlternativesWidgetAccessor",
+    "RecipeBookResultsAccessor",
+    "RecipeBookScreenAccessor",
+    "RecipeBookWidgetAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
