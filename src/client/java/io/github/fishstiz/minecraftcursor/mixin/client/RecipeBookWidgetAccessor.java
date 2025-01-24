@@ -14,7 +14,7 @@ import java.util.List;
 @Mixin(RecipeBookWidget.class)
 public interface RecipeBookWidgetAccessor {
     @Invoker("isOpen")
-    boolean isOpen();
+    boolean invokeIsOpen();
 
     @Accessor("searchField")
     TextFieldWidget getSearchField();
