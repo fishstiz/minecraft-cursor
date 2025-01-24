@@ -3,9 +3,16 @@
   "package": "io.github.fishstiz.minecraftcursor.mixin.client",
   "compatibilityLevel": "JAVA_21",
   "client": [
+    "AbstractFurnaceScreenAccessor",
+    "CraftingScreenAccessor",
     "CreativeInventoryScreenAccessor",
     "HandledScreenAccessor",
-    "MouseOptionsScreenMixin"
+    "InventoryScreenAccessor",
+    "MouseOptionsScreenMixin",
+    "RecipeAlternativesWidgetAccessor",
+    "RecipeBookResultsAccessor",
+    "RecipeBookScreenAccessor",
+    "RecipeBookWidgetAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

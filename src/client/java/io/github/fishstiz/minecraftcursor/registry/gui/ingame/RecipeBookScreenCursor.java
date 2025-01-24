@@ -1,164 +1,82 @@
 package io.github.fishstiz.minecraftcursor.registry.gui.ingame;
 
-import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
+import io.github.fishstiz.minecraftcursor.mixin.client.*;
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
 import io.github.fishstiz.minecraftcursor.registry.utils.CursorTypeUtils;
-import io.github.fishstiz.minecraftcursor.registry.utils.LookupUtils;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ingame.AbstractFurnaceScreen;
 import net.minecraft.client.gui.screen.ingame.CraftingScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.gui.screen.recipebook.*;
 import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.ToggleButtonWidget;
+import net.minecraft.screen.AbstractRecipeScreenHandler;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.VarHandle;
-import java.util.List;
-
-abstract public class RecipeBookScreenCursor {
-    public static final String INVENTORY_RECIPE_BOOK_NAME = "field_2929";
-    public static VarHandle inventoryRecipeBook;
-    public static final String CRAFTING_RECIPE_BOOK_NAME = "field_2880";
-    public static VarHandle craftingRecipeBook;
-    public static final String FURNACE_RECIPE_BOOK_NAME = "field_2924";
-    public static VarHandle furnaceRecipeBook;
-
-    // RecipeBookWidget
-    public static final String IS_OPEN_NAME = "method_2605";
-    public static final String IS_OPEN_DESC = "()Z";
-    public static MethodHandle isOpen;
-    public static final String SEARCH_FIELD_NAME = "field_3089";
-    public static VarHandle searchField;
-    public static final String TOGGLE_BTN_NAME = "field_3088";
-    public static VarHandle toggleCraftableButton;
-    public static final String TAB_BTNS_NAME = "field_3094";
-    public static VarHandle tabButtons;
-    public static final String CURRENT_TAB_NAME = "field_3098";
-    public static VarHandle currentTab;
-    public static final String RECIPES_AREA_NAME = "field_3086";
-    public static VarHandle recipesArea; // RecipeBookResults
-
-    // RecipeBookResults
-    public static final String HOVERED_RESULT_BTN_NAME = "field_3129";
-    public static VarHandle hoveredResultButton;
-    public static final String PREV_PAGE_BTN_NAME = "field_3130";
-    public static VarHandle prevPageButton;
-    public static final String NEXT_PAGE_BTN_NAME = "field_3128";
-    public static VarHandle nextPageButton;
-    public static final String RESULT_BTNS_NAME = "field_3131";
-    public static VarHandle resultButtons;
-    public static final String ALTERNATES_WIDGET_NAME = "field_3132";
-    public static VarHandle alternatesWidget; // RecipeAlternativesWidget
-
-    // RecipeAlternativesWidget
-    public static final String ALTERNATIVE_BTNS_NAME = "field_3106";
-    public static VarHandle alternativeButtons;
-
+public class RecipeBookScreenCursor extends HandledScreenCursor<AbstractRecipeScreenHandler<?, ?>> {
     public static void register(CursorTypeRegistry cursorRegistry) {
-        try {
-            initScreenHandles();
-            initWidgetHandles();
-            initResultsHandles();
-            initAlternativesHandles();
-            cursorRegistry.register(InventoryScreen.class, RecipeBookScreenCursor::getCursorType);
-            cursorRegistry.register(CraftingScreen.class, RecipeBookScreenCursor::getCursorType);
-            cursorRegistry.register(AbstractFurnaceScreen.class, RecipeBookScreenCursor::getCursorType);
-        } catch (IllegalAccessException | NoSuchMethodException | NoSuchFieldException e) {
-            MinecraftCursor.LOGGER.warn("Could not register cursor type for RecipeBookScreen");
+        RecipeBookScreenCursor recipeBookScreenCursor = new RecipeBookScreenCursor();
+        cursorRegistry.register(InventoryScreen.class, recipeBookScreenCursor::getCursorType);
+        cursorRegistry.register(CraftingScreen.class, recipeBookScreenCursor::getCursorType);
+        cursorRegistry.register(AbstractFurnaceScreen.class, recipeBookScreenCursor::getCursorType);
+    }
+
+    @Override
+    public CursorType getCursorType(Element element, double mouseX, double mouseY) {
+        CursorType cursorType = super.getCursorType(element, mouseX, mouseY);
+        if (cursorType != CursorType.DEFAULT) return cursorType;
+
+        RecipeBookWidgetAccessor recipeBook;
+        switch (element) {
+            case InventoryScreen inventoryScreen ->
+                    recipeBook = (RecipeBookWidgetAccessor) ((InventoryScreenAccessor) inventoryScreen).getRecipeBook();
+            case CraftingScreen craftingScreen ->
+                    recipeBook = (RecipeBookWidgetAccessor) ((CraftingScreenAccessor) craftingScreen).getRecipeBook();
+            case AbstractFurnaceScreen<?> abstractFurnaceScreen ->
+                    recipeBook = (RecipeBookWidgetAccessor) ((AbstractFurnaceScreenAccessor) abstractFurnaceScreen).getRecipeBook();
+            case null, default -> {
+                return CursorType.DEFAULT;
+            }
         }
+
+        if (!recipeBook.isOpen()) return CursorType.DEFAULT;
+
+        RecipeBookResultsAccessor recipesArea = (RecipeBookResultsAccessor) recipeBook.getRecipesArea();
+        RecipeAlternativesWidgetAccessor alternatesWidget = (RecipeAlternativesWidgetAccessor) recipesArea.getAlternatesWidget();
+
+        if (((RecipeAlternativesWidget) alternatesWidget).isVisible()) {
+            return getAlternatesWidgetCursor(alternatesWidget);
+        }
+
+        boolean isResultHovered = recipesArea.getHoveredResultButton() != null;
+        if (isResultHovered && CursorTypeUtils.canShift()) {
+            return CursorType.SHIFT;
+        } else if (isButtonHovered(recipeBook, recipesArea) || isResultHovered) {
+            return CursorType.POINTER;
+        } else if (recipeBook.getSearchField().isHovered()) {
+            return CursorType.TEXT;
+        }
+        return getTabCursor(recipeBook);
     }
 
-    private static void initScreenHandles() throws NoSuchFieldException, IllegalAccessException {
-        inventoryRecipeBook = LookupUtils.getVarHandle(InventoryScreen.class, INVENTORY_RECIPE_BOOK_NAME, RecipeBookWidget.class);
-        craftingRecipeBook = LookupUtils.getVarHandle(CraftingScreen.class, CRAFTING_RECIPE_BOOK_NAME, RecipeBookWidget.class);
-        furnaceRecipeBook = LookupUtils.getVarHandle(AbstractFurnaceScreen.class, FURNACE_RECIPE_BOOK_NAME, AbstractFurnaceRecipeBookScreen.class);
-    }
-
-    private static void initWidgetHandles() throws IllegalAccessException, NoSuchMethodException, NoSuchFieldException {
-        Class<?> targetClass = RecipeBookWidget.class;
-        isOpen = LookupUtils.getMethodHandle(targetClass, IS_OPEN_NAME, IS_OPEN_DESC, boolean.class);
-        searchField = LookupUtils.getVarHandle(targetClass, SEARCH_FIELD_NAME, TextFieldWidget.class);
-        toggleCraftableButton = LookupUtils.getVarHandle(targetClass, TOGGLE_BTN_NAME, ToggleButtonWidget.class);
-        tabButtons = LookupUtils.getVarHandle(targetClass, TAB_BTNS_NAME, List.class);
-        currentTab = LookupUtils.getVarHandle(targetClass, CURRENT_TAB_NAME, RecipeGroupButtonWidget.class);
-        recipesArea = LookupUtils.getVarHandle(targetClass, RECIPES_AREA_NAME, RecipeBookResults.class);
-    }
-
-    private static void initResultsHandles() throws IllegalAccessException, NoSuchMethodException, NoSuchFieldException {
-        Class<?> targetClass = RecipeBookResults.class;
-        hoveredResultButton = LookupUtils.getVarHandle(targetClass, HOVERED_RESULT_BTN_NAME, AnimatedResultButton.class);
-        prevPageButton = LookupUtils.getVarHandle(targetClass, PREV_PAGE_BTN_NAME, ToggleButtonWidget.class);
-        nextPageButton = LookupUtils.getVarHandle(targetClass, NEXT_PAGE_BTN_NAME, ToggleButtonWidget.class);
-        alternatesWidget = LookupUtils.getVarHandle(targetClass, ALTERNATES_WIDGET_NAME, RecipeAlternativesWidget.class);
-        resultButtons = LookupUtils.getVarHandle(targetClass, RESULT_BTNS_NAME, List.class);
-    }
-
-    public static void initAlternativesHandles() throws IllegalAccessException, NoSuchMethodException, NoSuchFieldException {
-        alternativeButtons = LookupUtils.getVarHandle(RecipeAlternativesWidget.class, ALTERNATIVE_BTNS_NAME, List.class);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static CursorType getCursorType(Element element, double mouseX, double mouseY) {
-        try {
-            CursorType handledScreenCursor = HandledScreenCursor.getCursorType(element, mouseX, mouseY);
-            if (handledScreenCursor != CursorType.DEFAULT) {
-                return handledScreenCursor;
-            }
-
-            RecipeBookWidget recipeBook;
-            switch (element) {
-                case InventoryScreen inventory -> recipeBook = (RecipeBookWidget) inventoryRecipeBook.get(inventory);
-                case CraftingScreen crafting -> recipeBook = (RecipeBookWidget) craftingRecipeBook.get(crafting);
-                case AbstractFurnaceScreen<?> furnace ->
-                        recipeBook = (AbstractFurnaceRecipeBookScreen) furnaceRecipeBook.get(furnace);
-                case null, default -> {
-                    return CursorType.DEFAULT;
-                }
-            }
-
-            if (!((boolean) isOpen.invoke(recipeBook))) {
-                return CursorType.DEFAULT;
-            }
-
-            RecipeBookResults recipeResults = (RecipeBookResults) RecipeBookScreenCursor.recipesArea.get(recipeBook);
-            RecipeAlternativesWidget recipeAlternatives = (RecipeAlternativesWidget) alternatesWidget.get(recipeResults);
-
-            if (recipeAlternatives.isVisible()) {
-                if (((List<ClickableWidget>) alternativeButtons.get(recipeAlternatives)).stream().anyMatch(ClickableWidget::isHovered)) {
-                    if (CursorTypeUtils.canShift()) {
-                        return CursorType.SHIFT;
-                    }
-                    return CursorType.POINTER;
-                }
-                return CursorType.DEFAULT;
-            }
-
-            ToggleButtonWidget prevPageBtn = (ToggleButtonWidget) prevPageButton.get(recipeResults);
-            ToggleButtonWidget nextPageBtn = (ToggleButtonWidget) nextPageButton.get(recipeResults);
-            AnimatedResultButton hoveredResultBtn = (AnimatedResultButton) hoveredResultButton.get(recipeResults);
-
-            if (hoveredResultBtn != null && CursorTypeUtils.canShift()) {
-                return CursorType.SHIFT;
-            }
-            if (prevPageBtn.isHovered() && prevPageBtn.visible
-                    || nextPageBtn.isHovered() && nextPageBtn.visible
-                    || ((ToggleButtonWidget) toggleCraftableButton.get(recipeBook)).isHovered()
-                    || hoveredResultBtn != null) {
-                return CursorType.POINTER;
-            }
-            if (((TextFieldWidget) searchField.get(recipeBook)).isHovered()) {
-                return CursorType.TEXT;
-            }
-            boolean isUnselectedTabHovered = ((List<RecipeGroupButtonWidget>) tabButtons.get(recipeBook))
-                    .stream()
-                    .anyMatch(btn -> btn.isHovered() && btn != currentTab.get(recipeBook));
-            return isUnselectedTabHovered ? CursorType.POINTER : CursorType.DEFAULT;
-        } catch (Throwable e) {
-            MinecraftCursor.LOGGER.warn("Could not get cursor type for RecipeBookScreen");
+    private CursorType getAlternatesWidgetCursor(RecipeAlternativesWidgetAccessor alternatesWidget) {
+        if (alternatesWidget.getAlternativeButtons().stream().anyMatch(ClickableWidget::isHovered)) {
+            return CursorTypeUtils.canShift() ? CursorType.SHIFT : CursorType.POINTER;
         }
         return CursorType.DEFAULT;
+    }
+
+    private boolean isButtonHovered(RecipeBookWidgetAccessor recipeBook, RecipeBookResultsAccessor recipesArea) {
+        ToggleButtonWidget prevPageButton = recipesArea.getPrevPageButton();
+        ToggleButtonWidget nextPageButton = recipesArea.getNextPageButton();
+        return (prevPageButton.isHovered() && prevPageButton.visible) ||
+                (nextPageButton.isHovered() && nextPageButton.visible) ||
+                recipeBook.getToggleCraftableButton().isHovered();
+    }
+
+    private CursorType getTabCursor(RecipeBookWidgetAccessor recipeBook) {
+        boolean isUnselectedTabHovered = recipeBook.getTabButtons().stream()
+                .anyMatch(btn -> btn.isHovered() && btn != recipeBook.getCurrentTab());
+        return isUnselectedTabHovered ? CursorType.POINTER : CursorType.DEFAULT;
     }
 }
