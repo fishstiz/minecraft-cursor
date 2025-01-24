@@ -2,7 +2,7 @@ package io.github.fishstiz.minecraftcursor.registry.gui.ingame;
 
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
-import io.github.fishstiz.minecraftcursor.registry.utils.CursorTypeUtils;
+import io.github.fishstiz.minecraftcursor.utils.CursorTypeUtils;
 import io.github.fishstiz.minecraftcursor.registry.gui.GuiCursorHandler;
 import net.minecraft.client.gui.Element;
 

@@ -3,7 +3,7 @@ package io.github.fishstiz.minecraftcursor.registry.gui.ingame;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.mixin.client.*;
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
-import io.github.fishstiz.minecraftcursor.registry.utils.CursorTypeUtils;
+import io.github.fishstiz.minecraftcursor.utils.CursorTypeUtils;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ingame.AbstractFurnaceScreen;
 import net.minecraft.client.gui.screen.ingame.CraftingScreen;
