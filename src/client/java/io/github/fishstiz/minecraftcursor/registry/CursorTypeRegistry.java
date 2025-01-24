@@ -1,13 +1,13 @@
 package io.github.fishstiz.minecraftcursor.registry;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
-import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorHotspotWidget;
 import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorSliderWidget;
 import io.github.fishstiz.minecraftcursor.registry.gui.ingame.*;
 import io.github.fishstiz.minecraftcursor.registry.gui.modmenu.ModScreenCursor;
 import io.github.fishstiz.minecraftcursor.registry.gui.world.WorldListWidgetCursor;
+import io.github.fishstiz.minecraftcursor.utils.CursorTypeUtils;
 import io.github.fishstiz.minecraftcursor.registry.utils.ElementCursorTypeFunction;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.Element;
@@ -149,9 +149,7 @@ public class CursorTypeRegistry {
 
     private static CursorType sliderWidgetCursor(Element element, double mouseX, double mouseY) {
         SliderWidget slider = (SliderWidget) element;
-        if (slider.isFocused()
-                && MinecraftCursorClient.CLIENT.currentScreen != null
-                && MinecraftCursorClient.CLIENT.currentScreen.isDragging()) {
+        if (slider.isFocused() && (CursorTypeUtils.isLeftClickHeld() || CursorTypeUtils.isGrabbing())) {
             return CursorType.GRABBING;
         }
         return slider.active && slider.visible ?
@@ -164,8 +162,7 @@ public class CursorTypeRegistry {
     }
 
     private static CursorType hotspotWidgetCursor(Element element, double mouseX, double mouseY) {
-        if (MinecraftCursorClient.CLIENT.currentScreen != null
-                && MinecraftCursorClient.CLIENT.currentScreen.isDragging()) {
+        if (CursorTypeUtils.isLeftClickHeld() || CursorTypeUtils.isGrabbing()) {
             return CursorType.GRABBING;
         }
         return CursorType.POINTER;

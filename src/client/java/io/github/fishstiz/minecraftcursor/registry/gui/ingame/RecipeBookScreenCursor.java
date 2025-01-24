@@ -6,7 +6,7 @@ import io.github.fishstiz.minecraftcursor.mixin.client.RecipeBookResultsAccessor
 import io.github.fishstiz.minecraftcursor.mixin.client.RecipeBookScreenAccessor;
 import io.github.fishstiz.minecraftcursor.mixin.client.RecipeBookWidgetAccessor;
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
-import io.github.fishstiz.minecraftcursor.registry.utils.CursorTypeUtils;
+import io.github.fishstiz.minecraftcursor.utils.CursorTypeUtils;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ingame.RecipeBookScreen;
 import net.minecraft.client.gui.screen.recipebook.*;
