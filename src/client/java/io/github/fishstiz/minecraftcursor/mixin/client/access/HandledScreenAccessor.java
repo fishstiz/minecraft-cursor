@@ -1,4 +1,4 @@
-package io.github.fishstiz.minecraftcursor.mixin.client;
+package io.github.fishstiz.minecraftcursor.mixin.client.access;
 
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.screen.ScreenHandler;

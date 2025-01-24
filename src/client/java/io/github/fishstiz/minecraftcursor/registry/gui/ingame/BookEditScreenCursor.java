@@ -2,7 +2,7 @@ package io.github.fishstiz.minecraftcursor.registry.gui.ingame;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
-import io.github.fishstiz.minecraftcursor.mixin.client.BookEditScreenAccessor;
+import io.github.fishstiz.minecraftcursor.mixin.client.access.BookEditScreenAccessor;
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
 
 import io.github.fishstiz.minecraftcursor.registry.gui.GuiCursorHandler;

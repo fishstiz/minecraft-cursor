@@ -3,18 +3,18 @@
   "package": "io.github.fishstiz.minecraftcursor.mixin.client",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "BookEditScreenAccessor",
-    "CreativeInventoryScreenAccessor",
-    "ElementMixin",
-    "HandledScreenAccessor",
-    "LoomScreenAccessor",
     "MouseOptionsScreenMixin",
-    "RecipeAlternativesWidgetAccessor",
-    "RecipeBookResultsAccessor",
-    "RecipeBookScreenAccessor",
-    "RecipeBookWidgetAccessor",
     "ScreenMixin",
-    "StonecutterScreenAccessor"
+    "ElementMixin",
+    "access.BookEditScreenAccessor",
+    "access.CreativeInventoryScreenAccessor",
+    "access.HandledScreenAccessor",
+    "access.LoomScreenAccessor",
+    "access.RecipeAlternativesWidgetAccessor",
+    "access.RecipeBookResultsAccessor",
+    "access.RecipeBookScreenAccessor",
+    "access.RecipeBookWidgetAccessor",
+    "access.StonecutterScreenAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

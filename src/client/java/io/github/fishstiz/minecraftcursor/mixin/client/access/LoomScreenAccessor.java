@@ -1,4 +1,4 @@
-package io.github.fishstiz.minecraftcursor.mixin.client;
+package io.github.fishstiz.minecraftcursor.mixin.client.access;
 
 import net.minecraft.client.gui.screen.ingame.LoomScreen;
 import net.minecraft.screen.LoomScreenHandler;

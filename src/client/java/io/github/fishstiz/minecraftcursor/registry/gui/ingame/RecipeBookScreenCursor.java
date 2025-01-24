@@ -1,10 +1,10 @@
 package io.github.fishstiz.minecraftcursor.registry.gui.ingame;
 
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
-import io.github.fishstiz.minecraftcursor.mixin.client.RecipeAlternativesWidgetAccessor;
-import io.github.fishstiz.minecraftcursor.mixin.client.RecipeBookResultsAccessor;
-import io.github.fishstiz.minecraftcursor.mixin.client.RecipeBookScreenAccessor;
-import io.github.fishstiz.minecraftcursor.mixin.client.RecipeBookWidgetAccessor;
+import io.github.fishstiz.minecraftcursor.mixin.client.access.RecipeAlternativesWidgetAccessor;
+import io.github.fishstiz.minecraftcursor.mixin.client.access.RecipeBookResultsAccessor;
+import io.github.fishstiz.minecraftcursor.mixin.client.access.RecipeBookScreenAccessor;
+import io.github.fishstiz.minecraftcursor.mixin.client.access.RecipeBookWidgetAccessor;
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
 import io.github.fishstiz.minecraftcursor.utils.CursorTypeUtils;
 import net.minecraft.client.gui.Element;

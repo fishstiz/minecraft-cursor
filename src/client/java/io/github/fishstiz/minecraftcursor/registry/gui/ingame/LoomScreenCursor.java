@@ -2,7 +2,7 @@ package io.github.fishstiz.minecraftcursor.registry.gui.ingame;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
-import io.github.fishstiz.minecraftcursor.mixin.client.LoomScreenAccessor;
+import io.github.fishstiz.minecraftcursor.mixin.client.access.LoomScreenAccessor;
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
 import net.minecraft.block.entity.BannerPattern;
 import net.minecraft.client.gui.Element;

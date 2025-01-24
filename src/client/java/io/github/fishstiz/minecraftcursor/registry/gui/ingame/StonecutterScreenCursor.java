@@ -2,7 +2,7 @@ package io.github.fishstiz.minecraftcursor.registry.gui.ingame;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
-import io.github.fishstiz.minecraftcursor.mixin.client.StonecutterScreenAccessor;
+import io.github.fishstiz.minecraftcursor.mixin.client.access.StonecutterScreenAccessor;
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ingame.StonecutterScreen;

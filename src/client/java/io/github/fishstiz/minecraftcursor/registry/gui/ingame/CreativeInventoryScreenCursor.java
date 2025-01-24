@@ -3,7 +3,7 @@ package io.github.fishstiz.minecraftcursor.registry.gui.ingame;
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
-import io.github.fishstiz.minecraftcursor.mixin.client.CreativeInventoryScreenAccessor;
+import io.github.fishstiz.minecraftcursor.mixin.client.access.CreativeInventoryScreenAccessor;
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
 import io.github.fishstiz.minecraftcursor.utils.CursorTypeUtils;
 import net.minecraft.client.gui.Element;
