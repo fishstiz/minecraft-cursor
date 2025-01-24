@@ -5,14 +5,15 @@
   "client": [
     "BookEditScreenAccessor",
     "CreativeInventoryScreenAccessor",
+    "ElementMixin",
     "HandledScreenAccessor",
     "LoomScreenAccessor",
     "MouseOptionsScreenMixin",
-    "ElementMixin",
     "RecipeAlternativesWidgetAccessor",
     "RecipeBookResultsAccessor",
     "RecipeBookScreenAccessor",
     "RecipeBookWidgetAccessor",
+    "ScreenMixin",
     "StonecutterScreenAccessor"
   ],
   "injectors": {
