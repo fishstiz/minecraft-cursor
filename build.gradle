@@ -27,6 +27,7 @@ loom {
 		}
 	}
 
+	accessWidenerPath = file("src/client/resources/minecraft-cursor.accesswidener")
 }
 
 dependencies {
