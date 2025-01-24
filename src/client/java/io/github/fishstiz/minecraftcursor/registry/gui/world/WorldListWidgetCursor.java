@@ -3,15 +3,17 @@ package io.github.fishstiz.minecraftcursor.registry.gui.world;
 import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
+import io.github.fishstiz.minecraftcursor.registry.gui.GuiCursorHandler;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
 
-public class WorldListWidgetCursor {
+public class WorldListWidgetCursor extends GuiCursorHandler {
     public static void register(CursorTypeRegistry cursorTypeRegistry) {
-        cursorTypeRegistry.register(WorldListWidget.class, WorldListWidgetCursor::getCursorTypeFromWorld);
+        cursorTypeRegistry.register(WorldListWidget.class, new WorldListWidgetCursor()::getCursorType);
     }
 
-    private static CursorType getCursorTypeFromWorld(Element element, double mouseX, double mouseY) {
+    @Override
+    protected CursorType getCursorType(Element element, double mouseX, double mouseY) {
         if (!MinecraftCursorClient.CONFIG.get().isWorldIconEnabled()) return CursorType.DEFAULT;
 
         WorldListWidget worldListWidget = (WorldListWidget) element;

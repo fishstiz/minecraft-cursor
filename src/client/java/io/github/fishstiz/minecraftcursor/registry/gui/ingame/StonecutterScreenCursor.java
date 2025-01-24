@@ -27,7 +27,7 @@ public class StonecutterScreenCursor extends HandledScreenCursor<StonecutterScre
     }
 
     @Override
-    public CursorType getCursorType(Element element, double mouseX, double mouseY) {
+    protected CursorType getCursorType(Element element, double mouseX, double mouseY) {
         CursorType cursorType = super.getCursorType(element, mouseX, mouseY);
         if (cursorType != CursorType.DEFAULT) return cursorType;
 
