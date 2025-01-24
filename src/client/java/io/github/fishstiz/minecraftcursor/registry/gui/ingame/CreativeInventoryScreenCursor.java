@@ -6,7 +6,6 @@ import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.mixin.client.CreativeInventoryScreenAccessor;
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
 import io.github.fishstiz.minecraftcursor.registry.utils.CursorTypeUtils;
-import io.github.fishstiz.minecraftcursor.registry.utils.LookupUtils;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.item.ItemGroup;
