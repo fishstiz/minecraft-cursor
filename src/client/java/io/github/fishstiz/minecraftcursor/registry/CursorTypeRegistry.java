@@ -35,24 +35,16 @@ public class CursorTypeRegistry {
     }
 
     public void init() {
-        initPointerElements();
-        initTextElements();
-        initGrabbingElements();
+        initElements();
         initGuis();
     }
 
-    public void initPointerElements() {
+    public void initElements() {
         register(PressableWidget.class, CursorTypeRegistry::clickableWidgetCursor);
         register(TabButtonWidget.class, CursorTypeRegistry::tabButtonWidgetCursor);
-    }
-
-    public void initGrabbingElements() {
         register(SliderWidget.class, CursorTypeRegistry::sliderWidgetCursor);
         register(SelectedCursorSliderWidget.class, CursorTypeRegistry::sliderWidgetCursor);
         register(SelectedCursorHotspotWidget.class, CursorTypeRegistry::hotspotWidgetCursor);
-    }
-
-    public void initTextElements() {
         register(TextFieldWidget.class, CursorTypeRegistry::textFieldWidgetCursor);
     }
 
