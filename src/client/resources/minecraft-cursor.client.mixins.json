@@ -3,6 +3,7 @@
   "package": "io.github.fishstiz.minecraftcursor.mixin.client",
   "compatibilityLevel": "JAVA_21",
   "client": [
+    "HandledScreenAccessor",
     "MouseOptionsScreenMixin"
   ],
   "injectors": {
