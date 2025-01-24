@@ -5,6 +5,7 @@
   "client": [
     "CreativeInventoryScreenAccessor",
     "HandledScreenAccessor",
+    "LoomScreenAccessor",
     "MouseOptionsScreenMixin",
     "RecipeAlternativesWidgetAccessor",
     "RecipeBookResultsAccessor",
