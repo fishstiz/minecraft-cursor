@@ -14,6 +14,11 @@ import net.minecraft.client.gui.widget.ToggleButtonWidget;
 import net.minecraft.screen.AbstractRecipeScreenHandler;
 
 public class RecipeBookScreenCursor extends HandledScreenCursor<AbstractRecipeScreenHandler<?, ?>> {
+    private RecipeAlternativesWidgetAccessor alternatesWidget;
+
+    private RecipeBookScreenCursor() {
+    }
+
     public static void register(CursorTypeRegistry cursorRegistry) {
         RecipeBookScreenCursor recipeBookScreenCursor = new RecipeBookScreenCursor();
         cursorRegistry.register(InventoryScreen.class, recipeBookScreenCursor::getCursorType);
@@ -24,7 +29,9 @@ public class RecipeBookScreenCursor extends HandledScreenCursor<AbstractRecipeSc
     @Override
     protected CursorType getCursorType(Element element, double mouseX, double mouseY) {
         CursorType cursorType = super.getCursorType(element, mouseX, mouseY);
-        if (cursorType != CursorType.DEFAULT) return cursorType;
+        if (cursorType != CursorType.DEFAULT && (alternatesWidget == null || !(((RecipeAlternativesWidget) alternatesWidget).isVisible()))) {
+            return cursorType;
+        }
 
         RecipeBookWidgetAccessor recipeBook;
         switch (element) {
@@ -42,7 +49,7 @@ public class RecipeBookScreenCursor extends HandledScreenCursor<AbstractRecipeSc
         if (!recipeBook.invokeIsOpen()) return CursorType.DEFAULT;
 
         RecipeBookResultsAccessor recipesArea = (RecipeBookResultsAccessor) recipeBook.getRecipesArea();
-        RecipeAlternativesWidgetAccessor alternatesWidget = (RecipeAlternativesWidgetAccessor) recipesArea.getAlternatesWidget();
+        alternatesWidget = (RecipeAlternativesWidgetAccessor) recipesArea.getAlternatesWidget();
 
         if (((RecipeAlternativesWidget) alternatesWidget).isVisible()) {
             return getAlternatesWidgetCursor(alternatesWidget);
@@ -63,7 +70,7 @@ public class RecipeBookScreenCursor extends HandledScreenCursor<AbstractRecipeSc
         if (alternatesWidget.getAlternativeButtons().stream().anyMatch(ClickableWidget::isHovered)) {
             return CursorTypeUtils.canShift() ? CursorType.SHIFT : CursorType.POINTER;
         }
-        return CursorType.DEFAULT;
+        return CursorType.DEFAULT_FORCE;
     }
 
     private boolean isButtonHovered(RecipeBookWidgetAccessor recipeBook, RecipeBookResultsAccessor recipesArea) {

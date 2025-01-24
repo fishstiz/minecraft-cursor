@@ -10,7 +10,8 @@ public enum CursorType {
     POINTER("pointer"),
     GRABBING("grabbing"),
     TEXT("text"),
-    SHIFT("shift");
+    SHIFT("shift"),
+    DEFAULT_FORCE("default_force"); // fake cursor type to force default
 
     private final String key;
 
