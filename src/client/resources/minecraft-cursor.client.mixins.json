@@ -8,6 +8,7 @@
     "HandledScreenAccessor",
     "LoomScreenAccessor",
     "MouseOptionsScreenMixin",
+    "ElementMixin",
     "RecipeAlternativesWidgetAccessor",
     "RecipeBookResultsAccessor",
     "RecipeBookScreenAccessor",
