@@ -46,9 +46,9 @@ public class CreativeInventoryScreenCursor extends HandledScreenCursor<CreativeI
         try {
             boolean isHovered = false;
             for (ItemGroup itemGroup : ItemGroups.getGroupsToDisplay()) {
-                if (creativeInventoryScreen.isPointWithinBounds(
-                        creativeInventoryScreen.getTabX(itemGroup) + TAB_OFFSET_X,
-                        creativeInventoryScreen.getTabY(itemGroup) + TAB_OFFSET_Y,
+                if (creativeInventoryScreen.invokeIsPointWithinBounds(
+                        creativeInventoryScreen.invokeGetTabX(itemGroup) + TAB_OFFSET_X,
+                        creativeInventoryScreen.invokeGetTabY(itemGroup) + TAB_OFFSET_Y,
                         TAB_WIDTH,
                         TAB_HEIGHT,
                         mouseX,

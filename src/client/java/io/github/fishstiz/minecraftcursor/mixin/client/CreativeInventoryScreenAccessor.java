@@ -16,8 +16,8 @@ public interface CreativeInventoryScreenAccessor extends HandledScreenAccessor<C
     Slot getDeleteItemSlot();
 
     @Invoker("getTabX")
-    int getTabX(ItemGroup group);
+    int invokeGetTabX(ItemGroup group);
 
     @Invoker("getTabY")
-    int getTabY(ItemGroup group);
+    int invokeGetTabY(ItemGroup group);
 }
