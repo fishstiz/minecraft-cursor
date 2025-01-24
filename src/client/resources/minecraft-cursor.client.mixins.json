@@ -5,6 +5,7 @@
   "client": [
     "AbstractFurnaceScreenAccessor",
     "CraftingScreenAccessor",
+    "BookEditScreenAccessor",
     "CreativeInventoryScreenAccessor",
     "HandledScreenAccessor",
     "LoomScreenAccessor",
