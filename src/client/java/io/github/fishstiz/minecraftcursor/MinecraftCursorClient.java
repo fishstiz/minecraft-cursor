@@ -6,11 +6,16 @@ import io.github.fishstiz.minecraftcursor.cursor.CursorManager;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.resource.ResourceType;
-import org.lwjgl.glfw.GLFW;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MinecraftCursorClient implements ClientModInitializer {
     public static final MinecraftClient CLIENT = MinecraftClient.getInstance();
@@ -18,6 +23,7 @@ public class MinecraftCursorClient implements ClientModInitializer {
             new CursorConfigService(String.format("config/%s%s", MinecraftCursor.MOD_ID, CursorConfigLoader.FILE_EXTENSION));
     public static final CursorManager CURSOR_MANAGER = new CursorManager(CONFIG, CLIENT);
     public static final CursorTypeRegistry CURSOR_REGISTRY = new CursorTypeRegistry();
+    public static final List<Element> SCREEN_ELEMENTS = new ArrayList<>();
 
     @Override
     public void onInitializeClient() {
@@ -25,33 +31,36 @@ public class MinecraftCursorClient implements ClientModInitializer {
                 new CursorResourceReloadListener(CURSOR_MANAGER, MinecraftCursor.MOD_ID, CONFIG);
         ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(resourceReloadListener);
 
-        ClientTickEvents.START_CLIENT_TICK.register(this::tick);
+        ScreenEvents.BEFORE_INIT.register((MinecraftClient client, Screen screen, int width, int height) -> {
+            if (client.currentScreen == null) return;
+            SCREEN_ELEMENTS.clear();
+            ScreenEvents.afterRender(client.currentScreen).register(this::afterRender);
+        });
     }
 
-    public void tick(MinecraftClient client) {
-        if (client.currentScreen == null) {
-            return;
-        }
+    public void afterRender(Screen currentScreen, DrawContext context, int mouseX, int mouseY, float tickDelta) {
         if (!CURSOR_MANAGER.isAdaptive()) {
             CURSOR_MANAGER.setCurrentCursor(CursorType.DEFAULT);
             return;
         }
-        if (client.currentScreen.isDragging()
-                && CURSOR_MANAGER.getCurrentCursor().getType() == CursorType.GRABBING
-                && GLFW.glfwGetMouseButton(CLIENT.getWindow().getHandle(), GLFW.GLFW_MOUSE_BUTTON_1) == GLFW.GLFW_PRESS) {
+        if (currentScreen.isDragging() && CURSOR_MANAGER.getCurrentCursor().getType() == CursorType.GRABBING) {
             return;
         }
 
-        double scale = client.getWindow().getScaleFactor();
-        double x = client.mouse.getX() / scale;
-        double y = client.mouse.getY() / scale;
-
-        CursorType screenCursorType = CURSOR_REGISTRY.getCursorType(client.currentScreen, x, y);
-        CursorType cursorType = (screenCursorType != CursorType.DEFAULT)
-                ? screenCursorType
-                : client.currentScreen.hoveredElement(x, y)
-                .map(element -> CURSOR_REGISTRY.getCursorType(element, x, y))
-                .orElse(CursorType.DEFAULT);
+        CursorType cursorType = CursorType.DEFAULT;
+        for (Element element : SCREEN_ELEMENTS) {
+            if (element.isMouseOver(mouseX, mouseY)) {
+                cursorType = CURSOR_REGISTRY.getCursorType(element, mouseX, mouseY);
+            }
+        }
+        if (cursorType == CursorType.DEFAULT) {
+            cursorType = CURSOR_REGISTRY.getCursorType(currentScreen, mouseX, mouseY);
+        }
+        if (cursorType == CursorType.DEFAULT) {
+            cursorType = currentScreen.hoveredElement(mouseX, mouseY)
+                    .map(element -> CURSOR_REGISTRY.getCursorType(element, mouseX, mouseY))
+                    .orElse(CursorType.DEFAULT);
+        }
 
         CURSOR_MANAGER.setCurrentCursor(cursorType);
     }
