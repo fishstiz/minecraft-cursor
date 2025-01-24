@@ -1,4 +1,4 @@
-package io.github.fishstiz.minecraftcursor.mixin.client;
+package io.github.fishstiz.minecraftcursor.mixin.client.access;
 
 import net.minecraft.client.gui.screen.ingame.CraftingScreen;
 import net.minecraft.client.gui.screen.recipebook.RecipeBookWidget;
