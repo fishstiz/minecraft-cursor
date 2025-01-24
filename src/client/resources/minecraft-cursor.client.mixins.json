@@ -7,11 +7,11 @@
     "CraftingScreenAccessor",
     "CreativeInventoryScreenAccessor",
     "HandledScreenAccessor",
+    "LoomScreenAccessor",
     "InventoryScreenAccessor",
     "MouseOptionsScreenMixin",
     "RecipeAlternativesWidgetAccessor",
     "RecipeBookResultsAccessor",
-    "RecipeBookScreenAccessor",
     "RecipeBookWidgetAccessor"
   ],
   "injectors": {
