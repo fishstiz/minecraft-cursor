@@ -3,6 +3,7 @@ package io.github.fishstiz.minecraftcursor.registry.gui.ingame;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.mixin.client.RecipeAlternativesWidgetAccessor;
 import io.github.fishstiz.minecraftcursor.mixin.client.RecipeBookResultsAccessor;
+import io.github.fishstiz.minecraftcursor.mixin.client.RecipeBookScreenAccessor;
 import io.github.fishstiz.minecraftcursor.mixin.client.RecipeBookWidgetAccessor;
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
 import io.github.fishstiz.minecraftcursor.registry.utils.CursorTypeUtils;
@@ -14,6 +15,9 @@ import net.minecraft.client.gui.widget.ToggleButtonWidget;
 import net.minecraft.screen.AbstractRecipeScreenHandler;
 
 public class RecipeBookScreenCursor extends HandledScreenCursor<AbstractRecipeScreenHandler> {
+    private RecipeBookScreenCursor() {
+    }
+
     public static void register(CursorTypeRegistry cursorRegistry) {
         cursorRegistry.register(RecipeBookScreen.class, new RecipeBookScreenCursor()::getCursorType);
     }
@@ -23,7 +27,7 @@ public class RecipeBookScreenCursor extends HandledScreenCursor<AbstractRecipeSc
         CursorType cursorType = super.getCursorType(element, mouseX, mouseY);
         if (cursorType != CursorType.DEFAULT) return cursorType;
 
-        RecipeBookWidgetAccessor recipeBook = (RecipeBookWidgetAccessor) element;
+        RecipeBookWidgetAccessor recipeBook = (RecipeBookWidgetAccessor) ((RecipeBookScreenAccessor<?>) element).getRecipeBook();
         if (!recipeBook.isOpen()) return CursorType.DEFAULT;
 
         RecipeBookResultsAccessor recipesArea = (RecipeBookResultsAccessor) recipeBook.getRecipesArea();
