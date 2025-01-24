@@ -21,7 +21,7 @@ public class CrafterScreenCursor extends HandledScreenCursor<CrafterScreenHandle
 
     @Override
     @SuppressWarnings("unchecked")
-    public CursorType getCursorType(Element element, double mouseX, double mouseY) {
+    protected CursorType getCursorType(Element element, double mouseX, double mouseY) {
         CursorType cursorType = super.getCursorType(element, mouseX, mouseY);
         if (cursorType != CursorType.DEFAULT) return cursorType;
 

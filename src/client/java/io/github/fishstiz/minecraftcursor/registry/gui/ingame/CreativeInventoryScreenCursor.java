@@ -27,7 +27,7 @@ public class CreativeInventoryScreenCursor extends HandledScreenCursor<CreativeI
     }
 
     @Override
-    public CursorType getCursorType(Element element, double mouseX, double mouseY) {
+    protected CursorType getCursorType(Element element, double mouseX, double mouseY) {
         CreativeInventoryScreen creativeInventoryScreen = (CreativeInventoryScreen) element;
         CursorType handledScreenCursor = super.getCursorType(creativeInventoryScreen, mouseX, mouseY);
         if (handledScreenCursor != CursorType.DEFAULT) {

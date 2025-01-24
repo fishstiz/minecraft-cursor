@@ -6,7 +6,6 @@ import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorHotspotWidget;
 import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorSliderWidget;
 import io.github.fishstiz.minecraftcursor.registry.gui.ingame.*;
-import io.github.fishstiz.minecraftcursor.registry.gui.modmenu.ModMenuWidgetsCursor;
 import io.github.fishstiz.minecraftcursor.registry.gui.modmenu.ModScreenCursor;
 import io.github.fishstiz.minecraftcursor.registry.gui.world.WorldListWidgetCursor;
 import io.github.fishstiz.minecraftcursor.registry.utils.ElementCursorTypeFunction;
@@ -71,10 +70,10 @@ public class CursorTypeRegistry {
 
         try {
             if (FabricLoader.getInstance().isModLoaded("modmenu")) {
-                ModMenuWidgetsCursor.register(this);
                 ModScreenCursor.register(this);
             }
         } catch (NoClassDefFoundError ignore) {
+            MinecraftCursor.LOGGER.warn("Could not register cursor type for Mod Menu");
         }
     }
 
