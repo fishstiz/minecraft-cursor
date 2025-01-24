@@ -5,22 +5,24 @@ import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.mixin.client.BookEditScreenAccessor;
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
 
+import io.github.fishstiz.minecraftcursor.registry.gui.GuiCursorHandler;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ingame.BookEditScreen;
 
-public class BookEditScreenCursor {
+public class BookEditScreenCursor extends GuiCursorHandler {
     // Manually set values from testing in game
-    private static final int MAX_POS_X = 115;
-    private static final int MAX_POS_Y = 125;
+    public static final int MAX_POS_X = 115;
+    public static final int MAX_POS_Y = 125;
 
     private BookEditScreenCursor() {
     }
 
     public static void register(CursorTypeRegistry cursorTypeRegistry) {
-        cursorTypeRegistry.register(BookEditScreen.class, new BookEditScreenCursor()::getBookScreenCursor);
+        cursorTypeRegistry.register(BookEditScreen.class, new BookEditScreenCursor()::getCursorType);
     }
 
-    public CursorType getBookScreenCursor(Element element, double mouseX, double mouseY) {
+    @Override
+    protected CursorType getCursorType(Element element, double mouseX, double mouseY) {
         if (!MinecraftCursorClient.CONFIG.get().isBookEditEnabled()) return CursorType.DEFAULT;
 
         BookEditScreenAccessor bookEditScreen = (BookEditScreenAccessor) element;
