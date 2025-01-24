@@ -31,6 +31,7 @@
       "environment": "client"
     }
   ],
+  "accessWidener": "minecraft-cursor.accesswidener",
   "depends": {
     "fabricloader": ">=0.16.9",
     "minecraft": ">=1.21.4",
