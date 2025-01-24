@@ -35,7 +35,7 @@ public class LoomScreenCursor extends HandledScreenCursor<LoomScreenHandler> {
 
         LoomScreenAccessor loomScreen = (LoomScreenAccessor) element;
 
-        if (!loomScreen.canApplyDyePattern()) return CursorType.DEFAULT;
+        if (!loomScreen.getCanApplyDyePattern()) return CursorType.DEFAULT;
 
         LoomScreenHandler handler = loomScreen.getHandler();
         List<RegistryEntry<BannerPattern>> patterns = handler.getBannerPatterns();

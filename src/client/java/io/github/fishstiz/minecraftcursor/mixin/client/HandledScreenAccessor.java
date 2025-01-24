@@ -28,5 +28,5 @@ public interface HandledScreenAccessor<T extends ScreenHandler> {
     int getY();
 
     @Invoker("isPointWithinBounds")
-    boolean isPointWithinBounds(int x, int y, int width, int height, double pointX, double pointY);
+    boolean invokeIsPointWithinBounds(int x, int y, int width, int height, double pointX, double pointY);
 }

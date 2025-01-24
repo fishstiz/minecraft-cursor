@@ -28,7 +28,7 @@ public class RecipeBookScreenCursor extends HandledScreenCursor<AbstractRecipeSc
         if (cursorType != CursorType.DEFAULT) return cursorType;
 
         RecipeBookWidgetAccessor recipeBook = (RecipeBookWidgetAccessor) ((RecipeBookScreenAccessor<?>) element).getRecipeBook();
-        if (!recipeBook.isOpen()) return CursorType.DEFAULT;
+        if (!recipeBook.invokeIsOpen()) return CursorType.DEFAULT;
 
         RecipeBookResultsAccessor recipesArea = (RecipeBookResultsAccessor) recipeBook.getRecipesArea();
         RecipeAlternativesWidgetAccessor alternatesWidget = (RecipeAlternativesWidgetAccessor) recipesArea.getAlternatesWidget();
