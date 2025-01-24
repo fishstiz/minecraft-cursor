@@ -12,7 +12,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 
 public class HandledScreenCursor<T extends ScreenHandler> {
-    private HandledScreenCursor() {
+    protected HandledScreenCursor() {
     }
 
     public static void register(CursorTypeRegistry cursorTypeRegistry) {
