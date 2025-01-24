@@ -12,7 +12,8 @@
     "MouseOptionsScreenMixin",
     "RecipeAlternativesWidgetAccessor",
     "RecipeBookResultsAccessor",
-    "RecipeBookWidgetAccessor"
+    "RecipeBookWidgetAccessor",
+    "StonecutterScreenAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
