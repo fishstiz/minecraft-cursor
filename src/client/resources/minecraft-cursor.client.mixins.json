@@ -10,7 +10,8 @@
     "RecipeAlternativesWidgetAccessor",
     "RecipeBookResultsAccessor",
     "RecipeBookScreenAccessor",
-    "RecipeBookWidgetAccessor"
+    "RecipeBookWidgetAccessor",
+    "StonecutterScreenAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
