@@ -146,7 +146,7 @@ public class RegistryOptionsScreen extends Screen {
             public RegistryToggleWidget toggleButton;
 
             public RegistryEntry(Text title) {
-                this(Text.translatable(title.getString()).formatted(Formatting.BOLD, Formatting.YELLOW), false, false, null);
+                this(Text.empty().append(title).formatted(Formatting.BOLD, Formatting.YELLOW), false, false, null);
             }
 
             public RegistryEntry(Text label, boolean defaultValue, boolean active, @Nullable Consumer<Boolean> onPress) {
