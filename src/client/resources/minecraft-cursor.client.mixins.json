@@ -5,6 +5,7 @@
   "client": [
     "MouseOptionsScreenMixin",
     "access.AbstractFurnaceScreenAccessor",
+    "access.AdvancementsScreenAccessor",
     "access.BookEditScreenAccessor",
     "access.CraftingScreenAccessor",
     "access.CreativeInventoryScreenAccessor",
