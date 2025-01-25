@@ -6,6 +6,7 @@ import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorHotspotWidget
 import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorSliderWidget;
 import io.github.fishstiz.minecraftcursor.registry.gui.ingame.*;
 import io.github.fishstiz.minecraftcursor.registry.gui.modmenu.ModScreenCursor;
+import io.github.fishstiz.minecraftcursor.registry.gui.multiplayer.MultiplayerServerListWidgetCursor;
 import io.github.fishstiz.minecraftcursor.registry.gui.world.WorldListWidgetCursor;
 import io.github.fishstiz.minecraftcursor.utils.CursorTypeUtils;
 import io.github.fishstiz.minecraftcursor.registry.utils.ElementCursorTypeFunction;
@@ -51,6 +52,7 @@ public class CursorTypeRegistry {
     public void initGuis() {
         HandledScreenCursor.register(this);
         WorldListWidgetCursor.register(this);
+        MultiplayerServerListWidgetCursor.register(this);
         RecipeBookScreenCursor.register(this);
         CreativeInventoryScreenCursor.register(this);
         BookEditScreenCursor.register(this);
