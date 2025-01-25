@@ -36,6 +36,7 @@ public class RegistryOptionsScreen extends Screen {
     private static final Text LOOM_TEXT = Text.translatable("minecraft-cursor.options.loom");
     private static final Text ADVANCEMENTS_TEXT = Text.translatable("minecraft-cursor.options.advancements");
     private static final Text WORLD_ICON_TEXT = Text.translatable("minecraft-cursor.options.world");
+    private static final Text SERVER_ICON_TEXT = Text.translatable("minecraft-cursor.options.server");
     private static final int BUTTON_WIDTH = 40;
     private static final int ITEM_HEIGHT = 20;
     private static final int ROW_GAP = 6;
@@ -112,6 +113,7 @@ public class RegistryOptionsScreen extends Screen {
             addOptionEntry(LOOM_TEXT, config.isLoomPatternsEnabled(), isAdaptive, config::setLoomPatternsEnabled);
             addOptionEntry(ADVANCEMENTS_TEXT, config.isAdvancementTabsEnabled(), isAdaptive, config::setAdvancementTabsEnabled);
             addOptionEntry(WORLD_ICON_TEXT, config.isWorldIconEnabled(), isAdaptive, config::setWorldIconEnabled);
+            addOptionEntry(SERVER_ICON_TEXT, config.isServerIconEnabled(), isAdaptive, config::setServerIconEnabled);
         }
 
         public void addOptionEntry(Text label, boolean isEnabled, boolean defaultValue, Consumer<Boolean> onPress) {
