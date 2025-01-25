@@ -59,6 +59,7 @@ public class CursorTypeRegistry {
         LoomScreenCursor.register(this);
         CrafterScreenCursor.register(this);
         MerchantScreen$WidgetButtonPage.register(this);
+        AdvancementScreenCursor.register(this);
 
         try {
             if (FabricLoader.getInstance().isModLoaded("modmenu")) {
