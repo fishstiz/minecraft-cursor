@@ -47,7 +47,8 @@ public class SelectedCursorToggleWidget extends ButtonWidget {
     }
 
     protected void updateMessage() {
-        Text message = Text.translatable(prefix.getString())
+        Text message = Text.empty()
+                .append(prefix)
                 .append(": ")
                 .append(value ? ScreenTexts.ON : ScreenTexts.OFF);
 

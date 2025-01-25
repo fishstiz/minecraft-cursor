@@ -101,7 +101,7 @@ public class SelectedCursorSliderWidget extends SliderWidget {
     @Override
     protected void updateMessage() {
         String formattedValue = String.format(step % 1 == 0 ? "%.0f" : "%.2f", translatedValue);
-        setMessage(Text.translatable(prefix.getString()).append(Text.of(": " + formattedValue + suffix)));
+        setMessage(Text.empty().append(prefix).append(Text.of(": " + formattedValue + suffix)));
     }
 
     public double getTranslatedValue() {
