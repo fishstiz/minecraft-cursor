@@ -18,6 +18,7 @@ public class CursorConfig {
     private boolean bookEditEnabled = true;
     private boolean loomPatternsEnabled = true;
     private boolean worldIconEnabled = true;
+    private boolean advancementTabsEnabled = true;
 
     @JsonProperty
     protected Map<String, Settings> settings = new HashMap<>();
@@ -109,6 +110,14 @@ public class CursorConfig {
 
     public void setItemGrabbingEnabled(boolean itemGrabbingEnabled) {
         this.itemGrabbingEnabled = itemGrabbingEnabled;
+    }
+
+    public boolean isAdvancementTabsEnabled() {
+        return advancementTabsEnabled;
+    }
+
+    public void setAdvancementTabsEnabled(boolean advancementTabsEnabled) {
+        this.advancementTabsEnabled = advancementTabsEnabled;
     }
 
     public static class Defaults {

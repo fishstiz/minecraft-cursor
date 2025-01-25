@@ -34,6 +34,7 @@ public class RegistryOptionsScreen extends Screen {
     private static final Text STONECUTTER_TEXT = Text.translatable("minecraft-cursor.options.stonecutter");
     private static final Text BOOK_EDIT_TEXT = Text.translatable("minecraft-cursor.options.book_edit");
     private static final Text LOOM_TEXT = Text.translatable("minecraft-cursor.options.loom");
+    private static final Text ADVANCEMENTS_TEXT = Text.translatable("minecraft-cursor.options.advancements");
     private static final Text WORLD_ICON_TEXT = Text.translatable("minecraft-cursor.options.world");
     private static final int BUTTON_WIDTH = 40;
     private static final int ITEM_HEIGHT = 20;
@@ -97,48 +98,26 @@ public class RegistryOptionsScreen extends Screen {
         }
 
         public void populateEntries() {
+            boolean isAdaptive = cursorManager.isAdaptive();
+
             this.addEntry(new RegistryEntry(ADAPTIVE_CURSOR_TEXT));
             this.addEntry(new RegistryEntry(
-                    ENABLED_TEXT, cursorManager.isAdaptive(), true, ADAPTIVE_CURSOR_TOOLTIP, RegistryOptionsScreen.this::enableAll));
+                    ENABLED_TEXT, isAdaptive, true, ADAPTIVE_CURSOR_TOOLTIP, RegistryOptionsScreen.this::enableAll));
+            addOptionEntry(ITEM_SLOT_TEXT, config.isItemSlotEnabled(), isAdaptive, config::setItemSlotEnabled);
+            addOptionEntry(ITEM_GRAB_TEXT, config.isItemGrabbingEnabled(), isAdaptive, config::setItemGrabbingEnabled);
+            addOptionEntry(CREATIVE_TABS_TEXT, config.isCreativeTabsEnabled(), isAdaptive, config::setCreativeTabsEnabled);
+            addOptionEntry(ENCHANTMENTS_TEXT, config.isEnchantmentsEnabled(), isAdaptive, config::setEnchantmentsEnabled);
+            addOptionEntry(STONECUTTER_TEXT, config.isStonecutterRecipesEnabled(), isAdaptive, config::setStonecutterRecipesEnabled);
+            addOptionEntry(BOOK_EDIT_TEXT, config.isBookEditEnabled(), isAdaptive, config::setBookEditEnabled);
+            addOptionEntry(LOOM_TEXT, config.isLoomPatternsEnabled(), isAdaptive, config::setLoomPatternsEnabled);
+            addOptionEntry(ADVANCEMENTS_TEXT, config.isAdvancementTabsEnabled(), isAdaptive, config::setAdvancementTabsEnabled);
+            addOptionEntry(WORLD_ICON_TEXT, config.isWorldIconEnabled(), isAdaptive, config::setWorldIconEnabled);
+        }
 
-            boolean isActive = cursorManager.isAdaptive();
-
-            RegistryEntry itemSlot = new RegistryEntry(ITEM_SLOT_TEXT, config.isItemSlotEnabled(), isActive, config::setItemSlotEnabled);
-            options.add(itemSlot);
-            this.addEntry(itemSlot);
-
-            RegistryEntry itemGrab = new RegistryEntry(ITEM_GRAB_TEXT, config.isItemGrabbingEnabled(), isActive, config::setItemGrabbingEnabled);
-            options.add(itemGrab);
-            this.addEntry(itemGrab);
-
-            RegistryEntry creative = new RegistryEntry(CREATIVE_TABS_TEXT, config.isCreativeTabsEnabled(), isActive, config::setCreativeTabsEnabled);
-            options.add(creative);
-            this.addEntry(creative);
-
-            RegistryEntry enchants = new RegistryEntry(
-                    ENCHANTMENTS_TEXT, config.isEnchantmentsEnabled(), isActive, config::setEnchantmentsEnabled);
-            options.add(enchants);
-            this.addEntry(enchants);
-
-            RegistryEntry stonecutter = new RegistryEntry(
-                    STONECUTTER_TEXT, config.isStonecutterRecipesEnabled(), isActive, config::setStonecutterRecipesEnabled);
-            options.add(stonecutter);
-            this.addEntry(stonecutter);
-
-            RegistryEntry bookEdit = new RegistryEntry(
-                    BOOK_EDIT_TEXT, config.isBookEditEnabled(), isActive, config::setBookEditEnabled);
-            options.add(bookEdit);
-            this.addEntry(bookEdit);
-
-            RegistryEntry loomPatterns = new RegistryEntry(
-                    LOOM_TEXT, config.isLoomPatternsEnabled(), isActive, config::setLoomPatternsEnabled);
-            options.add(loomPatterns);
-            this.addEntry(loomPatterns);
-
-            RegistryEntry worldIcon = new RegistryEntry(
-                    WORLD_ICON_TEXT, config.isWorldIconEnabled(), isActive, config::setWorldIconEnabled);
-            options.add(worldIcon);
-            this.addEntry(worldIcon);
+        public void addOptionEntry(Text label, boolean isEnabled, boolean defaultValue, Consumer<Boolean> onPress) {
+            RegistryEntry entry = new RegistryEntry(label, isEnabled, defaultValue, onPress);
+            options.add(entry);
+            this.addEntry(entry);
         }
 
         public class RegistryEntry extends ElementListWidget.Entry<RegistryListWidget.RegistryEntry> {
