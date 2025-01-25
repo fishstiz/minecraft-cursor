@@ -208,5 +208,6 @@ A Fabric mod that replaces the boring old default system cursor with a Minecraft
      <li><code>LoomScreen</code> patterns</li>
      <li><code>AdvancementsScreen</code> tabs</li>
      <li><code>WorldListWidget</code> world icon play button</li>
+     <li><code>MultiplayerServerListWidget</code> server icon play button</li>
    </ul>
 </details>

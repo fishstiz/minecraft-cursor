@@ -17,8 +17,9 @@ public class CursorConfig {
     private boolean stonecutterRecipesEnabled = true;
     private boolean bookEditEnabled = true;
     private boolean loomPatternsEnabled = true;
-    private boolean worldIconEnabled = true;
     private boolean advancementTabsEnabled = true;
+    private boolean worldIconEnabled = true;
+    private boolean serverIconEnabled = true;
 
     @JsonProperty
     protected Map<String, Settings> settings = new HashMap<>();
@@ -120,6 +121,14 @@ public class CursorConfig {
         this.advancementTabsEnabled = advancementTabsEnabled;
     }
 
+    public boolean isServerIconEnabled() {
+        return serverIconEnabled;
+    }
+
+    public void setServerIconEnabled(boolean serverIconEnabled) {
+        this.serverIconEnabled = serverIconEnabled;
+    }
+
     public static class Defaults {
         public static final double SCALE = 1.0;
         public static final double SCALE_MIN = 0.5;
@@ -182,7 +191,3 @@ public class CursorConfig {
         }
     }
 }
-
-
-
-

@@ -20,5 +20,6 @@
   "minecraft-cursor.options.book_edit": "Book and Quill Book",
   "minecraft-cursor.options.loom": "Loom Screen Pattern Buttons",
   "minecraft-cursor.options.advancements": "Advancements Tabs",
-  "minecraft-cursor.options.world": "World Icon Play Button"
+  "minecraft-cursor.options.world": "World Icon Play Button",
+  "minecraft-cursor.options.server": "Server Icon Play Button"
 }
