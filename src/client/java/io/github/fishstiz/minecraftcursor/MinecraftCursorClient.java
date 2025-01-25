@@ -55,7 +55,7 @@ public class MinecraftCursorClient implements ClientModInitializer {
     }
 
     public void tick(MinecraftClient client) {
-        if (client.currentScreen == null && visibleNonCurrentScreen != null && !SCREEN_ELEMENTS.isEmpty()) {
+        if (client.currentScreen == null && visibleNonCurrentScreen != null && !client.mouse.isCursorLocked()) {
             double scale = client.getWindow().getScaleFactor();
             double mouseX = client.mouse.getX() / scale;
             double mouseY = client.mouse.getY() / scale;
@@ -69,13 +69,6 @@ public class MinecraftCursorClient implements ClientModInitializer {
         if (CursorTypeUtils.isGrabbing()) return CursorType.GRABBING;
 
         CursorType cursorType = CURSOR_REGISTRY.getCursorType(currentScreen, mouseX, mouseY);
-        cursorType = cursorType != CursorType.DEFAULT ? cursorType
-                : SCREEN_ELEMENTS.stream()
-                .filter(element -> element.isMouseOver(mouseX, mouseY))
-                .map(element -> CURSOR_REGISTRY.getCursorType(element, mouseX, mouseY))
-                .filter(type -> type != CursorType.DEFAULT)
-                .findFirst()
-                .orElse(CursorType.DEFAULT);
         cursorType = cursorType != CursorType.DEFAULT ? cursorType
                 : currentScreen.hoveredElement(mouseX, mouseY)
                 .map(element -> CURSOR_REGISTRY.getCursorType(element, mouseX, mouseY))

@@ -4,8 +4,6 @@
   "compatibilityLevel": "JAVA_21",
   "client": [
     "MouseOptionsScreenMixin",
-    "ScreenMixin",
-    "ElementMixin",
     "access.BookEditScreenAccessor",
     "access.CreativeInventoryScreenAccessor",
     "access.HandledScreenAccessor",
