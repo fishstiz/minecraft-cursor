@@ -1,5 +1,6 @@
 package io.github.fishstiz.minecraftcursor.registry.gui.ingame;
 
+import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.mixin.client.access.AdvancementsScreenAccessor;
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
@@ -18,6 +19,8 @@ public class AdvancementScreenCursor extends GuiCursorHandler {
 
     @Override
     protected CursorType getCursorType(Element element, double mouseX, double mouseY) {
+        if (!MinecraftCursorClient.CONFIG.get().isAdvancementTabsEnabled()) return CursorType.DEFAULT;
+
         AdvancementsScreen advancementsScreen = (AdvancementsScreen) element;
         int x = (advancementsScreen.width - AdvancementsScreen.WINDOW_WIDTH) / 2;
         int y = (advancementsScreen.height - AdvancementsScreen.WINDOW_HEIGHT) / 2;
