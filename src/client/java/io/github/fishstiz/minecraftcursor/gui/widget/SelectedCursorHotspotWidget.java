@@ -7,7 +7,7 @@ import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
-public class SelectedCursorHotspotWidget extends ClickableWidget {
+public class SelectedCursorHotspotWidget extends SelectedCursorClickableWidget {
     private static final Identifier BACKGROUND = Identifier.of(MinecraftCursor.MOD_ID, "textures/cursors/hotspot_background.png");
     private static final int HOTSPOT_RULER_COLOR = 0xFFFF0000; // red
     private final SelectedCursorOptionsWidget optionsWidget;
@@ -18,7 +18,7 @@ public class SelectedCursorHotspotWidget extends ClickableWidget {
     }
 
     @Override
-    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+    protected void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
         drawTexture(context, BACKGROUND);
         drawTexture(context, optionsWidget.optionsScreen.getSelectedCursor().getSprite());
         renderRuler(context);

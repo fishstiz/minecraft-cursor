@@ -1,5 +1,6 @@
 package io.github.fishstiz.minecraftcursor.registry.gui.modmenu;
 
+import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.gui.ModsScreen;
 import com.terraformersmc.modmenu.gui.widget.ModListWidget;
 import com.terraformersmc.modmenu.gui.widget.entries.ModListEntry;
@@ -35,8 +36,8 @@ public class ModScreenCursor extends GuiCursorHandler {
         }
 
         for (ModListEntry entry : modListWidget.children()) {
-            if (entry.isMouseOver(mouseX, mouseY) && modsScreen.getModHasConfigScreen(entry.mod.getId())) {
-                if (mouseX >= modListWidget.getX() && mouseX <= modListWidget.getX() + ICON_SIZE + ENTRY_OFFSET_X) {
+            if (entry.isMouseOver(mouseX, mouseY) && modsScreen.getModHasConfigScreen().get(entry.mod.getId())) {
+                if (mouseX >= modListWidget.getRowLeft() && mouseX <= modListWidget.getRowLeft() + ICON_SIZE + ENTRY_OFFSET_X) {
                     return CursorType.POINTER;
                 }
             }

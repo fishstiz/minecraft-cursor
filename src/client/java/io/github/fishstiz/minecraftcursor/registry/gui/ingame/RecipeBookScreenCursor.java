@@ -13,7 +13,7 @@ import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.ToggleButtonWidget;
 import net.minecraft.screen.AbstractRecipeScreenHandler;
 
-public class RecipeBookScreenCursor extends HandledScreenCursor<AbstractRecipeScreenHandler<?, ?>> {
+public class RecipeBookScreenCursor extends HandledScreenCursor<AbstractRecipeScreenHandler<?>> {
     private RecipeAlternativesWidgetAccessor alternatesWidget;
 
     private RecipeBookScreenCursor() {
@@ -34,16 +34,14 @@ public class RecipeBookScreenCursor extends HandledScreenCursor<AbstractRecipeSc
         }
 
         RecipeBookWidgetAccessor recipeBook;
-        switch (element) {
-            case InventoryScreen inventoryScreen ->
-                    recipeBook = (RecipeBookWidgetAccessor) ((InventoryScreenAccessor) inventoryScreen).getRecipeBook();
-            case CraftingScreen craftingScreen ->
-                    recipeBook = (RecipeBookWidgetAccessor) ((CraftingScreenAccessor) craftingScreen).getRecipeBook();
-            case AbstractFurnaceScreen<?> abstractFurnaceScreen ->
-                    recipeBook = (RecipeBookWidgetAccessor) ((AbstractFurnaceScreenAccessor) abstractFurnaceScreen).getRecipeBook();
-            case null, default -> {
-                return CursorType.DEFAULT;
-            }
+        if (element instanceof InventoryScreen inventoryScreen) {
+            recipeBook = (RecipeBookWidgetAccessor) ((InventoryScreenAccessor) inventoryScreen).getRecipeBook();
+        } else if (element instanceof CraftingScreen craftingScreen) {
+            recipeBook = (RecipeBookWidgetAccessor) ((CraftingScreenAccessor) craftingScreen).getRecipeBook();
+        } else if (element instanceof AbstractFurnaceScreen<?> abstractFurnaceScreen) {
+            recipeBook = (RecipeBookWidgetAccessor) ((AbstractFurnaceScreenAccessor) abstractFurnaceScreen).getRecipeBook();
+        } else {
+            return CursorType.DEFAULT;
         }
 
         if (!recipeBook.invokeIsOpen()) return CursorType.DEFAULT;

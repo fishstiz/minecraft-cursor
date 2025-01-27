@@ -22,7 +22,14 @@ public class CursorListWidget extends ElementListWidget<CursorListWidget.CursorW
     private final CursorOptionsScreen optionsScreen;
 
     public CursorListWidget(MinecraftClient client, int width, CursorOptionsScreen optionsScreen) {
-        super(client, width + SCROLLBAR_OFFSET, optionsScreen.layout.getContentHeight(), optionsScreen.layout.getHeaderHeight(), ITEM_HEIGHT + ROW_GAP);
+        super(
+                client,
+                width + SCROLLBAR_OFFSET,
+                optionsScreen.getContentHeight(),
+                optionsScreen.layout.getHeaderHeight(),
+                optionsScreen.layout.getHeaderHeight(),
+                ITEM_HEIGHT + ROW_GAP
+        );
         this.optionsScreen = optionsScreen;
         populateEntries();
     }
@@ -43,27 +50,32 @@ public class CursorListWidget extends ElementListWidget<CursorListWidget.CursorW
         }
     }
 
-    @Override
-    protected int getScrollbarX() {
-        return getRight() - 6;
+//    @Override
+//    protected int getScrollbarX() {
+//        return getRight() - 6;
+//    }
+
+//    @Override
+//    public void setX(int x) {
+//        this.x = x;
+//        super.setX(x);
+//        refreshScroll();
+//        for (CursorWidgetEntry entry : entries) {
+//            entry.button.setX(x);
+//        }
+//    }
+
+    public void setHeight(int height) {
+        this.height = height;
     }
 
-    @Override
-    public void setX(int x) {
-        super.setX(x);
-        refreshScroll();
-        for (CursorWidgetEntry entry : entries) {
-            entry.button.setX(x);
-        }
-    }
-
-    @Override
-    protected void drawHeaderAndFooterSeparators(DrawContext context) {
-    }
-
-    @Override
-    public void drawMenuListBackground(DrawContext context) {
-    }
+//    @Override
+//    protected void drawHeaderAndFooterSeparators(DrawContext context) {
+//    }
+//
+//    @Override
+//    public void drawMenuListBackground(DrawContext context) {
+//    }
 
     public class CursorWidgetEntry extends ElementListWidget.Entry<CursorListWidget.CursorWidgetEntry> {
         public PressableWidget button;
@@ -114,7 +126,7 @@ public class CursorListWidget extends ElementListWidget<CursorListWidget.CursorW
         }
 
         @Override
-        protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+        public void render(DrawContext context, int mouseX, int mouseY, float delta) {
             renderBox(context);
             renderTexture(context);
             renderMessage(context);

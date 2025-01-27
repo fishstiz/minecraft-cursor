@@ -20,9 +20,6 @@
     ],
     "client": [
       "io.github.fishstiz.minecraftcursor.MinecraftCursorClient"
-    ],
-    "modmenu": [
-      "io.github.fishstiz.minecraftcursor.MinecraftCursorModMenuApiImpl"
     ]
   },
   "mixins": [
@@ -34,8 +31,8 @@
   "accessWidener": "minecraft-cursor.accesswidener",
   "depends": {
     "fabricloader": ">=0.16.9",
-    "minecraft": ">=1.21 <1.21.2-",
-    "java": ">=21",
+    "minecraft": "1.20.1",
+    "java": ">=17",
     "fabric-api": "*"
   }
 }

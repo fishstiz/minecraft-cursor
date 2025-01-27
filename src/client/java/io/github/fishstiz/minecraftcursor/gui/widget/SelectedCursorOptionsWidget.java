@@ -30,7 +30,7 @@ public class SelectedCursorOptionsWidget extends ContainerWidget {
     public SelectedCursorTestWidget cursorTest;
 
     public SelectedCursorOptionsWidget(int width, CursorOptionsScreen optionsScreen) {
-        super(0, optionsScreen.layout.getHeaderHeight(), width, optionsScreen.layout.getContentHeight(), Text.empty());
+        super(0, optionsScreen.layout.getHeaderHeight(), width, optionsScreen.getContentHeight(), Text.empty());
         this.optionsScreen = optionsScreen;
         initWidgets();
     }
@@ -74,7 +74,7 @@ public class SelectedCursorOptionsWidget extends ContainerWidget {
     private void grid(ClickableWidget widget, int gridX, int gridY, boolean absolute) {
         if (!absolute) {
             widget.setWidth((getWidth() / 2) - GRID_PADDING);
-            widget.setHeight(OPTIONS_HEIGHT - GRID_PADDING);
+//            widget.setHeight(OPTIONS_HEIGHT - GRID_PADDING);
         }
         widget.setX(getX() + ((getWidth() / 2) * gridX));
         widget.setY(getY() + (OPTIONS_HEIGHT * (gridY)));
@@ -97,13 +97,13 @@ public class SelectedCursorOptionsWidget extends ContainerWidget {
     }
 
     @Override
-    public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+    protected void renderContents(DrawContext context, int mouseX, int mouseY, float delta) {
         enableButton.render(context, mouseX, mouseY, delta);
-        scaleSlider.renderWidget(context, mouseX, mouseY, delta);
-        xhotSlider.renderWidget(context, mouseX, mouseY, delta);
-        yhotSlider.renderWidget(context, mouseX, mouseY, delta);
-        cursorHotspot.renderWidget(context, mouseX, mouseY, delta);
-        cursorTest.renderWidget(context, mouseX, mouseY, delta);
+        scaleSlider.render(context, mouseX, mouseY, delta);
+        xhotSlider.render(context, mouseX, mouseY, delta);
+        yhotSlider.render(context, mouseX, mouseY, delta);
+        cursorHotspot.render(context, mouseX, mouseY, delta);
+        cursorTest.render(context, mouseX, mouseY, delta);
     }
 
     @Override
@@ -114,5 +114,15 @@ public class SelectedCursorOptionsWidget extends ContainerWidget {
 
     @Override
     protected void appendClickableNarrations(NarrationMessageBuilder builder) {
+    }
+
+    @Override
+    protected int getContentsHeight() {
+        return 0;
+    }
+
+    @Override
+    protected double getDeltaYPerScroll() {
+        return 0;
     }
 }

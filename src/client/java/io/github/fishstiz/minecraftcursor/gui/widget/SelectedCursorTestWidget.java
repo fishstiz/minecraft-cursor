@@ -7,11 +7,10 @@ import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
-public class SelectedCursorTestWidget extends ClickableWidget {
+public class SelectedCursorTestWidget extends SelectedCursorClickableWidget {
     private static final Identifier BACKGROUND = Identifier.of(MinecraftCursor.MOD_ID, "textures/cursors/test_background.png");
     private static final int HOTSPOT_RULER_COLOR = 0xFF00FF00; // green
     private static final ButtonWidget hoverButton = ButtonWidget.builder(Text.empty(),
@@ -33,7 +32,7 @@ public class SelectedCursorTestWidget extends ClickableWidget {
     }
 
     @Override
-    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+    protected void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
         Cursor cursor = optionsWidget.optionsScreen.getSelectedCursor();
         context.drawTexture(BACKGROUND, getX(), getY(), 0, 0, width, height, width, height);
 

@@ -59,7 +59,6 @@ public class CursorTypeRegistry {
         EnchantmentScreenCursor.register(this);
         StonecutterScreenCursor.register(this);
         LoomScreenCursor.register(this);
-        CrafterScreenCursor.register(this);
         MerchantScreen$WidgetButtonPage.register(this);
         AdvancementScreenCursor.register(this);
 

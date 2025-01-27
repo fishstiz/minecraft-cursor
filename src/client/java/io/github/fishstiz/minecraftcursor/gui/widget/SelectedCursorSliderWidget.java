@@ -82,8 +82,8 @@ public class SelectedCursorSliderWidget extends SliderWidget {
     }
 
     @Override
-    public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
-        super.renderWidget(context, mouseX, mouseY, delta);
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.render(context, mouseX, mouseY, delta);
         hovered = isMouseOver(mouseX, mouseY);
     }
 

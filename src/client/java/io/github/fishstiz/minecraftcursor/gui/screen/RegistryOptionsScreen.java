@@ -10,9 +10,7 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.ElementListWidget;
-import net.minecraft.client.gui.widget.ThreePartsLayoutWidget;
+import net.minecraft.client.gui.widget.*;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -54,8 +52,8 @@ public class RegistryOptionsScreen extends Screen {
 
     @Override
     protected void init() {
-        this.layout.addHeader(this.title, this.textRenderer);
-        this.body = this.layout.addBody(new RegistryListWidget(this.client, this));
+        this.layout.addHeader(new TextWidget(this.title, this.textRenderer));
+        this.body = this.layout.addBody((RegistryListWidget & Widget) new RegistryListWidget(this.client, this));
         this.layout.addFooter(ButtonWidget.builder(ScreenTexts.DONE, btn -> this.close()).build());
         this.layout.forEachChild(this::addDrawableChild);
         this.refreshWidgetPositions();
@@ -64,7 +62,7 @@ public class RegistryOptionsScreen extends Screen {
     protected void refreshWidgetPositions() {
         if (this.body != null) {
             this.layout.refreshPositions();
-            this.body.position(width, layout);
+            this.body.position(width, getContentHeight(), layout.getHeaderHeight());
         }
     }
 
@@ -90,11 +88,22 @@ public class RegistryOptionsScreen extends Screen {
         cursorManager.setIsAdaptive(isEnabled);
     }
 
+    public int getContentHeight() {
+        return height - layout.getHeaderHeight() - layout.getFooterHeight();
+    }
+
     public class RegistryListWidget extends ElementListWidget<RegistryListWidget.RegistryEntry> {
         public final List<RegistryEntry> options = new ArrayList<>();
 
         public RegistryListWidget(MinecraftClient minecraftClient, RegistryOptionsScreen options) {
-            super(minecraftClient, options.width, options.layout.getContentHeight(), options.layout.getHeaderHeight(), ITEM_HEIGHT + ROW_GAP);
+            super(
+                    minecraftClient,
+                    options.width,
+                    options.getContentHeight(),
+                    options.layout.getHeaderHeight(),
+                    options.layout.getFooterHeight(),
+                    ITEM_HEIGHT + ROW_GAP
+            );
             populateEntries();
         }
 
@@ -120,6 +129,13 @@ public class RegistryOptionsScreen extends Screen {
             RegistryEntry entry = new RegistryEntry(label, isEnabled, defaultValue, onPress);
             options.add(entry);
             this.addEntry(entry);
+        }
+
+        public void position(int width, int height, int y) {
+            this.width = width;
+            this.height = height;
+            this.setLeftPos(0);
+            this.top = y;
         }
 
         public class RegistryEntry extends ElementListWidget.Entry<RegistryListWidget.RegistryEntry> {

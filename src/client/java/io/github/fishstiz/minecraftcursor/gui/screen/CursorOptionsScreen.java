@@ -2,6 +2,7 @@ package io.github.fishstiz.minecraftcursor.gui.screen;
 
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
 import io.github.fishstiz.minecraftcursor.cursor.CursorManager;
+import io.github.fishstiz.minecraftcursor.gui.widget.ContainerWidget;
 import io.github.fishstiz.minecraftcursor.gui.widget.CursorListWidget;
 import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorOptionsWidget;
 import net.minecraft.client.gui.DrawContext;
@@ -39,10 +40,10 @@ public class CursorOptionsScreen extends Screen {
 
     @Override
     protected void init() {
-        selectedCursor = cursorManager.getLoadedCursors().getFirst();
+        selectedCursor = cursorManager.getLoadedCursors().get(0);
 
-        this.layout.addHeader(this.title, this.textRenderer);
-        this.body = this.layout.addBody(new CursorOptionsBody(this));
+        this.layout.addHeader(new TextWidget(this.title, this.textRenderer));
+        this.body = this.layout.addBody(new CursorOptionsBody());
 
         moreButton = ButtonWidget.builder(Text.translatable("minecraft-cursor.options.more").append("..."),
                 btn -> {
@@ -130,6 +131,10 @@ public class CursorOptionsScreen extends Screen {
         }
     }
 
+    public int getContentHeight() {
+        return height - layout.getHeaderHeight() - layout.getFooterHeight();
+    }
+
     public void removeOverride() {
         cursorManager.clearOverrides();
     }
@@ -138,20 +143,20 @@ public class CursorOptionsScreen extends Screen {
         public CursorListWidget cursorsColumn;
         public SelectedCursorOptionsWidget selectedCursorColumn;
 
-        public CursorOptionsBody(CursorOptionsScreen optionsScreen) {
-            super(optionsScreen.layout.getX(), optionsScreen.layout.getHeaderHeight(), optionsScreen.width, optionsScreen.layout.getContentHeight(), Text.of("BODY"));
-            cursorsColumn = new CursorListWidget(client, CURSORS_COLUMN_WIDTH, optionsScreen);
-            selectedCursorColumn = new SelectedCursorOptionsWidget(SELECTED_CURSOR_COLUMN_WIDTH, optionsScreen);
+        public CursorOptionsBody() {
+            super(layout.getX(), layout.getHeaderHeight(), CursorOptionsScreen.this.width, CursorOptionsScreen.this.getContentHeight(), Text.empty());
+            cursorsColumn = new CursorListWidget(client, CURSORS_COLUMN_WIDTH, CursorOptionsScreen.this);
+            selectedCursorColumn = new SelectedCursorOptionsWidget(SELECTED_CURSOR_COLUMN_WIDTH, CursorOptionsScreen.this);
         }
 
-        @Override
-        public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-            boolean isScrolled = super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
-            if (isScrolled && cursorsColumn.isMouseOver(mouseX, mouseY)) {
-                cursorsColumn.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
-            }
-            return isScrolled;
-        }
+//        @Override
+//        public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+//            boolean isScrolled = super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+//            if (isScrolled && cursorsColumn.isMouseOver(mouseX, mouseY)) {
+//                cursorsColumn.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+//            }
+//            return isScrolled;
+//        }
 
         @Override
         public List<? extends Element> children() {
@@ -159,30 +164,40 @@ public class CursorOptionsScreen extends Screen {
         }
 
         @Override
-        protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
-            cursorsColumn.renderWidget(context, mouseX, mouseY, delta);
-            selectedCursorColumn.renderWidget(context, mouseX, mouseY, delta);
+        protected void renderContents(DrawContext context, int mouseX, int mouseY, float delta) {
+            cursorsColumn.render(context, mouseX, mouseY, delta);
+            selectedCursorColumn.render(context, mouseX, mouseY, delta);
         }
 
         public void position(int width, ThreePartsLayoutWidget layout) {
-            this.setDimensions(width, layout.getContentHeight());
+            this.height = getContentsHeight();
+            this.width = width;
             this.setPosition(this.getX(), layout.getHeaderHeight());
-            this.setHeight(layout.getContentHeight());
 
-            cursorsColumn.setHeight(layout.getContentHeight());
-            selectedCursorColumn.setHeight(layout.getContentHeight());
+            cursorsColumn.setHeight(getContentHeight());
+//            selectedCursorColumn.setHeight(getContentHeight());
 
             int cursorsColumnX = width / 2 - CURSORS_COLUMN_WIDTH;
             int selectedCursorColumnX = width / 2;
             int leftShift = (selectedCursorColumnX + SELECTED_CURSOR_COLUMN_WIDTH) -
                     (((CURSORS_COLUMN_WIDTH + SELECTED_CURSOR_COLUMN_WIDTH) / 2) + (width / 2));
 
-            cursorsColumn.setX(cursorsColumnX - leftShift - COLUMN_GAP / 2);
+            cursorsColumn.setLeftPos(cursorsColumnX - leftShift - COLUMN_GAP / 2);
             selectedCursorColumn.setX(selectedCursorColumnX - leftShift + COLUMN_GAP / 2);
         }
 
         @Override
         protected void appendClickableNarrations(NarrationMessageBuilder builder) {
+        }
+
+        @Override
+        protected int getContentsHeight() {
+            return 0;
+        }
+
+        @Override
+        protected double getDeltaYPerScroll() {
+            return 0;
         }
     }
 }
