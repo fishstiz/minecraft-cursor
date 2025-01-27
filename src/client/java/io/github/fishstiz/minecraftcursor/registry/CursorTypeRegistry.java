@@ -3,7 +3,6 @@ package io.github.fishstiz.minecraftcursor.registry;
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorHotspotWidget;
-import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorSliderWidget;
 import io.github.fishstiz.minecraftcursor.registry.gui.ingame.*;
 import io.github.fishstiz.minecraftcursor.registry.gui.modmenu.ModScreenCursor;
 import io.github.fishstiz.minecraftcursor.registry.gui.multiplayer.MultiplayerServerListWidgetCursor;
@@ -44,7 +43,6 @@ public class CursorTypeRegistry {
         register(PressableWidget.class, CursorTypeRegistry::clickableWidgetCursor);
         register(TabButtonWidget.class, CursorTypeRegistry::tabButtonWidgetCursor);
         register(SliderWidget.class, CursorTypeRegistry::sliderWidgetCursor);
-        register(SelectedCursorSliderWidget.class, CursorTypeRegistry::sliderWidgetCursor);
         register(SelectedCursorHotspotWidget.class, CursorTypeRegistry::hotspotWidgetCursor);
         register(TextFieldWidget.class, CursorTypeRegistry::textFieldWidgetCursor);
     }
@@ -114,15 +112,18 @@ public class CursorTypeRegistry {
     }
 
     public CursorType parentElementGetChildCursorType(Element parentElement, double mouseX, double mouseY) {
+        CursorType cursorType = CursorType.DEFAULT;
         for (Element child : ((ParentElement) parentElement).children()) {
             if (child instanceof ParentElement) {
-                parentElementGetChildCursorType(child, mouseX, mouseY);
+                CursorType parentCursorType = parentElementGetChildCursorType(child, mouseX, mouseY);
+                cursorType = parentCursorType != CursorType.DEFAULT ? parentCursorType : cursorType;
             }
             if (child.isMouseOver(mouseX, mouseY)) {
-                return getCursorType(child, mouseX, mouseY);
+                CursorType childCursorType = getCursorType(child, mouseX, mouseY);
+                cursorType = childCursorType != CursorType.DEFAULT ? childCursorType : cursorType;
             }
         }
-        return CursorType.DEFAULT;
+        return cursorType;
     }
 
     public static CursorType elementToDefault(Element ignoreElement, double ignoreMouseX, double ignoreMouseY) {
