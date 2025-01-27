@@ -3,7 +3,6 @@ package io.github.fishstiz.minecraftcursor.gui.widget;
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
-import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -39,8 +38,8 @@ public class SelectedCursorHotspotWidget extends SelectedCursorClickableWidget {
         int yhotY1 = (getY() + yhot * rulerSize);
         int yhotY2 = (getY() + yhot * rulerSize) + rulerSize;
 
-        context.fill(xhotX1, getY(), xhotX2, getBottom(), HOTSPOT_RULER_COLOR);
-        context.fill(getX(), yhotY1, getRight(), yhotY2, HOTSPOT_RULER_COLOR);
+        context.fill(xhotX1, getY(), xhotX2, getY() + getHeight(), HOTSPOT_RULER_COLOR);
+        context.fill(getX(), yhotY1, getX() + getWidth(), yhotY2, HOTSPOT_RULER_COLOR);
     }
 
     @Override

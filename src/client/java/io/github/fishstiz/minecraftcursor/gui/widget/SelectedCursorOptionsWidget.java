@@ -7,13 +7,14 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.*;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 
 import java.util.List;
 
 import static io.github.fishstiz.minecraftcursor.config.CursorConfig.Defaults.*;
 
 public class SelectedCursorOptionsWidget extends ContainerWidget {
-    protected static final int OPTIONS_HEIGHT = 26;
+    protected static final int OPTIONS_HEIGHT = 24;
     private static final int GRID_PADDING = 4;
     private static final int BOX_WIDGET_TEXTURE_SIZE = 96;
     private static final Text ENABLED_TEXT = Text.translatable("minecraft-cursor.options.enabled");
@@ -33,6 +34,14 @@ public class SelectedCursorOptionsWidget extends ContainerWidget {
         super(0, optionsScreen.layout.getHeaderHeight(), width, optionsScreen.getContentHeight(), Text.empty());
         this.optionsScreen = optionsScreen;
         initWidgets();
+    }
+
+    @Override
+    protected void drawBox(DrawContext context) {
+    }
+
+    @Override
+    public void drawTexture(DrawContext context, Identifier texture, int x, int y, int u, int v, int hoveredVOffset, int width, int height, int textureWidth, int textureHeight) {
     }
 
     private void initWidgets() {
@@ -74,10 +83,10 @@ public class SelectedCursorOptionsWidget extends ContainerWidget {
     private void grid(ClickableWidget widget, int gridX, int gridY, boolean absolute) {
         if (!absolute) {
             widget.setWidth((getWidth() / 2) - GRID_PADDING);
-//            widget.setHeight(OPTIONS_HEIGHT - GRID_PADDING);
+            widget.height = OPTIONS_HEIGHT - GRID_PADDING;
         }
-        widget.setX(getX() + ((getWidth() / 2) * gridX));
-        widget.setY(getY() + (OPTIONS_HEIGHT * (gridY)));
+        widget.setX((getX() + ((getWidth() / 2) * gridX)) + 1);
+        widget.setY((getY() + (OPTIONS_HEIGHT * (gridY))) + 1);
     }
 
     public void refreshWidgets() {
@@ -103,7 +112,11 @@ public class SelectedCursorOptionsWidget extends ContainerWidget {
         xhotSlider.render(context, mouseX, mouseY, delta);
         yhotSlider.render(context, mouseX, mouseY, delta);
         cursorHotspot.render(context, mouseX, mouseY, delta);
-        cursorTest.render(context, mouseX, mouseY, delta);
+        cursorTest.renderButton(context, mouseX, mouseY, delta);
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
     }
 
     @Override

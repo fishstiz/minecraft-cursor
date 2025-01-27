@@ -1,3 +1,4 @@
 accessWidener v2 named
+accessible field net/minecraft/client/gui/widget/ClickableWidget height I
 accessible class net/minecraft/client/gui/screen/ingame/BookEditScreen$Position
 accessible method net/minecraft/client/gui/screen/ingame/BookEditScreen$Position <init> (II)V

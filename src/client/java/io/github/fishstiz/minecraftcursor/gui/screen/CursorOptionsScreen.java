@@ -62,6 +62,15 @@ public class CursorOptionsScreen extends Screen {
         }
     }
 
+    @Override
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.render(context, mouseX, mouseY, delta);
+        this.renderBackgroundTexture(context);
+        body.render(context, mouseX, mouseY, delta);
+        moreButton.render(context, mouseX, mouseY, delta);
+        doneButton.render(context, mouseX, mouseY, delta);
+    }
+
     protected void refreshWidgetPositions() {
         this.layout.refreshPositions();
         if (this.body != null) {
@@ -149,14 +158,14 @@ public class CursorOptionsScreen extends Screen {
             selectedCursorColumn = new SelectedCursorOptionsWidget(SELECTED_CURSOR_COLUMN_WIDTH, CursorOptionsScreen.this);
         }
 
-//        @Override
-//        public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-//            boolean isScrolled = super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
-//            if (isScrolled && cursorsColumn.isMouseOver(mouseX, mouseY)) {
-//                cursorsColumn.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
-//            }
-//            return isScrolled;
-//        }
+        @Override
+        public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+            boolean isScrolled = super.mouseScrolled(mouseX, mouseY, amount);
+            if (isScrolled && cursorsColumn.isMouseOver(mouseX, mouseY)) {
+                cursorsColumn.mouseScrolled(mouseX, mouseY, amount);
+            }
+            return isScrolled;
+        }
 
         @Override
         public List<? extends Element> children() {
@@ -164,7 +173,7 @@ public class CursorOptionsScreen extends Screen {
         }
 
         @Override
-        protected void renderContents(DrawContext context, int mouseX, int mouseY, float delta) {
+        public void render(DrawContext context, int mouseX, int mouseY, float delta) {
             cursorsColumn.render(context, mouseX, mouseY, delta);
             selectedCursorColumn.render(context, mouseX, mouseY, delta);
         }
@@ -175,7 +184,7 @@ public class CursorOptionsScreen extends Screen {
             this.setPosition(this.getX(), layout.getHeaderHeight());
 
             cursorsColumn.setHeight(getContentHeight());
-//            selectedCursorColumn.setHeight(getContentHeight());
+            selectedCursorColumn.setHeight(getContentHeight());
 
             int cursorsColumnX = width / 2 - CURSORS_COLUMN_WIDTH;
             int selectedCursorColumnX = width / 2;
@@ -198,6 +207,11 @@ public class CursorOptionsScreen extends Screen {
         @Override
         protected double getDeltaYPerScroll() {
             return 0;
+        }
+
+        @Override
+        protected void renderContents(DrawContext context, int mouseX, int mouseY, float delta) {
+            this.render(context, mouseX, mouseY, delta);
         }
     }
 }

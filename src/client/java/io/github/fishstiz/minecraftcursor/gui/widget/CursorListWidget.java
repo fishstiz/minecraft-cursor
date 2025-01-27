@@ -27,9 +27,10 @@ public class CursorListWidget extends ElementListWidget<CursorListWidget.CursorW
                 width + SCROLLBAR_OFFSET,
                 optionsScreen.getContentHeight(),
                 optionsScreen.layout.getHeaderHeight(),
-                optionsScreen.layout.getHeaderHeight(),
+                optionsScreen.layout.getHeaderHeight() + optionsScreen.getContentHeight(),
                 ITEM_HEIGHT + ROW_GAP
         );
+        this.top = optionsScreen.layout.getHeaderHeight();
         this.optionsScreen = optionsScreen;
         populateEntries();
     }
@@ -50,35 +51,54 @@ public class CursorListWidget extends ElementListWidget<CursorListWidget.CursorW
         }
     }
 
-//    @Override
-//    protected int getScrollbarX() {
-//        return getRight() - 6;
-//    }
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        CursorWidgetEntry entry = this.getEntryAtPosition(mouseX, mouseY);
+        if (entry != null) {
+            return entry.mouseClicked(mouseX, mouseY, button);
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
 
-//    @Override
-//    public void setX(int x) {
-//        this.x = x;
-//        super.setX(x);
-//        refreshScroll();
-//        for (CursorWidgetEntry entry : entries) {
-//            entry.button.setX(x);
-//        }
-//    }
+    @Override
+    protected int getScrollbarPositionX() {
+        return (left + width) - SCROLLBAR_OFFSET;
+    }
+
+    @Override
+    public void setLeftPos(int leftPos) {
+        this.left = leftPos;
+        super.setLeftPos(leftPos);
+        this.centerScrollOn(this.getFirst());
+
+        for (CursorWidgetEntry entry : entries) {
+            entry.button.setX(leftPos);
+        }
+    }
 
     public void setHeight(int height) {
         this.height = height;
     }
 
-//    @Override
-//    protected void drawHeaderAndFooterSeparators(DrawContext context) {
-//    }
-//
-//    @Override
-//    public void drawMenuListBackground(DrawContext context) {
-//    }
+    @Override
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        for (int i = 0; i < entries.size(); i++) {
+            this.renderEntry(
+                    context,
+                    mouseX,
+                    mouseY,
+                    delta,
+                    i,
+                    this.getRowLeft(),
+                    optionsScreen.layout.getHeaderHeight() + (itemHeight + ROW_GAP) * i - (int) Math.round(getScrollAmount()),
+                    getRowWidth(),
+                    itemHeight
+            );
+        }
+    }
 
     public class CursorWidgetEntry extends ElementListWidget.Entry<CursorListWidget.CursorWidgetEntry> {
-        public PressableWidget button;
+        public CursorClickableWidget button;
 
         public CursorWidgetEntry(Cursor cursor, int y, int width, int height, MinecraftClient client, CursorOptionsScreen optionsScreen) {
             button = new CursorClickableWidget(0, y, width, height, cursor, client, optionsScreen);
@@ -113,6 +133,7 @@ public class CursorListWidget extends ElementListWidget<CursorListWidget.CursorW
         private final CursorOptionsScreen optionsScreen;
         private final Cursor cursor;
 
+
         public CursorClickableWidget(int x, int y, int width, int height, Cursor cursor, MinecraftClient client, CursorOptionsScreen optionsScreen) {
             super(x, y, width, height, Text.empty());
             this.client = client;
@@ -132,7 +153,7 @@ public class CursorListWidget extends ElementListWidget<CursorListWidget.CursorW
             renderMessage(context);
 
             context.drawBorder(getX(), getY(), getWidth(), getHeight(),
-                    isSelected() || cursor == optionsScreen.getSelectedCursor() ? BORDER_COLOR : 0xFF000000);
+                    isMouseOver(mouseX, mouseY) || cursor == optionsScreen.getSelectedCursor() ? BORDER_COLOR : 0xFF000000);
         }
 
         private void renderBox(DrawContext context) {
@@ -153,6 +174,17 @@ public class CursorListWidget extends ElementListWidget<CursorListWidget.CursorW
             Text name = Text.translatable(PREFIX_TEXT_KEY + cursor.getType().getKey());
             context.drawText(client.textRenderer, name, x, y + Math.round(getHeight() / 3.0f), cursor.getEnabled() ? TEXT_COLOR : TEXT_DISABLED_COLOR, false);
         }
+
+//        @Override
+//        public boolean isMouseOver(double mouseX, double mouseY) {
+//            boolean isMouseOverWidget = super.isMouseOver(mouseX, mouseY);
+//            hovered = isMouseOverWidget;
+//
+//            if (isMouseOverWidget) {
+//                System.out.println("hovered over: " + cursor.getType());
+//            }
+//            return isMouseOverWidget;
+//        }
 
         @Override
         protected void appendClickableNarrations(NarrationMessageBuilder builder) {

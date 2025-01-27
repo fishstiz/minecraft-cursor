@@ -20,6 +20,9 @@
     ],
     "client": [
       "io.github.fishstiz.minecraftcursor.MinecraftCursorClient"
+    ],
+    "modmenu": [
+      "io.github.fishstiz.minecraftcursor.MinecraftCursorModMenuApiImpl"
     ]
   },
   "mixins": [
