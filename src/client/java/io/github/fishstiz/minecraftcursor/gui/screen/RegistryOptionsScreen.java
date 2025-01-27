@@ -43,6 +43,7 @@ public class RegistryOptionsScreen extends Screen {
     private final CursorManager cursorManager;
     private final CursorConfig config = MinecraftCursorClient.CONFIG.get();
     private RegistryListWidget body;
+    private ButtonWidget doneButton;
 
     protected RegistryOptionsScreen(Screen previousScreen, CursorManager cursorManager) {
         super(Text.translatable("minecraft-cursor.options.more"));
@@ -53,10 +54,19 @@ public class RegistryOptionsScreen extends Screen {
     @Override
     protected void init() {
         this.layout.addHeader(new TextWidget(this.title, this.textRenderer));
-        this.body = this.layout.addBody((RegistryListWidget & Widget) new RegistryListWidget(this.client, this));
-        this.layout.addFooter(ButtonWidget.builder(ScreenTexts.DONE, btn -> this.close()).build());
+        this.body = this.layout.addBody(new RegistryListWidget(this.client, this));
+        doneButton = ButtonWidget.builder(ScreenTexts.DONE, btn -> this.close()).build();
+        this.layout.addFooter(doneButton);
         this.layout.forEachChild(this::addDrawableChild);
         this.refreshWidgetPositions();
+    }
+
+    @Override
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.render(context, mouseX, mouseY, delta);
+        this.renderBackgroundTexture(context);
+        body.render(context, mouseX, mouseY, delta);
+        doneButton.render(context, mouseX, mouseY, delta);
     }
 
     protected void refreshWidgetPositions() {
@@ -92,7 +102,12 @@ public class RegistryOptionsScreen extends Screen {
         return height - layout.getHeaderHeight() - layout.getFooterHeight();
     }
 
-    public class RegistryListWidget extends ElementListWidget<RegistryListWidget.RegistryEntry> {
+    @Override
+    public List<? extends Element> children() {
+        return List.of(body, doneButton);
+    }
+
+    public class RegistryListWidget extends ElementListWidget<RegistryListWidget.RegistryEntry> implements Widget {
         public final List<RegistryEntry> options = new ArrayList<>();
 
         public RegistryListWidget(MinecraftClient minecraftClient, RegistryOptionsScreen options) {
@@ -101,7 +116,7 @@ public class RegistryOptionsScreen extends Screen {
                     options.width,
                     options.getContentHeight(),
                     options.layout.getHeaderHeight(),
-                    options.layout.getFooterHeight(),
+                    options.layout.getHeaderHeight() + options.getContentHeight(),
                     ITEM_HEIGHT + ROW_GAP
             );
             populateEntries();
@@ -136,6 +151,39 @@ public class RegistryOptionsScreen extends Screen {
             this.height = height;
             this.setLeftPos(0);
             this.top = y;
+        }
+
+        @Override
+        public void setX(int x) {
+            this.setLeftPos(x);
+        }
+
+        @Override
+        public void setY(int y) {
+        }
+
+        @Override
+        public int getX() {
+            return getRowLeft();
+        }
+
+        @Override
+        public int getY() {
+            return this.headerHeight;
+        }
+
+        @Override
+        public int getWidth() {
+            return this.getRowWidth();
+        }
+
+        @Override
+        public int getHeight() {
+            return this.itemHeight;
+        }
+
+        @Override
+        public void forEachChild(Consumer<ClickableWidget> consumer) {
         }
 
         public class RegistryEntry extends ElementListWidget.Entry<RegistryListWidget.RegistryEntry> {
