@@ -60,7 +60,7 @@ public class CursorConfigLoader {
     public void createDefault() {
         CursorConfig defaultConfig = new CursorConfig();
 
-        for (CursorType type : CursorType.values()) {
+        for (CursorType type : CursorType.TYPES.values()) {
             defaultConfig.getOrCreateCursorSettings(type);
         }
 

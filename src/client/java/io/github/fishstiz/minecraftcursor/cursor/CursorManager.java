@@ -25,7 +25,7 @@ public class CursorManager {
         this.config = config;
         this.client = client;
 
-        for (CursorType type : CursorType.values()) {
+        for (CursorType type : CursorType.TYPES.values()) {
             cursors.put(type, new Cursor((type)));
         }
     }
