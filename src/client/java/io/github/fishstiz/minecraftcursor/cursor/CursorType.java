@@ -15,7 +15,7 @@ public enum CursorType {
 
     private final String key;
 
-    static final Map<String, CursorType> CURSOR_TYPES = new HashMap<>();
+    public static final Map<String, CursorType> TYPES = new HashMap<>();
 
     CursorType(String key) {
         this.key = key;
@@ -26,12 +26,14 @@ public enum CursorType {
     }
 
     static {
-        for (CursorType cursorType : CursorType.values())
-            CURSOR_TYPES.put(cursorType.key, cursorType);
+        for (CursorType cursorType : CursorType.values()) {
+            if (cursorType == CursorType.DEFAULT_FORCE) continue;
+            TYPES.put(cursorType.key, cursorType);
+        }
     }
 
     @Nullable
     public static CursorType getCursorTypeOrNull(String key) {
-        return CURSOR_TYPES.get(key);
+        return TYPES.get(key);
     }
 }
