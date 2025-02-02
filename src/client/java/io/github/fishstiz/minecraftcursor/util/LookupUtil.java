@@ -1,4 +1,4 @@
-package io.github.fishstiz.minecraftcursor.registry.utils;
+package io.github.fishstiz.minecraftcursor.util;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.MappingResolver;
@@ -8,7 +8,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.invoke.VarHandle;
 
-public class LookupUtils {
+public class LookupUtil {
     public static final String NAMESPACE = "intermediary";
     public static final MappingResolver RESOLVER = FabricLoader.getInstance().getMappingResolver();
 

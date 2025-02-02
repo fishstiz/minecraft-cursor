@@ -7,7 +7,7 @@ import io.github.fishstiz.minecraftcursor.registry.gui.ingame.*;
 import io.github.fishstiz.minecraftcursor.registry.gui.modmenu.ModScreenCursor;
 import io.github.fishstiz.minecraftcursor.registry.gui.multiplayer.MultiplayerServerListWidgetCursor;
 import io.github.fishstiz.minecraftcursor.registry.gui.world.WorldListWidgetCursor;
-import io.github.fishstiz.minecraftcursor.utils.CursorTypeUtils;
+import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
 import io.github.fishstiz.minecraftcursor.registry.utils.ElementCursorTypeFunction;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.Element;
@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static io.github.fishstiz.minecraftcursor.registry.utils.LookupUtils.NAMESPACE;
-import static io.github.fishstiz.minecraftcursor.registry.utils.LookupUtils.RESOLVER;
+import static io.github.fishstiz.minecraftcursor.util.LookupUtil.NAMESPACE;
+import static io.github.fishstiz.minecraftcursor.util.LookupUtil.RESOLVER;
 
 public class CursorTypeRegistry {
     private final List<AbstractMap.SimpleImmutableEntry<Class<? extends Element>, ElementCursorTypeFunction>> registry = new ArrayList<>();
@@ -152,7 +152,7 @@ public class CursorTypeRegistry {
 
     private static CursorType sliderWidgetCursor(Element element, double mouseX, double mouseY) {
         SliderWidget slider = (SliderWidget) element;
-        if (slider.isFocused() && (CursorTypeUtils.isLeftClickHeld() || CursorTypeUtils.isGrabbing())) {
+        if (slider.isFocused() && (CursorTypeUtil.isLeftClickHeld() || CursorTypeUtil.isGrabbing())) {
             return CursorType.GRABBING;
         }
         return slider.active && slider.visible ?
@@ -165,7 +165,7 @@ public class CursorTypeRegistry {
     }
 
     private static CursorType hotspotWidgetCursor(Element element, double mouseX, double mouseY) {
-        if (CursorTypeUtils.isLeftClickHeld() || CursorTypeUtils.isGrabbing()) {
+        if (CursorTypeUtil.isLeftClickHeld() || CursorTypeUtil.isGrabbing()) {
             return CursorType.GRABBING;
         }
         return CursorType.POINTER;

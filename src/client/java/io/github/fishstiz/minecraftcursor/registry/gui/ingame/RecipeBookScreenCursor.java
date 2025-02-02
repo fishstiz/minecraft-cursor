@@ -3,7 +3,7 @@ package io.github.fishstiz.minecraftcursor.registry.gui.ingame;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.mixin.client.access.*;
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
-import io.github.fishstiz.minecraftcursor.utils.CursorTypeUtils;
+import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ingame.AbstractFurnaceScreen;
 import net.minecraft.client.gui.screen.ingame.CraftingScreen;
@@ -54,7 +54,7 @@ public class RecipeBookScreenCursor extends HandledScreenCursor<AbstractRecipeSc
         }
 
         boolean isResultHovered = recipesArea.getHoveredResultButton() != null;
-        if (isResultHovered && CursorTypeUtils.canShift()) {
+        if (isResultHovered && CursorTypeUtil.canShift()) {
             return CursorType.SHIFT;
         } else if (isButtonHovered(recipeBook, recipesArea) || isResultHovered) {
             return CursorType.POINTER;
@@ -66,7 +66,7 @@ public class RecipeBookScreenCursor extends HandledScreenCursor<AbstractRecipeSc
 
     private CursorType getAlternatesWidgetCursor(RecipeAlternativesWidgetAccessor alternatesWidget) {
         if (alternatesWidget.getAlternativeButtons().stream().anyMatch(ClickableWidget::isHovered)) {
-            return CursorTypeUtils.canShift() ? CursorType.SHIFT : CursorType.POINTER;
+            return CursorTypeUtil.canShift() ? CursorType.SHIFT : CursorType.POINTER;
         }
         return CursorType.DEFAULT_FORCE;
     }

@@ -1,6 +1,6 @@
 package io.github.fishstiz.minecraftcursor.gui.widget;
 
-import io.github.fishstiz.minecraftcursor.utils.CursorTypeUtils;
+import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.text.Text;
@@ -87,14 +87,14 @@ public class SelectedCursorSliderWidget extends SliderWidget {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
         hovered = isMouseOver(mouseX, mouseY);
-        if (held && !CursorTypeUtils.isLeftClickHeld()) {
+        if (held && !CursorTypeUtil.isLeftClickHeld()) {
             if (this.onRelease != null) {
                 this.onRelease.run();
             }
             setFocused(false);
             held = false;
         } else {
-            held = CursorTypeUtils.isLeftClickHeld();
+            held = CursorTypeUtil.isLeftClickHeld();
         }
     }
 
