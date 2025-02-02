@@ -1,34 +1,24 @@
-package io.github.fishstiz.minecraftcursor.registry.gui.ingame;
+package io.github.fishstiz.minecraftcursor.cursorhandler.ingame;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.mixin.client.access.CreativeInventoryScreenAccessor;
-import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
 import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
-import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemGroups;
 import net.minecraft.screen.slot.Slot;
 
-public class CreativeInventoryScreenCursor extends HandledScreenCursor<CreativeInventoryScreen.CreativeScreenHandler> {
+public class CreativeInventoryScreenCursorHandler extends HandledScreenCursorHandler<CreativeInventoryScreen.CreativeScreenHandler, CreativeInventoryScreen> {
     // Derived from CreativeInventoryScreen#renderTabTooltipIfHovered
     public static final int TAB_WIDTH = 21;
     public static final int TAB_HEIGHT = 27;
     public static final int TAB_OFFSET_X = 3;
     public static final int TAB_OFFSET_Y = 3;
 
-    private CreativeInventoryScreenCursor() {
-    }
-
-    public static void register(CursorTypeRegistry cursorTypeRegistry) {
-        cursorTypeRegistry.register(CreativeInventoryScreen.class, new CreativeInventoryScreenCursor()::getCursorType);
-    }
-
     @Override
-    protected CursorType getCursorType(Element element, double mouseX, double mouseY) {
-        CreativeInventoryScreen creativeInventoryScreen = (CreativeInventoryScreen) element;
+    public CursorType getCursorType(CreativeInventoryScreen creativeInventoryScreen, double mouseX, double mouseY) {
         CursorType handledScreenCursor = super.getCursorType(creativeInventoryScreen, mouseX, mouseY);
         if (handledScreenCursor != CursorType.DEFAULT) {
             return handledScreenCursor;

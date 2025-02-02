@@ -1,27 +1,17 @@
-package io.github.fishstiz.minecraftcursor.registry.gui.multiplayer;
+package io.github.fishstiz.minecraftcursor.cursorhandler.multiplayer;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
-import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
-import io.github.fishstiz.minecraftcursor.registry.gui.GuiCursorHandler;
-import net.minecraft.client.gui.Element;
+import io.github.fishstiz.minecraftcursor.api.CursorHandler;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
 
-public class MultiplayerServerListWidgetCursor extends GuiCursorHandler {
+public class MultiplayerServerListWidgetCursorHandler implements CursorHandler<MultiplayerServerListWidget> {
     public static final int ICON_SIZE = 32;
 
-    private MultiplayerServerListWidgetCursor() {
-    }
-
-    public static void register(CursorTypeRegistry cursorTypeRegistry) {
-        cursorTypeRegistry.register(MultiplayerServerListWidget.class, new MultiplayerServerListWidgetCursor()::getCursorType);
-    }
-
     @Override
-    protected CursorType getCursorType(Element element, double mouseX, double mouseY) {
+    public CursorType getCursorType(MultiplayerServerListWidget serverList, double mouseX, double mouseY) {
         if (!MinecraftCursorClient.CONFIG.get().isServerIconEnabled()) return CursorType.DEFAULT;
 
-        MultiplayerServerListWidget serverList = (MultiplayerServerListWidget) element;
         MultiplayerServerListWidget.ServerEntry serverEntry =
                 (MultiplayerServerListWidget.ServerEntry) serverList.hoveredElement(mouseX, mouseY)
                         .filter(entry -> entry instanceof MultiplayerServerListWidget.ServerEntry)
