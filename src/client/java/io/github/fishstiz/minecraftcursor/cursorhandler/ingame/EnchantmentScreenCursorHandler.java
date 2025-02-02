@@ -1,33 +1,24 @@
-package io.github.fishstiz.minecraftcursor.registry.gui.ingame;
+package io.github.fishstiz.minecraftcursor.cursorhandler.ingame;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.mixin.client.access.HandledScreenAccessor;
-import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ingame.EnchantmentScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.screen.EnchantmentScreenHandler;
 
-public class EnchantmentScreenCursor extends HandledScreenCursor<EnchantmentScreenHandler> {
+public class EnchantmentScreenCursorHandler extends HandledScreenCursorHandler<EnchantmentScreenHandler, EnchantmentScreen> {
     // Derived from EnchantmentScreen#drawBackground
     public static final int ENCHANTMENT_BTN_WIDTH = 108;
     public static final int ENCHANTMENT_BTN_HEIGHT = 19;
     public static final int ENCHANTMENT_BTN_OFFSET_X = 60;
     public static final int ENCHANTMENT_BTN_OFFSET_Y = 14;
 
-    private EnchantmentScreenCursor() {
-    }
-
-    public static void register(CursorTypeRegistry cursorTypeRegistry) {
-        cursorTypeRegistry.register(EnchantmentScreen.class, new EnchantmentScreenCursor()::getCursorType);
-    }
-
     @Override
     @SuppressWarnings("unchecked")
-    protected CursorType getCursorType(Element element, double mouseX, double mouseY) {
-        CursorType cursorType = super.getCursorType(element, mouseX, mouseY);
+    public CursorType getCursorType(EnchantmentScreen enchantmentScreen, double mouseX, double mouseY) {
+        CursorType cursorType = super.getCursorType(enchantmentScreen, mouseX, mouseY);
         if (cursorType != CursorType.DEFAULT) return cursorType;
 
         if (!MinecraftCursorClient.CONFIG.get().isEnchantmentsEnabled()) return CursorType.DEFAULT;
@@ -35,7 +26,6 @@ public class EnchantmentScreenCursor extends HandledScreenCursor<EnchantmentScre
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
         if (player == null) return CursorType.DEFAULT;
 
-        EnchantmentScreen enchantmentScreen = (EnchantmentScreen) element;
         HandledScreenAccessor<EnchantmentScreenHandler> accessor =
                 (HandledScreenAccessor<EnchantmentScreenHandler>) enchantmentScreen;
         EnchantmentScreenHandler handler = accessor.getHandler();

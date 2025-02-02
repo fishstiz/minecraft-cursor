@@ -1,51 +1,42 @@
-package io.github.fishstiz.minecraftcursor.registry.gui.ingame;
+package io.github.fishstiz.minecraftcursor.cursorhandler.ingame;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.mixin.client.access.LoomScreenAccessor;
-import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
 import net.minecraft.block.entity.BannerPattern;
-import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ingame.LoomScreen;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.LoomScreenHandler;
 
 import java.util.List;
 
-public class LoomScreenCursor extends HandledScreenCursor<LoomScreenHandler> {
+public class LoomScreenCursorHandler extends HandledScreenCursorHandler<LoomScreenHandler, LoomScreen> {
     // Derived from LoomScreen#drawBackground
     public static final int PATTERNS_OFFSET_X = 60;
     public static final int PATTERNS_OFFSET_Y = 13;
     public static final int GRID_SIZE = 4;
     public static final int PATTERN_SIZE = 14;
 
-    private LoomScreenCursor() {
-    }
-
-    public static void register(CursorTypeRegistry cursorTypeRegistry) {
-        cursorTypeRegistry.register(LoomScreen.class, new LoomScreenCursor()::getCursorType);
-    }
-
     @Override
-    protected CursorType getCursorType(Element element, double mouseX, double mouseY) {
-        CursorType cursorType = super.getCursorType(element, mouseX, mouseY);
+    public CursorType getCursorType(LoomScreen loomScreen, double mouseX, double mouseY) {
+        CursorType cursorType = super.getCursorType(loomScreen, mouseX, mouseY);
         if (cursorType != CursorType.DEFAULT) return cursorType;
 
         if (!MinecraftCursorClient.CONFIG.get().isLoomPatternsEnabled()) return CursorType.DEFAULT;
 
-        LoomScreenAccessor loomScreen = (LoomScreenAccessor) element;
+        LoomScreenAccessor loomScreenAccessor = (LoomScreenAccessor) loomScreen;
 
-        if (!loomScreen.getCanApplyDyePattern()) return CursorType.DEFAULT;
+        if (!loomScreenAccessor.getCanApplyDyePattern()) return CursorType.DEFAULT;
 
-        LoomScreenHandler handler = loomScreen.getHandler();
+        LoomScreenHandler handler = loomScreenAccessor.getHandler();
         List<RegistryEntry<BannerPattern>> patterns = handler.getBannerPatterns();
-        int patternsX = loomScreen.getX() + PATTERNS_OFFSET_X;
-        int patternsY = loomScreen.getY() + PATTERNS_OFFSET_Y;
+        int patternsX = loomScreenAccessor.getX() + PATTERNS_OFFSET_X;
+        int patternsY = loomScreenAccessor.getY() + PATTERNS_OFFSET_Y;
 
         exitLoop:
         for (int row = 0; row < GRID_SIZE; row++) {
             for (int col = 0; col < GRID_SIZE; col++) {
-                int patternIndex = row + loomScreen.getVisibleTopRow();
+                int patternIndex = row + loomScreenAccessor.getVisibleTopRow();
                 int patternSlot = patternIndex * GRID_SIZE + col;
                 if (patternSlot >= patterns.size()) {
                     break exitLoop;

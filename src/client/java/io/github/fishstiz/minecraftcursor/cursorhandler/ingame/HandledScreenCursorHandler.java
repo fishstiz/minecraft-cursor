@@ -1,33 +1,24 @@
-package io.github.fishstiz.minecraftcursor.registry.gui.ingame;
+package io.github.fishstiz.minecraftcursor.cursorhandler.ingame;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.mixin.client.access.HandledScreenAccessor;
-import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
 import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
-import io.github.fishstiz.minecraftcursor.registry.gui.GuiCursorHandler;
-import net.minecraft.client.gui.Element;
+import io.github.fishstiz.minecraftcursor.api.CursorHandler;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 
-public class HandledScreenCursor<T extends ScreenHandler> extends GuiCursorHandler {
-    protected HandledScreenCursor() {
-    }
 
-    public static void register(CursorTypeRegistry cursorTypeRegistry) {
-        cursorTypeRegistry.register(HandledScreen.class, new HandledScreenCursor<>()::getCursorType);
-    }
-
+public class HandledScreenCursorHandler<T extends ScreenHandler, U extends HandledScreen<? extends T>> implements CursorHandler<U> {
     @Override
     @SuppressWarnings("unchecked")
-    protected CursorType getCursorType(Element element, double mouseX, double mouseY) {
+    public CursorType getCursorType(U handledScreen, double mouseX, double mouseY) {
         CursorConfig config = MinecraftCursorClient.CONFIG.get();
 
-        HandledScreenAccessor<T> handledScreen = (HandledScreenAccessor<T>) element;
-        ScreenHandler handler = handledScreen.getHandler();
-        Slot focusedSlot = handledScreen.getFocusedSlot();
+        ScreenHandler handler = ((HandledScreenAccessor<T>) handledScreen).getHandler();
+        Slot focusedSlot = ((HandledScreenAccessor<T>) handledScreen).getFocusedSlot();
 
         boolean canClickFocusedSlot = handler.getCursorStack().isEmpty()
                 && focusedSlot != null

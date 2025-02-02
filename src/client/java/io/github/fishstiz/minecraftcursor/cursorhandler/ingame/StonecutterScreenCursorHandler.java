@@ -1,14 +1,12 @@
-package io.github.fishstiz.minecraftcursor.registry.gui.ingame;
+package io.github.fishstiz.minecraftcursor.cursorhandler.ingame;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.mixin.client.access.StonecutterScreenAccessor;
-import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
-import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ingame.StonecutterScreen;
 import net.minecraft.screen.StonecutterScreenHandler;
 
-public class StonecutterScreenCursor extends HandledScreenCursor<StonecutterScreenHandler> {
+public class StonecutterScreenCursorHandler extends HandledScreenCursorHandler<StonecutterScreenHandler, StonecutterScreen> {
     // Derived from StonecutterScreen#drawBackground
     public static final int RECIPES_OFFSET_X = 52;
     public static final int RECIPES_OFFSET_Y = 14;
@@ -19,26 +17,18 @@ public class StonecutterScreenCursor extends HandledScreenCursor<StonecutterScre
     public static final int RECIPE_SLOT_HEIGHT = 18;
     public static final int RECIPE_SLOT_HEIGHT_OFFSET = 2;
 
-    private StonecutterScreenCursor() {
-    }
-
-    public static void register(CursorTypeRegistry cursorTypeRegistry) {
-        cursorTypeRegistry.register(StonecutterScreen.class, new StonecutterScreenCursor()::getCursorType);
-    }
-
     @Override
-    protected CursorType getCursorType(Element element, double mouseX, double mouseY) {
-        CursorType cursorType = super.getCursorType(element, mouseX, mouseY);
+    public CursorType getCursorType(StonecutterScreen stonecutterScreen, double mouseX, double mouseY) {
+        CursorType cursorType = super.getCursorType(stonecutterScreen, mouseX, mouseY);
         if (cursorType != CursorType.DEFAULT) return cursorType;
 
         if (!MinecraftCursorClient.CONFIG.get().isStonecutterRecipesEnabled()) return CursorType.DEFAULT;
 
-        StonecutterScreenAccessor stonecutterScreen = (StonecutterScreenAccessor) element;
-        StonecutterScreenHandler handler = stonecutterScreen.getHandler();
-
-        int recipesX = stonecutterScreen.getX() + RECIPES_OFFSET_X;
-        int recipesY = stonecutterScreen.getY() + RECIPES_OFFSET_Y;
-        int scrollOffset = stonecutterScreen.getScrollOffset();
+        StonecutterScreenAccessor accessor = (StonecutterScreenAccessor) stonecutterScreen;
+        StonecutterScreenHandler handler = accessor.getHandler();
+        int recipesX = accessor.getX() + RECIPES_OFFSET_X;
+        int recipesY = accessor.getY() + RECIPES_OFFSET_Y;
+        int scrollOffset = accessor.getScrollOffset();
 
         for (int i = scrollOffset; i < scrollOffset + RECIPES_SCROLLOFFSET && i < handler.getAvailableRecipeCount(); i++) {
             int recipeIndex = i - scrollOffset;
