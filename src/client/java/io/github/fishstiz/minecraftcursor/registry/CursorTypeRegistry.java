@@ -1,6 +1,7 @@
 package io.github.fishstiz.minecraftcursor.registry;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
+import io.github.fishstiz.minecraftcursor.api.CursorProvider;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.cursorhandler.ingame.*;
 import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorHotspotWidget;
@@ -112,6 +113,13 @@ public class CursorTypeRegistry {
 
     public <T extends Element> CursorType getCursorType(T element, double mouseX, double mouseY) {
         try {
+            if (element instanceof CursorProvider cursorProvider) {
+                CursorType providedCursorType = cursorProvider.getCursorType(mouseX, mouseY);
+                if (providedCursorType != null && providedCursorType != CursorType.DEFAULT) {
+                    return providedCursorType;
+                }
+            }
+
             @SuppressWarnings("unchecked")
             ElementCursorTypeFunction<T> cursorTypeFunction =
                     (ElementCursorTypeFunction<T>) cachedRegistry.computeIfAbsent(element.getClass().getName(),
