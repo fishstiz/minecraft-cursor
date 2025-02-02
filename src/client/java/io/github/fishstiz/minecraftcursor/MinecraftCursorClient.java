@@ -1,5 +1,6 @@
 package io.github.fishstiz.minecraftcursor;
 
+import io.github.fishstiz.minecraftcursor.api.MinecraftCursorApi;
 import io.github.fishstiz.minecraftcursor.config.CursorConfigLoader;
 import io.github.fishstiz.minecraftcursor.config.CursorConfigService;
 import io.github.fishstiz.minecraftcursor.cursor.CursorManager;
@@ -10,13 +11,11 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.resource.ResourceType;
-
-import java.util.HashSet;
 
 public class MinecraftCursorClient implements ClientModInitializer {
     public static final MinecraftClient CLIENT = MinecraftClient.getInstance();
@@ -24,7 +23,6 @@ public class MinecraftCursorClient implements ClientModInitializer {
             new CursorConfigService(String.format("config/%s%s", MinecraftCursor.MOD_ID, CursorConfigLoader.FILE_EXTENSION));
     public static final CursorManager CURSOR_MANAGER = new CursorManager(CONFIG, CLIENT);
     public static final CursorTypeRegistry CURSOR_REGISTRY = new CursorTypeRegistry();
-    public static final HashSet<Element> SCREEN_ELEMENTS = new HashSet<>();
 
     private Screen visibleNonCurrentScreen;
 
@@ -34,9 +32,11 @@ public class MinecraftCursorClient implements ClientModInitializer {
                 new CursorResourceReloadListener(CURSOR_MANAGER, MinecraftCursor.MOD_ID, CONFIG);
         ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(resourceReloadListener);
 
-        ScreenEvents.BEFORE_INIT.register((MinecraftClient client, Screen screen, int width, int height) -> {
-            SCREEN_ELEMENTS.clear();
+        FabricLoader.getInstance().getEntrypoints(MinecraftCursor.MOD_ID, MinecraftCursorApi.class).forEach(
+                entrypoint -> entrypoint.init(CURSOR_REGISTRY)
+        );
 
+        ScreenEvents.BEFORE_INIT.register((MinecraftClient client, Screen screen, int width, int height) -> {
             if (client.currentScreen == null) {
                 CURSOR_MANAGER.setCurrentCursor(CursorType.DEFAULT);
                 visibleNonCurrentScreen = screen;
