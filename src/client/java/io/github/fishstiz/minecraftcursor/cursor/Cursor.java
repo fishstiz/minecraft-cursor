@@ -1,7 +1,7 @@
 package io.github.fishstiz.minecraftcursor.cursor;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
-import io.github.fishstiz.minecraftcursor.utils.BufferedImageUtils;
+import io.github.fishstiz.minecraftcursor.util.BufferedImageUtil;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
@@ -27,7 +27,7 @@ public class Cursor {
 
     public void loadImage(Identifier sprite, BufferedImage image, double scale, int xhot, int yhot, boolean enabled) throws IOException {
         this.sprite = sprite;
-        this.base64Image = BufferedImageUtils.compressImageToBase64(image);
+        this.base64Image = BufferedImageUtil.compressImageToBase64(image);
         this.enabled = enabled;
 
         create(image, scale, xhot, yhot, null);
@@ -39,7 +39,7 @@ public class Cursor {
         }
 
         try {
-            BufferedImage image = BufferedImageUtils.decompressBase64ToImage(base64Image);
+            BufferedImage image = BufferedImageUtil.decompressBase64ToImage(base64Image);
             create(image, scale, xhot, yhot, onUpdate);
             image.flush();
         } catch (IOException e) {
@@ -48,7 +48,7 @@ public class Cursor {
     }
 
     private void create(BufferedImage image, double scale, int xhot, int yhot, @Nullable Runnable onCreate) {
-        BufferedImage scaledImage = scale == 1 ? image : BufferedImageUtils.scaleImage(image, scale);
+        BufferedImage scaledImage = scale == 1 ? image : BufferedImageUtil.scaleImage(image, scale);
         int scaledXHot = scale == 1 ? xhot : (int) Math.round(xhot * scale);
         int scaledYHot = scale == 1 ? yhot : (int) Math.round(yhot * scale);
 
@@ -56,7 +56,7 @@ public class Cursor {
         GLFWImage.Buffer glfwImageBuffer = GLFWImage.create(1);
         glfwImageBuffer.width(scaledImage.getWidth());
         glfwImageBuffer.height(scaledImage.getHeight());
-        glfwImageBuffer.pixels(BufferedImageUtils.getPixelsRGBA(scaledImage));
+        glfwImageBuffer.pixels(BufferedImageUtil.getPixelsRGBA(scaledImage));
         scaledImage.flush();
 
         long previousId = this.id;
