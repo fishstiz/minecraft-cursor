@@ -73,7 +73,7 @@ public class CursorTypeRegistry {
         }
     }
 
-    private <T extends Element> void register(CursorHandler<T> cursorHandler) {
+    public <T extends Element> void register(CursorHandler<T> cursorHandler) {
         CursorHandler.TargetElement<T> targetElement = cursorHandler.getTargetElement();
 
         if (targetElement.elementClass().isPresent()) {
