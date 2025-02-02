@@ -5,7 +5,7 @@ import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.mixin.client.access.HandledScreenAccessor;
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
-import io.github.fishstiz.minecraftcursor.utils.CursorTypeUtils;
+import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
 import io.github.fishstiz.minecraftcursor.registry.gui.GuiCursorHandler;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -34,7 +34,7 @@ public class HandledScreenCursor<T extends ScreenHandler> extends GuiCursorHandl
                 && focusedSlot.hasStack()
                 && focusedSlot.canBeHighlighted();
 
-        if (canClickFocusedSlot && CursorTypeUtils.canShift()) {
+        if (canClickFocusedSlot && CursorTypeUtil.canShift()) {
             return CursorType.SHIFT;
         }
         if (config.isItemSlotEnabled() && canClickFocusedSlot) {

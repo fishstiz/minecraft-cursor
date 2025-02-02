@@ -5,7 +5,7 @@ import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.mixin.client.access.CreativeInventoryScreenAccessor;
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
-import io.github.fishstiz.minecraftcursor.utils.CursorTypeUtils;
+import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.item.ItemGroup;
@@ -66,7 +66,7 @@ public class CreativeInventoryScreenCursor extends HandledScreenCursor<CreativeI
 
     private CursorType getCursorTypeDelete(CreativeInventoryScreenAccessor creativeInventoryScreen) {
         Slot focusedSlot = creativeInventoryScreen.getFocusedSlot();
-        if (CursorTypeUtils.canShift()
+        if (CursorTypeUtil.canShift()
                 && focusedSlot != null
                 && focusedSlot == creativeInventoryScreen.getDeleteItemSlot()) {
             return CursorType.SHIFT;

@@ -1,4 +1,4 @@
-package io.github.fishstiz.minecraftcursor.utils;
+package io.github.fishstiz.minecraftcursor.util;
 
 import org.lwjgl.BufferUtils;
 
@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Base64;
 
-public class BufferedImageUtils {
+public class BufferedImageUtil {
     public static ByteBuffer getPixelsRGBA(BufferedImage image) {
         int width = image.getWidth();
         int height = image.getHeight();
