@@ -4,7 +4,6 @@ import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.api.CursorProvider;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.cursorhandler.ingame.*;
-import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorHotspotWidget;
 import io.github.fishstiz.minecraftcursor.api.CursorHandler;
 import io.github.fishstiz.minecraftcursor.cursorhandler.modmenu.ModScreenCursorHandler;
 import io.github.fishstiz.minecraftcursor.cursorhandler.multiplayer.MultiplayerServerListWidgetCursorHandler;
@@ -45,7 +44,6 @@ public class CursorTypeRegistry {
         register(PressableWidget.class, CursorTypeRegistry::clickableWidgetCursor);
         register(TabButtonWidget.class, CursorTypeRegistry::tabButtonWidgetCursor);
         register(SliderWidget.class, CursorTypeRegistry::sliderWidgetCursor);
-        register(SelectedCursorHotspotWidget.class, CursorTypeRegistry::hotspotWidgetCursor);
         register(TextFieldWidget.class, CursorTypeRegistry::textFieldWidgetCursor);
     }
 
@@ -194,13 +192,6 @@ public class CursorTypeRegistry {
     private static CursorType textFieldWidgetCursor(Element element, double mouseX, double mouseY) {
         TextFieldWidget textField = (TextFieldWidget) element;
         return textField.visible ? CursorType.TEXT : CursorType.DEFAULT;
-    }
-
-    private static CursorType hotspotWidgetCursor(Element element, double mouseX, double mouseY) {
-        if (CursorTypeUtil.isLeftClickHeld() || CursorTypeUtil.isGrabbing()) {
-            return CursorType.GRABBING;
-        }
-        return CursorType.POINTER;
     }
 
     @FunctionalInterface

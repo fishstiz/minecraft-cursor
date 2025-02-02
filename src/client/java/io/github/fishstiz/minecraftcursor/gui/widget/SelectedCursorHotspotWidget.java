@@ -1,6 +1,9 @@
 package io.github.fishstiz.minecraftcursor.gui.widget;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
+import io.github.fishstiz.minecraftcursor.api.CursorProvider;
+import io.github.fishstiz.minecraftcursor.cursor.CursorType;
+import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ClickableWidget;
@@ -8,9 +11,10 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
-public class SelectedCursorHotspotWidget extends ClickableWidget {
+public class SelectedCursorHotspotWidget extends ClickableWidget implements CursorProvider {
     private static final Identifier BACKGROUND = Identifier.of(MinecraftCursor.MOD_ID, "textures/cursors/hotspot_background.png");
     private static final int HOTSPOT_RULER_COLOR = 0xFFFF0000; // red
+    private static final int CURSOR_SIZE = 32;
     private final SelectedCursorOptionsWidget optionsWidget;
 
     public SelectedCursorHotspotWidget(int size, SelectedCursorOptionsWidget optionsWidget) {
@@ -34,7 +38,7 @@ public class SelectedCursorHotspotWidget extends ClickableWidget {
         int xhot = (int) optionsWidget.xhotSlider.getTranslatedValue();
         int yhot = (int) optionsWidget.yhotSlider.getTranslatedValue();
 
-        int rulerSize = getWidth() / 32;
+        int rulerSize = getRulerSize();
         int xhotX1 = (getX() + xhot * rulerSize);
         int xhotX2 = (getX() + xhot * rulerSize) + rulerSize;
         int yhotY1 = (getY() + yhot * rulerSize);
@@ -49,18 +53,31 @@ public class SelectedCursorHotspotWidget extends ClickableWidget {
         setHotspots(mouseX, mouseY);
     }
 
+    @Override
     protected void onDrag(double mouseX, double mouseY, double deltaX, double deltaY) {
         setHotspots(mouseX, mouseY);
     }
 
     public void setHotspots(double mouseX, double mouseY) {
-        int rulerSize = getWidth() / 32;
+        int rulerSize = getRulerSize();
 
         int xhot = ((int) mouseX - getX()) / rulerSize;
         int yhot = ((int) mouseY - getY()) / rulerSize;
 
         optionsWidget.xhotSlider.setValue(xhot);
         optionsWidget.yhotSlider.setValue(yhot);
+    }
+
+    private int getRulerSize() {
+        return getWidth() / CURSOR_SIZE;
+    }
+
+    @Override
+    public CursorType getCursorType(double mouseX, double mouseY) {
+        if (CursorTypeUtil.isLeftClickHeld() || CursorTypeUtil.isGrabbing()) {
+            return CursorType.GRABBING;
+        }
+        return CursorType.POINTER;
     }
 
     @Override
