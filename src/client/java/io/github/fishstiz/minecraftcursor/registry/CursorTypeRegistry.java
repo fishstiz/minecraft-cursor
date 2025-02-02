@@ -2,13 +2,13 @@ package io.github.fishstiz.minecraftcursor.registry;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
+import io.github.fishstiz.minecraftcursor.cursorhandler.ingame.*;
 import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorHotspotWidget;
-import io.github.fishstiz.minecraftcursor.registry.gui.ingame.*;
-import io.github.fishstiz.minecraftcursor.registry.gui.modmenu.ModScreenCursor;
-import io.github.fishstiz.minecraftcursor.registry.gui.multiplayer.MultiplayerServerListWidgetCursor;
-import io.github.fishstiz.minecraftcursor.registry.gui.world.WorldListWidgetCursor;
+import io.github.fishstiz.minecraftcursor.api.CursorHandler;
+import io.github.fishstiz.minecraftcursor.cursorhandler.modmenu.ModScreenCursorHandler;
+import io.github.fishstiz.minecraftcursor.cursorhandler.multiplayer.MultiplayerServerListWidgetCursorHandler;
+import io.github.fishstiz.minecraftcursor.cursorhandler.world.WorldListWidgetCursorHandler;
 import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
-import io.github.fishstiz.minecraftcursor.registry.utils.ElementCursorTypeFunction;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.ParentElement;
@@ -27,8 +27,9 @@ import static io.github.fishstiz.minecraftcursor.util.LookupUtil.NAMESPACE;
 import static io.github.fishstiz.minecraftcursor.util.LookupUtil.RESOLVER;
 
 public class CursorTypeRegistry {
-    private final List<AbstractMap.SimpleImmutableEntry<Class<? extends Element>, ElementCursorTypeFunction>> registry = new ArrayList<>();
-    private final ConcurrentHashMap<String, ElementCursorTypeFunction> cachedRegistry = new ConcurrentHashMap<>();
+    private final List<AbstractMap.SimpleImmutableEntry<Class<? extends Element>, ElementCursorTypeFunction<? extends Element>>>
+            registry = new ArrayList<>();
+    private final ConcurrentHashMap<String, ElementCursorTypeFunction<? extends Element>> cachedRegistry = new ConcurrentHashMap<>();
 
     public CursorTypeRegistry() {
         init();
@@ -36,7 +37,7 @@ public class CursorTypeRegistry {
 
     public void init() {
         initElements();
-        initGuis();
+        initCursorHandlers();
     }
 
     public void initElements() {
@@ -47,51 +48,74 @@ public class CursorTypeRegistry {
         register(TextFieldWidget.class, CursorTypeRegistry::textFieldWidgetCursor);
     }
 
-    public void initGuis() {
-        HandledScreenCursor.register(this);
-        WorldListWidgetCursor.register(this);
-        MultiplayerServerListWidgetCursor.register(this);
-        RecipeBookScreenCursor.register(this);
-        CreativeInventoryScreenCursor.register(this);
-        BookEditScreenCursor.register(this);
-        EnchantmentScreenCursor.register(this);
-        StonecutterScreenCursor.register(this);
-        LoomScreenCursor.register(this);
-        MerchantScreen$WidgetButtonPage.register(this);
-        AdvancementScreenCursor.register(this);
+    public void initCursorHandlers() {
+        register(new WorldListWidgetCursorHandler());
+        register(new MultiplayerServerListWidgetCursorHandler());
+        register(new HandledScreenCursorHandler<>());
+        register(RecipeBookScreenCursorHandler.INVENTORY);
+        register(RecipeBookScreenCursorHandler.CRAFTING);
+        register(RecipeBookScreenCursorHandler.FURNACE);
+        register(new CreativeInventoryScreenCursorHandler());
+        register(new BookEditScreenCursorHandler());
+        register(new EnchantmentScreenCursorHandler());
+        register(new StonecutterScreenCursorHandler());
+        register(new LoomScreenCursorHandler());
+        register(new MerchantScreenButtonCursorHandler());
+        register(new AdvancementsScreenCursorHandler());
 
         try {
             if (FabricLoader.getInstance().isModLoaded("modmenu")) {
-                ModScreenCursor.register(this);
+                register(new ModScreenCursorHandler());
+                register("com.terraformersmc.modmenu.gui.widget.DescriptionListWidget$MojangCreditsEntry", CursorTypeRegistry::elementToPointer);
+                register("com.terraformersmc.modmenu.gui.widget.DescriptionListWidget$LinkEntry", CursorTypeRegistry::elementToPointer);
             }
         } catch (NoClassDefFoundError ignore) {
             MinecraftCursor.LOGGER.warn("Could not register cursor type for Mod Menu");
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public void register(String fullyQualifiedClassName, ElementCursorTypeFunction elementToCursorType) {
-        try {
-            Class<?> elementClass = Class.forName(RESOLVER.mapClassName(NAMESPACE, fullyQualifiedClassName));
+    private <T extends Element> void register(CursorHandler<T> cursorHandler) {
+        CursorHandler.TargetElement<T> targetElement = cursorHandler.getTargetElement();
 
-            assert Element.class.isAssignableFrom(elementClass) :
-                    fullyQualifiedClassName + " is not an instance of net.minecraft.client.gui.Element";
-
-            if (Element.class.isAssignableFrom(elementClass)) {
-                register((Class<? extends Element>) elementClass, elementToCursorType);
-            }
-        } catch (ClassNotFoundException e) {
-            MinecraftCursor.LOGGER.error("Error registering widget cursor type. Class not found: {}", fullyQualifiedClassName);
+        if (targetElement.elementClass().isPresent()) {
+            register(targetElement.elementClass().get(), cursorHandler::getCursorType);
+        } else if (targetElement.fullyQualifiedClassName().isPresent()) {
+            register(targetElement.fullyQualifiedClassName().get(), cursorHandler::getCursorType);
+        } else {
+            throw new AssertionError("Could not register cursor handler: "
+                    + cursorHandler.getClass().getName()
+                    + " - Target Element Class and FQCN not present");
         }
     }
 
-    public void register(Class<? extends Element> elementClass, ElementCursorTypeFunction elementToCursorType) {
+    @SuppressWarnings("unchecked")
+    public <T extends Element> void register(String fullyQualifiedClassName, ElementCursorTypeFunction<T> elementToCursorType) {
+        try {
+            Class<T> elementClass = (Class<T>) Class.forName(RESOLVER.mapClassName(NAMESPACE, fullyQualifiedClassName));
+
+            if (!Element.class.isAssignableFrom(elementClass)) {
+                throw new ClassCastException(fullyQualifiedClassName + " is not a subclass of Element");
+            }
+
+            register(elementClass, elementToCursorType);
+        } catch (ClassNotFoundException e) {
+            MinecraftCursor.LOGGER.error("Error registering cursor type. Class not found: {}", fullyQualifiedClassName);
+        } catch (ClassCastException e) {
+            MinecraftCursor.LOGGER.error("Error registering cursor type. Invalid class: {}", e.getMessage());
+        }
+    }
+
+    public <T extends Element> void register(Class<T> elementClass, ElementCursorTypeFunction<T> elementToCursorType) {
         registry.add(new AbstractMap.SimpleImmutableEntry<>(elementClass, elementToCursorType));
     }
 
-    public CursorType getCursorType(Element element, double mouseX, double mouseY) {
+    public <T extends Element> CursorType getCursorType(T element, double mouseX, double mouseY) {
         try {
-            return cachedRegistry.computeIfAbsent(element.getClass().getName(), k -> computeCursorType(element)).apply(element, mouseX, mouseY);
+            @SuppressWarnings("unchecked")
+            ElementCursorTypeFunction<T> cursorTypeFunction =
+                    (ElementCursorTypeFunction<T>) cachedRegistry.computeIfAbsent(element.getClass().getName(),
+                            k -> computeCursorType(element));
+            return cursorTypeFunction.apply(element, mouseX, mouseY);
         } catch (Exception e) {
             MinecraftCursor.LOGGER.warn("Could not get cursor type for element: {}",
                     RESOLVER.unmapClassName("named", element.getClass().getName()));
@@ -99,23 +123,24 @@ public class CursorTypeRegistry {
         return CursorType.DEFAULT;
     }
 
-    private ElementCursorTypeFunction computeCursorType(Element element) {
+    @SuppressWarnings("unchecked")
+    private <T extends Element> ElementCursorTypeFunction<T> computeCursorType(Element element) {
         for (int i = registry.size() - 1; i >= 0; i--) {
             if (registry.get(i).getKey().isInstance(element)) {
-                return registry.get(i).getValue();
+                return (ElementCursorTypeFunction<T>) registry.get(i).getValue();
             }
         }
         if (element instanceof ParentElement) {
-            return this::parentElementGetChildCursorType;
+            return (parent, x, y) -> this.parentElementGetChildCursorType((ParentElement) parent, x, y);
         }
         return CursorTypeRegistry::elementToDefault;
     }
 
-    public CursorType parentElementGetChildCursorType(Element parentElement, double mouseX, double mouseY) {
+    public CursorType parentElementGetChildCursorType(ParentElement parentElement, double mouseX, double mouseY) {
         CursorType cursorType = CursorType.DEFAULT;
-        for (Element child : ((ParentElement) parentElement).children()) {
-            if (child instanceof ParentElement) {
-                CursorType parentCursorType = parentElementGetChildCursorType(child, mouseX, mouseY);
+        for (Element child : parentElement.children()) {
+            if (child instanceof ParentElement childParent) {
+                CursorType parentCursorType = parentElementGetChildCursorType(childParent, mouseX, mouseY);
                 cursorType = parentCursorType != CursorType.DEFAULT ? parentCursorType : cursorType;
             }
             if (child.isMouseOver(mouseX, mouseY)) {
@@ -169,5 +194,10 @@ public class CursorTypeRegistry {
             return CursorType.GRABBING;
         }
         return CursorType.POINTER;
+    }
+
+    @FunctionalInterface
+    public interface ElementCursorTypeFunction<T extends Element> {
+        CursorType apply(T element, double mouseX, double mouseY);
     }
 }
