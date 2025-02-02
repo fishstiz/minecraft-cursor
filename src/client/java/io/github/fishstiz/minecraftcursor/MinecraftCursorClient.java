@@ -5,7 +5,7 @@ import io.github.fishstiz.minecraftcursor.config.CursorConfigService;
 import io.github.fishstiz.minecraftcursor.cursor.CursorManager;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
-import io.github.fishstiz.minecraftcursor.utils.CursorTypeUtils;
+import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
@@ -66,7 +66,7 @@ public class MinecraftCursorClient implements ClientModInitializer {
     private CursorType getCursorType(Screen currentScreen, double mouseX, double mouseY) {
         if (!CURSOR_MANAGER.isAdaptive()) return CursorType.DEFAULT;
 
-        if (CursorTypeUtils.isGrabbing()) return CursorType.GRABBING;
+        if (CursorTypeUtil.isGrabbing()) return CursorType.GRABBING;
 
         CursorType cursorType = CURSOR_REGISTRY.getCursorType(currentScreen, mouseX, mouseY);
         cursorType = cursorType != CursorType.DEFAULT ? cursorType

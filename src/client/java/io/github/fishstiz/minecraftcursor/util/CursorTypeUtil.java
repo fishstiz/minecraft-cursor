@@ -1,4 +1,4 @@
-package io.github.fishstiz.minecraftcursor.utils;
+package io.github.fishstiz.minecraftcursor.util;
 
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import net.minecraft.client.util.InputUtil;
@@ -7,7 +7,7 @@ import org.lwjgl.glfw.GLFW;
 import static io.github.fishstiz.minecraftcursor.MinecraftCursorClient.CLIENT;
 import static io.github.fishstiz.minecraftcursor.MinecraftCursorClient.CURSOR_MANAGER;
 
-public class CursorTypeUtils {
+public class CursorTypeUtil {
     public static boolean canShift() {
         long handle = CLIENT.getWindow().getHandle();
         return CURSOR_MANAGER.getCursor(CursorType.SHIFT).getId() != 0
