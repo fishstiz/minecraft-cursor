@@ -2,6 +2,7 @@ package io.github.fishstiz.minecraftcursor.registry;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.api.CursorProvider;
+import io.github.fishstiz.minecraftcursor.api.CursorTypeRegistrar;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.cursorhandler.ingame.*;
 import io.github.fishstiz.minecraftcursor.api.CursorHandler;
@@ -26,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static io.github.fishstiz.minecraftcursor.util.LookupUtil.NAMESPACE;
 import static io.github.fishstiz.minecraftcursor.util.LookupUtil.RESOLVER;
 
-public class CursorTypeRegistry {
+public class CursorTypeRegistry implements CursorTypeRegistrar {
     private final List<AbstractMap.SimpleImmutableEntry<Class<? extends Element>, ElementCursorTypeFunction<? extends Element>>>
             registry = new ArrayList<>();
     private final ConcurrentHashMap<String, ElementCursorTypeFunction<? extends Element>> cachedRegistry = new ConcurrentHashMap<>();
@@ -35,19 +36,19 @@ public class CursorTypeRegistry {
         init();
     }
 
-    public void init() {
+    private void init() {
         initElements();
         initCursorHandlers();
     }
 
-    public void initElements() {
+    private void initElements() {
         register(PressableWidget.class, CursorTypeRegistry::clickableWidgetCursor);
         register(TabButtonWidget.class, CursorTypeRegistry::tabButtonWidgetCursor);
         register(SliderWidget.class, CursorTypeRegistry::sliderWidgetCursor);
         register(TextFieldWidget.class, CursorTypeRegistry::textFieldWidgetCursor);
     }
 
-    public void initCursorHandlers() {
+    private void initCursorHandlers() {
         register(new WorldListWidgetCursorHandler());
         register(new HandledScreenCursorHandler<>());
         register(new MultiplayerServerListWidgetCursorHandler());
@@ -64,8 +65,8 @@ public class CursorTypeRegistry {
         try {
             if (FabricLoader.getInstance().isModLoaded("modmenu")) {
                 register(new ModScreenCursorHandler());
-                register("com.terraformersmc.modmenu.gui.widget.DescriptionListWidget$MojangCreditsEntry", CursorTypeRegistry::elementToPointer);
-                register("com.terraformersmc.modmenu.gui.widget.DescriptionListWidget$LinkEntry", CursorTypeRegistry::elementToPointer);
+                register("com.terraformersmc.modmenu.gui.widget.DescriptionListWidget$MojangCreditsEntry", CursorTypeRegistrar::elementToPointer);
+                register("com.terraformersmc.modmenu.gui.widget.DescriptionListWidget$LinkEntry", CursorTypeRegistrar::elementToPointer);
             }
         } catch (NoClassDefFoundError ignore) {
             MinecraftCursor.LOGGER.warn("Could not register cursor type for Mod Menu");
@@ -120,7 +121,7 @@ public class CursorTypeRegistry {
             ElementCursorTypeFunction<T> cursorTypeFunction =
                     (ElementCursorTypeFunction<T>) cachedRegistry.computeIfAbsent(element.getClass().getName(),
                             k -> computeCursorType(element));
-            return cursorTypeFunction.apply(element, mouseX, mouseY);
+            return cursorTypeFunction.getCursorType(element, mouseX, mouseY);
         } catch (Exception e) {
             MinecraftCursor.LOGGER.warn("Could not get cursor type for element: {}",
                     RESOLVER.unmapClassName("named", element.getClass().getName()));
@@ -138,10 +139,10 @@ public class CursorTypeRegistry {
         if (element instanceof ParentElement) {
             return (parent, x, y) -> this.parentElementGetChildCursorType((ParentElement) parent, x, y);
         }
-        return CursorTypeRegistry::elementToDefault;
+        return CursorTypeRegistrar::elementToDefault;
     }
 
-    public CursorType parentElementGetChildCursorType(ParentElement parentElement, double mouseX, double mouseY) {
+    private CursorType parentElementGetChildCursorType(ParentElement parentElement, double mouseX, double mouseY) {
         CursorType cursorType = CursorType.DEFAULT;
         for (Element child : parentElement.children()) {
             if (child instanceof ParentElement childParent) {
@@ -154,18 +155,6 @@ public class CursorTypeRegistry {
             }
         }
         return cursorType;
-    }
-
-    public static CursorType elementToDefault(Element ignoreElement, double ignoreMouseX, double ignoreMouseY) {
-        return CursorType.DEFAULT;
-    }
-
-    public static CursorType elementToPointer(Element ignoreElement, double ignoreMouseX, double ignoreMouseY) {
-        return CursorType.POINTER;
-    }
-
-    public static CursorType elementToText(Element ignoreElement, double ignoreMouseX, double ignoreMouseY) {
-        return CursorType.TEXT;
     }
 
     private static CursorType clickableWidgetCursor(Element element, double mouseX, double mouseY) {
@@ -192,10 +181,5 @@ public class CursorTypeRegistry {
     private static CursorType textFieldWidgetCursor(Element element, double mouseX, double mouseY) {
         TextFieldWidget textField = (TextFieldWidget) element;
         return textField.visible ? CursorType.TEXT : CursorType.DEFAULT;
-    }
-
-    @FunctionalInterface
-    public interface ElementCursorTypeFunction<T extends Element> {
-        CursorType apply(T element, double mouseX, double mouseY);
     }
 }
