@@ -1,5 +1,6 @@
 package io.github.fishstiz.minecraftcursor.api;
 
+import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
 
 /**
@@ -13,25 +14,22 @@ import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
  */
 public interface MinecraftCursorApi {
     /**
-     * Allows registering {@link net.minecraft.client.gui.Element} classes with a cursor type function:
+     * Initialize your cursors and register your elements here:
      *
      * <p><strong>Example usage:</strong></p>
      * <pre>{@code
-     * public void init(CursorTypeRegistry cursorTypeRegistry) {
-     *      cursorTypeRegistry.register(MyButton.class, (myButton, mouseX, mouseY) -> CursorType.POINTER);
-     *      // you can use the existing static methods in CursorTypeRegistry
-     *      cursorTypeRegistry.register(MyOtherButton.class, CursorTypeRegistry::elementToPointer);
+     * public void init(CursorTypeFactory cursorTypeFactory, CursorTypeRegistry cursorTypeRegistry) {
+     *      CursorType customCursorType = cursorTypeFactory.create("custom-cursor");
+     *
+     *      // Registering my button class with the pointer cursor
+     *      cursorTypeRegistry.register(MyButton.class, CursorTypeRegistry::elementToPointer);
+     *      // Registering my custom element with my custom cursor
+     *      cursorTypeRegistry.register(MyCustomElement.class, (myCustomElement, mouseX, mouseY) -> customCursorType);
      * }
      * }</pre>
      *
+     * @param cursorTypeFactory  the functional interface for creating {@link CursorType} objects based on a given key.
      * @param cursorTypeRegistry the registry used to associate element classes with cursor types
-     *
-     * @apiNote The {@code Element} must either be the current screen or be accessible through
-     * {@link net.minecraft.client.gui.ParentElement#children()} from the current screen or from its parent element.
-     * <br>
-     * Any containers or nested parent elements must be an instance of {@link net.minecraft.client.gui.ParentElement}
-     * and also be accessible through {@link net.minecraft.client.gui.ParentElement#children()} from the current screen
-     * to the  parent element.
      */
-    void init(CursorTypeRegistry cursorTypeRegistry);
+    void init(CursorTypeFactory cursorTypeFactory, CursorTypeRegistry cursorTypeRegistry);
 }
