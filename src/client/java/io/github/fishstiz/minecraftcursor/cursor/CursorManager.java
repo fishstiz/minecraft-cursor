@@ -9,14 +9,14 @@ import org.lwjgl.glfw.GLFW;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.EnumMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.TreeMap;
 
 public class CursorManager {
     private final CursorConfigService config;
     private final MinecraftClient client;
-    private final EnumMap<CursorType, Cursor> cursors = new EnumMap<>(CursorType.class);
+    private final LinkedHashMap<CursorType, Cursor> cursors = new LinkedHashMap<>();
     private final TreeMap<Integer, CursorType> currentCursorOverrides = new TreeMap<>();
     private Cursor currentCursor;
     private long previousCursorId;
@@ -24,20 +24,19 @@ public class CursorManager {
     public CursorManager(CursorConfigService config, MinecraftClient client) {
         this.config = config;
         this.client = client;
-
-        for (CursorType type : CursorType.TYPES.values()) {
+        for (CursorType type : CursorType.types()) {
             cursors.put(type, new Cursor((type)));
         }
     }
 
     public void loadCursorImage(CursorType type, Identifier sprite, BufferedImage image, CursorConfig.Settings settings) throws IOException {
-        Cursor cursor = cursors.get(type);
+        Cursor cursor = cursors.computeIfAbsent(type, Cursor::new);
         cursor.loadImage(sprite, image, settings.getScale(), settings.getXHot(), settings.getYHot(), settings.getEnabled());
 
         if (currentCursor == null) {
+            setCurrentCursor(cursor.getType());
             return;
         }
-
         if (currentCursor.getType() == type) {
             reloadCursor();
         }

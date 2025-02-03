@@ -31,13 +31,13 @@ public class MinecraftCursorClient implements ClientModInitializer {
     public void onInitializeClient() {
         instance = this;
 
-        CursorResourceReloadListener resourceReloadListener =
-                new CursorResourceReloadListener(CURSOR_MANAGER, MinecraftCursor.MOD_ID, CONFIG);
-        ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(resourceReloadListener);
-
         FabricLoader.getInstance().getEntrypoints(MinecraftCursor.MOD_ID, MinecraftCursorApi.class).forEach(
                 entrypoint -> entrypoint.init(CURSOR_REGISTRY)
         );
+
+        CursorResourceReloadListener resourceReloadListener = new CursorResourceReloadListener(
+                CURSOR_MANAGER, MinecraftCursor.MOD_ID, CONFIG);
+        ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(resourceReloadListener);
 
         ScreenEvents.BEFORE_INIT.register((MinecraftClient client, Screen screen, int width, int height) -> {
             if (client.currentScreen == null) {
