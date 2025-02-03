@@ -32,7 +32,7 @@ public class MinecraftCursorClient implements ClientModInitializer {
         instance = this;
 
         FabricLoader.getInstance().getEntrypoints(MinecraftCursor.MOD_ID, MinecraftCursorApi.class).forEach(
-                entrypoint -> entrypoint.init(CURSOR_REGISTRY)
+                entrypoint -> entrypoint.init(CursorType::new, CURSOR_REGISTRY)
         );
 
         CursorResourceReloadListener resourceReloadListener = new CursorResourceReloadListener(
