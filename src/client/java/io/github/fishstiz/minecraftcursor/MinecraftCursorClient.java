@@ -23,11 +23,14 @@ public class MinecraftCursorClient implements ClientModInitializer {
             new CursorConfigService(String.format("config/%s%s", MinecraftCursor.MOD_ID, CursorConfigLoader.FILE_EXTENSION));
     public static final CursorManager CURSOR_MANAGER = new CursorManager(CONFIG, CLIENT);
     public static final CursorTypeRegistry CURSOR_REGISTRY = new CursorTypeRegistry();
-
+    private static MinecraftCursorClient instance;
     private Screen visibleNonCurrentScreen;
+    private CursorType singleCycleCursor;
 
     @Override
     public void onInitializeClient() {
+        instance = this;
+
         CursorResourceReloadListener resourceReloadListener =
                 new CursorResourceReloadListener(CURSOR_MANAGER, MinecraftCursor.MOD_ID, CONFIG);
         ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(resourceReloadListener);
@@ -50,11 +53,11 @@ public class MinecraftCursorClient implements ClientModInitializer {
         ClientTickEvents.START_CLIENT_TICK.register(this::tick);
     }
 
-    public void afterRenderScreen(Screen currentScreen, DrawContext context, int mouseX, int mouseY, float tickDelta) {
+    private void afterRenderScreen(Screen currentScreen, DrawContext context, int mouseX, int mouseY, float tickDelta) {
         CURSOR_MANAGER.setCurrentCursor(getCursorType(currentScreen, mouseX, mouseY));
     }
 
-    public void tick(MinecraftClient client) {
+    private void tick(MinecraftClient client) {
         if (client.currentScreen == null && visibleNonCurrentScreen != null && !client.mouse.isCursorLocked()) {
             double scale = client.getWindow().getScaleFactor();
             double mouseX = client.mouse.getX() / scale;
@@ -68,6 +71,12 @@ public class MinecraftCursorClient implements ClientModInitializer {
 
         if (CursorTypeUtil.isGrabbing()) return CursorType.GRABBING;
 
+        if (singleCycleCursor != null) {
+            CursorType singleCycleCursor = this.singleCycleCursor;
+            this.singleCycleCursor = null;
+            return singleCycleCursor;
+        }
+
         CursorType cursorType = CURSOR_REGISTRY.getCursorType(currentScreen, mouseX, mouseY);
         cursorType = cursorType != CursorType.DEFAULT ? cursorType
                 : currentScreen.hoveredElement(mouseX, mouseY)
@@ -75,5 +84,9 @@ public class MinecraftCursorClient implements ClientModInitializer {
                 .orElse(CursorType.DEFAULT);
 
         return cursorType;
+    }
+
+    public static void setSingleCycleCursor(CursorType cursorType) {
+        instance.singleCycleCursor = cursorType;
     }
 }
