@@ -2,38 +2,40 @@ package io.github.fishstiz.minecraftcursor.cursor;
 
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 
-public enum CursorType {
-    DEFAULT("default"),
-    POINTER("pointer"),
-    GRABBING("grabbing"),
-    TEXT("text"),
-    SHIFT("shift"),
-    DEFAULT_FORCE("default_force"); // fake cursor type to force default
+public class CursorType {
+    private static final LinkedHashMap<String, CursorType> TYPES = new LinkedHashMap<>();
+    public static final CursorType DEFAULT = new CursorType("default");
+    public static final CursorType POINTER = new CursorType("pointer");
+    public static final CursorType GRABBING = new CursorType("grabbing");
+    public static final CursorType TEXT = new CursorType("text");
+    public static final CursorType SHIFT = new CursorType("shift");
+    public static final CursorType DEFAULT_FORCE = new CursorType("default_force", false); // fake cursor type to force default
 
     private final String key;
 
-    public static final Map<String, CursorType> TYPES = new HashMap<>();
+    public CursorType(String key) {
+        this(key, true);
+    }
 
-    CursorType(String key) {
+    private CursorType(String key, boolean register) {
         this.key = key;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    static {
-        for (CursorType cursorType : CursorType.values()) {
-            if (cursorType == CursorType.DEFAULT_FORCE) continue;
-            TYPES.put(cursorType.key, cursorType);
+        if (register) {
+            TYPES.put(key, this);
         }
     }
 
-    @Nullable
-    public static CursorType getCursorTypeOrNull(String key) {
+    public String getKey() {
+        return this.key;
+    }
+
+    public static Collection<CursorType> types() {
+        return TYPES.values();
+    }
+
+    public static @Nullable CursorType getCursorTypeOrNull(String key) {
         return TYPES.get(key);
     }
 }
