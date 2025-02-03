@@ -13,7 +13,7 @@ import io.github.fishstiz.minecraftcursor.cursor.CursorType;
  * and also be accessible through {@link net.minecraft.client.gui.ParentElement#children()} from the current screen
  * to the parent element.
  * </p>
- * @apiNote An alternative to the {@code CursorTypeRegistry} approach.
+ * @apiNote An alternative to the {@link CursorTypeRegistrar} approach.
  * <br>
  * <p>
  * Implement this directly to your element if Minecraft Cursor is a required dependency.
