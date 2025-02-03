@@ -41,10 +41,9 @@ public class CursorResourceReloadListener implements SimpleSynchronousResourceRe
 
     @Override
     public void reload(ResourceManager manager) {
-        cursorManager.setCurrentCursor(CursorType.DEFAULT);
-
         initConfig(manager);
         loadCursorTextures(manager);
+        cursorManager.setCurrentCursor(CursorType.DEFAULT);
     }
 
     private void initConfig(ResourceManager manager) {
