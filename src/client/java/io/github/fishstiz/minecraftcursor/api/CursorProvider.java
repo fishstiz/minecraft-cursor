@@ -1,29 +1,26 @@
 package io.github.fishstiz.minecraftcursor.api;
 
 /**
- * This interface should only be implemented by instances of {@link net.minecraft.client.gui.Element}.
- * <p>
- * The {@code Element} must either be the current screen or be accessible through
- * {@link net.minecraft.client.gui.ParentElement#children()} from the current screen or from its parent element.
- * </p>
- * <p>
- * Any containers or nested parent elements must be an instance of {@link net.minecraft.client.gui.ParentElement}
- * and also be accessible through {@link net.minecraft.client.gui.ParentElement#children()} from the current screen
- * to the parent element.
- * </p>
- * @apiNote An alternative to the {@link CursorTypeRegistrar} approach.
- * <br>
+ * An alternative to the {@link CursorTypeRegistrar} approach to determine the cursor type directly from the implementing {@link net.minecraft.client.gui.Element}
  * <p>
  * Implement this directly to your element if Minecraft Cursor is a required dependency.
  * </p>
- * <br>
- * <p>
  * For optional dependencies, you can create a wrapper element that implements {@code CursorProvider} and use that if the mod is loaded.
+ *
+ * <p>
+ * <b>Note:</b> The {@link net.minecraft.client.gui.Element} must either be the current screen or be accessible from the current screen or
+ * from its parent element through {@link net.minecraft.client.gui.ParentElement#children()}.
+ * </p>
+ * Any container or nested container must be an instance of {@link net.minecraft.client.gui.ParentElement}
+ * and be accessible via the {@link net.minecraft.client.gui.ParentElement#children()} method.
+ * <p>
+ * This accessibility must be maintained throughout the entire element hierarchy, starting from
+ * the current screen down to the deepest nested parent element.
  * </p>
  */
 public interface CursorProvider {
     /**
-     * Retrieves the cursor type to be applied when the mouse is over the element.
+     * Returns the cursor type to be applied when the mouse is over the element.
      * <p>
      * This method is invoked after screen render and when
      * {@link net.minecraft.client.gui.Element#isMouseOver(double mouseX, double mouseY)}
