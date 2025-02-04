@@ -7,21 +7,20 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Optional;
 
 /**
- * This interface defines a handler for associating a {@link CursorType} with a specific type of {@link Element}.
- * Implementing this interface allows you to define how the cursor should change when hovering over a given element.
+ * This interface defines a handler for determining the {@link CursorType} of an {@link Element}.
  *
- * <p>The implementation should provide a cursor type based on the provided element and mouse coordinates.</p>
+ * <p>Must be registered using the {@link CursorTypeRegistrar#register(CursorHandler)} method to work.</p>
  *
  * @param <T> the type of the {@link Element} the cursor handler is associated with.
  *           <br><br>
  *            If the target {@link Element} is inaccessible, you can pass {@link Element}
- *            as a generic type and override the {@link #getTargetElement()} method to use the fully qualified
- *            class name (FQCN) of your target element.
+ *            as a generic type and override the {@link #getTargetElement()} method to return a {@link TargetElement}
+ *            with the fully qualified class name (FQCN) of the element.
  */
 public interface CursorHandler<T extends Element> {
     /**
-     * Gets the target element associated with this cursor handler.
-     * The target element is either determined by the element class or the fully qualified class name.
+     * Returns the target element associated with this cursor handler.
+     * The target element is determined either by the element class or the fully qualified class name.
      *
      * @return a {@link TargetElement} containing either the element class or its fully qualified class name
      */
@@ -43,13 +42,18 @@ public interface CursorHandler<T extends Element> {
     CursorType getCursorType(T element, double mouseX, double mouseY);
 
     /**
-     * A record that represents the target element associated with a {@link CursorHandler}.
-     * It stores either the {@link Class} of the target element or its fully qualified class name (FQCN).
+     * The record that represents the target element of the {@link CursorHandler}.
+     * <p>
+     * It stores either the {@link Class} of the target element or a {@link String} representing
+     * its fully qualified class name (FQCN).
+     * </p>
      *
      * <p>The fully qualified class name can be used when the target element is inaccessible, allowing
      * for reflection-based access to the class.</p>
      *
      * @param <T> the type of the {@link Element}
+     * @param elementClass the {@link Optional} class of the target element
+     * @param fullyQualifiedClassName the {@link Optional} fully qualified class name of the target element
      */
     record TargetElement<T extends Element>(
             Optional<Class<T>> elementClass,
@@ -68,6 +72,8 @@ public interface CursorHandler<T extends Element> {
 
         /**
          * Creates a {@link TargetElement} from the given fully qualified class name.
+         *
+         * <p>Use the intermediary mappings for native Minecraft elements.</p>
          *
          * @param fullyQualifiedClassName the fully qualified class name of the target element
          * @param <T>                     the type of the {@link Element}

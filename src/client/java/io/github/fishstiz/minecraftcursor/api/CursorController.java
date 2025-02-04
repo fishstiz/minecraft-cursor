@@ -3,6 +3,9 @@ package io.github.fishstiz.minecraftcursor.api;
 import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
 import io.github.fishstiz.minecraftcursor.cursor.CursorManager;
 
+/**
+ * Provides methods that allow direct control of the cursor.
+ */
 public class CursorController {
     private static CursorController instance;
     private final CursorManager cursorManager;
@@ -11,6 +14,11 @@ public class CursorController {
         this.cursorManager = cursorManager;
     }
 
+    /**
+     * Returns the {@link CursorController} instance.
+     *
+     * @return the {@link CursorController} instance.
+     */
     public static CursorController getInstance() {
         if (instance == null) {
             instance = new CursorController(MinecraftCursorClient.CURSOR_MANAGER);
