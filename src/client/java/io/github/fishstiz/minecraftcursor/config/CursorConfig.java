@@ -2,7 +2,7 @@ package io.github.fishstiz.minecraftcursor.config;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.github.fishstiz.minecraftcursor.cursor.CursorType;
+import io.github.fishstiz.minecraftcursor.api.CursorType;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,7 +1,5 @@
 package io.github.fishstiz.minecraftcursor.api;
 
-import io.github.fishstiz.minecraftcursor.cursor.CursorType;
-
 /**
  * This interface should only be implemented by instances of {@link net.minecraft.client.gui.Element}.
  * <p>
