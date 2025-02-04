@@ -1,6 +1,5 @@
-package io.github.fishstiz.minecraftcursor.registry;
+package io.github.fishstiz.minecraftcursor;
 
-import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.api.CursorProvider;
 import io.github.fishstiz.minecraftcursor.api.CursorTypeRegistrar;
 import io.github.fishstiz.minecraftcursor.cursor.CursorType;
@@ -27,12 +26,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import static io.github.fishstiz.minecraftcursor.util.LookupUtil.NAMESPACE;
 import static io.github.fishstiz.minecraftcursor.util.LookupUtil.RESOLVER;
 
-public class CursorTypeRegistry implements CursorTypeRegistrar {
+class CursorTypeResolver implements CursorTypeRegistrar {
     private final List<AbstractMap.SimpleImmutableEntry<Class<? extends Element>, ElementCursorTypeFunction<? extends Element>>>
             registry = new ArrayList<>();
     private final ConcurrentHashMap<String, ElementCursorTypeFunction<? extends Element>> cachedRegistry = new ConcurrentHashMap<>();
 
-    public CursorTypeRegistry() {
+    public CursorTypeResolver() {
         init();
     }
 
@@ -42,10 +41,10 @@ public class CursorTypeRegistry implements CursorTypeRegistrar {
     }
 
     private void initElements() {
-        register(PressableWidget.class, CursorTypeRegistry::clickableWidgetCursor);
-        register(TabButtonWidget.class, CursorTypeRegistry::tabButtonWidgetCursor);
-        register(SliderWidget.class, CursorTypeRegistry::sliderWidgetCursor);
-        register(TextFieldWidget.class, CursorTypeRegistry::textFieldWidgetCursor);
+        register(PressableWidget.class, CursorTypeResolver::clickableWidgetCursor);
+        register(TabButtonWidget.class, CursorTypeResolver::tabButtonWidgetCursor);
+        register(SliderWidget.class, CursorTypeResolver::sliderWidgetCursor);
+        register(TextFieldWidget.class, CursorTypeResolver::textFieldWidgetCursor);
     }
 
     private void initCursorHandlers() {
