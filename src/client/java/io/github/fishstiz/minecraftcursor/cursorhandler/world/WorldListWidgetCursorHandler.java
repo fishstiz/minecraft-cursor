@@ -1,7 +1,7 @@
 package io.github.fishstiz.minecraftcursor.cursorhandler.world;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
-import io.github.fishstiz.minecraftcursor.cursor.CursorType;
+import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.api.CursorHandler;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
 

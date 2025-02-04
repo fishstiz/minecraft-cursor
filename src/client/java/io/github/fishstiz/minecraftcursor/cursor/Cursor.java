@@ -1,6 +1,7 @@
 package io.github.fishstiz.minecraftcursor.cursor;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
+import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.util.BufferedImageUtil;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;

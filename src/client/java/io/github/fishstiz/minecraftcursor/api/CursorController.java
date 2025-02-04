@@ -2,7 +2,6 @@ package io.github.fishstiz.minecraftcursor.api;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
 import io.github.fishstiz.minecraftcursor.cursor.CursorManager;
-import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 
 public class CursorController {
     private static CursorController instance;

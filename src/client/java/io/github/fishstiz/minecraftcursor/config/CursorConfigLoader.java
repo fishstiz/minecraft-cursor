@@ -2,7 +2,8 @@ package io.github.fishstiz.minecraftcursor.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
-import io.github.fishstiz.minecraftcursor.cursor.CursorType;
+import io.github.fishstiz.minecraftcursor.api.CursorType;
+import io.github.fishstiz.minecraftcursor.cursor.CursorTypeRegistry;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -60,7 +61,7 @@ public class CursorConfigLoader {
     public void createDefault() {
         CursorConfig defaultConfig = new CursorConfig();
 
-        for (CursorType type : CursorType.types()) {
+        for (CursorType type : CursorTypeRegistry.types()) {
             defaultConfig.getOrCreateCursorSettings(type);
         }
 
