@@ -4,17 +4,23 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.ParentElement;
 
 /**
- * The registrar used to register element classes with a function that determines their cursor type
+ * The registrar used to map {@link Element} classes with {@link ElementCursorTypeFunction} methods.
+ *
+ * <p>
+ * <b>Note:</b> The {@link Element} must either be the current screen or be accessible from the current screen or
+ * from its parent element through {@link ParentElement#children()}.
+ * </p>
+ * Any container or nested container must be an instance of {@link ParentElement}
+ * and be accessible via the {@link ParentElement#children()} method.
+ * <p>
+ * This accessibility must be maintained throughout the entire element hierarchy, starting from
+ * the current screen down to the deepest nested parent element.
+ * </p>
  */
 public interface CursorTypeRegistrar {
     /**
-     * Registers an {@link Element} class using the {@link CursorHandler#getTargetElement()} method
-     * with the method {@link CursorHandler#getCursorType(Element, double, double)} to determine its {@link CursorType}.
-     * <p>
-     * The {@link CursorHandler} provides logic for determining the cursor type based on the element and mouse position.
-     * The target element can be identified either by its class or by its fully qualified class name (FQCN) for cases
-     * where direct access to the class is not possible.
-     * </p>
+     * Registers an {@link Element} class as specified by the {@link CursorHandler#getTargetElement()} method
+     * with the {@link CursorHandler#getCursorType(Element, double, double)} method to determine its {@link CursorType}.
      *
      * <p><strong>Example usage:</strong></p>
      * <pre>{@code
@@ -26,31 +32,28 @@ public interface CursorTypeRegistrar {
      * });
      * }</pre>
      *
-     * @param cursorHandler The {@link CursorHandler} implementation that defines how the cursor should behave for a specific element.
-     *
-     * @throws AssertionError if the {@link CursorHandler} does not provide either an element class or an FQCN.
+     * @param <T>           The type of the {@link Element} to register
+     * @param cursorHandler The {@link CursorHandler} implementation that provides the target {@link Element}
+     *                      and the {@link ElementCursorTypeFunction} method.
      */
     <T extends Element> void register(CursorHandler<T> cursorHandler);
 
     /**
-     * Registers an {@link Element} class specified by the FQCN using reflection
+     * Registers an {@link Element} class specified by the fully qualified class name (FQCN) {@link String}
      * with a function that determines its {@link CursorType}.
+     *
+     * <p>Use the intermediary mappings when registering native Minecraft elements.</p>
      *
      * <p><strong>Example usage:</strong></p>
      * <pre>
      * {@code register("net.minecraft.class_4264", (pressableWidget, mouseX, mouseY) -> CursorType.POINTER); }
      * </pre>
      *
+     * @param <T>                     The type of the {@link Element} to register
      * @param fullyQualifiedClassName The fully qualified class name of the {@link Element} to register.
      *                                Use the intermediary name when registering native Minecraft elements.
-     * @param elementToCursorType A function that takes an instance of the element, mouse X, and mouse Y positions,
-     *                            and returns the corresponding {@link CursorType}.
-     *
-     * @apiNote The {@link Element} must either be the current screen or be accessible from the current screen or
-     * from its parent element through {@link ParentElement#children()}.
-     * <br>
-     * Any containers or nested parent elements must be an instance of {@link ParentElement} and also be accessible
-     * through {@link ParentElement#children()} from the current screen to the parent element.
+     * @param elementToCursorType     A function that takes an instance of the element, mouse X, and mouse Y positions,
+     *                                and returns the corresponding {@link CursorType}.
      */
     <T extends Element> void register(String fullyQualifiedClassName, ElementCursorTypeFunction<T> elementToCursorType);
 
@@ -64,60 +67,56 @@ public interface CursorTypeRegistrar {
      *      register(MyOtherButton.class, CursorTypeRegistrar::elementToPointer);
      * }</pre>
      *
+     * @param <T>                 The type of the {@link Element} to register
      * @param elementClass        The {@link Class} of the {@link Element} to register
      * @param elementToCursorType A function that takes an instance of the element, mouse X, and mouse Y positions,
      *                            and returns the corresponding {@link CursorType}.
-     * @apiNote The {@link Element} must either be the current screen or be accessible from the current screen or
-     * from its parent element through {@link ParentElement#children()}.
-     * <br>
-     * Any containers or nested parent elements must be an instance of {@link ParentElement} and also be accessible
-     * through {@link ParentElement#children()} from the current screen to the parent element.
      */
     <T extends Element> void register(Class<T> elementClass, ElementCursorTypeFunction<T> elementToCursorType);
 
     /**
-     * Returns the default {@link CursorType} for the given element.
+     * A built-in {@link ElementCursorTypeFunction} static method that always returns {@link CursorType#DEFAULT}.
      * <p>
-     * Use this method when no additional logic is needed to determine the cursor type for the element.
+     * Use this static method when no additional logic is needed to determine the cursor type for the element.
      * </p>
      *
      * @param ignoreElement The {@link Element} for which the cursor type is being determined.
      *                      This parameter is ignored as the default cursor is always returned.
-     * @param ignoreMouseX The mouse X-coordinate. This parameter is ignored in this method.
-     * @param ignoreMouseY The mouse Y-coordinate. This parameter is ignored in this method.
-     * @return The default {@link CursorType} (i.e., {@link CursorType#DEFAULT}).
+     * @param ignoreMouseX  The mouse X-coordinate. This parameter is ignored in this method.
+     * @param ignoreMouseY  The mouse Y-coordinate. This parameter is ignored in this method.
+     * @return {@link CursorType#DEFAULT}
      */
     static CursorType elementToDefault(Element ignoreElement, double ignoreMouseX, double ignoreMouseY) {
         return CursorType.DEFAULT;
     }
 
     /**
-     * Returns the pointer {@link CursorType} for the given element.
+     * A built-in {@link ElementCursorTypeFunction} static method that always returns {@link CursorType#POINTER}.
      * <p>
-     * Use this method when no additional logic is needed for the {@link CursorType#POINTER} element.
+     * Use this static method when no additional logic is needed for the {@link CursorType#POINTER} element.
      * </p>
      *
      * @param ignoreElement The {@link Element} for which the cursor type is being determined.
      *                      This parameter is ignored as the pointer cursor is always returned.
-     * @param ignoreMouseX The mouse X-coordinate. This parameter is ignored in this method.
-     * @param ignoreMouseY The mouse Y-coordinate. This parameter is ignored in this method.
-     * @return The pointer {@link CursorType} (i.e., {@link CursorType#POINTER}).
+     * @param ignoreMouseX  The mouse X-coordinate. This parameter is ignored in this method.
+     * @param ignoreMouseY  The mouse Y-coordinate. This parameter is ignored in this method.
+     * @return {@link CursorType#POINTER}
      */
     static CursorType elementToPointer(Element ignoreElement, double ignoreMouseX, double ignoreMouseY) {
         return CursorType.POINTER;
     }
 
     /**
-     * Returns the text {@link CursorType} for the given element.
+     * A built-in {@link ElementCursorTypeFunction} static method that always returns {@link CursorType#TEXT}.
      * <p>
-     * Use this method when no additional logic is needed for the {@link CursorType#TEXT} element.
+     * Use this static method when no additional logic is needed for the {@link CursorType#TEXT} element.
      * </p>
      *
      * @param ignoreElement The {@link Element} for which the cursor type is being determined.
      *                      This parameter is ignored as the text cursor is always returned.
-     * @param ignoreMouseX The mouse X-coordinate. This parameter is ignored in this method.
-     * @param ignoreMouseY The mouse Y-coordinate. This parameter is ignored in this method.
-     * @return The text {@link CursorType} (i.e., {@link CursorType#TEXT}).
+     * @param ignoreMouseX  The mouse X-coordinate. This parameter is ignored in this method.
+     * @param ignoreMouseY  The mouse Y-coordinate. This parameter is ignored in this method.
+     * @return {@link CursorType#TEXT}
      */
     static CursorType elementToText(Element ignoreElement, double ignoreMouseX, double ignoreMouseY) {
         return CursorType.TEXT;
@@ -127,14 +126,16 @@ public interface CursorTypeRegistrar {
      * A functional interface that defines a method for determining the {@link CursorType} for the given
      * {@link Element} when moused over.
      *
-     * @param <T> The type of the {@link Element} for which the cursor type is being determined.
+     * @param <T> The type of the {@link Element} to register
      */
     @FunctionalInterface
     interface ElementCursorTypeFunction<T extends Element> {
         /**
-         * @param element The {@link Element} for which the cursor type is being determined.
-         * @param mouseX The mouse X-coordinate.
-         * @param mouseY The mouse Y-coordinate.
+         * Determines the cursor type based on the {@link Element}, and the X and Y coordinates of the mouse.
+         *
+         * @param element The {@link Element} that is registered
+         * @param mouseX  The mouse X-coordinate.
+         * @param mouseY  The mouse Y-coordinate.
          * @return The {@link CursorType} to be applied for the element when moused over.
          */
         CursorType getCursorType(T element, double mouseX, double mouseY);

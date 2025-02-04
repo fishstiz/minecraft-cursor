@@ -1,7 +1,10 @@
 package io.github.fishstiz.minecraftcursor.api;
 
 /**
+ * The entry point for Minecraft Cursor on initialization.
+ * <p>
  * The implementing class must be an entry point of {@code "minecraft-cursor"} in {@code fabric.mod.json}
+ * </p>
  * <p><strong>Example:</strong></p>
  * <pre>
  * "entrypoints" {
@@ -11,7 +14,8 @@ package io.github.fishstiz.minecraftcursor.api;
  */
 public interface MinecraftCursorApi {
     /**
-     * Initialize your cursors and register your elements here:
+     * The {@link CursorTypeFactory} and {@link CursorTypeRegistrar} are injected here
+     * for initializing your cursor types and registering your elements.
      *
      * <p><strong>Example usage:</strong></p>
      * <pre>{@code
