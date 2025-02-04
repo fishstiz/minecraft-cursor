@@ -1,6 +1,6 @@
 package io.github.fishstiz.minecraftcursor.cursorhandler.ingame;
 
-import io.github.fishstiz.minecraftcursor.cursor.CursorType;
+import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.mixin.client.access.RecipeAlternativesWidgetAccessor;
 import io.github.fishstiz.minecraftcursor.mixin.client.access.RecipeBookResultsAccessor;
 import io.github.fishstiz.minecraftcursor.mixin.client.access.RecipeBookScreenAccessor;

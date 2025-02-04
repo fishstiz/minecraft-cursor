@@ -1,8 +1,8 @@
 package io.github.fishstiz.minecraftcursor;
 
 import io.github.fishstiz.minecraftcursor.api.CursorProvider;
+import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.api.CursorTypeRegistrar;
-import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import io.github.fishstiz.minecraftcursor.cursorhandler.ingame.*;
 import io.github.fishstiz.minecraftcursor.api.CursorHandler;
 import io.github.fishstiz.minecraftcursor.cursorhandler.modmenu.ModScreenCursorHandler;

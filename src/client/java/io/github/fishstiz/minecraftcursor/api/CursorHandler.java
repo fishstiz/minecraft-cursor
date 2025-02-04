@@ -1,7 +1,6 @@
 package io.github.fishstiz.minecraftcursor.api;
 
 import com.google.common.reflect.TypeToken;
-import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import net.minecraft.client.gui.Element;
 import org.jetbrains.annotations.NotNull;
 

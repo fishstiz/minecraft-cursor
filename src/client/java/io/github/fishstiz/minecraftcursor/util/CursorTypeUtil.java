@@ -1,6 +1,6 @@
 package io.github.fishstiz.minecraftcursor.util;
 
-import io.github.fishstiz.minecraftcursor.cursor.CursorType;
+import io.github.fishstiz.minecraftcursor.api.CursorType;
 import net.minecraft.client.util.InputUtil;
 import org.lwjgl.glfw.GLFW;
 

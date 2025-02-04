@@ -1,6 +1,5 @@
 package io.github.fishstiz.minecraftcursor.api;
 
-import io.github.fishstiz.minecraftcursor.cursor.CursorType;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.ParentElement;
 

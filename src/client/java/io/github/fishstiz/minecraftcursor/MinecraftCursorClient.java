@@ -1,11 +1,11 @@
 package io.github.fishstiz.minecraftcursor;
 
+import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.api.MinecraftCursorApi;
 import io.github.fishstiz.minecraftcursor.config.CursorConfigLoader;
 import io.github.fishstiz.minecraftcursor.config.CursorConfigService;
 import io.github.fishstiz.minecraftcursor.cursor.CursorManager;
-import io.github.fishstiz.minecraftcursor.cursor.CursorType;
-import io.github.fishstiz.minecraftcursor.registry.CursorTypeRegistry;
+import io.github.fishstiz.minecraftcursor.cursor.CursorTypeRegistry;
 import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -22,7 +22,7 @@ public class MinecraftCursorClient implements ClientModInitializer {
     public static final CursorConfigService CONFIG =
             new CursorConfigService(String.format("config/%s%s", MinecraftCursor.MOD_ID, CursorConfigLoader.FILE_EXTENSION));
     public static final CursorManager CURSOR_MANAGER = new CursorManager(CONFIG, CLIENT);
-    public static final CursorTypeRegistry CURSOR_REGISTRY = new CursorTypeRegistry();
+    private static final CursorTypeResolver CURSOR_RESOLVER = new CursorTypeResolver();
     private static MinecraftCursorClient instance;
     private Screen visibleNonCurrentScreen;
     private CursorType singleCycleCursor;
@@ -32,7 +32,7 @@ public class MinecraftCursorClient implements ClientModInitializer {
         instance = this;
 
         FabricLoader.getInstance().getEntrypoints(MinecraftCursor.MOD_ID, MinecraftCursorApi.class).forEach(
-                entrypoint -> entrypoint.init(CursorType::new, CURSOR_REGISTRY)
+                entrypoint -> entrypoint.init(CursorTypeRegistry::put, CURSOR_RESOLVER)
         );
 
         CursorResourceReloadListener resourceReloadListener = new CursorResourceReloadListener(
@@ -77,10 +77,10 @@ public class MinecraftCursorClient implements ClientModInitializer {
             return singleCycleCursor;
         }
 
-        CursorType cursorType = CURSOR_REGISTRY.getCursorType(currentScreen, mouseX, mouseY);
+        CursorType cursorType = CURSOR_RESOLVER.getCursorType(currentScreen, mouseX, mouseY);
         cursorType = cursorType != CursorType.DEFAULT ? cursorType
                 : currentScreen.hoveredElement(mouseX, mouseY)
-                .map(element -> CURSOR_REGISTRY.getCursorType(element, mouseX, mouseY))
+                .map(element -> CURSOR_RESOLVER.getCursorType(element, mouseX, mouseY))
                 .orElse(CursorType.DEFAULT);
 
         return cursorType;

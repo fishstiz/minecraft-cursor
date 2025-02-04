@@ -1,5 +1,6 @@
 package io.github.fishstiz.minecraftcursor.cursor;
 
+import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.config.CursorConfigService;
 import net.minecraft.client.MinecraftClient;
@@ -24,7 +25,8 @@ public class CursorManager {
     public CursorManager(CursorConfigService config, MinecraftClient client) {
         this.config = config;
         this.client = client;
-        for (CursorType type : CursorType.types()) {
+
+        for (CursorType type : CursorTypeRegistry.types()) {
             cursors.put(type, new Cursor((type)));
         }
     }
