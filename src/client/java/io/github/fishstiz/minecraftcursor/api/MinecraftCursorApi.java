@@ -1,7 +1,5 @@
 package io.github.fishstiz.minecraftcursor.api;
 
-import io.github.fishstiz.minecraftcursor.cursor.CursorType;
-
 /**
  * The implementing class must be an entry point of {@code "minecraft-cursor"} in {@code fabric.mod.json}
  * <p><strong>Example:</strong></p>
@@ -18,7 +16,7 @@ public interface MinecraftCursorApi {
      * <p><strong>Example usage:</strong></p>
      * <pre>{@code
      * public void init(CursorTypeFactory cursorTypeFactory, CursorTypeRegistrar cursorTypeRegistrar) {
-     *      CursorType customCursorType = cursorTypeFactory.create("custom-cursor");
+     *      CursorType customCursorType = cursorTypeFactory.of("custom-cursor");
      *
      *      // Registering my button class with the pointer cursor
      *      cursorTypeRegistrar.register(MyButton.class, CursorTypeRegistrar::elementToPointer);

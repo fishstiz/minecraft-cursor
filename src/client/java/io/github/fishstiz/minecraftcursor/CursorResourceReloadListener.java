@@ -1,10 +1,11 @@
 package io.github.fishstiz.minecraftcursor;
 
+import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.config.CursorConfigLoader;
 import io.github.fishstiz.minecraftcursor.config.CursorConfigService;
 import io.github.fishstiz.minecraftcursor.cursor.CursorManager;
-import io.github.fishstiz.minecraftcursor.cursor.CursorType;
+import io.github.fishstiz.minecraftcursor.cursor.CursorTypeRegistry;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
@@ -43,7 +44,6 @@ public class CursorResourceReloadListener implements SimpleSynchronousResourceRe
     public void reload(ResourceManager manager) {
         initConfig(manager);
         loadCursorTextures(manager);
-        cursorManager.setCurrentCursor(CursorType.DEFAULT);
     }
 
     private void initConfig(ResourceManager manager) {
@@ -66,7 +66,10 @@ public class CursorResourceReloadListener implements SimpleSynchronousResourceRe
     }
 
     private void loadCursorTextures(ResourceManager manager) {
-        for (Map.Entry<Identifier, Resource> entry : manager.findResources(getFabricId().getPath(), id -> getCursorTypeByIdentifierOrNull(id) != null).entrySet()) {
+        for (Map.Entry<Identifier, Resource> entry : manager.findResources(
+                getFabricId().getPath(),
+                id -> getCursorTypeByIdentifierOrNull(id) != null).entrySet()
+        ) {
             CursorType cursorType = getCursorTypeByIdentifierOrNull(entry.getKey());
             assert cursorType != null;
 
@@ -89,6 +92,6 @@ public class CursorResourceReloadListener implements SimpleSynchronousResourceRe
         String[] path = id.getPath().split("/");
         String name = path[path.length - 1].split(FILE_EXTENSION)[0];
 
-        return CursorType.getCursorTypeOrNull(name);
+        return CursorTypeRegistry.getCursorTypeOrNull(name);
     }
 }
