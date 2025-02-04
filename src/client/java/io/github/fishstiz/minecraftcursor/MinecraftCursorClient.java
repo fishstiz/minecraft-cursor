@@ -1,7 +1,7 @@
 package io.github.fishstiz.minecraftcursor;
 
 import io.github.fishstiz.minecraftcursor.api.CursorType;
-import io.github.fishstiz.minecraftcursor.api.MinecraftCursorApi;
+import io.github.fishstiz.minecraftcursor.api.MinecraftCursorInitializer;
 import io.github.fishstiz.minecraftcursor.config.CursorConfigLoader;
 import io.github.fishstiz.minecraftcursor.config.CursorConfigService;
 import io.github.fishstiz.minecraftcursor.cursor.CursorManager;
@@ -31,7 +31,7 @@ public class MinecraftCursorClient implements ClientModInitializer {
     public void onInitializeClient() {
         instance = this;
 
-        FabricLoader.getInstance().getEntrypoints(MinecraftCursor.MOD_ID, MinecraftCursorApi.class).forEach(
+        FabricLoader.getInstance().getEntrypoints(MinecraftCursor.MOD_ID, MinecraftCursorInitializer.class).forEach(
                 entrypoint -> entrypoint.init(CursorTypeRegistry::put, CURSOR_RESOLVER)
         );
 
