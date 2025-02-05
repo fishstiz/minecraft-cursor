@@ -211,3 +211,14 @@ A Fabric mod that replaces the boring old default system cursor with a Minecraft
      <li><code>MultiplayerServerListWidget</code> server icon play button</li>
    </ul>
 </details>
+
+# Developer API
+The Minecraft Cursor mod provides an API for developers to:
+- Create custom cursor types.
+- Register elements with custom cursor type functions. 
+- Use an interface for elements that implements a `getCursorType()` method to declare its cursor type. 
+- Directly change the cursor, bypassing the element-based system.
+
+Visit the Minecraft Cursor Wiki for more details: https://github.com/fishstiz/minecraft-cursor/wiki
+
+Minecraft Cursor API JavaDocs: https://minecraft-cursor.bitbucket.io
