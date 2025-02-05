@@ -1,0 +1,5 @@
+- Added API for Developers that allows: 
+  - Creation of cursor types in runtime (on resource reloads only) 
+  - Registering of elements with a cursor type function
+  - Implementing an interface to elements to declare its cursor type 
+  - Direct control of the current cursor type
