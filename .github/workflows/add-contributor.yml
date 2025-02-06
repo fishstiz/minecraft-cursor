@@ -1,0 +1,51 @@
+name: Add Contributor on First Interaction
+
+on:
+  pull_request_target:
+    types:
+      - 'closed'
+    branches: [ 'master', '1.20.1', '1.21', '1.21.2' ]
+
+permissions:
+  contents: write
+
+jobs:
+  add-contributor:
+    if: ${{ github.event.pull_request.merged == true && contains(github.event.pull_request.user.type, 'User') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if First Interaction
+        uses: fishstiz/is-first-interaction@v1.3.0+is-first
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          pr-message: 'Thank you for contributing!'
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
+
+      - name: Read Current Contributors
+        id: read-json
+        run: |
+          content=$(cat src/main/resources/fabric.mod.json)
+          echo "contributors=$(echo $content | jq -r '.contributors')" >> $GITHUB_OUTPUT
+
+      - name: Update Contributors
+        uses: jossef/action-set-json-field@v2.1
+        with:
+          file: src/main/resources/fabric.mod.json
+          field: contributors
+          value: ${{ fromJSON(steps.read-json.outputs.contributors) + [github.event.pull_request.user.login] }}
+
+      - name: Commit files
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git commit -a -m "Add ${{ github.event.pull_request.user.login }} to Contributors (PR #${{ github.event.pull_request.number }})"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.event.pull_request.base.ref }}
