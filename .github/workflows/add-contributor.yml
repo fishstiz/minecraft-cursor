@@ -28,7 +28,6 @@ jobs:
       - name: Update Contributors
         run: |
           content=$(cat src/main/resources/fabric.mod.json)
-          # Add new contributor to array and ensure it's unique
           newContent=$(echo "$content" | jq '.contributors += ["${{ github.event.pull_request.user.login }}"] | .contributors |= unique')
           echo "$newContent" > src/main/resources/fabric.mod.json
 
