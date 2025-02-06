@@ -4,9 +4,8 @@ on:
   pull_request_target:
     types:
       - 'closed'
+      - 'labeled'
     branches: [ 'master' ]
-    paths:
-      - 'src/{client,main}/resources/assets/minecraft-cursor/lang/*.json'
 
 permissions:
   contents: write
