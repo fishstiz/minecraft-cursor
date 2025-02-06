@@ -92,7 +92,7 @@ tasks.register('getProperties') {
 	doLast {
 		println "MINECRAFT_VERSION=${minecraft_version}"
 		println "MOD_VERSION=${mod_version}"
-		println "JAVA_VERSION=${JavaVersion.VERSION_21}"
+		println "JAVA_VERSION=${java.targetCompatibility}"
 		println "RELEASE_NAME=Minecraft Cursor ${mod_version}"
 	}
 }

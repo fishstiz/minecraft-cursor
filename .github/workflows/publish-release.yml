@@ -1,6 +1,12 @@
 name: Publish on GitHub, CurseForge & Modrinth
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      additional_versions:
+        description: 'Additional Minecraft Versions'
+        required: false
+        type: string
 
 env:
   CURSEFORGE_ID: 1184736
@@ -47,20 +53,24 @@ jobs:
       - name: Publish (CurseForge/Modrinth/GitHub)
         uses: Kir-Antipov/mc-publish@v3.3
         with:
-          curseforge-id: "${{env.CURSEFORGE_ID}}"
-          curseforge-token: "${{env.CURSEFORGE_TOKEN}}"
+          curseforge-id: ${{ env.CURSEFORGE_ID }}
+          curseforge-token: ${{ env.CURSEFORGE_TOKEN }}
 
-          modrinth-id: "${{env.MODRINTH_ID}}"
-          modrinth-token: "${{env.MODRINTH_TOKEN}}"
+          modrinth-id: ${{ env.MODRINTH_ID }}
+          modrinth-token: ${{ env.MODRINTH_TOKEN }}
 
           github-tag: "v${{env.VERSION}}"
-          github-token: "${{env.GITHUB_TOKEN}}"
+          github-token: ${{env.GITHUB_TOKEN}}
+          github-generate-changelog: false
 
-          name: "${{env.RELEASE_NAME}}"
-          version: "${{env.VERSION}}"
+          name: ${{ env.RELEASE_NAME }}
+          version: ${{ env.VERSION }}
           version-type: release
           changelog-file: CHANGELOG.md
 
           loaders: fabric
-          game-versions: "${{env.MINECRAFT_VERSION}}"
-          java: "${{env.JAVA_VERSION}}"
+          game-versions: |
+            ${{ env.MINECRAFT_VERSION }}
+            ${{ inputs.additional_versions }}
+
+          java: ${{ env.JAVA_VERSION }}
