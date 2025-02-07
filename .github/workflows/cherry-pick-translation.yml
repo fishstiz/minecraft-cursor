@@ -26,12 +26,10 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ matrix.branch }}
-
       - name: Configure Git
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-
       - name: Cherry pick Translation to ${{ matrix.branch }}
         id: cherry-pick
         continue-on-error: true
@@ -42,16 +40,14 @@ jobs:
             git cherry-pick --abort
             echo "status=failed" >> $GITHUB_OUTPUT
           fi
-
       - name: Push Changes
         if: steps.cherry-pick.outputs.status == 'success'
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ matrix.branch }}
-
       - name: Create an Issue
-        if: steps.cherry-pick.outputs.status == 'failed'
+        if: ${{ steps.cherry-pick.outputs.status == 'failed' || failure() }}
         uses: actions-ecosystem/action-create-issue@v1
         with:
           github_token: ${{ secrets.github_token }}
