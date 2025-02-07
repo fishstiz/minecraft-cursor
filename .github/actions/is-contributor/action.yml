@@ -1,0 +1,31 @@
+name: Check if already a Contributor
+description: Checks if the name is already in the authors or contributors array of fabric.mod.json
+inputs:
+  contributor:
+    description: 'Contributor name'
+    required: true
+  fmj-path:
+    description: 'Path to fabric.mod.json'
+    default: src/main/resources/fabric.mod.json
+    required: false
+runs:
+  using: composite
+  steps:
+    - name: Check if in Authors
+      shell: bash
+      run: |
+        if $(jq --arg name "${{ inputs.contributor }}" 'any(.authors[]; . == $name)' ${{ inputs.fmj-path }}); then 
+          echo "${{ inputs.contributor }} is already listed as an author in fabric.mod.json"
+          exit 1 
+        else
+          echo "${{ inputs.contributor }} is not in the authors list..."
+        fi
+    - name: Check if in Contributors
+      shell: bash
+      run: |
+        if $(jq --arg name "${{ inputs.contributor }}" 'any(.contributors[]; . == $name)' ${{ inputs.fmj-path }}); then 
+          echo "${{ inputs.contributor }} is already listed as a contributor in fabric.mod.json"
+          exit 1 
+        else
+          echo "${{ inputs.contributor }} is not in the contributors list..."
+        fi

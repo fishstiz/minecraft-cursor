@@ -8,37 +8,61 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
-  add-contributor:
+  is-first-interaction:
     if: ${{ github.event.pull_request.merged == true && contains(github.event.pull_request.user.type, 'User') }}
     runs-on: ubuntu-latest
     steps:
-      - name: Check if First Interaction
-        uses: fishstiz/is-first-interaction@v1.3.0+is-first
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          pr-message: 'Thank you for contributing!'
-
       - name: Checkout
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.base.ref }}
-
-      - name: Update Contributors
-        run: |
-          content=$(cat src/main/resources/fabric.mod.json)
-          newContent=$(echo "$content" | jq '.contributors += ["${{ github.event.pull_request.user.login }}"] | .contributors |= unique')
-          echo "$newContent" > src/main/resources/fabric.mod.json
-
-      - name: Commit files
-        run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git commit -a -m "Add ${{ github.event.pull_request.user.login }} to Contributors (PR #${{ github.event.pull_request.number }})"
-
-      - name: Push changes
-        uses: ad-m/github-push-action@master
+      - name: Check if already a Contributor
+        uses: ./.github/actions/is-contributor
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          contributor: ${{ github.event.pull_request.user.login }}
+      - name: Send First Contribution Message
+        uses: fishstiz/is-first-interaction@no-action-check
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          pr-message: 'Thank you for the contribution! Your name will be added to the list of contributors 📃.'
+  add-contributor-all:
+    needs: [ is-first-interaction ]
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'translation') }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        branch: [ 'master', '1.20.1', '1.21', '1.21.2' ]
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.branch }}
+      - name: Check if already a Contributor
+        uses: ./.github/actions/is-contributor
+        with:
+          contributor: ${{ github.event.pull_request.user.login }}
+      - name: Add Contributor to fabric.mod.json
+        uses: ./.github/actions/add-contributor
+        with:
+          contributor: ${{ github.event.pull_request.user.login }}
+          branch: ${{ matrix.branch }}
+          message: "Add ${{ github.event.pull_request.user.login }} to contributors (Contributed PR: #${{ github.event.pull_request.number }})"
+  add-contributor:
+    needs: [ is-first-interaction ]
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'translation') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
+      - name: Add Contributor to fabric.mod.json
+        uses: ./.github/actions/add-contributor
+        with:
           branch: ${{ github.event.pull_request.base.ref }}
+          contributor: ${{ github.event.pull_request.user.login }}
+          message: "Add ${{ github.event.pull_request.user.login }} to contributors (Contributed PR: #${{ github.event.pull_request.number }})"
