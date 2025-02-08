@@ -38,7 +38,7 @@ public class SelectedCursorTestWidget extends ClickableWidget implements CursorP
         Cursor cursor = optionsWidget.optionsScreen.getSelectedCursor();
         context.drawTexture(RenderLayer::getGuiTextured, BACKGROUND, getX(), getY(), 0, 0, width, height, width, height);
 
-        if (cursor.getEnabled()) {
+        if (cursor.isEnabled()) {
             hoverButton.render(context, mouseX, mouseY, delta);
             renderRuler(context, mouseX, mouseY);
         } else {
@@ -62,10 +62,10 @@ public class SelectedCursorTestWidget extends ClickableWidget implements CursorP
 
     @Override
     public boolean isMouseOver(double mouseX, double mouseY) {
-        return mouseX >= (double) this.getX()
-                && mouseY >= (double) this.getY()
-                && mouseX < (double) this.getRight()
-                && mouseY < (double) this.getBottom();
+        return mouseX >= this.getX()
+                && mouseY >= this.getY()
+                && mouseX < this.getRight()
+                && mouseY < this.getBottom();
     }
 
     @Override

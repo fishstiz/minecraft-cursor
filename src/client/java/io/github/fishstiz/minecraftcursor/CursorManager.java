@@ -15,23 +15,20 @@ import java.util.List;
 import java.util.TreeMap;
 
 public class CursorManager {
-    private static final LinkedHashMap<CursorType, Cursor> cursors = new LinkedHashMap<>();
     private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
+    private static final LinkedHashMap<CursorType, Cursor> CURSORS = new LinkedHashMap<>();
     private final TreeMap<Integer, CursorType> currentCursorOverrides = new TreeMap<>();
     private Cursor currentCursor;
     private long previousCursorId;
 
     CursorManager() {
-    }
-
-    static {
-        for (CursorType type : CursorTypeRegistry.types()) {
-            cursors.put(type, new Cursor((type)));
+        for (CursorType cursorType : CursorTypeRegistry.types()) {
+            CURSORS.put(cursorType, new Cursor(cursorType));
         }
     }
 
     public void loadCursorImage(CursorType type, Identifier sprite, BufferedImage image, CursorConfig.Settings settings) throws IOException {
-        Cursor cursor = cursors.computeIfAbsent(type, Cursor::new);
+        Cursor cursor = CURSORS.computeIfAbsent(type, Cursor::new);
         cursor.loadImage(sprite, image, settings.getScale(), settings.getXHot(), settings.getYHot(), settings.isEnabled());
 
         if (currentCursor == null) {
@@ -44,17 +41,17 @@ public class CursorManager {
     }
 
     public void setCurrentCursor(CursorType type) {
-        Cursor cursor = cursors.get(currentCursorOverrides.isEmpty() ? type : currentCursorOverrides.lastEntry().getValue());
+        Cursor cursor = CURSORS.get(currentCursorOverrides.isEmpty() ? type : currentCursorOverrides.lastEntry().getValue());
 
-        if (cursor == null || (type != CursorType.DEFAULT && cursor.getId() == 0) || !cursor.getEnabled()) {
-            cursor = cursors.get(CursorType.DEFAULT);
+        if (cursor == null || (type != CursorType.DEFAULT && cursor.getId() == 0) || !cursor.isEnabled()) {
+            cursor = CURSORS.get(CursorType.DEFAULT);
         }
 
-        if (currentCursor != null && cursor.getId() == previousCursorId) {
+        if (cursor == null || !cursor.isLoaded()) {
             return;
         }
 
-        if (!cursor.isLoaded()) {
+        if (currentCursor != null && cursor.getId() == previousCursorId) {
             return;
         }
 
@@ -64,7 +61,7 @@ public class CursorManager {
     }
 
     public void overrideCurrentCursor(CursorType type, int index) {
-        if (getCursor(type).getEnabled()) {
+        if (getCursor(type).isEnabled()) {
             currentCursorOverrides.put(index, type);
         } else {
             currentCursorOverrides.remove(index);
@@ -89,13 +86,13 @@ public class CursorManager {
     }
 
     public Cursor getCursor(CursorType type) {
-        return cursors.get(type);
+        return CURSORS.get(type);
     }
 
     public List<Cursor> getLoadedCursors() {
         List<Cursor> activeCursors = new ArrayList<>();
-        for (Cursor cursor : cursors.values()) {
-            if (cursor.isLoaded() && CursorTypeRegistry.getCursorTypeOrNull(cursor.getType().getKey()) != null) {
+        for (Cursor cursor : CURSORS.values()) {
+            if (cursor.isLoaded()) {
                 activeCursors.add(cursor);
             }
         }
@@ -103,13 +100,13 @@ public class CursorManager {
     }
 
     public boolean isAdaptive() {
-        return cursors.values().stream().anyMatch(cursor ->
-                cursor.getEnabled() && CursorType.DEFAULT != cursor.getType()
+        return CURSORS.values().stream().anyMatch(cursor ->
+                cursor.isEnabled() && CursorType.DEFAULT != cursor.getType()
         );
     }
 
     public void setIsAdaptive(boolean isAdaptive) {
-        cursors.values().forEach(cursor -> {
+        CURSORS.values().forEach(cursor -> {
             if (cursor.getType() != CursorType.DEFAULT) {
                 cursor.enable(isAdaptive);
             }

@@ -5,7 +5,8 @@ import io.github.fishstiz.minecraftcursor.gui.screen.CursorOptionsScreen;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
-import net.minecraft.client.gui.widget.*;
+import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.gui.widget.ContainerWidget;
 import net.minecraft.text.Text;
 
 import java.util.List;
@@ -39,7 +40,7 @@ public class SelectedCursorOptionsWidget extends ContainerWidget {
         Cursor cursor = optionsScreen.getSelectedCursor();
 
         enableButton = SelectedCursorToggleWidget.build(
-                ENABLED_TEXT, cursor.getEnabled(), optionsScreen::onPressEnabled);
+                ENABLED_TEXT, cursor.isEnabled(), optionsScreen::onPressEnabled);
         scaleSlider = new SelectedCursorSliderWidget(
                 SCALE_TEXT, cursor.getScale(), SCALE_MIN, SCALE_MAX, SCALE_STEP,
                 optionsScreen::onChangeScale, optionsScreen::removeOverride, this);
@@ -83,7 +84,7 @@ public class SelectedCursorOptionsWidget extends ContainerWidget {
     public void refreshWidgets() {
         Cursor cursor = optionsScreen.getSelectedCursor();
 
-        enableButton.setValue(cursor.getEnabled());
+        enableButton.setValue(cursor.isEnabled());
         scaleSlider.setValue(cursor.getScale());
         xhotSlider.setValue(cursor.getXhot());
         yhotSlider.setValue(cursor.getYhot());

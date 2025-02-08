@@ -129,7 +129,7 @@ public class Cursor {
         updateImage(getScale(), getXhot(), yhot, onUpdate);
     }
 
-    public boolean getEnabled() {
+    public boolean isEnabled() {
         return enabled;
     }
 
