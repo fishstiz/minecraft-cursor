@@ -16,23 +16,11 @@ package io.github.fishstiz.minecraftcursor.api;
  */
 public interface MinecraftCursorInitializer {
     /**
-     * The {@link CursorTypeFactory} and {@link CursorTypeRegistrar} are injected here
-     * for initializing your cursor types and registering your elements.
+     * The {@link CursorTypeRegistrar} and {@link ElementRegistrar} instances are injected here
+     * where you can register custom cursor types and elements.
      *
-     * <p><strong>Example usage:</strong></p>
-     * <pre>{@code
-     * public void init(CursorTypeFactory cursorTypeFactory, CursorTypeRegistrar cursorTypeRegistrar) {
-     *      CursorType customCursorType = cursorTypeFactory.of("custom-cursor");
-     *
-     *      // Registering my button class with the pointer cursor
-     *      cursorTypeRegistrar.register(MyButton.class, CursorTypeRegistrar::elementToPointer);
-     *      // Registering my custom element with my custom cursor
-     *      cursorTypeRegistrar.register(MyCustomElement.class, (myCustomElement, mouseX, mouseY) -> customCursorType);
-     * }
-     * }</pre>
-     *
-     * @param cursorTypeFactory  the functional interface for creating {@link CursorType} objects based on a given key.
-     * @param cursorTypeRegistrar the registrar used to associate element classes with cursor types
+     * @param cursorRegistrar  the registrar used to register {@link CursorType} objects.
+     * @param elementRegistrar the registrar used to associate element classes with cursor type functions.
      */
-    void init(CursorTypeFactory cursorTypeFactory, CursorTypeRegistrar cursorTypeRegistrar);
+    void init(CursorTypeRegistrar cursorRegistrar, ElementRegistrar elementRegistrar);
 }

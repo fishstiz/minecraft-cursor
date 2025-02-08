@@ -1,21 +1,29 @@
-package io.github.fishstiz.minecraftcursor.cursor;
+package io.github.fishstiz.minecraftcursor;
 
 import io.github.fishstiz.minecraftcursor.api.CursorType;
+import io.github.fishstiz.minecraftcursor.api.CursorTypeRegistrar;
+import io.github.fishstiz.minecraftcursor.cursor.StandardCursorType;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 
-public class CursorTypeRegistry {
+public class CursorTypeRegistry implements CursorTypeRegistrar {
     private static final LinkedHashMap<String, CursorType> TYPES = new LinkedHashMap<>();
 
-    static {
-        TYPES.put(CursorType.DEFAULT.getKey(), CursorType.DEFAULT);
+    CursorTypeRegistry() {
     }
 
-    public static CursorType put(String key) {
-        return TYPES.computeIfAbsent(key, Entry::new);
+    static {
+        for (CursorType cursorType : StandardCursorType.values()) {
+            TYPES.put(cursorType.getKey(), cursorType);
+        }
+    }
+
+    @Override
+    public void register(CursorType cursorType) {
+        TYPES.put(cursorType.getKey(), cursorType);
     }
 
     public static Collection<CursorType> types() {
@@ -24,18 +32,5 @@ public class CursorTypeRegistry {
 
     public static @Nullable CursorType getCursorTypeOrNull(String key) {
         return TYPES.get(key);
-    }
-
-    public static class Entry implements CursorType {
-        private final String key;
-
-        private Entry(String key) {
-            this.key = key;
-        }
-
-        @Override
-        public String getKey() {
-            return key;
-        }
     }
 }
