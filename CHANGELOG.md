@@ -1,15 +1,1 @@
-- Added API for Developers that allows:
-    - Creation of cursor types in runtime (on resource reloads only)
-    - Registering of elements with a cursor type function
-    - Implementing an interface to elements to declare its cursor type
-    - Direct control of the current cursor type
-- Added pt_br translation
-
-
-- 3.1.0 has breaking changes for Minecraft Cursor API
-    - Renamed `CursorTypeRegistrar` to `ElementRegistrar`
-        - Rename `ElementCursorTypeFunction` to `CursorTypeFunction`
-    - Replaced `CursorTypeFactory` with `CursorTypeRegistrar`
-        - use `CursorType#of(String)` or `CursorTypeRegistrar#register(String)` to create a `CursorType`
-        - use `CursorTypeRegistrar#register(CursorType...)` to register multiple `CursorType` objects
-    - The access and packages of some internal classes have been modified
+- Fixed Adaptive Cursor Enable toggle option in More Cursor Options not saving.
