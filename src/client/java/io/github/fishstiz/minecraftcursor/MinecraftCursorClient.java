@@ -4,8 +4,6 @@ import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.api.MinecraftCursorInitializer;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.config.CursorConfigLoader;
-import io.github.fishstiz.minecraftcursor.cursor.CursorManager;
-import io.github.fishstiz.minecraftcursor.cursor.CursorTypeRegistry;
 import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -25,17 +23,16 @@ public class MinecraftCursorClient implements ClientModInitializer {
             MinecraftCursor.MOD_ID
     )));
     public static final CursorManager CURSOR_MANAGER = new CursorManager();
+    private static final CursorTypeRegistry CURSOR_REGISTRY = new CursorTypeRegistry();
     private static final CursorTypeResolver CURSOR_RESOLVER = new CursorTypeResolver();
-    private static MinecraftCursorClient instance;
+    private static CursorType singleCycleCursor;
     private Screen visibleNonCurrentScreen;
-    private CursorType singleCycleCursor;
 
     @Override
     public void onInitializeClient() {
-        instance = this;
-
         FabricLoader.getInstance().getEntrypoints(MinecraftCursor.MOD_ID, MinecraftCursorInitializer.class).forEach(
-                entrypoint -> entrypoint.init(CursorTypeRegistry::put, CURSOR_RESOLVER));
+                entrypoint -> entrypoint.init(CURSOR_REGISTRY, CURSOR_RESOLVER)
+        );
 
         CursorResourceReloadListener resourceReloadListener = new CursorResourceReloadListener(
                 CURSOR_MANAGER, MinecraftCursor.MOD_ID, CONFIG
@@ -75,9 +72,9 @@ public class MinecraftCursorClient implements ClientModInitializer {
 
         if (CursorTypeUtil.isGrabbing()) return CursorType.GRABBING;
 
-        if (this.singleCycleCursor != null) {
-            CursorType temp = this.singleCycleCursor;
-            this.singleCycleCursor = null;
+        if (singleCycleCursor != null) {
+            CursorType temp = singleCycleCursor;
+            setSingleCycleCursor(null);
             return temp;
         }
 
@@ -91,6 +88,6 @@ public class MinecraftCursorClient implements ClientModInitializer {
     }
 
     public static void setSingleCycleCursor(CursorType cursorType) {
-        instance.singleCycleCursor = cursorType;
+        singleCycleCursor = cursorType;
     }
 }

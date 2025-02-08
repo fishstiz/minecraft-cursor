@@ -1,6 +1,6 @@
 package io.github.fishstiz.minecraftcursor.gui.screen;
 
-import io.github.fishstiz.minecraftcursor.cursor.CursorManager;
+import io.github.fishstiz.minecraftcursor.CursorManager;
 import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorToggleWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;

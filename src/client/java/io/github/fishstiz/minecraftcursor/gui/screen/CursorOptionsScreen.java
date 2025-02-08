@@ -1,7 +1,7 @@
 package io.github.fishstiz.minecraftcursor.gui.screen;
 
+import io.github.fishstiz.minecraftcursor.CursorManager;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
-import io.github.fishstiz.minecraftcursor.cursor.CursorManager;
 import io.github.fishstiz.minecraftcursor.gui.widget.ContainerWidget;
 import io.github.fishstiz.minecraftcursor.gui.widget.CursorListWidget;
 import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorOptionsWidget;
@@ -9,7 +9,9 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
-import net.minecraft.client.gui.widget.*;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.TextWidget;
+import net.minecraft.client.gui.widget.ThreePartsLayoutWidget;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 

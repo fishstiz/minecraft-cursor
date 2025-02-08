@@ -1,7 +1,7 @@
 package io.github.fishstiz.minecraftcursor.config;
 
+import io.github.fishstiz.minecraftcursor.CursorTypeRegistry;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
-import io.github.fishstiz.minecraftcursor.cursor.CursorTypeRegistry;
 
 import java.io.File;
 import java.util.HashMap;

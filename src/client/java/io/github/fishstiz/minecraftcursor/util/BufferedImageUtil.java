@@ -12,6 +12,9 @@ import java.nio.ByteBuffer;
 import java.util.Base64;
 
 public class BufferedImageUtil {
+    private BufferedImageUtil() {
+    }
+
     public static ByteBuffer getPixelsRGBA(BufferedImage image) {
         int width = image.getWidth();
         int height = image.getHeight();

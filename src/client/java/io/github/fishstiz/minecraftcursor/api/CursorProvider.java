@@ -1,7 +1,7 @@
 package io.github.fishstiz.minecraftcursor.api;
 
 /**
- * An alternative to the {@link CursorTypeRegistrar} approach to determine the cursor type directly from the implementing {@link net.minecraft.client.gui.Element}
+ * An alternative to the {@link ElementRegistrar} approach to determine the cursor type directly from the implementing {@link net.minecraft.client.gui.Element}
  * <p>
  * Implement this directly to your element if Minecraft Cursor is a required dependency.
  * </p>

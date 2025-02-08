@@ -1,17 +1,16 @@
 package io.github.fishstiz.minecraftcursor.api;
 
+import io.github.fishstiz.minecraftcursor.CursorManager;
 import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
-import io.github.fishstiz.minecraftcursor.cursor.CursorManager;
 
 /**
  * Provides methods that allow direct control of the cursor.
  */
 public class CursorController {
+    private static final CursorManager cursorManager = MinecraftCursorClient.CURSOR_MANAGER;
     private static CursorController instance;
-    private final CursorManager cursorManager;
 
-    private CursorController(CursorManager cursorManager) {
-        this.cursorManager = cursorManager;
+    private CursorController() {
     }
 
     /**
@@ -21,7 +20,7 @@ public class CursorController {
      */
     public static CursorController getInstance() {
         if (instance == null) {
-            instance = new CursorController(MinecraftCursorClient.CURSOR_MANAGER);
+            instance = new CursorController();
         }
         return instance;
     }
@@ -47,8 +46,8 @@ public class CursorController {
      * Override the current cursor with a specified type and index.
      * If multiple overrides exist, the one with the highest index takes precedence.
      *
-     * @param cursorType  the {@link CursorType} to override with
-     * @param index the index of the cursor override
+     * @param cursorType the {@link CursorType} to override with
+     * @param index      the index of the cursor override
      */
     public void overrideCursor(CursorType cursorType, int index) {
         cursorManager.overrideCurrentCursor(cursorType, index);
