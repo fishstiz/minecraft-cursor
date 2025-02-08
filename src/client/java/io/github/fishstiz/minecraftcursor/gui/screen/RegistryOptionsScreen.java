@@ -83,6 +83,13 @@ public class RegistryOptionsScreen extends Screen {
             option.toggleButton.setValue(isEnabled);
         });
         cursorManager.setIsAdaptive(isEnabled);
+
+        CONFIG.getSettings().forEach((key, settings) -> settings.update(
+                settings.getScale(),
+                settings.getXHot(),
+                settings.getYHot(),
+                isEnabled
+        ));
     }
 
     public class RegistryListWidget extends ElementListWidget<RegistryListWidget.RegistryEntry> {
