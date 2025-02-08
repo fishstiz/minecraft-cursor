@@ -1,10 +1,9 @@
 package io.github.fishstiz.minecraftcursor.cursorhandler.ingame;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
+import io.github.fishstiz.minecraftcursor.api.CursorHandler;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.mixin.client.access.BookEditScreenAccessor;
-
-import io.github.fishstiz.minecraftcursor.api.CursorHandler;
 import net.minecraft.client.gui.screen.ingame.BookEditScreen;
 
 public class BookEditScreenCursorHandler implements CursorHandler<BookEditScreen> {
@@ -14,7 +13,7 @@ public class BookEditScreenCursorHandler implements CursorHandler<BookEditScreen
 
     @Override
     public CursorType getCursorType(BookEditScreen element, double mouseX, double mouseY) {
-        if (!MinecraftCursorClient.CONFIG.get().isBookEditEnabled()) return CursorType.DEFAULT;
+        if (!MinecraftCursorClient.CONFIG.isBookEditEnabled()) return CursorType.DEFAULT;
 
         BookEditScreenAccessor bookEditScreen = (BookEditScreenAccessor) element;
 

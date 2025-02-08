@@ -21,7 +21,7 @@ public class EnchantmentScreenCursorHandler extends HandledScreenCursorHandler<E
         CursorType cursorType = super.getCursorType(enchantmentScreen, mouseX, mouseY);
         if (cursorType != CursorType.DEFAULT) return cursorType;
 
-        if (!MinecraftCursorClient.CONFIG.get().isEnchantmentsEnabled()) return CursorType.DEFAULT;
+        if (!MinecraftCursorClient.CONFIG.isEnchantmentsEnabled()) return CursorType.DEFAULT;
 
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
         if (player == null) return CursorType.DEFAULT;

@@ -22,7 +22,7 @@ public class StonecutterScreenCursorHandler extends HandledScreenCursorHandler<S
         CursorType cursorType = super.getCursorType(stonecutterScreen, mouseX, mouseY);
         if (cursorType != CursorType.DEFAULT) return cursorType;
 
-        if (!MinecraftCursorClient.CONFIG.get().isStonecutterRecipesEnabled()) return CursorType.DEFAULT;
+        if (!MinecraftCursorClient.CONFIG.isStonecutterRecipesEnabled()) return CursorType.DEFAULT;
 
         StonecutterScreenAccessor accessor = (StonecutterScreenAccessor) stonecutterScreen;
         StonecutterScreenHandler handler = accessor.getHandler();

@@ -2,104 +2,49 @@ package io.github.fishstiz.minecraftcursor.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
-import io.github.fishstiz.minecraftcursor.api.CursorType;
-import io.github.fishstiz.minecraftcursor.cursor.CursorTypeRegistry;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
 
 public class CursorConfigLoader {
-    public static final String FILE_EXTENSION = ".json";
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-    private final String path;
-    private CursorConfig config;
+    static final ObjectMapper MAPPER = new ObjectMapper();
 
-    public CursorConfigLoader(InputStream stream) {
-        this("", stream, false);
+    private CursorConfigLoader() {
     }
 
-    public CursorConfigLoader(String path) {
-        this(path, null, true);
+    public static CursorConfig fromStream(InputStream stream) throws IOException {
+        CursorConfig config;
+        config = MAPPER.readValue(stream, CursorConfig.class);
+        return config;
     }
 
-    private CursorConfigLoader(String path, @Nullable InputStream stream, boolean createIfNotFound) {
-        this.path = path;
-
-        init(createIfNotFound, stream);
-    }
-
-    private void init(boolean createIfNotFound, @Nullable InputStream stream) {
-        load(createIfNotFound, stream);
-
-        if (config != null && config.get_hash() == null) {
-            generateHash();
+    public static CursorConfig fromFile(File file) {
+        if (!file.getPath().endsWith(".json")) {
+            throw new IllegalArgumentException("Unsupported file type.");
         }
-    }
 
-    public void load(boolean createIfNotFound, @Nullable InputStream stream) {
+        CursorConfig config = new CursorConfig();
+
         try {
-            if (stream != null) {
-                config = MAPPER.readValue(stream, CursorConfig.class);
-            } else if (!path.isEmpty()) {
-                config = MAPPER.readValue(new File(path), CursorConfig.class);
-            }
+            config = MAPPER.readValue(file, CursorConfig.class);
         } catch (FileNotFoundException e) {
-            if (createIfNotFound) {
-                MinecraftCursor.LOGGER.warn("Config not found, creating config file at: {}", path);
-                createDefault();
-            }
+            MinecraftCursor.LOGGER.info("Creating cursor config file at {}", file.getPath());
+            saveConfig(file, config);
         } catch (IOException e) {
-            config = new CursorConfig();
-            MinecraftCursor.LOGGER.error("Failed to load file", e);
-        }
-    }
-
-    public void createDefault() {
-        CursorConfig defaultConfig = new CursorConfig();
-
-        for (CursorType type : CursorTypeRegistry.types()) {
-            defaultConfig.getOrCreateCursorSettings(type);
+            MinecraftCursor.LOGGER.warn("Failed to load cursor config at {}", file.getPath());
         }
 
-        config = defaultConfig;
-        save();
+        config.file = file;
+        return config;
     }
 
-    public void save() {
+    public static void saveConfig(File file, CursorConfig config) {
         try {
-            MAPPER.writerWithDefaultPrettyPrinter().writeValue(new File(path), config);
+            MAPPER.writerWithDefaultPrettyPrinter().writeValue(file, config);
         } catch (IOException e) {
-            MinecraftCursor.LOGGER.error("Failed to save config file", e);
+            MinecraftCursor.LOGGER.error("Failed to save config file at {}", file.getPath());
         }
-    }
-
-    public CursorConfig config() {
-        return this.config;
-    }
-
-    // generate hash to check if resource has changed for cursor
-    private void generateHash() {
-        long hash = 0;
-        long prime = 31;
-
-        for (Map.Entry<String, CursorConfig.Settings> entry : config.settings.entrySet()) {
-            String key = entry.getKey();
-            CursorConfig.Settings value = entry.getValue();
-
-            for (char c : key.toCharArray()) {
-                hash = hash * prime + c;
-            }
-
-            hash = hash * prime + (long) value.getScale();
-            hash = hash * prime + value.getXHot();
-            hash = hash * prime + value.getYHot();
-            hash = hash * prime + (value.getEnabled() ? 1 : 0);
-        }
-
-        config.set_hash(Long.toHexString(hash));
     }
 }
