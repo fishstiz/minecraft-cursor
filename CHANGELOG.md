@@ -6,11 +6,10 @@
 - Added pt_br translation
 
 
-- Removed Version 3.0.0
-    - 3.1.0 has breaking changes for Minecraft Cursor API
+- 3.1.0 has breaking changes for Minecraft Cursor API
     - Renamed `CursorTypeRegistrar` to `ElementRegistrar`
         - Rename `ElementCursorTypeFunction` to `CursorTypeFunction`
     - Replaced `CursorTypeFactory` with `CursorTypeRegistrar`
-        - use `CursorType#of(String)` to create a `CursorType`
-        - use `CursorTypeRegistrar#register(CursorType)` to register a `CursorType`
+        - use `CursorType#of(String)` or `CursorTypeRegistrar#register(String)` to create a `CursorType`
+        - use `CursorTypeRegistrar#register(CursorType...)` to register multiple `CursorType` objects
     - The access and packages of some internal classes have been modified
