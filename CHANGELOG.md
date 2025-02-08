@@ -1,0 +1,1 @@
+- Significantly reduced jar size in 1.21.1 and below by using Gson instead of including Jackson (which is in 1.21.2+)
