@@ -9,6 +9,9 @@ import java.lang.invoke.MethodType;
 import java.lang.invoke.VarHandle;
 
 public class LookupUtil {
+    private LookupUtil() {
+    }
+
     public static final String NAMESPACE = "intermediary";
     public static final MappingResolver RESOLVER = FabricLoader.getInstance().getMappingResolver();
 

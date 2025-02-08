@@ -14,13 +14,13 @@ import java.io.IOException;
 public class Cursor {
     private final CursorType type;
     private Identifier sprite;
-    private String base64Image;
-    private long id = 0;
+    private String cachedBufferedImage;
     private double scale;
     private int xhot;
     private int yhot;
     private boolean enabled;
     private boolean loaded;
+    private long id = 0;
 
     public Cursor(CursorType type) {
         this.type = type;
@@ -28,7 +28,7 @@ public class Cursor {
 
     public void loadImage(Identifier sprite, BufferedImage image, double scale, int xhot, int yhot, boolean enabled) throws IOException {
         this.sprite = sprite;
-        this.base64Image = BufferedImageUtil.compressImageToBase64(image);
+        this.cachedBufferedImage = BufferedImageUtil.compressImageToBase64(image);
         this.enabled = enabled;
 
         create(image, scale, xhot, yhot, null);
@@ -40,7 +40,7 @@ public class Cursor {
         }
 
         try {
-            BufferedImage image = BufferedImageUtil.decompressBase64ToImage(base64Image);
+            BufferedImage image = BufferedImageUtil.decompressBase64ToImage(cachedBufferedImage);
             create(image, scale, xhot, yhot, onUpdate);
             image.flush();
         } catch (IOException e) {

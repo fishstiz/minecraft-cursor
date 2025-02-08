@@ -9,10 +9,10 @@ import java.util.Optional;
 /**
  * This interface defines a handler for determining the {@link CursorType} of an {@link Element}.
  *
- * <p>Must be registered using the {@link CursorTypeRegistrar#register(CursorHandler)} method to work.</p>
+ * <p>Must be registered using the {@link ElementRegistrar#register(CursorHandler)} method to work.</p>
  *
  * @param <T> the type of the {@link Element} the cursor handler is associated with.
- *           <br><br>
+ *            <br><br>
  *            If the target {@link Element} is inaccessible, you can pass {@link Element}
  *            as a generic type and override the {@link #getTargetElement()} method to return a {@link TargetElement}
  *            with the fully qualified class name (FQCN) of the element.
@@ -51,8 +51,8 @@ public interface CursorHandler<T extends Element> {
      * <p>The fully qualified class name can be used when the target element is inaccessible, allowing
      * for reflection-based access to the class.</p>
      *
-     * @param <T> the type of the {@link Element}
-     * @param elementClass the {@link Optional} class of the target element
+     * @param <T>                     the type of the {@link Element}
+     * @param elementClass            the {@link Optional} class of the target element
      * @param fullyQualifiedClassName the {@link Optional} fully qualified class name of the target element
      */
     record TargetElement<T extends Element>(
