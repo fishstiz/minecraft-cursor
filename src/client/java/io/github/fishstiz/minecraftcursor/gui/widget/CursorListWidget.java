@@ -139,7 +139,7 @@ public class CursorListWidget extends ElementListWidget<CursorListWidget.CursorW
             int x = getX() + TEXTURE_SIZE + PADDING_LEFT * 2;
             int y = getY() + (getHeight() / 2) - Math.round(client.textRenderer.fontHeight * 1.5f);
             Text name = Text.translatable(PREFIX_TEXT_KEY + cursor.getType().getKey());
-            context.drawText(client.textRenderer, name, x, y + Math.round(getHeight() / 3.0f), cursor.getEnabled() ? TEXT_COLOR : TEXT_DISABLED_COLOR, false);
+            context.drawText(client.textRenderer, name, x, y + Math.round(getHeight() / 3.0f), cursor.isEnabled() ? TEXT_COLOR : TEXT_DISABLED_COLOR, false);
         }
 
         @Override
