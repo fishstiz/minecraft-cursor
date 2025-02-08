@@ -11,7 +11,7 @@ import net.minecraft.util.Identifier;
 
 import java.util.List;
 
-import static io.github.fishstiz.minecraftcursor.config.CursorConfig.Defaults.*;
+import static io.github.fishstiz.minecraftcursor.config.CursorConfig.Settings.Default.*;
 
 public class SelectedCursorOptionsWidget extends ContainerWidget {
     protected static final int OPTIONS_HEIGHT = 24;

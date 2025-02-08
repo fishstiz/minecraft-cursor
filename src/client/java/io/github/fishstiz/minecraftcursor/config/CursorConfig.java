@@ -1,14 +1,13 @@
 package io.github.fishstiz.minecraftcursor.config;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
+import io.github.fishstiz.minecraftcursor.cursor.CursorTypeRegistry;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
 public class CursorConfig {
-    @JsonProperty
     private String _hash;
     private boolean itemSlotEnabled = true;
     private boolean itemGrabbingEnabled = true;
@@ -20,25 +19,58 @@ public class CursorConfig {
     private boolean advancementTabsEnabled = true;
     private boolean worldIconEnabled = true;
     private boolean serverIconEnabled = true;
-
-    @JsonProperty
     protected Map<String, Settings> settings = new HashMap<>();
+    File file;
+
+    CursorConfig() {
+        for (CursorType type : CursorTypeRegistry.types()) {
+            this.getOrCreateCursorSettings(type);
+        }
+    }
 
     public Settings getOrCreateCursorSettings(CursorType type) {
         return settings.computeIfAbsent(type.getKey(), k -> new Settings());
     }
 
-    protected void updateCursorSettings(CursorType type, Settings settings) {
-        this.settings.get(type.getKey()).update(settings.getScale(), settings.getXHot(), settings.getYHot(), settings.getEnabled());
+    public String get_hash() {
+        if (this._hash == null) {
+            generateHash();
+        }
+
+        return _hash;
     }
 
-    @JsonGetter("_hash")
-    public String get_hash() {
-        return _hash;
+    private void generateHash() {
+        long hash = 0;
+        long prime = 31;
+
+        for (Map.Entry<String, CursorConfig.Settings> entry : this.settings.entrySet()) {
+            String key = entry.getKey();
+            CursorConfig.Settings value = entry.getValue();
+
+            for (char c : key.toCharArray()) {
+                hash = hash * prime + c;
+            }
+
+            hash = hash * prime + (long) value.getScale();
+            hash = hash * prime + value.getXHot();
+            hash = hash * prime + value.getYHot();
+            hash = hash * prime + (value.isEnabled() ? 1 : 0);
+        }
+
+        this.set_hash(Long.toHexString(hash));
     }
 
     public void set_hash(String hash) {
         _hash = hash;
+    }
+
+    public void save() {
+        if (file == null) {
+            throw new AssertionError("Cannot save config without file.");
+        }
+
+        CursorConfigLoader.saveConfig(file, this);
     }
 
     public Map<String, Settings> getSettings() {
@@ -129,18 +161,6 @@ public class CursorConfig {
         this.serverIconEnabled = serverIconEnabled;
     }
 
-    public static class Defaults {
-        public static final double SCALE = 1.0;
-        public static final double SCALE_MIN = 0.5;
-        public static final double SCALE_MAX = 3.0;
-        public static final double SCALE_STEP = 0.05;
-        public static final int X_HOT = 0;
-        public static final int Y_HOT = 0;
-        public static final int HOT_MIN = 0;
-        public static final int HOT_MAX = 31;
-        public static final boolean ENABLED = true;
-    }
-
     public static class Settings {
         private double scale;
         private int xhot;
@@ -148,10 +168,10 @@ public class CursorConfig {
         private boolean enabled;
 
         public Settings() {
-            this.scale = Defaults.SCALE;
-            this.xhot = Defaults.X_HOT;
-            this.yhot = Defaults.Y_HOT;
-            this.enabled = Defaults.ENABLED;
+            this.scale = Default.SCALE;
+            this.xhot = Default.X_HOT;
+            this.yhot = Default.Y_HOT;
+            this.enabled = Default.ENABLED;
         }
 
         public void update(double scale, int xhot, int yhot, boolean enabled) {
@@ -162,32 +182,38 @@ public class CursorConfig {
         }
 
         public double getScale() {
-            double scale = Math.max(Defaults.SCALE_MIN, Math.min(Defaults.SCALE_MAX, this.scale));
-            this.scale = Math.round(scale / Defaults.SCALE_STEP) * Defaults.SCALE_STEP;
+            double clampedScale = Math.max(Default.SCALE_MIN, Math.min(Default.SCALE_MAX, this.scale));
+            this.scale = Math.round(clampedScale / Default.SCALE_STEP) * Default.SCALE_STEP;
             return this.scale;
         }
 
         public int getXHot() {
-            xhot = Math.max(Defaults.HOT_MIN, Math.min(Defaults.HOT_MAX, this.xhot));
-            return xhot;
+            this.xhot = Math.max(Default.HOT_MIN, Math.min(Default.HOT_MAX, this.xhot));
+            return this.xhot;
         }
 
         public int getYHot() {
-            yhot = Math.max(Defaults.HOT_MIN, Math.min(Defaults.HOT_MAX, this.yhot));
-            return yhot;
+            this.yhot = Math.max(Default.HOT_MIN, Math.min(Default.HOT_MAX, this.yhot));
+            return this.yhot;
         }
 
-        public boolean getEnabled() {
+        public boolean isEnabled() {
             return enabled;
         }
 
-        public static Settings create(double scale, int xhot, int yhot, boolean enabled) {
-            Settings settings = new Settings();
-            settings.scale = scale;
-            settings.xhot = xhot;
-            settings.yhot = yhot;
-            settings.enabled = enabled;
-            return settings;
+        public static class Default {
+            private Default() {
+            }
+
+            public static final double SCALE = 1.0;
+            public static final double SCALE_MIN = 0.5;
+            public static final double SCALE_MAX = 3.0;
+            public static final double SCALE_STEP = 0.05;
+            public static final int X_HOT = 0;
+            public static final int Y_HOT = 0;
+            public static final int HOT_MIN = 0;
+            public static final int HOT_MAX = 31;
+            public static final boolean ENABLED = true;
         }
     }
 }
