@@ -4,10 +4,11 @@ import io.github.fishstiz.minecraftcursor.CursorTypeRegistry;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CursorConfig {
+public class CursorConfig implements Serializable {
     private String _hash;
     private boolean itemSlotEnabled = true;
     private boolean itemGrabbingEnabled = true;
@@ -19,8 +20,8 @@ public class CursorConfig {
     private boolean advancementTabsEnabled = true;
     private boolean worldIconEnabled = true;
     private boolean serverIconEnabled = true;
-    protected Map<String, Settings> settings = new HashMap<>();
-    File file;
+    private Map<String, Settings> settings = new HashMap<>();
+    transient File file;
 
     CursorConfig() {
         for (CursorType type : CursorTypeRegistry.types()) {
@@ -161,7 +162,7 @@ public class CursorConfig {
         this.serverIconEnabled = serverIconEnabled;
     }
 
-    public static class Settings {
+    public static class Settings implements Serializable {
         private double scale;
         private int xhot;
         private int yhot;
