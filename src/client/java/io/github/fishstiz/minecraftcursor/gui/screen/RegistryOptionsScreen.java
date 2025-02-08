@@ -1,7 +1,5 @@
 package io.github.fishstiz.minecraftcursor.gui.screen;
 
-import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
-import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.cursor.CursorManager;
 import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorToggleWidget;
 import net.minecraft.client.MinecraftClient;
@@ -22,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static io.github.fishstiz.minecraftcursor.MinecraftCursorClient.CONFIG;
 
 public class RegistryOptionsScreen extends Screen {
     private static final Tooltip ADAPTIVE_CURSOR_TOOLTIP = Tooltip.of(Text.translatable("minecraft-cursor.options.more.adapt.tooltip"));
@@ -43,7 +42,6 @@ public class RegistryOptionsScreen extends Screen {
     private final ThreePartsLayoutWidget layout = new ThreePartsLayoutWidget(this);
     private final Screen previousScreen;
     private final CursorManager cursorManager;
-    private final CursorConfig config = MinecraftCursorClient.CONFIG.get();
     private RegistryListWidget body;
 
     protected RegistryOptionsScreen(Screen previousScreen, CursorManager cursorManager) {
@@ -76,7 +74,6 @@ public class RegistryOptionsScreen extends Screen {
                 screen.body.selectedCursorColumn.refreshWidgets();
             }
             this.client.setScreen(previousScreen);
-            cursorManager.saveAll();
         }
     }
 
@@ -102,16 +99,16 @@ public class RegistryOptionsScreen extends Screen {
             this.addEntry(new RegistryEntry(ADAPTIVE_CURSOR_TEXT));
             this.addEntry(new RegistryEntry(
                     ENABLED_TEXT, isAdaptive, true, ADAPTIVE_CURSOR_TOOLTIP, RegistryOptionsScreen.this::enableAll));
-            addOptionEntry(ITEM_SLOT_TEXT, config.isItemSlotEnabled(), isAdaptive, config::setItemSlotEnabled);
-            addOptionEntry(ITEM_GRAB_TEXT, config.isItemGrabbingEnabled(), isAdaptive, config::setItemGrabbingEnabled);
-            addOptionEntry(CREATIVE_TABS_TEXT, config.isCreativeTabsEnabled(), isAdaptive, config::setCreativeTabsEnabled);
-            addOptionEntry(ENCHANTMENTS_TEXT, config.isEnchantmentsEnabled(), isAdaptive, config::setEnchantmentsEnabled);
-            addOptionEntry(STONECUTTER_TEXT, config.isStonecutterRecipesEnabled(), isAdaptive, config::setStonecutterRecipesEnabled);
-            addOptionEntry(BOOK_EDIT_TEXT, config.isBookEditEnabled(), isAdaptive, config::setBookEditEnabled);
-            addOptionEntry(LOOM_TEXT, config.isLoomPatternsEnabled(), isAdaptive, config::setLoomPatternsEnabled);
-            addOptionEntry(ADVANCEMENTS_TEXT, config.isAdvancementTabsEnabled(), isAdaptive, config::setAdvancementTabsEnabled);
-            addOptionEntry(WORLD_ICON_TEXT, config.isWorldIconEnabled(), isAdaptive, config::setWorldIconEnabled);
-            addOptionEntry(SERVER_ICON_TEXT, config.isServerIconEnabled(), isAdaptive, config::setServerIconEnabled);
+            addOptionEntry(ITEM_SLOT_TEXT, CONFIG.isItemSlotEnabled(), isAdaptive, CONFIG::setItemSlotEnabled);
+            addOptionEntry(ITEM_GRAB_TEXT, CONFIG.isItemGrabbingEnabled(), isAdaptive, CONFIG::setItemGrabbingEnabled);
+            addOptionEntry(CREATIVE_TABS_TEXT, CONFIG.isCreativeTabsEnabled(), isAdaptive, CONFIG::setCreativeTabsEnabled);
+            addOptionEntry(ENCHANTMENTS_TEXT, CONFIG.isEnchantmentsEnabled(), isAdaptive, CONFIG::setEnchantmentsEnabled);
+            addOptionEntry(STONECUTTER_TEXT, CONFIG.isStonecutterRecipesEnabled(), isAdaptive, CONFIG::setStonecutterRecipesEnabled);
+            addOptionEntry(BOOK_EDIT_TEXT, CONFIG.isBookEditEnabled(), isAdaptive, CONFIG::setBookEditEnabled);
+            addOptionEntry(LOOM_TEXT, CONFIG.isLoomPatternsEnabled(), isAdaptive, CONFIG::setLoomPatternsEnabled);
+            addOptionEntry(ADVANCEMENTS_TEXT, CONFIG.isAdvancementTabsEnabled(), isAdaptive, CONFIG::setAdvancementTabsEnabled);
+            addOptionEntry(WORLD_ICON_TEXT, CONFIG.isWorldIconEnabled(), isAdaptive, CONFIG::setWorldIconEnabled);
+            addOptionEntry(SERVER_ICON_TEXT, CONFIG.isServerIconEnabled(), isAdaptive, CONFIG::setServerIconEnabled);
         }
 
         public void addOptionEntry(Text label, boolean isEnabled, boolean defaultValue, Consumer<Boolean> onPress) {

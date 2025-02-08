@@ -22,7 +22,7 @@ public class LoomScreenCursorHandler extends HandledScreenCursorHandler<LoomScre
         CursorType cursorType = super.getCursorType(loomScreen, mouseX, mouseY);
         if (cursorType != CursorType.DEFAULT) return cursorType;
 
-        if (!MinecraftCursorClient.CONFIG.get().isLoomPatternsEnabled()) return CursorType.DEFAULT;
+        if (!MinecraftCursorClient.CONFIG.isLoomPatternsEnabled()) return CursorType.DEFAULT;
 
         LoomScreenAccessor loomScreenAccessor = (LoomScreenAccessor) loomScreen;
 
@@ -33,13 +33,13 @@ public class LoomScreenCursorHandler extends HandledScreenCursorHandler<LoomScre
         int patternsX = loomScreenAccessor.getX() + PATTERNS_OFFSET_X;
         int patternsY = loomScreenAccessor.getY() + PATTERNS_OFFSET_Y;
 
-        exitLoop:
+        grid:
         for (int row = 0; row < GRID_SIZE; row++) {
             for (int col = 0; col < GRID_SIZE; col++) {
                 int patternIndex = row + loomScreenAccessor.getVisibleTopRow();
                 int patternSlot = patternIndex * GRID_SIZE + col;
                 if (patternSlot >= patterns.size()) {
-                    break exitLoop;
+                    break grid;
                 }
                 int patternX = patternsX + col * PATTERN_SIZE;
                 int patternY = patternsY + row * PATTERN_SIZE;

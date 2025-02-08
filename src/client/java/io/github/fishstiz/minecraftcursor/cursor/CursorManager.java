@@ -2,7 +2,6 @@ package io.github.fishstiz.minecraftcursor.cursor;
 
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
-import io.github.fishstiz.minecraftcursor.config.CursorConfigService;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
@@ -15,17 +14,13 @@ import java.util.List;
 import java.util.TreeMap;
 
 public class CursorManager {
-    private final CursorConfigService config;
-    private final MinecraftClient client;
-    private final LinkedHashMap<CursorType, Cursor> cursors = new LinkedHashMap<>();
+    private static final LinkedHashMap<CursorType, Cursor> cursors = new LinkedHashMap<>();
+    private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
     private final TreeMap<Integer, CursorType> currentCursorOverrides = new TreeMap<>();
     private Cursor currentCursor;
     private long previousCursorId;
 
-    public CursorManager(CursorConfigService config, MinecraftClient client) {
-        this.config = config;
-        this.client = client;
-
+    static {
         for (CursorType type : CursorTypeRegistry.types()) {
             cursors.put(type, new Cursor((type)));
         }
@@ -33,7 +28,7 @@ public class CursorManager {
 
     public void loadCursorImage(CursorType type, Identifier sprite, BufferedImage image, CursorConfig.Settings settings) throws IOException {
         Cursor cursor = cursors.computeIfAbsent(type, Cursor::new);
-        cursor.loadImage(sprite, image, settings.getScale(), settings.getXHot(), settings.getYHot(), settings.getEnabled());
+        cursor.loadImage(sprite, image, settings.getScale(), settings.getXHot(), settings.getYHot(), settings.isEnabled());
 
         if (currentCursor == null) {
             setCurrentCursor(cursor.getType());
@@ -55,9 +50,13 @@ public class CursorManager {
             return;
         }
 
+        if (!cursor.isLoaded()) {
+            return;
+        }
+
         currentCursor = cursor;
         previousCursorId = cursor.getId();
-        GLFW.glfwSetCursor(client.getWindow().getHandle(), currentCursor.getId());
+        GLFW.glfwSetCursor(CLIENT.getWindow().getHandle(), currentCursor.getId());
     }
 
     public void overrideCurrentCursor(CursorType type, int index) {
@@ -72,16 +71,12 @@ public class CursorManager {
         currentCursorOverrides.remove(index);
     }
 
-    public void clearOverrides() {
-        currentCursorOverrides.clear();
-    }
-
     public void reloadCursor() {
         long id = currentCursorOverrides.isEmpty() ?
                 currentCursor.getId() :
                 getCursor(currentCursorOverrides.lastEntry().getValue()).getId();
 
-        GLFW.glfwSetCursor(client.getWindow().getHandle(), id);
+        GLFW.glfwSetCursor(CLIENT.getWindow().getHandle(), id);
     }
 
     public Cursor getCurrentCursor() {
@@ -96,7 +91,7 @@ public class CursorManager {
     public List<Cursor> getLoadedCursors() {
         List<Cursor> activeCursors = new ArrayList<>();
         for (Cursor cursor : cursors.values()) {
-            if (cursor.isLoaded()) {
+            if (cursor.isLoaded() && CursorTypeRegistry.getCursorTypeOrNull(cursor.getType().getKey()) != null) {
                 activeCursors.add(cursor);
             }
         }
@@ -115,13 +110,5 @@ public class CursorManager {
                 cursor.enable(isAdaptive);
             }
         });
-    }
-
-    public void saveAll() {
-        config.saveSettings(true, cursors.values().toArray(new Cursor[0]));
-    }
-
-    public void saveCursor(CursorType type) {
-        config.saveSettings(getCursor(type));
     }
 }

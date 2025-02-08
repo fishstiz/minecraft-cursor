@@ -1,6 +1,5 @@
 package io.github.fishstiz.minecraftcursor.cursorhandler.ingame;
 
-import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.mixin.client.access.CreativeInventoryScreenAccessor;
@@ -31,27 +30,23 @@ public class CreativeInventoryScreenCursorHandler extends HandledScreenCursorHan
     }
 
     private CursorType getCursorTypeTabs(CreativeInventoryScreenAccessor creativeInventoryScreen, double mouseX, double mouseY) {
-        if (!MinecraftCursorClient.CONFIG.get().isCreativeTabsEnabled()) return CursorType.DEFAULT;
-        try {
-            boolean isHovered = false;
-            for (ItemGroup itemGroup : ItemGroups.getGroupsToDisplay()) {
-                if (creativeInventoryScreen.invokeIsPointWithinBounds(
-                        creativeInventoryScreen.invokeGetTabX(itemGroup) + TAB_OFFSET_X,
-                        creativeInventoryScreen.invokeGetTabY(itemGroup) + TAB_OFFSET_Y,
-                        TAB_WIDTH,
-                        TAB_HEIGHT,
-                        mouseX,
-                        mouseY)
-                        && itemGroup != creativeInventoryScreen.getSelectedTab()) {
-                    isHovered = true;
-                    break;
-                }
+        if (!MinecraftCursorClient.CONFIG.isCreativeTabsEnabled()) return CursorType.DEFAULT;
+
+        boolean isHovered = false;
+        for (ItemGroup itemGroup : ItemGroups.getGroupsToDisplay()) {
+            if (creativeInventoryScreen.invokeIsPointWithinBounds(
+                    creativeInventoryScreen.invokeGetTabX(itemGroup) + TAB_OFFSET_X,
+                    creativeInventoryScreen.invokeGetTabY(itemGroup) + TAB_OFFSET_Y,
+                    TAB_WIDTH,
+                    TAB_HEIGHT,
+                    mouseX,
+                    mouseY)
+                    && itemGroup != creativeInventoryScreen.getSelectedTab()) {
+                isHovered = true;
+                break;
             }
-            return isHovered ? CursorType.POINTER : CursorType.DEFAULT;
-        } catch (Throwable e) {
-            MinecraftCursor.LOGGER.warn("Cannot get cursor type for CreativeInventoryScreen");
         }
-        return CursorType.DEFAULT;
+        return isHovered ? CursorType.POINTER : CursorType.DEFAULT;
     }
 
     private CursorType getCursorTypeDelete(CreativeInventoryScreenAccessor creativeInventoryScreen) {

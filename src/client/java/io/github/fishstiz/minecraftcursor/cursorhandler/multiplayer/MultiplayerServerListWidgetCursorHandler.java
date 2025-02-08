@@ -1,8 +1,8 @@
 package io.github.fishstiz.minecraftcursor.cursorhandler.multiplayer;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
-import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.api.CursorHandler;
+import io.github.fishstiz.minecraftcursor.api.CursorType;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
 
 public class MultiplayerServerListWidgetCursorHandler implements CursorHandler<MultiplayerServerListWidget> {
@@ -10,7 +10,7 @@ public class MultiplayerServerListWidgetCursorHandler implements CursorHandler<M
 
     @Override
     public CursorType getCursorType(MultiplayerServerListWidget serverList, double mouseX, double mouseY) {
-        if (!MinecraftCursorClient.CONFIG.get().isServerIconEnabled()) return CursorType.DEFAULT;
+        if (!MinecraftCursorClient.CONFIG.isServerIconEnabled()) return CursorType.DEFAULT;
 
         MultiplayerServerListWidget.ServerEntry serverEntry =
                 (MultiplayerServerListWidget.ServerEntry) serverList.hoveredElement(mouseX, mouseY)
