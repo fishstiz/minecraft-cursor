@@ -18,13 +18,13 @@ import net.minecraft.resource.ResourceType;
 import java.io.File;
 
 public class MinecraftCursorClient implements ClientModInitializer {
+    private static final CursorTypeRegistry CURSOR_REGISTRY = new CursorTypeRegistry();
+    private static final CursorTypeResolver CURSOR_RESOLVER = new CursorTypeResolver();
+    public static final CursorManager CURSOR_MANAGER = new CursorManager();
     public static final CursorConfig CONFIG = CursorConfigLoader.fromFile(new File(String.format("%s/%s.json",
             FabricLoader.getInstance().getConfigDir(),
             MinecraftCursor.MOD_ID
     )));
-    public static final CursorManager CURSOR_MANAGER = new CursorManager();
-    private static final CursorTypeRegistry CURSOR_REGISTRY = new CursorTypeRegistry();
-    private static final CursorTypeResolver CURSOR_RESOLVER = new CursorTypeResolver();
     private static CursorType singleCycleCursor;
     private Screen visibleNonCurrentScreen;
 

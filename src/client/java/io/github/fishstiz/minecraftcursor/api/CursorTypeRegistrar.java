@@ -5,9 +5,17 @@ package io.github.fishstiz.minecraftcursor.api;
  */
 public interface CursorTypeRegistrar {
     /**
-     * Registers a {@link CursorType} object to be loaded.
+     * Registers a variable number of {@link CursorType} objects to be loaded.
      *
-     * @param cursorType The cursor type to be registered.
+     * @param cursorTypes variable number of {@link CursorType} objects.
      */
-    void register(CursorType cursorType);
+    void register(CursorType... cursorTypes);
+
+    /**
+     * Creates and registers a {@link CursorType} object using its key.
+     *
+     * @param key The identifier of the {@link CursorType} to be loaded.
+     * @return {@link CursorType}
+     */
+    CursorType register(String key);
 }
