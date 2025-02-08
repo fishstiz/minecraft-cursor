@@ -1,6 +1,6 @@
 package io.github.fishstiz.minecraftcursor.api;
 
-import io.github.fishstiz.minecraftcursor.cursor.CursorTypeRegistry;
+import io.github.fishstiz.minecraftcursor.cursor.StandardCursorType;
 
 /**
  * Represents a cursor type identified by a unique key.
@@ -19,9 +19,23 @@ public interface CursorType {
     String getKey();
 
     /**
+     * Binds a {@link CursorType} object to a key that serves as its identifier.
+     * <p>
+     * You must register your {@link CursorType} in
+     * {@link MinecraftCursorInitializer#init(CursorTypeRegistrar, ElementRegistrar)}
+     * so its resource is loaded when Minecraft first loads.
+     *
+     * @param key The identifier of the cursor type
+     * @return {@link CursorType}
+     */
+    static CursorType of(String key) {
+        return () -> key;
+    }
+
+    /**
      * The fallback cursor type
      */
-    CursorType DEFAULT = CursorTypeRegistry.put("default");
+    CursorType DEFAULT = StandardCursorType.DEFAULT;
 
     /**
      * The cursor type is determined in two passes:
@@ -39,21 +53,21 @@ public interface CursorType {
      * The cursor type that is applied when the mouse is over {@link net.minecraft.client.gui.widget.PressableWidget}
      * elements and on other certain elements that can be clicked.
      */
-    CursorType POINTER = CursorTypeRegistry.put("pointer");
+    CursorType POINTER = StandardCursorType.POINTER;
 
     /**
      * The cursor type that is applied when grabbing the slider of {@link net.minecraft.client.gui.widget.SliderWidget}
      * elements and when grabbing items in the inventory.
      */
-    CursorType GRABBING = CursorTypeRegistry.put("grabbing");
+    CursorType GRABBING = StandardCursorType.GRABBING;
 
     /**
      * The cursor type that is applied when the mouse is over {@link net.minecraft.client.gui.widget.TextFieldWidget} elements
      */
-    CursorType TEXT = CursorTypeRegistry.put("text");
+    CursorType TEXT = StandardCursorType.TEXT;
 
     /**
      * The cursor type that is applied when shift is held and the mouse is over elements with special shift actions.
      */
-    CursorType SHIFT = CursorTypeRegistry.put("shift");
+    CursorType SHIFT = StandardCursorType.SHIFT;
 }

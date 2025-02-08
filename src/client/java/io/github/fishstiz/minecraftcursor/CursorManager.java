@@ -1,7 +1,8 @@
-package io.github.fishstiz.minecraftcursor.cursor;
+package io.github.fishstiz.minecraftcursor;
 
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
+import io.github.fishstiz.minecraftcursor.cursor.Cursor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
@@ -19,6 +20,9 @@ public class CursorManager {
     private final TreeMap<Integer, CursorType> currentCursorOverrides = new TreeMap<>();
     private Cursor currentCursor;
     private long previousCursorId;
+
+    CursorManager() {
+    }
 
     static {
         for (CursorType type : CursorTypeRegistry.types()) {
