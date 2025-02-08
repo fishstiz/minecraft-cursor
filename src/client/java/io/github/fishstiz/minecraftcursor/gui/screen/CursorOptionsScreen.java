@@ -122,7 +122,7 @@ public class CursorOptionsScreen extends Screen {
                 selectedCursor.getScale(),
                 selectedCursor.getXhot(),
                 selectedCursor.getYhot(),
-                selectedCursor.getEnabled()
+                selectedCursor.isEnabled()
         );
     }
 
