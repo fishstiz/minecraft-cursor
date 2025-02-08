@@ -26,7 +26,7 @@ jobs:
         run: env
 
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: true
 
@@ -60,8 +60,9 @@ jobs:
           modrinth-token: ${{ env.MODRINTH_TOKEN }}
 
           github-tag: "v${{env.VERSION}}"
-          github-token: ${{env.GITHUB_TOKEN}}
+          github-token: ${{ env.GITHUB_TOKEN }}
           github-generate-changelog: false
+          github-commitish: ${{ github.ref }}
 
           name: ${{ env.RELEASE_NAME }}
           version: ${{ env.VERSION }}
