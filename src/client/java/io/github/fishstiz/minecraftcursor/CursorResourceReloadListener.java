@@ -3,7 +3,6 @@ package io.github.fishstiz.minecraftcursor;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.config.CursorConfigLoader;
-import io.github.fishstiz.minecraftcursor.config.CursorConfigService;
 import io.github.fishstiz.minecraftcursor.cursor.CursorManager;
 import io.github.fishstiz.minecraftcursor.cursor.CursorTypeRegistry;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
@@ -19,49 +18,46 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
 
-public class CursorResourceReloadListener implements SimpleSynchronousResourceReloadListener {
-    private static final String PATH = "textures/cursors";
-    private static final String FILE_EXTENSION = ".png";
+class CursorResourceReloadListener implements SimpleSynchronousResourceReloadListener {
     private static final String CONFIG_PATH = "atlases/cursors.json";
+    private static final String CURSORS_DIR = "textures/cursors";
     private final CursorManager cursorManager;
-    private final String modId;
-    private final CursorConfig userConfig;
     private final CursorConfig config;
+    private final String namespace;
 
-    CursorResourceReloadListener(CursorManager cursorManager, String modId, CursorConfigService userConfig) {
+    CursorResourceReloadListener(CursorManager cursorManager, String namespace, CursorConfig config) {
         this.cursorManager = cursorManager;
-        this.modId = modId;
-        this.userConfig = userConfig.get();
-        config = userConfig.get();
+        this.namespace = namespace;
+        this.config = config;
     }
 
     @Override
     public Identifier getFabricId() {
-        return Identifier.of(modId, PATH);
+        return Identifier.of(namespace, CURSORS_DIR);
     }
 
     @Override
     public void reload(ResourceManager manager) {
-        initConfig(manager);
+        cursorManager.setCurrentCursor(CursorType.DEFAULT);
+        loadConfig(manager);
         loadCursorTextures(manager);
     }
 
-    private void initConfig(ResourceManager manager) {
-        Optional<Resource> resourceConfigResourceOpt = manager.getResource(Identifier.of(modId, CONFIG_PATH));
+    private void loadConfig(ResourceManager manager) {
+        Optional<Resource> resourceOptional = manager.getResource(Identifier.of(namespace, CONFIG_PATH));
 
-        if (resourceConfigResourceOpt.isEmpty()) {
-            return;
-        }
+        if (resourceOptional.isEmpty()) return;
 
-        try (InputStream stream = resourceConfigResourceOpt.get().getInputStream()) {
-            CursorConfig resourceConfig = new CursorConfigLoader(stream).config();
-            if (!resourceConfig.get_hash().equals(userConfig.get_hash())) {
-                userConfig.set_hash(resourceConfig.get_hash());
+        try (InputStream stream = resourceOptional.get().getInputStream()) {
+            CursorConfig resourceConfig = CursorConfigLoader.fromStream(stream);
+            if (!resourceConfig.get_hash().equals(config.get_hash())) {
+                config.set_hash(resourceConfig.get_hash());
                 config.setSettings(resourceConfig.getSettings());
-                MinecraftCursor.LOGGER.info("Using default cursor settings provided by resource");
+                config.save();
+                MinecraftCursor.LOGGER.info("Using cursor settings provided by resource pack");
             }
         } catch (IOException e) {
-            MinecraftCursor.LOGGER.error("Failed to load resource cursor settings", e);
+            MinecraftCursor.LOGGER.error("Failed to load resource pack's cursor settings");
         }
     }
 
@@ -76,9 +72,14 @@ public class CursorResourceReloadListener implements SimpleSynchronousResourceRe
             BufferedImage image = null;
             try (InputStream stream = entry.getValue().getInputStream()) {
                 image = ImageIO.read(stream);
-                cursorManager.loadCursorImage(cursorType, entry.getKey(), image, config.getOrCreateCursorSettings(cursorType));
+                cursorManager.loadCursorImage(
+                        cursorType,
+                        entry.getKey(), // Identifier
+                        image,
+                        config.getOrCreateCursorSettings(cursorType)
+                );
             } catch (IOException e) {
-                MinecraftCursor.LOGGER.error("Failed to load image {}", entry.getKey().getPath(), e);
+                MinecraftCursor.LOGGER.error("Failed to load cursor image {}", entry.getKey().getPath());
             } finally {
                 if (image != null) {
                     image.flush();
@@ -87,10 +88,10 @@ public class CursorResourceReloadListener implements SimpleSynchronousResourceRe
         }
     }
 
-    @Nullable
-    private CursorType getCursorTypeByIdentifierOrNull(Identifier id) {
+    private static @Nullable CursorType getCursorTypeByIdentifierOrNull(Identifier id) {
+        String fileType = ".png";
         String[] path = id.getPath().split("/");
-        String name = path[path.length - 1].split(FILE_EXTENSION)[0];
+        String name = path[path.length - 1].split(fileType)[0];
 
         return CursorTypeRegistry.getCursorTypeOrNull(name);
     }
