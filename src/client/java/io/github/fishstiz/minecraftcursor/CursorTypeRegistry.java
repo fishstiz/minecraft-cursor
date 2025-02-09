@@ -13,7 +13,12 @@ public class CursorTypeRegistry implements CursorTypeRegistrar {
     private static final LinkedHashMap<String, CursorType> TYPES = new LinkedHashMap<>();
 
     CursorTypeRegistry() {
-        register(StandardCursorType.values());
+    }
+
+    static {
+        for (CursorType cursorType : StandardCursorType.values()) {
+            TYPES.put(cursorType.getKey(), cursorType);
+        }
     }
 
     @Override
