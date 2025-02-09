@@ -22,6 +22,9 @@ public class CursorManager {
     private long previousCursorId;
 
     CursorManager() {
+    }
+
+    static {
         for (CursorType cursorType : CursorTypeRegistry.types()) {
             CURSORS.put(cursorType, new Cursor(cursorType));
         }
