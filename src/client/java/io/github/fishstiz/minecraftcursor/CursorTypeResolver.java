@@ -23,14 +23,12 @@ import static io.github.fishstiz.minecraftcursor.util.LookupUtil.NAMESPACE;
 import static io.github.fishstiz.minecraftcursor.util.LookupUtil.RESOLVER;
 
 class CursorTypeResolver implements ElementRegistrar {
-    private final List<AbstractMap.SimpleImmutableEntry<
-            Class<? extends Element>,
+    private final List<AbstractMap.SimpleImmutableEntry<Class<? extends Element>,
             CursorTypeFunction<? extends Element>>>
             registry = new ArrayList<>();
-    private final ConcurrentHashMap<
-            String,
-            CursorTypeFunction<? extends Element>>
+    private final ConcurrentHashMap<String, CursorTypeFunction<? extends Element>>
             cachedRegistry = new ConcurrentHashMap<>();
+    private String lastFailedElement;
 
     CursorTypeResolver() {
         init();
@@ -69,7 +67,7 @@ class CursorTypeResolver implements ElementRegistrar {
                 register("com.terraformersmc.modmenu.gui.widget.DescriptionListWidget$MojangCreditsEntry", ElementRegistrar::elementToPointer);
                 register("com.terraformersmc.modmenu.gui.widget.DescriptionListWidget$LinkEntry", ElementRegistrar::elementToPointer);
             }
-        } catch (NoClassDefFoundError ignore) {
+        } catch (NoClassDefFoundError e) {
             MinecraftCursor.LOGGER.warn("Could not register cursor type for Mod Menu");
         }
     }
@@ -83,27 +81,25 @@ class CursorTypeResolver implements ElementRegistrar {
         } else if (targetElement.fullyQualifiedClassName().isPresent()) {
             register(targetElement.fullyQualifiedClassName().get(), cursorHandler::getCursorType);
         } else {
-            throw new AssertionError("Could not register cursor handler: "
+            throw new NoClassDefFoundError("Could not register cursor handler: "
                     + cursorHandler.getClass().getName()
                     + " - Target Element Class and FQCN not present");
         }
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <T extends Element> void register(String fullyQualifiedClassName, CursorTypeFunction<T> elementToCursorType) {
         try {
+            @SuppressWarnings("unchecked")
             Class<T> elementClass = (Class<T>) Class.forName(RESOLVER.mapClassName(NAMESPACE, fullyQualifiedClassName));
-
             if (!Element.class.isAssignableFrom(elementClass)) {
                 throw new ClassCastException(fullyQualifiedClassName + " is not a subclass of Element");
             }
-
             register(elementClass, elementToCursorType);
         } catch (ClassNotFoundException e) {
-            MinecraftCursor.LOGGER.error("Error registering cursor type. Class not found: {}", fullyQualifiedClassName);
+            MinecraftCursor.LOGGER.error("Error registering element. Class not found: {}", fullyQualifiedClassName);
         } catch (ClassCastException e) {
-            MinecraftCursor.LOGGER.error("Error registering cursor type. Invalid class: {}", e.getMessage());
+            MinecraftCursor.LOGGER.error("Error registering element. Invalid class: {}", e.getMessage());
         }
     }
 
@@ -120,37 +116,41 @@ class CursorTypeResolver implements ElementRegistrar {
                     return providedCursorType;
                 }
             }
-
             @SuppressWarnings("unchecked")
-            CursorTypeFunction<T> cursorTypeFunction =
-                    (CursorTypeFunction<T>) cachedRegistry.computeIfAbsent(element.getClass().getName(),
-                            k -> computeCursorType(element));
-            return cursorTypeFunction.getCursorType(element, mouseX, mouseY);
+            CursorType cursorType = ((CursorTypeFunction<T>) cachedRegistry
+                    .computeIfAbsent(element.getClass().getName(), k -> computeCursorType(element)))
+                    .getCursorType(element, mouseX, mouseY);
+            return cursorType != null ? cursorType : CursorType.DEFAULT;
         } catch (Exception e) {
-            MinecraftCursor.LOGGER.warn("Could not get cursor type for element: {}",
-                    RESOLVER.unmapClassName("named", element.getClass().getName()));
+            String failedElement = element.getClass().getName();
+            if (!failedElement.equals(lastFailedElement)) {
+                lastFailedElement = failedElement;
+                MinecraftCursor.LOGGER.error(
+                        "Could not get cursor type for element: {}",
+                        RESOLVER.unmapClassName("named", failedElement)
+                );
+            }
         }
         return CursorType.DEFAULT;
     }
 
-    @SuppressWarnings("unchecked")
-    private <T extends Element> CursorTypeFunction<T> computeCursorType(Element element) {
+    private CursorTypeFunction<? extends Element> computeCursorType(Element element) {
         for (int i = registry.size() - 1; i >= 0; i--) {
             if (registry.get(i).getKey().isInstance(element)) {
-                return (CursorTypeFunction<T>) registry.get(i).getValue();
+                return registry.get(i).getValue();
             }
         }
         if (element instanceof ParentElement) {
-            return (parent, x, y) -> this.parentElementGetChildCursorType((ParentElement) parent, x, y);
+            return (CursorTypeFunction<ParentElement>) this::getChildCursorType;
         }
         return ElementRegistrar::elementToDefault;
     }
 
-    private CursorType parentElementGetChildCursorType(ParentElement parentElement, double mouseX, double mouseY) {
+    private <T extends ParentElement> CursorType getChildCursorType(T parentElement, double mouseX, double mouseY) {
         CursorType cursorType = CursorType.DEFAULT;
         for (Element child : parentElement.children()) {
             if (child instanceof ParentElement childParent) {
-                CursorType parentCursorType = parentElementGetChildCursorType(childParent, mouseX, mouseY);
+                CursorType parentCursorType = getChildCursorType(childParent, mouseX, mouseY);
                 cursorType = parentCursorType != CursorType.DEFAULT ? parentCursorType : cursorType;
             }
             if (child.isMouseOver(mouseX, mouseY)) {
@@ -161,29 +161,23 @@ class CursorTypeResolver implements ElementRegistrar {
         return cursorType;
     }
 
-    private static CursorType clickableWidgetCursor(Element element, double mouseX, double mouseY) {
-        ClickableWidget button = (ClickableWidget) element;
-        return button.active && button.visible ?
+    private static <T extends ClickableWidget> CursorType clickableWidgetCursor(T clickable, double mouseX, double mouseY) {
+        return clickable.active && clickable.visible ? CursorType.POINTER : CursorType.DEFAULT;
+    }
+
+    private static <T extends TabButtonWidget> CursorType tabButtonWidgetCursor(T tabButton, double mouseX, double mouseY) {
+        return tabButton.active && tabButton.visible && !tabButton.isCurrentTab() ?
                 CursorType.POINTER : CursorType.DEFAULT;
     }
 
-    private static CursorType tabButtonWidgetCursor(Element element, double mouseX, double mouseY) {
-        TabButtonWidget button = (TabButtonWidget) element;
-        return button.active && button.visible && !button.isCurrentTab() ?
-                CursorType.POINTER : CursorType.DEFAULT;
-    }
-
-    private static CursorType sliderWidgetCursor(Element element, double mouseX, double mouseY) {
-        SliderWidget slider = (SliderWidget) element;
+    private static <T extends SliderWidget> CursorType sliderWidgetCursor(T slider, double mouseX, double mouseY) {
         if (slider.isFocused() && (CursorTypeUtil.isLeftClickHeld() || CursorTypeUtil.isGrabbing())) {
             return CursorType.GRABBING;
         }
-        return slider.active && slider.visible ?
-                CursorType.POINTER : CursorType.DEFAULT;
+        return slider.active && slider.visible ? CursorType.POINTER : CursorType.DEFAULT;
     }
 
-    private static CursorType textFieldWidgetCursor(Element element, double mouseX, double mouseY) {
-        TextFieldWidget textField = (TextFieldWidget) element;
+    private static <T extends TextFieldWidget> CursorType textFieldWidgetCursor(T textField, double mouseX, double mouseY) {
         return textField.visible ? CursorType.TEXT : CursorType.DEFAULT;
     }
 }

@@ -12,10 +12,9 @@ import static io.github.fishstiz.minecraftcursor.MinecraftCursorClient.CONFIG;
 
 public class HandledScreenCursorHandler<T extends ScreenHandler, U extends HandledScreen<? extends T>> implements CursorHandler<U> {
     @Override
-    @SuppressWarnings("unchecked")
     public CursorType getCursorType(U handledScreen, double mouseX, double mouseY) {
-        ScreenHandler handler = ((HandledScreenAccessor<T>) handledScreen).getHandler();
-        Slot focusedSlot = ((HandledScreenAccessor<T>) handledScreen).getFocusedSlot();
+        ScreenHandler handler = ((HandledScreenAccessor<?>) handledScreen).getHandler();
+        Slot focusedSlot = ((HandledScreenAccessor<?>) handledScreen).getFocusedSlot();
 
         boolean canClickFocusedSlot = handler.getCursorStack().isEmpty()
                 && focusedSlot != null

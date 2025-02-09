@@ -51,8 +51,9 @@ public class CursorOptionsScreen extends Screen {
 
         moreButton = ButtonWidget.builder(Text.translatable("minecraft-cursor.options.more").append("..."),
                 btn -> {
-                    assert client != null;
-                    client.setScreen(new RegistryOptionsScreen(this, cursorManager));
+                    if (client != null) {
+                        client.setScreen(new RegistryOptionsScreen(this, cursorManager));
+                    }
                 }).build();
         this.layout.addFooter(moreButton);
 
