@@ -67,9 +67,8 @@ public class CursorConfig {
 
     public void save() {
         if (file == null) {
-            throw new AssertionError("Cannot save config without file.");
+            throw new NullPointerException("Cannot save config when initialized without file.");
         }
-
         CursorConfigLoader.saveConfig(file, this);
     }
 
