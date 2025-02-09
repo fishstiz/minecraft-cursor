@@ -40,6 +40,8 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
+
+	testImplementation "net.fabricmc:fabric-loader-junit:${project.loader_version}"
 }
 
 processResources {
@@ -95,4 +97,8 @@ tasks.register('getProperties') {
 		println "JAVA_VERSION=${java.targetCompatibility}"
 		println "RELEASE_NAME=Minecraft Cursor ${mod_version}"
 	}
+}
+
+test {
+    useJUnitPlatform()
 }
