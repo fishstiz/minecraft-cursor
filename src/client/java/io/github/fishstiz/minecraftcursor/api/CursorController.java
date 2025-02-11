@@ -1,28 +1,16 @@
 package io.github.fishstiz.minecraftcursor.api;
 
-import io.github.fishstiz.minecraftcursor.CursorManager;
-import io.github.fishstiz.minecraftcursor.MinecraftCursorClient;
-
 /**
  * Provides methods that allow direct control of the cursor.
  */
-public class CursorController {
-    private static final CursorManager cursorManager = MinecraftCursorClient.CURSOR_MANAGER;
-    private static CursorController instance;
-
-    private CursorController() {
-    }
-
+public interface CursorController {
     /**
      * Returns the {@link CursorController} instance.
      *
      * @return the {@link CursorController} instance.
      */
-    public static CursorController getInstance() {
-        if (instance == null) {
-            instance = new CursorController();
-        }
-        return instance;
+    static CursorController getInstance() {
+        return CursorControllerProvider.getInstance();
     }
 
     /**
@@ -38,9 +26,7 @@ public class CursorController {
      *
      * @param cursorType the {@link CursorType} to apply for the current cycle
      */
-    public void setSingleCycleCursor(CursorType cursorType) {
-        MinecraftCursorClient.setSingleCycleCursor(cursorType);
-    }
+    void setSingleCycleCursor(CursorType cursorType);
 
     /**
      * Override the current cursor with a specified type and index.
@@ -49,16 +35,12 @@ public class CursorController {
      * @param cursorType the {@link CursorType} to override with
      * @param index      the index of the cursor override
      */
-    public void overrideCursor(CursorType cursorType, int index) {
-        cursorManager.overrideCurrentCursor(cursorType, index);
-    }
+    void overrideCursor(CursorType cursorType, int index);
 
     /**
      * Removes the cursor override at the given index.
      *
      * @param index the index of the override to remove
      */
-    public void removeOverride(int index) {
-        cursorManager.removeOverride(index);
-    }
+    void removeOverride(int index);
 }
