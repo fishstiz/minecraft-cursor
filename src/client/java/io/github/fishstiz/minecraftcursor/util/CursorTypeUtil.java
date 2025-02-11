@@ -5,7 +5,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.InputUtil;
 import org.lwjgl.glfw.GLFW;
 
-import static io.github.fishstiz.minecraftcursor.MinecraftCursorClient.CURSOR_MANAGER;
+import static io.github.fishstiz.minecraftcursor.MinecraftCursorClient.getCursorManager;
 
 public class CursorTypeUtil {
     private CursorTypeUtil() {
@@ -15,14 +15,14 @@ public class CursorTypeUtil {
 
     public static boolean canShift() {
         long handle = client.getWindow().getHandle();
-        return CURSOR_MANAGER.getCursor(CursorType.SHIFT).getId() != 0
-                && (InputUtil.isKeyPressed(handle, GLFW.GLFW_KEY_RIGHT_SHIFT)
-                || InputUtil.isKeyPressed(handle, GLFW.GLFW_KEY_LEFT_SHIFT));
+        return getCursorManager().getCursor(CursorType.SHIFT).getId() != 0
+                && (InputUtil.isKeyPressed(handle, GLFW.GLFW_KEY_LEFT_SHIFT)
+                || InputUtil.isKeyPressed(handle, GLFW.GLFW_KEY_RIGHT_SHIFT));
     }
 
     public static boolean isGrabbing() {
-        return CURSOR_MANAGER.getCursor(CursorType.GRABBING).getId() != 0
-                && CURSOR_MANAGER.getCurrentCursor().getType() == CursorType.GRABBING
+        return getCursorManager().getCursor(CursorType.GRABBING).getId() != 0
+                && getCursorManager().getCurrentCursor().getType() == CursorType.GRABBING
                 && isLeftClickHeld();
     }
 

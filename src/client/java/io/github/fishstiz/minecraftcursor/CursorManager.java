@@ -15,86 +15,76 @@ import java.util.List;
 import java.util.TreeMap;
 
 public class CursorManager {
-    private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
-    private static final LinkedHashMap<CursorType, Cursor> CURSORS = new LinkedHashMap<>();
-    private final TreeMap<Integer, CursorType> currentCursorOverrides = new TreeMap<>();
+    private final LinkedHashMap<CursorType, Cursor> cursors = new LinkedHashMap<>();
+    private final TreeMap<Integer, CursorType> overrides = new TreeMap<>();
+    private final MinecraftClient client;
     private Cursor currentCursor;
-    private long previousCursorId;
 
-    CursorManager() {
-    }
+    CursorManager(MinecraftClient client) {
+        this.client = client;
 
-    static {
         for (CursorType cursorType : CursorTypeRegistry.types()) {
-            CURSORS.put(cursorType, new Cursor(cursorType));
+            cursors.put(cursorType, new Cursor(cursorType, this::handleCursorLoad));
         }
     }
 
     public void loadCursorImage(CursorType type, Identifier sprite, BufferedImage image, CursorConfig.Settings settings) throws IOException {
-        Cursor cursor = CURSORS.computeIfAbsent(type, Cursor::new);
+        Cursor cursor = getCursor(type);
         cursor.loadImage(sprite, image, settings.getScale(), settings.getXHot(), settings.getYHot(), settings.isEnabled());
+    }
 
-        if (currentCursor == null) {
-            setCurrentCursor(cursor.getType());
-            return;
-        }
-        if (currentCursor.getType() == type) {
+    private void handleCursorLoad(CursorType cursorType) {
+        if (getCurrentCursor() == null) {
+            setCurrentCursor(cursorType);
+        } else if (getCurrentCursor().getType() == cursorType) {
             reloadCursor();
         }
     }
 
-    public void setCurrentCursor(CursorType type) {
-        Cursor cursor = CURSORS.get(currentCursorOverrides.isEmpty() ? type : currentCursorOverrides.lastEntry().getValue());
+    void setCurrentCursor(CursorType type) {
+        Cursor cursor = cursors.get(overrides.isEmpty() ? type : overrides.lastEntry().getValue());
 
         if (cursor == null || (type != CursorType.DEFAULT && cursor.getId() == 0) || !cursor.isEnabled()) {
-            cursor = CURSORS.get(CursorType.DEFAULT);
+            cursor = cursors.get(CursorType.DEFAULT);
         }
 
-        if (cursor == null || !cursor.isLoaded()) {
-            return;
-        }
-
-        if (currentCursor != null && cursor.getId() == previousCursorId) {
+        if (currentCursor != null && cursor.getId() == currentCursor.getId()) {
             return;
         }
 
         currentCursor = cursor;
-        previousCursorId = cursor.getId();
-        GLFW.glfwSetCursor(CLIENT.getWindow().getHandle(), currentCursor.getId());
+        GLFW.glfwSetCursor(client.getWindow().getHandle(), currentCursor.getId());
     }
 
     public void overrideCurrentCursor(CursorType type, int index) {
         if (getCursor(type).isEnabled()) {
-            currentCursorOverrides.put(index, type);
+            overrides.put(index, type);
         } else {
-            currentCursorOverrides.remove(index);
+            overrides.remove(index);
         }
     }
 
     public void removeOverride(int index) {
-        currentCursorOverrides.remove(index);
+        overrides.remove(index);
     }
 
     public void reloadCursor() {
-        long id = currentCursorOverrides.isEmpty() ?
-                currentCursor.getId() :
-                getCursor(currentCursorOverrides.lastEntry().getValue()).getId();
-
-        GLFW.glfwSetCursor(CLIENT.getWindow().getHandle(), id);
+        GLFW.glfwSetCursor(client.getWindow().getHandle(), getCurrentCursor().getId());
     }
 
     public Cursor getCurrentCursor() {
-        return currentCursorOverrides.isEmpty() ? currentCursor :
-                getCursor(currentCursorOverrides.lastEntry().getValue());
+        return overrides.isEmpty()
+                ? currentCursor
+                : getCursor(overrides.lastEntry().getValue());
     }
 
     public Cursor getCursor(CursorType type) {
-        return CURSORS.get(type);
+        return cursors.computeIfAbsent(type, t -> new Cursor(t, this::handleCursorLoad));
     }
 
     public List<Cursor> getLoadedCursors() {
         List<Cursor> activeCursors = new ArrayList<>();
-        for (Cursor cursor : CURSORS.values()) {
+        for (Cursor cursor : cursors.values()) {
             if (cursor.isLoaded()) {
                 activeCursors.add(cursor);
             }
@@ -103,13 +93,13 @@ public class CursorManager {
     }
 
     public boolean isAdaptive() {
-        return CURSORS.values().stream().anyMatch(cursor ->
+        return cursors.values().stream().anyMatch(cursor ->
                 cursor.isEnabled() && CursorType.DEFAULT != cursor.getType()
         );
     }
 
     public void setIsAdaptive(boolean isAdaptive) {
-        CURSORS.values().forEach(cursor -> {
+        cursors.values().forEach(cursor -> {
             if (cursor.getType() != CursorType.DEFAULT) {
                 cursor.enable(isAdaptive);
             }

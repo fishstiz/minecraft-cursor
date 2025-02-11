@@ -1,9 +1,11 @@
 package io.github.fishstiz.minecraftcursor;
 
+import io.github.fishstiz.minecraftcursor.api.CursorControllerProvider;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.api.MinecraftCursorInitializer;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.config.CursorConfigLoader;
+import io.github.fishstiz.minecraftcursor.cursor.CursorControllerImpl;
 import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -17,45 +19,56 @@ import net.minecraft.resource.ResourceType;
 
 import java.io.File;
 
+import static io.github.fishstiz.minecraftcursor.MinecraftCursor.LOGGER;
+import static io.github.fishstiz.minecraftcursor.MinecraftCursor.MOD_ID;
+
 public class MinecraftCursorClient implements ClientModInitializer {
     private static final CursorTypeRegistry CURSOR_REGISTRY = new CursorTypeRegistry();
     private static final CursorTypeResolver CURSOR_RESOLVER = new CursorTypeResolver();
-    public static final CursorManager CURSOR_MANAGER = new CursorManager();
-    public static final CursorConfig CONFIG = CursorConfigLoader.fromFile(new File(String.format("%s/%s.json",
-            FabricLoader.getInstance().getConfigDir(),
-            MinecraftCursor.MOD_ID
-    )));
+    public static final CursorConfig CONFIG = CursorConfigLoader
+            .fromFile(new File(FabricLoader.getInstance().getConfigDir().toString(), MOD_ID + ".json"));
+    private static CursorManager cursorManager;
     private static CursorType singleCycleCursor;
     private Screen visibleNonCurrentScreen;
 
     @Override
     public void onInitializeClient() {
-        FabricLoader.getInstance().getEntrypoints(MinecraftCursor.MOD_ID, MinecraftCursorInitializer.class).forEach(
-                entrypoint -> entrypoint.init(CURSOR_REGISTRY, CURSOR_RESOLVER)
-        );
-
-        CursorResourceReloadListener resourceReloadListener = new CursorResourceReloadListener(
-                CURSOR_MANAGER, MinecraftCursor.MOD_ID, CONFIG
-        );
-
-        ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(resourceReloadListener);
-
-        ScreenEvents.BEFORE_INIT.register((MinecraftClient client, Screen screen, int width, int height) -> {
-            if (client.currentScreen == null) {
-                CURSOR_MANAGER.setCurrentCursor(CursorType.DEFAULT);
-                visibleNonCurrentScreen = screen;
-                return;
+        FabricLoader.getInstance().getEntrypointContainers(MOD_ID, MinecraftCursorInitializer.class).forEach(entrypoint -> {
+            try {
+                entrypoint.getEntrypoint().init(CURSOR_REGISTRY, CURSOR_RESOLVER);
+            } catch (Throwable e) {
+                LOGGER.error(
+                        "Invalid implementation of MinecraftCursorInitializer in mod: {}",
+                        entrypoint.getProvider().getMetadata().getId()
+                );
             }
-
-            visibleNonCurrentScreen = null;
-            ScreenEvents.afterRender(client.currentScreen).register(this::afterRenderScreen);
         });
 
+        initCursorManager();
+        CursorResourceReloadListener reloadListener = new CursorResourceReloadListener(cursorManager, MOD_ID, CONFIG);
+        ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(reloadListener);
+        CursorControllerProvider.init(CursorControllerImpl.getInstance());
+
+        ScreenEvents.BEFORE_INIT.register(this::beforeScreenInit);
         ClientTickEvents.START_CLIENT_TICK.register(this::tick);
     }
 
+    private static void initCursorManager() {
+        cursorManager = new CursorManager(MinecraftClient.getInstance());
+    }
+
+    private void beforeScreenInit(MinecraftClient client, Screen screen, int width, int height) {
+        if (client.currentScreen == null) {
+            cursorManager.setCurrentCursor(CursorType.DEFAULT);
+            visibleNonCurrentScreen = screen;
+            return;
+        }
+        visibleNonCurrentScreen = null;
+        ScreenEvents.afterRender(client.currentScreen).register(this::afterRenderScreen);
+    }
+
     private void afterRenderScreen(Screen currentScreen, DrawContext context, int mouseX, int mouseY, float tickDelta) {
-        CURSOR_MANAGER.setCurrentCursor(getCursorType(currentScreen, mouseX, mouseY));
+        cursorManager.setCurrentCursor(getCursorType(currentScreen, mouseX, mouseY));
     }
 
     private void tick(MinecraftClient client) {
@@ -63,12 +76,12 @@ public class MinecraftCursorClient implements ClientModInitializer {
             double scale = client.getWindow().getScaleFactor();
             double mouseX = client.mouse.getX() / scale;
             double mouseY = client.mouse.getY() / scale;
-            CURSOR_MANAGER.setCurrentCursor(getCursorType(visibleNonCurrentScreen, mouseX, mouseY));
+            cursorManager.setCurrentCursor(getCursorType(visibleNonCurrentScreen, mouseX, mouseY));
         }
     }
 
     private CursorType getCursorType(Screen currentScreen, double mouseX, double mouseY) {
-        if (!CURSOR_MANAGER.isAdaptive()) return CursorType.DEFAULT;
+        if (!cursorManager.isAdaptive()) return CursorType.DEFAULT;
 
         if (CursorTypeUtil.isGrabbing()) return CursorType.GRABBING;
 
@@ -89,5 +102,12 @@ public class MinecraftCursorClient implements ClientModInitializer {
 
     public static void setSingleCycleCursor(CursorType cursorType) {
         singleCycleCursor = cursorType;
+    }
+
+    public static CursorManager getCursorManager() {
+        if (cursorManager == null) {
+            throw new IllegalStateException("Cursor Manager not yet initialized");
+        }
+        return cursorManager;
     }
 }

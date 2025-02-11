@@ -38,8 +38,9 @@ public abstract class MouseOptionsScreenMixin extends GameOptionsScreen {
                 emptyTooltip(),
                 false,
                 value -> {
-                    assert client != null;
-                    client.setScreen(new CursorOptionsScreen(this, MinecraftCursorClient.CURSOR_MANAGER));
+                    if (this.client != null) {
+                        client.setScreen(new CursorOptionsScreen(this, MinecraftCursorClient.getCursorManager()));
+                    }
                 });
         buttonList.addSingleOptionEntry(button);
         CyclingButtonWidget<?> widget = (CyclingButtonWidget<?>) buttonList.getWidgetFor(button);
