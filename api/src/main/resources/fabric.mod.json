@@ -1,0 +1,14 @@
+{
+  "id": "minecraft-cursor_api",
+  "name": "Minecraft Cursor API",
+  "version": "${version}",
+  "schemaVersion": 1,
+  "custom": {
+    "modmenu": {
+      "parent": "minecraft-cursor",
+      "badges": [
+        "library"
+      ]
+    }
+  }
+}

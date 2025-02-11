@@ -1,5 +1,6 @@
-package io.github.fishstiz.minecraftcursor.api;
+package io.github.fishstiz.minecraftcursor.impl;
 
+import io.github.fishstiz.minecraftcursor.api.CursorController;
 import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal

@@ -2,7 +2,6 @@ package io.github.fishstiz.minecraftcursor;
 
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.api.CursorTypeRegistrar;
-import io.github.fishstiz.minecraftcursor.cursor.StandardCursorType;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -16,21 +15,33 @@ public class CursorTypeRegistry implements CursorTypeRegistrar {
     }
 
     static {
-        for (CursorType cursorType : StandardCursorType.values()) {
-            TYPES.put(cursorType.getKey(), cursorType);
-        }
+        addEntries(
+                CursorType.DEFAULT,
+                CursorType.POINTER,
+                CursorType.GRABBING,
+                CursorType.TEXT,
+                CursorType.SHIFT
+        );
     }
 
     @Override
     public void register(CursorType... cursorTypes) {
-        for (CursorType cursorType : cursorTypes) {
-            TYPES.put(cursorType.getKey(), cursorType);
-        }
+        addEntries(cursorTypes);
     }
 
     @Override
     public CursorType register(String key) {
+        return addEntry(key);
+    }
+
+    private static CursorType addEntry(String key) {
         return TYPES.computeIfAbsent(key, CursorType::of);
+    }
+
+    private static void addEntries(CursorType... cursorTypes) {
+        for (CursorType cursorType : cursorTypes) {
+            TYPES.put(cursorType.getKey(), cursorType);
+        }
     }
 
     public static Collection<CursorType> types() {

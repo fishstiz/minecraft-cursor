@@ -1,9 +1,9 @@
 package io.github.fishstiz.minecraftcursor.cursorhandler.ingame;
 
+import io.github.fishstiz.minecraftcursor.api.CursorHandler;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.mixin.client.access.HandledScreenAccessor;
 import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
-import io.github.fishstiz.minecraftcursor.api.CursorHandler;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
