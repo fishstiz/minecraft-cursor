@@ -7,7 +7,7 @@ import io.github.fishstiz.minecraftcursor.mixin.client.access.RecipeBookScreenAc
 import io.github.fishstiz.minecraftcursor.mixin.client.access.RecipeBookWidgetAccessor;
 import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
 import net.minecraft.client.gui.screen.ingame.RecipeBookScreen;
-import net.minecraft.client.gui.screen.recipebook.*;
+import net.minecraft.client.gui.screen.recipebook.RecipeAlternativesWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.ToggleButtonWidget;
 import net.minecraft.screen.AbstractRecipeScreenHandler;
