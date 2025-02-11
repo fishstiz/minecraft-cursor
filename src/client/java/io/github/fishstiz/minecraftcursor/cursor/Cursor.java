@@ -4,14 +4,15 @@ import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.util.BufferedImageUtil;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWImage;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.function.Consumer;
 
 public class Cursor {
+    private final Consumer<CursorType> onLoad;
     private final CursorType type;
     private Identifier sprite;
     private String cachedBufferedImage;
@@ -22,8 +23,9 @@ public class Cursor {
     private boolean loaded;
     private long id = 0;
 
-    public Cursor(CursorType type) {
+    public Cursor(CursorType type, Consumer<CursorType> onLoad) {
         this.type = type;
+        this.onLoad = onLoad;
     }
 
     public void loadImage(Identifier sprite, BufferedImage image, double scale, int xhot, int yhot, boolean enabled) throws IOException {
@@ -31,24 +33,24 @@ public class Cursor {
         this.cachedBufferedImage = BufferedImageUtil.compressImageToBase64(image);
         this.enabled = enabled;
 
-        create(image, scale, xhot, yhot, null);
+        create(image, scale, xhot, yhot);
     }
 
-    private void updateImage(double scale, int xhot, int yhot, Runnable onUpdate) {
+    private void updateImage(double scale, int xhot, int yhot) {
         if (id == 0) {
             return;
         }
 
         try {
             BufferedImage image = BufferedImageUtil.decompressBase64ToImage(cachedBufferedImage);
-            create(image, scale, xhot, yhot, onUpdate);
+            create(image, scale, xhot, yhot);
             image.flush();
         } catch (IOException e) {
             MinecraftCursor.LOGGER.error("Error updating image of {}: {}", type, e);
         }
     }
 
-    private void create(BufferedImage image, double scale, int xhot, int yhot, @Nullable Runnable onCreate) {
+    private void create(BufferedImage image, double scale, int xhot, int yhot) {
         BufferedImage scaledImage = scale == 1 ? image : BufferedImageUtil.scaleImage(image, scale);
         int scaledXHot = scale == 1 ? xhot : (int) Math.round(xhot * scale);
         int scaledYHot = scale == 1 ? yhot : (int) Math.round(yhot * scale);
@@ -63,8 +65,8 @@ public class Cursor {
         long previousId = this.id;
         this.id = GLFW.glfwCreateCursor(glfwImageBuffer.get(), scaledXHot, scaledYHot);
 
-        if (onCreate != null) {
-            onCreate.run();
+        if (onLoad != null) {
+            onLoad.accept(this.type);
         }
 
         if (previousId != 0 && this.id != previousId) {
@@ -109,24 +111,24 @@ public class Cursor {
         return scale;
     }
 
-    public void setScale(double scale, @Nullable Runnable onUpdate) {
-        updateImage(scale, getXhot(), getYhot(), onUpdate);
+    public void setScale(double scale) {
+        updateImage(scale, getXhot(), getYhot());
     }
 
     public int getXhot() {
         return xhot;
     }
 
-    public void setXhot(int xhot, @Nullable Runnable onUpdate) {
-        updateImage(getScale(), xhot, getYhot(), onUpdate);
+    public void setXhot(int xhot) {
+        updateImage(getScale(), xhot, getYhot());
     }
 
     public int getYhot() {
         return yhot;
     }
 
-    public void setYhot(int yhot, @Nullable Runnable onUpdate) {
-        updateImage(getScale(), getXhot(), yhot, onUpdate);
+    public void setYhot(int yhot) {
+        updateImage(getScale(), getXhot(), yhot);
     }
 
     public boolean isEnabled() {

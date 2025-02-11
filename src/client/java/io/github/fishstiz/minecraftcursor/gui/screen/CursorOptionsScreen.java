@@ -88,17 +88,17 @@ public class CursorOptionsScreen extends Screen {
             cursorManager.overrideCurrentCursor(selectedCursor.getType(), -1);
         }
 
-        selectedCursor.setScale(value, this::reloadCursorOnUpdate);
+        selectedCursor.setScale(value);
         updateSelectedCursorConfig();
     }
 
     public void onChangeXHot(double value) {
-        selectedCursor.setXhot((int) value, this::reloadCursorOnUpdate);
+        selectedCursor.setXhot((int) value);
         updateSelectedCursorConfig();
     }
 
     public void onChangeYHot(double value) {
-        selectedCursor.setYhot((int) value, this::reloadCursorOnUpdate);
+        selectedCursor.setYhot((int) value);
         updateSelectedCursorConfig();
     }
 
@@ -108,12 +108,6 @@ public class CursorOptionsScreen extends Screen {
 
         if (body != null) {
             body.selectedCursorColumn.refreshWidgets();
-        }
-    }
-
-    private void reloadCursorOnUpdate() {
-        if (selectedCursor == cursorManager.getCurrentCursor()) {
-            cursorManager.reloadCursor();
         }
     }
 
