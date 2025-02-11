@@ -1,11 +1,11 @@
 package io.github.fishstiz.minecraftcursor;
 
-import io.github.fishstiz.minecraftcursor.api.CursorControllerProvider;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.api.MinecraftCursorInitializer;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.config.CursorConfigLoader;
 import io.github.fishstiz.minecraftcursor.cursor.CursorControllerImpl;
+import io.github.fishstiz.minecraftcursor.impl.CursorControllerProvider;
 import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;

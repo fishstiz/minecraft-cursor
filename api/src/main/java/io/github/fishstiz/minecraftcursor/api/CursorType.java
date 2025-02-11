@@ -1,7 +1,5 @@
 package io.github.fishstiz.minecraftcursor.api;
 
-import io.github.fishstiz.minecraftcursor.cursor.StandardCursorType;
-
 /**
  * Represents a cursor type identified by a unique key.
  * <p>
@@ -35,7 +33,7 @@ public interface CursorType {
     /**
      * The fallback cursor type
      */
-    CursorType DEFAULT = StandardCursorType.DEFAULT;
+    CursorType DEFAULT = CursorType.of("default");
 
     /**
      * The cursor type is determined in two passes:
@@ -47,27 +45,27 @@ public interface CursorType {
      * This cursor type ensures that the second pass is skipped
      * and forces the cursor type to fall back to {@link CursorType#DEFAULT} since it is not a real cursor type.
      */
-    CursorType DEFAULT_FORCE = () -> "";
+    CursorType DEFAULT_FORCE = CursorType.of("");
 
     /**
      * The cursor type that is applied when the mouse is over {@link net.minecraft.client.gui.widget.PressableWidget}
      * elements and on other certain elements that can be clicked.
      */
-    CursorType POINTER = StandardCursorType.POINTER;
+    CursorType POINTER = CursorType.of("pointer");
 
     /**
      * The cursor type that is applied when grabbing the slider of {@link net.minecraft.client.gui.widget.SliderWidget}
      * elements and when grabbing items in the inventory.
      */
-    CursorType GRABBING = StandardCursorType.GRABBING;
+    CursorType GRABBING = CursorType.of("grabbing");
 
     /**
      * The cursor type that is applied when the mouse is over {@link net.minecraft.client.gui.widget.TextFieldWidget} elements
      */
-    CursorType TEXT = StandardCursorType.TEXT;
+    CursorType TEXT = CursorType.of("text");
 
     /**
      * The cursor type that is applied when shift is held and the mouse is over elements with special shift actions.
      */
-    CursorType SHIFT = StandardCursorType.SHIFT;
+    CursorType SHIFT = CursorType.of("shift");
 }
