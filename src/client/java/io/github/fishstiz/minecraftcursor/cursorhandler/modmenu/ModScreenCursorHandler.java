@@ -3,8 +3,8 @@ package io.github.fishstiz.minecraftcursor.cursorhandler.modmenu;
 import com.terraformersmc.modmenu.gui.ModsScreen;
 import com.terraformersmc.modmenu.gui.widget.ModListWidget;
 import com.terraformersmc.modmenu.gui.widget.entries.ModListEntry;
-import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.api.CursorHandler;
+import io.github.fishstiz.minecraftcursor.api.CursorType;
 import net.minecraft.client.gui.Element;
 
 import java.util.Optional;

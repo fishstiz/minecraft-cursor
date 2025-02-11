@@ -1,5 +1,7 @@
 package io.github.fishstiz.minecraftcursor.api;
 
+import io.github.fishstiz.minecraftcursor.impl.CursorControllerProvider;
+
 /**
  * Provides methods that allow direct control of the cursor.
  */

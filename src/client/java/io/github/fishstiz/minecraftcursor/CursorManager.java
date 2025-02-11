@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.TreeMap;
 
 public class CursorManager {
-    private final LinkedHashMap<CursorType, Cursor> cursors = new LinkedHashMap<>();
-    private final TreeMap<Integer, CursorType> overrides = new TreeMap<>();
+    private final LinkedHashMap<String, Cursor> cursors = new LinkedHashMap<>();
+    private final TreeMap<Integer, String> overrides = new TreeMap<>();
     private final MinecraftClient client;
     private Cursor currentCursor;
 
@@ -24,7 +24,7 @@ public class CursorManager {
         this.client = client;
 
         for (CursorType cursorType : CursorTypeRegistry.types()) {
-            cursors.put(cursorType, new Cursor(cursorType, this::handleCursorLoad));
+            cursors.put(cursorType.getKey(), new Cursor(cursorType, this::handleCursorLoad));
         }
     }
 
@@ -42,13 +42,13 @@ public class CursorManager {
     }
 
     void setCurrentCursor(CursorType type) {
-        Cursor cursor = cursors.get(overrides.isEmpty() ? type : overrides.lastEntry().getValue());
+        Cursor cursor = getCursor(overrides.isEmpty() ? type.getKey() : overrides.lastEntry().getValue());
 
         if (cursor == null || (type != CursorType.DEFAULT && cursor.getId() == 0) || !cursor.isEnabled()) {
-            cursor = cursors.get(CursorType.DEFAULT);
+            cursor = getCursor(CursorType.DEFAULT);
         }
 
-        if (currentCursor != null && cursor.getId() == currentCursor.getId()) {
+        if (cursor == null || (currentCursor != null && cursor.getId() == currentCursor.getId())) {
             return;
         }
 
@@ -58,7 +58,7 @@ public class CursorManager {
 
     public void overrideCurrentCursor(CursorType type, int index) {
         if (getCursor(type).isEnabled()) {
-            overrides.put(index, type);
+            overrides.put(index, type.getKey());
         } else {
             overrides.remove(index);
         }
@@ -78,8 +78,12 @@ public class CursorManager {
                 : getCursor(overrides.lastEntry().getValue());
     }
 
+    public Cursor getCursor(String key) {
+        return cursors.computeIfAbsent(key, k -> new Cursor(CursorType.of(k), this::handleCursorLoad));
+    }
+
     public Cursor getCursor(CursorType type) {
-        return cursors.computeIfAbsent(type, t -> new Cursor(t, this::handleCursorLoad));
+        return cursors.computeIfAbsent(type.getKey(), k -> new Cursor(type, this::handleCursorLoad));
     }
 
     public List<Cursor> getLoadedCursors() {
