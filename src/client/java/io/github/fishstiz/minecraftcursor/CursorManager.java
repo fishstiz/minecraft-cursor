@@ -23,8 +23,12 @@ public class CursorManager {
     CursorManager(MinecraftClient client) {
         this.client = client;
 
+        Cursor defaultCursor = new Cursor(CursorType.DEFAULT, this::handleCursorLoad);
+        cursors.put(defaultCursor.getType().getKey(), defaultCursor);
+        currentCursor = defaultCursor;
+
         for (CursorType cursorType : CursorTypeRegistry.types()) {
-            cursors.put(cursorType.getKey(), new Cursor(cursorType, this::handleCursorLoad));
+            cursors.putIfAbsent(cursorType.getKey(), new Cursor(cursorType, this::handleCursorLoad));
         }
     }
 
@@ -34,9 +38,8 @@ public class CursorManager {
     }
 
     private void handleCursorLoad(CursorType cursorType) {
-        if (getCurrentCursor() == null) {
-            setCurrentCursor(cursorType);
-        } else if (getCurrentCursor().getType() == cursorType) {
+        Cursor current = getCurrentCursor();
+        if (current != null && current.getType() == cursorType) {
             reloadCursor();
         }
     }
