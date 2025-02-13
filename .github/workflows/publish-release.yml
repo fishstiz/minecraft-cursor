@@ -7,6 +7,15 @@ on:
         description: 'Additional Minecraft Versions'
         required: false
         type: string
+      version-type:
+        description: 'Version Type'
+        required: true
+        type: choice
+        default: 'release'
+        options:
+          - release
+          - beta
+          - alpha
 
 env:
   CURSEFORGE_ID: 1184736
@@ -66,7 +75,7 @@ jobs:
 
           name: ${{ env.RELEASE_NAME }}
           version: ${{ env.VERSION }}
-          version-type: release
+          version-type: ${{ inputs.version-type }}
           changelog-file: CHANGELOG.md
 
           loaders: fabric
