@@ -1,8 +1,9 @@
 {
+  "schemaVersion": 1,
   "id": "minecraft-cursor_api",
   "name": "Minecraft Cursor API",
   "version": "${version}",
-  "schemaVersion": 1,
+  "environment": "client",
   "custom": {
     "modmenu": {
       "parent": "minecraft-cursor",

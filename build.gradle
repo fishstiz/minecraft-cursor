@@ -18,16 +18,13 @@ repositories {
 }
 
 loom {
-    splitEnvironmentSourceSets()
-
     mods {
         "minecraft-cursor" {
             sourceSet sourceSets.main
-            sourceSet sourceSets.client
         }
     }
 
-    accessWidenerPath = file("src/client/resources/minecraft-cursor.accesswidener")
+    accessWidenerPath = file("src/main/resources/minecraft-cursor.accesswidener")
 }
 
 dependencies {

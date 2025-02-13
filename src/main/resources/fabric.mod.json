@@ -18,11 +18,8 @@
   "icon": "assets/minecraft-cursor/icon.png",
   "environment": "client",
   "entrypoints": {
-    "main": [
-      "io.github.fishstiz.minecraftcursor.MinecraftCursor"
-    ],
     "client": [
-      "io.github.fishstiz.minecraftcursor.MinecraftCursorClient"
+      "io.github.fishstiz.minecraftcursor.MinecraftCursor"
     ],
     "modmenu": [
       "io.github.fishstiz.minecraftcursor.MinecraftCursorModMenuApiImpl"
