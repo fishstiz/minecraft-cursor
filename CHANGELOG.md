@@ -1,1 +1,7 @@
-- Fixed Adaptive Cursor Enable toggle option in More Cursor Options not saving.
+- API Changes:
+  - Separated the API from the Root Project, API is now its own library.
+    - Check the wiki for the updated installation guide.
+    - It can still be accessed from the root project like before as it's an api dependency and included.
+      - It would better to use `modCompileOnly` for API and `modRuntimeOnly` for the mod itself.
+  - Converted `CursorController` to interface. Methods remain unchanged.
+  - Added `AbstractHandledScreenCursorHandler` for `HandledScreen` subclasses.
