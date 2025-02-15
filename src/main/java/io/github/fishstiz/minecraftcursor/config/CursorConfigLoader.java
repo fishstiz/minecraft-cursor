@@ -9,15 +9,17 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class CursorConfigLoader {
-    static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private CursorConfigLoader() {
     }
 
+    public static AnimatedCursorConfig getAnimationConfig(InputStream stream) throws IOException {
+        return MAPPER.readValue(stream, AnimatedCursorConfig.class);
+    }
+
     public static CursorConfig fromStream(InputStream stream) throws IOException {
-        CursorConfig config;
-        config = MAPPER.readValue(stream, CursorConfig.class);
-        return config;
+        return MAPPER.readValue(stream, CursorConfig.class);
     }
 
     public static CursorConfig fromFile(File file) {

@@ -55,6 +55,10 @@ public class BufferedImageUtil {
         }
     }
 
+    public static BufferedImage cropImage(BufferedImage src, Rectangle rect) {
+        return src.getSubimage(rect.x, rect.y, rect.width, rect.height);
+    }
+
     public static BufferedImage decompressBase64ToImage(String base64Image) throws IOException {
         byte[] imageData = Base64.getDecoder().decode(base64Image);
 
