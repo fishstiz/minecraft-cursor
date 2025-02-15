@@ -3,6 +3,9 @@ package io.github.fishstiz.minecraftcursor.gui.widget;
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.api.CursorProvider;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
+import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
+import io.github.fishstiz.minecraftcursor.cursor.Cursor;
+import io.github.fishstiz.minecraftcursor.gui.screen.CursorOptionsScreen;
 import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
@@ -24,14 +27,34 @@ public class SelectedCursorHotspotWidget extends ClickableWidget implements Curs
 
     @Override
     protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
-        drawTexture(context, BACKGROUND);
-        drawTexture(context, optionsWidget.optionsScreen.getSelectedCursor().getSprite());
+        context.drawTexture(RenderLayer::getGuiTextured, BACKGROUND, getX(), getY(), 0, 0, width, height, width, height);
+        drawCursorTexture(context);
         renderRuler(context);
         context.drawBorder(getX(), getY(), getWidth(), getHeight(), 0xFF000000);
     }
 
-    private void drawTexture(DrawContext context, Identifier sprite) {
-        context.drawTexture(RenderLayer::getGuiTextured, sprite, getX(), getY(), 0, 0, width, height, width, height);
+    private void drawCursorTexture(DrawContext context) {
+        CursorOptionsScreen optionsScreen = optionsWidget.optionsScreen;
+        Cursor cursor = optionsScreen.getSelectedCursor();
+        int textureHeight = CURSOR_SIZE;
+        int frameIndex = 0;
+
+        if (cursor instanceof AnimatedCursor animatedCursor) {
+            textureHeight *= animatedCursor.getFrameCount();
+            frameIndex = optionsScreen.animationHelper.getCurrentFrame(animatedCursor);
+        }
+
+        int vOffset = CURSOR_SIZE * frameIndex;
+
+        context.drawTexture(
+                RenderLayer::getGuiTextured,
+                cursor.getSprite(),
+                getX(), getY(),
+                0, vOffset, // starting point
+                width, height, // width/height to stretch/shrink
+                CURSOR_SIZE, CURSOR_SIZE, // cropped width/height from actual image
+                CURSOR_SIZE, textureHeight // actual width/height
+        );
     }
 
     private void renderRuler(DrawContext context) {

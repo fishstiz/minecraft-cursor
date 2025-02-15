@@ -27,6 +27,7 @@ public class CursorOptionsScreen extends Screen {
     private final List<Cursor> cursors;
     protected final Screen previousScreen;
     public final ThreePartsLayoutWidget layout = new ThreePartsLayoutWidget(this);
+    public final CursorAnimationHelper animationHelper = new CursorAnimationHelper();
     protected CursorOptionsBody body;
     private Cursor selectedCursor;
     ButtonWidget moreButton;
