@@ -7,6 +7,7 @@ import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
@@ -21,17 +22,15 @@ public class CursorManager {
     private final LinkedHashMap<String, Cursor> cursors = new LinkedHashMap<>();
     private final TreeMap<Integer, String> overrides = new TreeMap<>();
     private final MinecraftClient client;
-    private Cursor currentCursor;
+    private Cursor currentCursor = new Cursor(CursorType.of(""), null);
+    private long lastFrameTime = 0;
+    private int currentFrame = 0;
 
     CursorManager(MinecraftClient client) {
         this.client = client;
 
-        Cursor defaultCursor = new Cursor(CursorType.DEFAULT, this::handleCursorLoad);
-        cursors.put(defaultCursor.getType().getKey(), defaultCursor);
-        currentCursor = defaultCursor;
-
         for (CursorType cursorType : CursorTypeRegistry.types()) {
-            cursors.putIfAbsent(cursorType.getKey(), new Cursor(cursorType, this::handleCursorLoad));
+            cursors.put(cursorType.getKey(), new Cursor(cursorType, this::handleCursorLoad));
         }
     }
 
@@ -49,7 +48,6 @@ public class CursorManager {
                 cursor = new Cursor(type, this::handleCursorLoad);
                 cursors.put(type.getKey(), cursor);
             }
-
             cursor.loadImage(sprite, image, settings);
             return;
         }
@@ -61,13 +59,12 @@ public class CursorManager {
             animatedCursor = new AnimatedCursor(type, this::handleCursorLoad);
             cursors.put(type.getKey(), animatedCursor);
         }
-
         animatedCursor.loadImage(sprite, image, settings, animationConfig);
     }
 
-    private void handleCursorLoad(CursorType cursorType) {
+    private void handleCursorLoad(Cursor cursor) {
         Cursor current = getCurrentCursor();
-        if (current != null && current.getType() == cursorType) {
+        if (current != null && current.getId() == cursor.getId()) {
             reloadCursor();
         }
     }
@@ -75,14 +72,40 @@ public class CursorManager {
     void setCurrentCursor(CursorType type) {
         Cursor cursor = getCursor(overrides.isEmpty() ? type.getKey() : overrides.lastEntry().getValue());
 
+        if (cursor instanceof AnimatedCursor animatedCursor) {
+            handleCursorAnimation(animatedCursor);
+            return;
+        }
+
         if (cursor == null || (type != CursorType.DEFAULT && cursor.getId() == 0) || !cursor.isEnabled()) {
             cursor = getCursor(CursorType.DEFAULT);
         }
 
-        if (cursor == null || (currentCursor != null && cursor.getId() == currentCursor.getId())) {
+        if (cursor == null) return;
+
+        updateCursor(cursor);
+    }
+
+    private void handleCursorAnimation(AnimatedCursor cursor) {
+        long currentTime = Util.getMeasuringTimeMs();
+
+        if (currentCursor == null || !currentCursor.getType().getKey().equals(cursor.getType().getKey())) {
+            lastFrameTime = currentTime;
+            currentFrame = 0;
+            updateCursor(cursor);
             return;
         }
 
+        if (currentTime - lastFrameTime >= cursor.getFrame(currentFrame).time() * 50L) { // 50ms = 1 tick
+            lastFrameTime = currentTime;
+            currentFrame = (currentFrame + 1) % cursor.getFrameCount();
+            Cursor currentFrameCursor = cursor.getFrame(currentFrame).cursor();
+            updateCursor(currentFrameCursor);
+        }
+    }
+
+    private void updateCursor(Cursor cursor) {
+        if (currentCursor != null && cursor.getId() == currentCursor.getId()) return;
         currentCursor = cursor;
         GLFW.glfwSetCursor(client.getWindow().getHandle(), currentCursor.getId());
     }
@@ -99,8 +122,13 @@ public class CursorManager {
         overrides.remove(index);
     }
 
-    public void reloadCursor() {
-        GLFW.glfwSetCursor(client.getWindow().getHandle(), getCurrentCursor().getId());
+    public synchronized void reloadCursor() {
+        Cursor cursor = getCurrentCursor();
+        if (cursor instanceof AnimatedCursor animatedCursor) {
+            handleCursorAnimation(animatedCursor);
+        } else {
+            GLFW.glfwSetCursor(client.getWindow().getHandle(), getCurrentCursor().getId());
+        }
     }
 
     public Cursor getCurrentCursor() {
