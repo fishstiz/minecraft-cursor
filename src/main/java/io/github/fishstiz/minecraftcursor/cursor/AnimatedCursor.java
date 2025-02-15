@@ -17,7 +17,7 @@ public class AnimatedCursor extends Cursor {
     private List<Frame> frames = new ArrayList<>();
     private boolean animated = true;
 
-    public AnimatedCursor(CursorType type, Consumer<CursorType> onLoad) {
+    public AnimatedCursor(CursorType type, Consumer<Cursor> onLoad) {
         super(type, onLoad);
     }
 
@@ -35,27 +35,27 @@ public class AnimatedCursor extends Cursor {
 
         for (int i = 1; i < frameCount; i++) {
             Cursor cursor = new Cursor(this.getType(), this.onLoad);
-
-            BufferedImage croppedFrame = BufferedImageUtil.cropImage(
-                    image,
-                    new Rectangle(0, i * SIZE, SIZE, SIZE)
-            );
-
-            cursor.loadImage(sprite, croppedFrame, settings);
-            croppedFrame.flush();
-
+            BufferedImage cropped = BufferedImageUtil.cropImage(image, new Rectangle(0, i * SIZE, SIZE, SIZE));
+            cursor.loadImage(sprite, cropped, settings);
+            cropped.flush();
             temp.add(new Frame(cursor, config.getTime(i)));
         }
 
         this.frames = temp;
     }
 
-    public boolean isAnimated() {
-        return this.animated;
+    @Override
+    protected void updateImage(double scale, int xhot, int yhot) {
+        super.updateImage(scale, xhot, yhot);
+        applyToFrames(cursor -> cursor.updateImage(scale, xhot, yhot));
     }
 
-    public void setAnimated(boolean animated) {
-        this.animated = animated;
+    private void applyToFrames(Consumer<Cursor> action) {
+        if (frames.size() == 1) return;
+
+        for (int i = 1; i < frames.size(); i++) {
+            action.accept(frames.get(i).cursor());
+        }
     }
 
     public int getFrameCount() {
@@ -64,54 +64,18 @@ public class AnimatedCursor extends Cursor {
 
     public Frame getFrame(int index) {
         Frame frame = frames.get(index);
-        if (!isAnimated() || frame.cursor() == null || frame.cursor().isEnabled()) {
+        if (!isAnimated() || frame.cursor() == null || !frame.cursor().isEnabled()) {
             return frames.getFirst();
         }
         return frame;
     }
 
-    @Override
-    public void setScale(double scale) {
-        super.setScale(scale);
-        applyToFrames(cursor -> cursor.setScale(scale));
+    public boolean isAnimated() {
+        return this.animated;
     }
 
-    @Override
-    public void setXhot(int xhot) {
-        super.setXhot(xhot);
-        applyToFrames(cursor -> cursor.setXhot(xhot));
-    }
-
-    @Override
-    public void setYhot(int yhot) {
-        super.setYhot(yhot);
-        applyToFrames(cursor -> cursor.setYhot(yhot));
-    }
-
-    @Override
-    public void enable(boolean enabled) {
-        super.enable(enabled);
-        applyToFrames(cursor -> cursor.enable(enabled));
-    }
-
-    @Override
-    public void enable() {
-        super.enable();
-        applyToFrames(Cursor::enable);
-    }
-
-    @Override
-    public void disable() {
-        super.disable();
-        applyToFrames(Cursor::disable);
-    }
-
-    public void applyToFrames(Consumer<Cursor> action) {
-        if (frames.size() == 1) return;
-
-        for (int i = 1; i <= frames.size(); i++) {
-            action.accept(frames.get(i).cursor());
-        }
+    public void setAnimated(boolean animated) {
+        this.animated = animated;
     }
 
     public record Frame(Cursor cursor, int time) {

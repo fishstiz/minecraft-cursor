@@ -1,13 +1,15 @@
 package io.github.fishstiz.minecraftcursor.config;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public record AnimatedCursorConfig(int frametime, List<Frame> frames) {
+public class AnimatedCursorConfig {
     private static final int MIN_TIME = 1;
+    public final int frametime;
+    public final List<Frame> frames = new ArrayList<>();
 
-    public AnimatedCursorConfig {
-        frametime = Math.max(frametime, MIN_TIME);
-        frames = List.copyOf(frames);
+    public AnimatedCursorConfig() {
+        this.frametime = MIN_TIME;
     }
 
     public int getTime(int index) {
@@ -19,9 +21,13 @@ public record AnimatedCursorConfig(int frametime, List<Frame> frames) {
         return frametime;
     }
 
-    public record Frame(int index, int time) {
-        public Frame {
-            time = Math.max(time, MIN_TIME);
+    public static class Frame {
+        public final int index;
+        public final int time;
+
+        public Frame() {
+            this.index = 0;
+            this.time = MIN_TIME;
         }
     }
 }

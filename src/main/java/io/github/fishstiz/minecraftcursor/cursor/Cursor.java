@@ -5,6 +5,7 @@ import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.util.BufferedImageUtil;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Util;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWImage;
 
@@ -15,7 +16,7 @@ import java.util.function.Consumer;
 
 public class Cursor {
     protected static final int SIZE = 32;
-    protected final Consumer<CursorType> onLoad;
+    protected final Consumer<Cursor> onLoad;
     private final CursorType type;
     private Identifier sprite;
     private String cachedBufferedImage;
@@ -26,26 +27,26 @@ public class Cursor {
     private boolean loaded;
     private long id = 0;
 
-    public Cursor(CursorType type, Consumer<CursorType> onLoad) {
+    public Cursor(CursorType type, Consumer<Cursor> onLoad) {
         this.type = type;
         this.onLoad = onLoad;
     }
 
     public void loadImage(Identifier sprite, BufferedImage image, CursorConfig.Settings settings) throws IOException {
-        this.sprite = sprite;
-        this.cachedBufferedImage = BufferedImageUtil.compressImageToBase64(image);
-        this.enabled = settings.isEnabled();
-
         BufferedImage croppedImage = image;
         if (image.getWidth() > SIZE || image.getHeight() > SIZE) {
             croppedImage = BufferedImageUtil.cropImage(croppedImage, new Rectangle(SIZE, SIZE));
         }
 
+        this.sprite = sprite;
+        this.cachedBufferedImage = BufferedImageUtil.compressImageToBase64(croppedImage);
+        this.enabled = settings.isEnabled();
+
         create(croppedImage, settings.getScale(), settings.getXHot(), settings.getYHot());
         croppedImage.flush();
     }
 
-    private void updateImage(double scale, int xhot, int yhot) {
+    protected void updateImage(double scale, int xhot, int yhot) {
         if (id == 0) {
             return;
         }
@@ -75,11 +76,11 @@ public class Cursor {
         this.id = GLFW.glfwCreateCursor(glfwImageBuffer.get(), scaledXHot, scaledYHot);
 
         if (onLoad != null) {
-            onLoad.accept(this.type);
+            onLoad.accept(this);
         }
 
         if (previousId != 0 && this.id != previousId) {
-            GLFW.glfwDestroyCursor(previousId);
+            Util.getMainWorkerExecutor().execute(() -> GLFW.glfwDestroyCursor(previousId));
         }
 
         loaded = true;
