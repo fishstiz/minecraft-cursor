@@ -21,11 +21,24 @@ public class CursorAnimationHelper {
 
     private final Map<AnimatedCursor, CursorAnimationState> cursorStates = new HashMap<>();
 
+    public void setCurrentFrame(AnimatedCursor cursor, int frameIndex) {
+        long currentTime = Util.getMeasuringTimeMs();
+        CursorAnimationState state = cursorStates.computeIfAbsent(cursor, c -> new CursorAnimationState(currentTime));
+        state.lastFrameTime = currentTime;
+        state.currentFrame = frameIndex;
+    }
+
     public int getCurrentFrame(AnimatedCursor cursor) {
         long currentTime = Util.getMeasuringTimeMs();
         CursorAnimationState state = cursorStates.computeIfAbsent(cursor, c -> new CursorAnimationState(currentTime));
 
-        if (currentTime - state.lastFrameTime >= cursor.getFrame(state.currentFrame).time() * 50L) { // 50ms per tick
+        if (!cursor.isAnimated()) {
+            state.lastFrameTime = currentTime;
+            state.currentFrame = 0;
+            return 0;
+        }
+
+        if (currentTime - state.lastFrameTime >= cursor.getFrame(state.currentFrame).time() * 50L) { // 50ms = 1 tick
             state.lastFrameTime = currentTime;
             state.currentFrame = switch (cursor.getMode()) {
                 case LOOP -> (state.currentFrame + 1) % cursor.getFrameCount();

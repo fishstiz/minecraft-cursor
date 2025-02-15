@@ -30,8 +30,6 @@ public class AnimatedCursor extends Cursor {
     ) throws IOException {
         super.loadImage(sprite, image, settings);
 
-        this.mode = config.mode;
-
         int frameCount = image.getHeight() / SIZE;
         List<Frame> temp = new ArrayList<>();
         temp.add(new Frame(this, config.getTime(0)));
@@ -44,6 +42,8 @@ public class AnimatedCursor extends Cursor {
             temp.add(new Frame(cursor, config.getTime(i)));
         }
 
+        this.animated = settings.isAnimated() == null || settings.isAnimated();
+        this.mode = config.mode;
         this.frames = temp;
     }
 

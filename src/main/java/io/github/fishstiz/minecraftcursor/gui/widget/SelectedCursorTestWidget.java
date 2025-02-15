@@ -23,7 +23,6 @@ public class SelectedCursorTestWidget extends ClickableWidget implements CursorP
         this.optionsWidget = optionsWidget;
 
         this.active = false;
-        placeButton();
     }
 
     private void placeButton() {
@@ -45,6 +44,7 @@ public class SelectedCursorTestWidget extends ClickableWidget implements CursorP
         }
 
         context.drawBorder(getX(), getY(), getWidth(), getHeight(), 0xFF000000);
+        placeButton();
     }
 
     private void renderRuler(DrawContext context, int mouseX, int mouseY) {
