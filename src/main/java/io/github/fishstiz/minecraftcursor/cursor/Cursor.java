@@ -2,17 +2,20 @@ package io.github.fishstiz.minecraftcursor.cursor;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
+import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.util.BufferedImageUtil;
 import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWImage;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.function.Consumer;
 
 public class Cursor {
-    private final Consumer<CursorType> onLoad;
+    protected static final int SIZE = 32;
+    protected final Consumer<CursorType> onLoad;
     private final CursorType type;
     private Identifier sprite;
     private String cachedBufferedImage;
@@ -28,12 +31,18 @@ public class Cursor {
         this.onLoad = onLoad;
     }
 
-    public void loadImage(Identifier sprite, BufferedImage image, double scale, int xhot, int yhot, boolean enabled) throws IOException {
+    public void loadImage(Identifier sprite, BufferedImage image, CursorConfig.Settings settings) throws IOException {
         this.sprite = sprite;
         this.cachedBufferedImage = BufferedImageUtil.compressImageToBase64(image);
-        this.enabled = enabled;
+        this.enabled = settings.isEnabled();
 
-        create(image, scale, xhot, yhot);
+        BufferedImage croppedImage = image;
+        if (image.getWidth() > SIZE || image.getHeight() > SIZE) {
+            croppedImage = BufferedImageUtil.cropImage(croppedImage, new Rectangle(SIZE, SIZE));
+        }
+
+        create(croppedImage, settings.getScale(), settings.getXHot(), settings.getYHot());
+        croppedImage.flush();
     }
 
     private void updateImage(double scale, int xhot, int yhot) {
