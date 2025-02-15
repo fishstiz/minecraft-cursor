@@ -4,6 +4,8 @@
   "minecraft-cursor.options.scale": "Scale",
   "minecraft-cursor.options.xhot": "Offset X",
   "minecraft-cursor.options.yhot": "Offset Y",
+  "minecraft-cursor.options.animate": "Animate",
+  "minecraft-cursor.options.animate-reset": "Restart Animation",
   "minecraft-cursor.options.cursor-type.default": "Default",
   "minecraft-cursor.options.cursor-type.pointer": "Pointer",
   "minecraft-cursor.options.cursor-type.grabbing": "Grabbing",
