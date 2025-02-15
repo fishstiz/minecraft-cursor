@@ -11,12 +11,15 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.MathHelper;
 
 public class SelectedCursorHotspotWidget extends SelectedCursorClickableWidget implements CursorProvider {
     private static final Identifier BACKGROUND = Identifier.of(MinecraftCursor.MOD_ID, "textures/gui/hotspot_background.png");
-    private static final int HOTSPOT_RULER_COLOR = 0xFFFF0000; // red
     private static final int CURSOR_SIZE = 32;
+    private static final int RULER_COLOR = 0xFFFF0000; // red
     private final SelectedCursorOptionsWidget optionsWidget;
+    private boolean rulerRendered = true;
+    private float rulerAlpha = 1f;
 
     public SelectedCursorHotspotWidget(int size, SelectedCursorOptionsWidget optionsWidget) {
         super(optionsWidget.getX(), optionsWidget.getY(), size, size, Text.empty());
@@ -27,7 +30,7 @@ public class SelectedCursorHotspotWidget extends SelectedCursorClickableWidget i
     protected void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
         context.drawTexture(BACKGROUND, getX(), getY(), 0, 0, width, height, width, height);
         drawCursorTexture(context);
-        renderRuler(context);
+        renderRuler(context, mouseX, mouseY);
         context.drawBorder(getX(), getY(), getWidth(), getHeight(), 0xFF000000);
     }
 
@@ -54,7 +57,13 @@ public class SelectedCursorHotspotWidget extends SelectedCursorClickableWidget i
         );
     }
 
-    private void renderRuler(DrawContext context) {
+    private void renderRuler(DrawContext context, int mouseX, int mouseY) {
+        if (isMouseOver(mouseX, mouseY)) setRulerRendered(true, false);
+
+        rulerAlpha = MathHelper.lerp(0.3f, rulerAlpha, rulerRendered ? 1f : 0f);
+
+        if (rulerAlpha <= 0.01f) return;
+
         int xhot = (int) optionsWidget.xhotSlider.getTranslatedValue();
         int yhot = (int) optionsWidget.yhotSlider.getTranslatedValue();
 
@@ -64,8 +73,11 @@ public class SelectedCursorHotspotWidget extends SelectedCursorClickableWidget i
         int yhotY1 = (getY() + yhot * rulerSize);
         int yhotY2 = (getY() + yhot * rulerSize) + rulerSize;
 
-        context.fill(xhotX1, getY(), xhotX2, getY() + getHeight(), HOTSPOT_RULER_COLOR);
-        context.fill(getX(), yhotY1, getX() + getWidth(), yhotY2, HOTSPOT_RULER_COLOR);
+        int alpha = (int) (rulerAlpha * 255);
+        int blendedColor = (alpha << 24) | (RULER_COLOR & 0x00FFFFFF);
+
+        context.fill(xhotX1, getY(), xhotX2, getBottom(), blendedColor);
+        context.fill(getX(), yhotY1, getRight(), yhotY2, blendedColor);
     }
 
     @Override
@@ -86,10 +98,17 @@ public class SelectedCursorHotspotWidget extends SelectedCursorClickableWidget i
 
         optionsWidget.xhotSlider.setValue(xhot);
         optionsWidget.yhotSlider.setValue(yhot);
+
+        setRulerRendered(true, true);
     }
 
     private int getRulerSize() {
         return getWidth() / CURSOR_SIZE;
+    }
+
+    public void setRulerRendered(boolean rulerRendered, boolean immediate) {
+        if (immediate) rulerAlpha = rulerRendered ? 1f : 0f;
+        this.rulerRendered = rulerRendered;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package io.github.fishstiz.minecraftcursor.gui.screen;
 
 import io.github.fishstiz.minecraftcursor.CursorManager;
+import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
 import io.github.fishstiz.minecraftcursor.gui.widget.ContainerWidget;
 import io.github.fishstiz.minecraftcursor.gui.widget.CursorListWidget;
@@ -119,6 +120,19 @@ public class CursorOptionsScreen extends Screen {
 
         if (body != null) {
             body.selectedCursorColumn.refreshWidgets();
+        }
+    }
+
+    public void onPressAnimate(boolean value) {
+        if (selectedCursor instanceof AnimatedCursor animatedCursor) {
+            animatedCursor.setAnimated(value);
+            CONFIG.getOrCreateCursorSettings(selectedCursor.getType()).setAnimated(animatedCursor.isAnimated());
+        }
+    }
+
+    public void onResetAnimation() {
+        if (selectedCursor instanceof AnimatedCursor animatedCursor) {
+            animationHelper.setCurrentFrame(animatedCursor, 0);
         }
     }
 
