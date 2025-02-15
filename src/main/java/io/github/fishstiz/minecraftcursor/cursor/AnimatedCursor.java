@@ -16,6 +16,7 @@ import java.util.function.Consumer;
 public class AnimatedCursor extends Cursor {
     private List<Frame> frames = new ArrayList<>();
     private boolean animated = true;
+    private AnimationMode mode = AnimationMode.LOOP;
 
     public AnimatedCursor(CursorType type, Consumer<Cursor> onLoad) {
         super(type, onLoad);
@@ -28,6 +29,8 @@ public class AnimatedCursor extends Cursor {
             AnimatedCursorConfig config
     ) throws IOException {
         super.loadImage(sprite, image, settings);
+
+        this.mode = config.mode;
 
         int frameCount = image.getHeight() / SIZE;
         List<Frame> temp = new ArrayList<>();
@@ -76,6 +79,10 @@ public class AnimatedCursor extends Cursor {
 
     public void setAnimated(boolean animated) {
         this.animated = animated;
+    }
+
+    public AnimationMode getMode() {
+        return this.mode;
     }
 
     public record Frame(Cursor cursor, int time) {
