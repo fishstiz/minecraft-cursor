@@ -25,6 +25,7 @@ public class CursorManager {
     private Cursor currentCursor = new Cursor(CursorType.of(""), null);
     private long lastFrameTime = 0;
     private int currentFrame = 0;
+    private boolean oscillateReverse = false;
 
     CursorManager(MinecraftClient client) {
         this.client = client;
@@ -98,7 +99,14 @@ public class CursorManager {
 
         if (currentTime - lastFrameTime >= cursor.getFrame(currentFrame).time() * 50L) { // 50ms = 1 tick
             lastFrameTime = currentTime;
-            currentFrame = (currentFrame + 1) % cursor.getFrameCount();
+            currentFrame = switch (cursor.getMode()) {
+                case LOOP -> (currentFrame + 1) % cursor.getFrameCount();
+                case HOLD -> Math.min(currentFrame + 1, cursor.getFrameCount() - 1);
+                case OSCILLATE -> {
+                    oscillateReverse = currentFrame != 0 && (currentFrame == cursor.getFrameCount() - 1 || oscillateReverse);
+                    yield oscillateReverse ? currentFrame - 1 : currentFrame + 1;
+                }
+            };
             Cursor currentFrameCursor = cursor.getFrame(currentFrame).cursor();
             updateCursor(currentFrameCursor);
         }
