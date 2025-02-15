@@ -1,10 +1,13 @@
 package io.github.fishstiz.minecraftcursor;
 
 import io.github.fishstiz.minecraftcursor.api.CursorType;
+import io.github.fishstiz.minecraftcursor.config.AnimatedCursorConfig;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
+import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.image.BufferedImage;
@@ -32,9 +35,34 @@ public class CursorManager {
         }
     }
 
-    public void loadCursorImage(CursorType type, Identifier sprite, BufferedImage image, CursorConfig.Settings settings) throws IOException {
+    public void loadCursorImage(
+            CursorType type,
+            Identifier sprite,
+            BufferedImage image,
+            CursorConfig.Settings settings,
+            @Nullable AnimatedCursorConfig animationConfig
+    ) throws IOException {
         Cursor cursor = getCursor(type);
-        cursor.loadImage(sprite, image, settings.getScale(), settings.getXHot(), settings.getYHot(), settings.isEnabled());
+
+        if (animationConfig == null) {
+            if (cursor instanceof AnimatedCursor) {
+                cursor = new Cursor(type, this::handleCursorLoad);
+                cursors.put(type.getKey(), cursor);
+            }
+
+            cursor.loadImage(sprite, image, settings);
+            return;
+        }
+
+        AnimatedCursor animatedCursor;
+        if (cursor instanceof AnimatedCursor) {
+            animatedCursor = (AnimatedCursor) cursor;
+        } else {
+            animatedCursor = new AnimatedCursor(type, this::handleCursorLoad);
+            cursors.put(type.getKey(), animatedCursor);
+        }
+
+        animatedCursor.loadImage(sprite, image, settings, animationConfig);
     }
 
     private void handleCursorLoad(CursorType cursorType) {

@@ -1,6 +1,7 @@
 package io.github.fishstiz.minecraftcursor;
 
 import io.github.fishstiz.minecraftcursor.api.CursorType;
+import io.github.fishstiz.minecraftcursor.config.AnimatedCursorConfig;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.config.CursorConfigLoader;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
@@ -13,11 +14,13 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 class CursorResourceReloadListener implements SimpleSynchronousResourceReloadListener {
     private static final String IMG_TYPE = ".png";
+    private static final String IMG_CONFIG_TYPE = IMG_TYPE + ".json";
     private static final String CONFIG_PATH = "atlases/cursors.json";
     private static final String CURSORS_DIR = "textures/cursors";
     private final CursorManager cursorManager;
@@ -39,6 +42,7 @@ class CursorResourceReloadListener implements SimpleSynchronousResourceReloadLis
     public void reload(ResourceManager manager) {
         loadConfig(manager);
         loadCursorTextures(manager);
+        cursorManager.setCurrentCursor(CursorType.DEFAULT);
     }
 
     private void loadConfig(ResourceManager manager) {
@@ -60,10 +64,13 @@ class CursorResourceReloadListener implements SimpleSynchronousResourceReloadLis
     }
 
     private void loadCursorTextures(ResourceManager manager) {
-        for (Map.Entry<Identifier, Resource> entry : manager.findResources(
-                getFabricId().getPath(),
-                id -> getCursorTypeByIdentifierOrNull(id) != null).entrySet()
-        ) {
+        Map<Identifier, Resource> cursorResources = manager.findResources(
+                this.getFabricId().getPath(),
+                id -> id.getPath().endsWith(IMG_TYPE) && getCursorTypeByIdentifierOrNull(id) != null
+        );
+        Map<String, AnimatedCursorConfig> animationConfigs =getAnimationConfigs(manager);
+
+        for (Map.Entry<Identifier, Resource> entry : cursorResources.entrySet()) {
             CursorType cursorType = getCursorTypeByIdentifierOrNull(entry.getKey());
             assert cursorType != null;
 
@@ -72,7 +79,7 @@ class CursorResourceReloadListener implements SimpleSynchronousResourceReloadLis
                 image = ImageIO.read(stream);
 
                 if (image == null) {
-                    MinecraftCursor.LOGGER.error("Invalid file for {}{}", cursorType, IMG_TYPE);
+                    MinecraftCursor.LOGGER.error("Invalid file for {}. Supported types: {}", cursorType, IMG_TYPE);
                     continue;
                 }
 
@@ -80,7 +87,8 @@ class CursorResourceReloadListener implements SimpleSynchronousResourceReloadLis
                         cursorType,
                         entry.getKey(), // Identifier
                         image,
-                        config.getOrCreateCursorSettings(cursorType)
+                        config.getOrCreateCursorSettings(cursorType),
+                        animationConfigs.get(cursorType.getKey())
                 );
             } catch (IOException e) {
                 MinecraftCursor.LOGGER.error("Failed to load cursor image {}", entry.getKey().getPath());
@@ -90,6 +98,28 @@ class CursorResourceReloadListener implements SimpleSynchronousResourceReloadLis
                 }
             }
         }
+    }
+
+    private Map<String, AnimatedCursorConfig> getAnimationConfigs(ResourceManager manager) {
+        Map<String, AnimatedCursorConfig> animationConfigs = new HashMap<>();
+
+        Map<Identifier, Resource> configResources = manager.findResources(
+                this.getFabricId().getPath(),
+                id -> id.getPath().endsWith(IMG_CONFIG_TYPE) && getCursorTypeByIdentifierOrNull(id) != null
+        );
+
+        for (Map.Entry<Identifier, Resource> entry : configResources.entrySet()) {
+            CursorType cursorType = getCursorTypeByIdentifierOrNull(entry.getKey());
+            assert cursorType != null;
+
+            try (InputStream stream = entry.getValue().getInputStream()) {
+                animationConfigs.put(cursorType.getKey(), CursorConfigLoader.getAnimationConfig(stream));
+            } catch (IOException e) {
+                MinecraftCursor.LOGGER.error("Failed to load animation config for {}", cursorType.getKey());
+            }
+        }
+
+        return animationConfigs;
     }
 
     private static @Nullable CursorType getCursorTypeByIdentifierOrNull(Identifier id) {
