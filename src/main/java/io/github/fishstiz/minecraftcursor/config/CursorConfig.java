@@ -1,5 +1,6 @@
 package io.github.fishstiz.minecraftcursor.config;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.fishstiz.minecraftcursor.CursorTypeRegistry;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 
@@ -165,6 +166,8 @@ public class CursorConfig {
         private int xhot;
         private int yhot;
         private boolean enabled;
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        private Boolean animated;
 
         public Settings() {
             this.scale = Default.SCALE;
@@ -198,6 +201,14 @@ public class CursorConfig {
 
         public boolean isEnabled() {
             return enabled;
+        }
+
+        public Boolean isAnimated() {
+            return this.animated;
+        }
+
+        public void setAnimated(boolean animated) {
+            this.animated = animated;
         }
 
         public static class Default {
