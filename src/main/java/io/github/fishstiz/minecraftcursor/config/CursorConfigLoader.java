@@ -12,6 +12,12 @@ public class CursorConfigLoader {
     private CursorConfigLoader() {
     }
 
+    public static AnimatedCursorConfig getAnimationConfig(InputStream stream) throws IOException {
+        try (InputStreamReader reader = new InputStreamReader(stream)) {
+            return GSON.fromJson(reader, AnimatedCursorConfig.class);
+        }
+    }
+
     public static CursorConfig fromStream(InputStream stream) throws IOException {
         try (InputStreamReader reader = new InputStreamReader(stream)) {
             return GSON.fromJson(reader, CursorConfig.class);
