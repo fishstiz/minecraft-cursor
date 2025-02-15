@@ -1,5 +1,6 @@
 package io.github.fishstiz.minecraftcursor.gui.widget;
 
+import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
 import io.github.fishstiz.minecraftcursor.gui.screen.CursorOptionsScreen;
 import net.minecraft.client.MinecraftClient;
@@ -123,6 +124,7 @@ public class CursorListWidget extends ElementListWidget<CursorListWidget.CursorW
 
     public static class CursorClickableWidget extends PressableWidget {
         private static final String PREFIX_TEXT_KEY = "minecraft-cursor.options.cursor-type.";
+        private static final int CURSOR_SIZE = 32;
         private static final int TEXTURE_SIZE = 16;
         private static final int PADDING_LEFT = 8;
         private static final int BACKGROUND_COLOR = 0x7F000000; // black 50%
@@ -165,7 +167,24 @@ public class CursorListWidget extends ElementListWidget<CursorListWidget.CursorW
         private void renderTexture(DrawContext context) {
             int x = getX() + PADDING_LEFT;
             int y = getY() + (getHeight() / 2) - (TEXTURE_SIZE / 2);
-            context.drawTexture(cursor.getSprite(), x, y, 0, 0, TEXTURE_SIZE, TEXTURE_SIZE, TEXTURE_SIZE, TEXTURE_SIZE);
+            int textureHeight = CURSOR_SIZE;
+            int frameIndex = 0;
+
+            if (cursor instanceof AnimatedCursor animatedCursor) {
+                textureHeight *= animatedCursor.getFrameCount();
+                frameIndex = optionsScreen.animationHelper.getCurrentFrame(animatedCursor);
+            }
+
+            int vOffset = CURSOR_SIZE * frameIndex;
+
+            context.drawTexture(
+                    cursor.getSprite(),
+                    x, y,
+                    0, vOffset, // starting point
+                    TEXTURE_SIZE, TEXTURE_SIZE, // width/height to stretch/shrink
+                    CURSOR_SIZE, CURSOR_SIZE, // cropped width/height from actual image
+                    CURSOR_SIZE, textureHeight // actual width/height
+            );
         }
 
         private void renderMessage(DrawContext context) {
