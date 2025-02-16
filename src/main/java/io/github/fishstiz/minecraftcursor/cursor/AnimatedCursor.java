@@ -142,6 +142,12 @@ public class AnimatedCursor extends Cursor {
         return this.mode;
     }
 
+    @Override
+    public void enable(boolean enabled) {
+        super.enable(enabled);
+        applyToFrames(cursor -> cursor.enable(enabled));
+    }
+
     public record Frame(Cursor cursor, int time, int spriteIndex) {
     }
 }

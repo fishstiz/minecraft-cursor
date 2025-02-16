@@ -72,7 +72,7 @@ public class CursorManager {
     void setCurrentCursor(CursorType type) {
         Cursor cursor = getCursor(overrides.isEmpty() ? type.getKey() : overrides.lastEntry().getValue());
 
-        if (cursor instanceof AnimatedCursor animatedCursor) {
+        if (cursor instanceof AnimatedCursor animatedCursor && cursor.getId() != 0) {
             handleCursorAnimation(animatedCursor);
             return;
         }

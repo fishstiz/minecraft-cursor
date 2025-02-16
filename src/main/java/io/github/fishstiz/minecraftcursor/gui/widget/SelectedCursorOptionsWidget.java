@@ -70,10 +70,11 @@ public class SelectedCursorOptionsWidget extends ContainerWidget {
                 HOT_MIN, HOT_MAX, 1, HOT_UNIT,
                 handleChangeHotspots(optionsScreen::onChangeYHot), this);
 
-        if (cursor instanceof AnimatedCursor animatedCursor) {
-            animateButton = SelectedCursorToggleWidget.build(ANIMATE_TEXT, animatedCursor.isAnimated(), this::handlePressAnimate);
-            resetAnimation = new SelectedCursorButtonWidget(RESET_ANIMATION_TEXT, this::handleResetAnimation);
-        }
+        animateButton = SelectedCursorToggleWidget.build(
+                ANIMATE_TEXT,
+                cursor instanceof AnimatedCursor animatedCursor && animatedCursor.isAnimated(),
+                this::handlePressAnimate);
+        resetAnimation = new SelectedCursorButtonWidget(RESET_ANIMATION_TEXT, this::handleResetAnimation);
 
         cursorHotspot = new SelectedCursorHotspotWidget(BOX_WIDGET_TEXTURE_SIZE, this);
         cursorTest = new SelectedCursorTestWidget(BOX_WIDGET_TEXTURE_SIZE, this);
@@ -90,7 +91,7 @@ public class SelectedCursorOptionsWidget extends ContainerWidget {
         grid(xhotSlider, 0, 1);
         grid(yhotSlider, 1, 1);
 
-        if (isAnimatedCursor) {
+        if (isAnimatedCursor && animateButton != null) {
             grid(animateButton, 0, 2);
             grid(resetAnimation, 1, 2);
         }
@@ -120,7 +121,7 @@ public class SelectedCursorOptionsWidget extends ContainerWidget {
         xhotSlider.setValue(cursor.getXhot());
         yhotSlider.setValue(cursor.getYhot());
 
-        if (cursor instanceof AnimatedCursor animatedCursor) {
+        if (cursor instanceof AnimatedCursor animatedCursor && animateButton != null) {
             animateButton.setValue(animatedCursor.isAnimated());
             resetAnimation.active = animatedCursor.isAnimated();
         }
@@ -152,7 +153,7 @@ public class SelectedCursorOptionsWidget extends ContainerWidget {
         xhotSlider.render(context, mouseX, mouseY, delta);
         yhotSlider.render(context, mouseX, mouseY, delta);
 
-        if (optionsScreen.getSelectedCursor() instanceof AnimatedCursor) {
+        if (optionsScreen.getSelectedCursor() instanceof AnimatedCursor && animateButton != null) {
             animateButton.render(context, mouseX, mouseY, delta);
             resetAnimation.render(context, mouseX, mouseY, delta);
         }
