@@ -28,7 +28,7 @@ public class CursorAnimationHelper {
         state.currentFrame = frameIndex;
     }
 
-    public int getCurrentFrame(AnimatedCursor cursor) {
+    public int getCurrentSpriteIndex(AnimatedCursor cursor) {
         long currentTime = Util.getMeasuringTimeMs();
         CursorAnimationState state = cursorStates.computeIfAbsent(cursor, c -> new CursorAnimationState(currentTime));
 
@@ -49,6 +49,6 @@ public class CursorAnimationHelper {
                 }
             };
         }
-        return state.currentFrame;
+        return cursor.getFrame(state.currentFrame).spriteIndex();
     }
 }

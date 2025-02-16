@@ -1,20 +1,25 @@
 package io.github.fishstiz.minecraftcursor.config;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
-import org.spongepowered.include.com.google.gson.Gson;
-import org.spongepowered.include.com.google.gson.GsonBuilder;
+import io.github.fishstiz.minecraftcursor.cursor.AnimationMode;
 
 import java.io.*;
 
 public class CursorConfigLoader {
-    static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson GSON_ANIMATION = new GsonBuilder()
+            .registerTypeAdapter(AnimatedCursorConfig.Frame.class, new AnimatedCursorConfig.FrameDeserializer())
+            .registerTypeAdapter(AnimationMode.class, new AnimationMode.Deserializer())
+            .create();
 
     private CursorConfigLoader() {
     }
 
     public static AnimatedCursorConfig getAnimationConfig(InputStream stream) throws IOException {
         try (InputStreamReader reader = new InputStreamReader(stream)) {
-            return GSON.fromJson(reader, AnimatedCursorConfig.class);
+            return GSON_ANIMATION.fromJson(reader, AnimatedCursorConfig.class);
         }
     }
 

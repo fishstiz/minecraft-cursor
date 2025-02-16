@@ -5,7 +5,6 @@ import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.util.BufferedImageUtil;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWImage;
 
@@ -80,7 +79,7 @@ public class Cursor {
         }
 
         if (previousId != 0 && this.id != previousId) {
-            Util.getMainWorkerExecutor().execute(() -> GLFW.glfwDestroyCursor(previousId));
+            GLFW.glfwDestroyCursor(previousId);
         }
 
         loaded = true;
