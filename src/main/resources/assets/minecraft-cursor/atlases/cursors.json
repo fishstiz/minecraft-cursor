@@ -16,6 +16,10 @@
       "xhot": 15,
       "yhot": 3
     },
+    "busy": {
+      "xhot": 13,
+      "yhot": 17
+    },
     "shift": {
       "xhot": 11,
       "yhot": 3

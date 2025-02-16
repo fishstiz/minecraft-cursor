@@ -20,7 +20,8 @@ public class CursorTypeRegistry implements CursorTypeRegistrar {
                 CursorType.POINTER,
                 CursorType.GRABBING,
                 CursorType.TEXT,
-                CursorType.SHIFT
+                CursorType.SHIFT,
+                CursorType.BUSY
         );
     }
 
