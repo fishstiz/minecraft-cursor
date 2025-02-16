@@ -24,6 +24,8 @@ public class Cursor {
     private int yhot;
     private boolean enabled;
     private boolean loaded;
+    private int trueWidth;
+    private int trueHeight;
     private long id = 0;
 
     public Cursor(CursorType type, Consumer<Cursor> onLoad) {
@@ -32,6 +34,9 @@ public class Cursor {
     }
 
     public void loadImage(Identifier sprite, BufferedImage image, CursorConfig.Settings settings) throws IOException {
+        this.trueWidth = image.getWidth();
+        this.trueHeight = image.getHeight();
+
         BufferedImage croppedImage = image;
         if (image.getWidth() > SIZE || image.getHeight() > SIZE) {
             croppedImage = BufferedImageUtil.cropImage(croppedImage, new Rectangle(SIZE, SIZE));
@@ -152,5 +157,13 @@ public class Cursor {
 
     public boolean isLoaded() {
         return loaded;
+    }
+
+    public int getTrueWidth() {
+        return trueWidth;
+    }
+
+    public int getTrueHeight() {
+        return trueHeight;
     }
 }
