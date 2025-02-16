@@ -97,7 +97,9 @@ public class AnimatedCursor extends Cursor {
     ) {
         this.animated = settings.isAnimated() == null || settings.isAnimated();
         this.mode = animation.mode;
-        this.frames = newFrames;
+
+        boolean isReversed = this.mode == AnimationMode.LOOP_REVERSE || this.mode == AnimationMode.REVERSE;
+        this.frames = isReversed ? newFrames.reversed() : newFrames;
 
         List<Cursor> oldCursors = List.copyOf(this.cursors.values());
         this.cursors = newCursors;
