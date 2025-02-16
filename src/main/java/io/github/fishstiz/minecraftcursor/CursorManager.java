@@ -93,7 +93,7 @@ public class CursorManager {
         if (currentCursor == null || !currentCursor.getType().getKey().equals(cursor.getType().getKey())) {
             lastFrameTime = currentTime;
             currentFrame = 0;
-            updateCursor(cursor);
+            updateCursor(cursor.getFrame(0).cursor());
             return;
         }
 
@@ -130,19 +130,20 @@ public class CursorManager {
         overrides.remove(index);
     }
 
-    public synchronized void reloadCursor() {
-        Cursor cursor = getCurrentCursor();
-        if (cursor instanceof AnimatedCursor animatedCursor) {
-            handleCursorAnimation(animatedCursor);
-        } else {
-            GLFW.glfwSetCursor(client.getWindow().getHandle(), getCurrentCursor().getId());
-        }
+    public void reloadCursor() {
+        GLFW.glfwSetCursor(client.getWindow().getHandle(), getCurrentCursor().getId());
     }
 
     public Cursor getCurrentCursor() {
-        return overrides.isEmpty()
+        Cursor cursor = overrides.isEmpty()
                 ? currentCursor
                 : getCursor(overrides.lastEntry().getValue());
+
+        if (cursor instanceof AnimatedCursor animatedCursor) {
+            return animatedCursor.getFrame(currentFrame).cursor();
+        }
+
+        return cursor;
     }
 
     public Cursor getCursor(String key) {
