@@ -45,7 +45,8 @@ public class CursorManager {
         Cursor cursor = getCursor(type);
 
         if (animationConfig == null) {
-            if (cursor instanceof AnimatedCursor) {
+            if (cursor instanceof AnimatedCursor animatedCursor) {
+                animatedCursor.destroy();
                 cursor = new Cursor(type, this::handleCursorLoad);
                 cursors.put(type.getKey(), cursor);
             }
@@ -57,6 +58,7 @@ public class CursorManager {
         if (cursor instanceof AnimatedCursor) {
             animatedCursor = (AnimatedCursor) cursor;
         } else {
+            cursor.destroy();
             animatedCursor = new AnimatedCursor(type, this::handleCursorLoad);
             cursors.put(type.getKey(), animatedCursor);
         }
