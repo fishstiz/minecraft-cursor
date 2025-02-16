@@ -21,7 +21,6 @@ public class AnimatedCursor extends Cursor {
     private HashMap<Integer, Cursor> cursors = new HashMap<>();
     private List<Frame> frames = new ArrayList<>();
     private boolean animated = true;
-    private int availableFrames;
 
     public AnimatedCursor(CursorType type, Consumer<Cursor> onLoad) {
         super(type, onLoad);
@@ -37,9 +36,9 @@ public class AnimatedCursor extends Cursor {
 
         HashMap<Integer, Cursor> tempCursors = new HashMap<>();
         List<Frame> tempFrames = new ArrayList<>();
-        this.availableFrames = image.getHeight() / SIZE;
+        int availableFrames = image.getHeight() / SIZE;
 
-        for (int i = 1; i < this.availableFrames; i++) {
+        for (int i = 1; i < availableFrames; i++) {
             Cursor cursor = createCursor(sprite, image, settings, i);
             tempCursors.put(i, cursor);
 
@@ -63,8 +62,11 @@ public class AnimatedCursor extends Cursor {
 
         this.animated = settings.isAnimated() == null || settings.isAnimated();
         this.mode = config.mode;
-        this.cursors = tempCursors;
         this.frames = tempFrames;
+
+        List<Cursor> oldCursors = List.copyOf(this.cursors.values());
+        this.cursors = tempCursors;
+        oldCursors.forEach(Cursor::destroy);
     }
 
     private Cursor createCursor(
@@ -114,10 +116,6 @@ public class AnimatedCursor extends Cursor {
 
     public AnimationMode getMode() {
         return this.mode;
-    }
-
-    public int getAvailableFrames() {
-        return this.availableFrames;
     }
 
     public record Frame(Cursor cursor, int time, int spriteIndex) {
