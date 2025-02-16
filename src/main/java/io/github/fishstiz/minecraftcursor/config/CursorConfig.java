@@ -1,6 +1,5 @@
 package io.github.fishstiz.minecraftcursor.config;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.fishstiz.minecraftcursor.CursorTypeRegistry;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 
@@ -167,7 +166,6 @@ public class CursorConfig implements Serializable {
         private int xhot;
         private int yhot;
         private boolean enabled;
-        @JsonInclude(JsonInclude.Include.NON_NULL)
         private Boolean animated;
 
         public Settings() {

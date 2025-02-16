@@ -138,8 +138,8 @@ public class CursorListWidget extends ElementListWidget<CursorListWidget.CursorW
             int frameIndex = 0;
 
             if (cursor instanceof AnimatedCursor animatedCursor) {
-                textureHeight *= animatedCursor.getFrameCount();
-                frameIndex = optionsScreen.animationHelper.getCurrentFrame(animatedCursor);
+                textureHeight *= animatedCursor.getAvailableFrames();
+                frameIndex = optionsScreen.animationHelper.getCurrentSpriteIndex(animatedCursor);
             }
 
             int vOffset = CURSOR_SIZE * frameIndex;

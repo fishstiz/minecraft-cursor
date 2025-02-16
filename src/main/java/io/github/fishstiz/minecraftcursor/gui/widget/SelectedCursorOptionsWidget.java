@@ -160,6 +160,7 @@ public class SelectedCursorOptionsWidget extends ContainerWidget {
     private void handlePressAnimate(boolean value) {
         optionsScreen.onPressAnimate(value);
         resetAnimation.active = value;
+        if (!value) cursorHotspot.setRulerRendered(true, true);
     }
 
     private void handleResetAnimation() {
