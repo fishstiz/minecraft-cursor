@@ -11,7 +11,10 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static io.github.fishstiz.minecraftcursor.config.CursorConfig.Settings.Default.*;
 
@@ -130,7 +133,7 @@ public class SelectedCursorOptionsWidget extends ContainerWidget {
 
     @Override
     public List<? extends Element> children() {
-        return List.of(
+        return Stream.of(
                 enableButton,
                 scaleSlider,
                 xhotSlider,
@@ -139,7 +142,7 @@ public class SelectedCursorOptionsWidget extends ContainerWidget {
                 resetAnimation,
                 cursorHotspot,
                 cursorTest
-        );
+        ).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     @Override
