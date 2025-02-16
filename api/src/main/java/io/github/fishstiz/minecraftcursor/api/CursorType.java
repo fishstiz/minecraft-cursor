@@ -68,4 +68,9 @@ public interface CursorType {
      * The cursor type that is applied when shift is held and the mouse is over elements with special shift actions.
      */
     CursorType SHIFT = CursorType.of("shift");
+
+    /**
+     * The cursor type that is applied when loading.
+     */
+    CursorType BUSY = CursorType.of("busy");
 }
