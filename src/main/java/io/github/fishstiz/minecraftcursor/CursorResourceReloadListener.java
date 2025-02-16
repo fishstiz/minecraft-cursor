@@ -16,7 +16,7 @@ import java.io.InputStream;
 
 class CursorResourceReloadListener implements SimpleSynchronousResourceReloadListener {
     private static final String IMG_TYPE = ".png";
-    private static final String ANIMATION_TYPE = IMG_TYPE + ".json";
+    private static final String ANIMATION_TYPE = IMG_TYPE + ".mcmeta";
     private static final String CONFIG_PATH = "atlases/cursors.json";
     private static final String CURSORS_DIR = "textures/cursors";
     private final CursorManager cursorManager;
