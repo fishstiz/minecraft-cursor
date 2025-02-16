@@ -8,8 +8,12 @@ import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 public enum AnimationMode {
     @JsonEnumDefaultValue
     LOOP,
-    HOLD,
-    OSCILLATE;
+    LOOP_REVERSE,
+    FORWARDS,
+    REVERSE,
+    OSCILLATE,
+    RANDOM,
+    RANDOM_LOOP;
 
     @JsonValue
     public String toLowerCase() {

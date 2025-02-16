@@ -123,7 +123,7 @@ public class CursorOptionsScreen extends Screen {
 
     public void onResetAnimation() {
         if (selectedCursor instanceof AnimatedCursor animatedCursor) {
-            animationHelper.setCurrentFrame(animatedCursor, 0);
+            animationHelper.reset(animatedCursor);
         }
     }
 
