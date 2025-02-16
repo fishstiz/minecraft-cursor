@@ -4,10 +4,10 @@ import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.config.AnimatedCursorConfig;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
+import io.github.fishstiz.minecraftcursor.cursor.AnimationState;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
@@ -22,10 +22,8 @@ public class CursorManager {
     private final LinkedHashMap<String, Cursor> cursors = new LinkedHashMap<>();
     private final TreeMap<Integer, String> overrides = new TreeMap<>();
     private final MinecraftClient client;
+    private final AnimationState animationState = new AnimationState();
     private Cursor currentCursor = new Cursor(CursorType.of(""), null);
-    private long lastFrameTime = 0;
-    private int currentFrame = 0;
-    private boolean oscillateReverse = false;
 
     CursorManager(MinecraftClient client) {
         this.client = client;
@@ -89,28 +87,14 @@ public class CursorManager {
     }
 
     private void handleCursorAnimation(AnimatedCursor cursor) {
-        long currentTime = Util.getMeasuringTimeMs();
-
         if (currentCursor == null || !currentCursor.getType().getKey().equals(cursor.getType().getKey())) {
-            lastFrameTime = currentTime;
-            currentFrame = 0;
-            updateCursor(cursor.getFrame(0).cursor());
-            return;
+            animationState.reset();
+        } else {
+            animationState.nextFrame(cursor);
         }
 
-        if (currentTime - lastFrameTime >= cursor.getFrame(currentFrame).time() * 50L) { // 50ms = 1 tick
-            lastFrameTime = currentTime;
-            currentFrame = switch (cursor.getMode()) {
-                case LOOP -> (currentFrame + 1) % cursor.getFrameCount();
-                case HOLD -> Math.min(currentFrame + 1, cursor.getFrameCount() - 1);
-                case OSCILLATE -> {
-                    oscillateReverse = currentFrame != 0 && (currentFrame == cursor.getFrameCount() - 1 || oscillateReverse);
-                    yield oscillateReverse ? currentFrame - 1 : currentFrame + 1;
-                }
-            };
-            Cursor currentFrameCursor = cursor.getFrame(currentFrame).cursor();
-            updateCursor(currentFrameCursor.getId() != 0 ? currentFrameCursor : cursor);
-        }
+        Cursor currentFrameCursor = cursor.getFrame(animationState.getCurrentFrame()).cursor();
+        updateCursor(currentFrameCursor.getId() != 0 ? currentFrameCursor : cursor);
     }
 
     private void updateCursor(Cursor cursor) {
@@ -141,7 +125,7 @@ public class CursorManager {
                 : getCursor(overrides.lastEntry().getValue());
 
         if (cursor instanceof AnimatedCursor animatedCursor) {
-            return animatedCursor.getFrame(currentFrame).cursor();
+            return animatedCursor.getFrame(animationState.getCurrentFrame()).cursor();
         }
 
         return cursor;

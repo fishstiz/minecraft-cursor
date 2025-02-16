@@ -10,8 +10,12 @@ import java.lang.reflect.Type;
 
 public enum AnimationMode {
     LOOP,
-    HOLD,
-    OSCILLATE;
+    LOOP_REVERSE,
+    FORWARDS,
+    REVERSE,
+    OSCILLATE,
+    RANDOM,
+    RANDOM_LOOP;
 
     @Override
     public String toString() {
