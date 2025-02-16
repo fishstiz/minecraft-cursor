@@ -88,6 +88,12 @@ public class Cursor {
         this.yhot = yhot;
     }
 
+    public void destroy() {
+        if (this.id != 0) {
+            GLFW.glfwDestroyCursor(this.id);
+        }
+    }
+
     public void enable(boolean enabled) {
         if (enabled) {
             enable();
