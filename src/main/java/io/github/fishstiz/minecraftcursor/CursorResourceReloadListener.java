@@ -13,7 +13,6 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Optional;
 
 class CursorResourceReloadListener implements SimpleSynchronousResourceReloadListener {
     private static final String IMG_TYPE = ".png";
@@ -43,20 +42,20 @@ class CursorResourceReloadListener implements SimpleSynchronousResourceReloadLis
     }
 
     private void loadConfig(ResourceManager manager) {
-        Optional<Resource> resourceOptional = manager.getResource(Identifier.of(namespace, CONFIG_PATH));
+        Resource configResource = manager.getResource(Identifier.of(namespace, CONFIG_PATH)).orElse(null);
 
-        if (resourceOptional.isEmpty()) return;
+        if (configResource == null) return;
 
-        try (InputStream stream = resourceOptional.get().getInputStream()) {
+        try (InputStream stream = configResource.getInputStream()) {
             CursorConfig resourceConfig = CursorConfigLoader.fromStream(stream);
             if (!resourceConfig.get_hash().equals(config.get_hash())) {
                 config.set_hash(resourceConfig.get_hash());
                 config.setSettings(resourceConfig.getSettings());
                 config.save();
-                MinecraftCursor.LOGGER.info("Using cursor settings provided by resource pack");
+                MinecraftCursor.LOGGER.info("New resource pack settings detected for minecraft-cursor '{}'", configResource.getPackId());
             }
         } catch (IOException e) {
-            MinecraftCursor.LOGGER.error("Failed to load resource pack's cursor settings");
+            MinecraftCursor.LOGGER.error("Failed to load settings of resource pack '{}'", configResource.getPackId());
         }
     }
 

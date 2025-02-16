@@ -40,29 +40,28 @@ public class CursorManager {
             Identifier sprite,
             BufferedImage image,
             CursorConfig.Settings settings,
-            @Nullable AnimatedCursorConfig animationConfig
+            @Nullable AnimatedCursorConfig animation
     ) throws IOException {
+        boolean animated = animation != null;
         Cursor cursor = getCursor(type);
 
-        if (animationConfig == null) {
-            if (cursor instanceof AnimatedCursor animatedCursor) {
-                animatedCursor.destroy();
-                cursor = new Cursor(type, this::handleCursorLoad);
-                cursors.put(type.getKey(), cursor);
-            }
-            cursor.loadImage(sprite, image, settings);
-            return;
+        if (animated != (cursor instanceof AnimatedCursor)) {
+            cursor.destroy();
+            cursor = createAppropiateCursor(type, animated);
+            cursors.put(type.getKey(), cursor);
         }
 
-        AnimatedCursor animatedCursor;
-        if (cursor instanceof AnimatedCursor) {
-            animatedCursor = (AnimatedCursor) cursor;
+        if (cursor instanceof AnimatedCursor animatedCursor) {
+            animatedCursor.loadImage(sprite, image, settings, animation);
         } else {
-            cursor.destroy();
-            animatedCursor = new AnimatedCursor(type, this::handleCursorLoad);
-            cursors.put(type.getKey(), animatedCursor);
+            cursor.loadImage(sprite, image, settings);
         }
-        animatedCursor.loadImage(sprite, image, settings, animationConfig);
+    }
+
+    private Cursor createAppropiateCursor(CursorType type, boolean animated) {
+        return animated
+                ? new AnimatedCursor(type, this::handleCursorLoad)
+                : new Cursor(type, this::handleCursorLoad);
     }
 
     private void handleCursorLoad(Cursor cursor) {
@@ -110,7 +109,7 @@ public class CursorManager {
                 }
             };
             Cursor currentFrameCursor = cursor.getFrame(currentFrame).cursor();
-            updateCursor(currentFrameCursor);
+            updateCursor(currentFrameCursor.getId() != 0 ? currentFrameCursor : cursor);
         }
     }
 
