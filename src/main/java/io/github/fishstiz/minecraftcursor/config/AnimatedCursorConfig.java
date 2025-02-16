@@ -1,37 +1,59 @@
 package io.github.fishstiz.minecraftcursor.config;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.github.fishstiz.minecraftcursor.cursor.AnimationMode;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class AnimatedCursorConfig {
     private static final int MIN_TIME = 1;
     public final AnimationMode mode;
-    public final int frametime;
-    public final List<Frame> frames = new ArrayList<>();
+    private final int frametime;
+    private final List<Frame> frames = List.of();
 
     public AnimatedCursorConfig() {
         this.mode = AnimationMode.LOOP;
         this.frametime = MIN_TIME;
     }
 
-    public int getTime(int index) {
-        for (Frame frame : frames) {
-            if (frame.index == index) {
-                return frame.time > 0 ? frame.time : Math.max(frametime, MIN_TIME);
-            }
-        }
-        return Math.max(frametime, MIN_TIME);
+    public int getFrametime() {
+        return Math.max(this.frametime, MIN_TIME);
+    }
+
+    public List<Frame> getFrames() {
+        return List.copyOf(this.frames);
     }
 
     public static class Frame {
-        public final int index;
-        public final int time;
+        private final int index;
+        private int time;
 
-        public Frame() {
-            this.index = 0;
-            this.time = MIN_TIME;
+        public Frame(int index, int time) {
+            this.index = index;
+            this.time = time;
+        }
+
+        public int getIndex() {
+            return this.index;
+        }
+
+        public int getTime(AnimatedCursorConfig config) {
+            this.time = this.time > 0 ? this.time : Math.max(config.getFrametime(), MIN_TIME);
+            return this.time;
+        }
+
+        @JsonCreator
+        public static Frame setFrames(JsonNode node) {
+            if (node.isInt()) {
+                return new Frame(node.asInt(), 0);
+            } else {
+                ObjectNode obj = (ObjectNode) node;
+                int index = obj.has("index") ? obj.get("index").asInt() : 0;
+                int time = obj.has("time") ? obj.get("time").asInt() : 0;
+                return new Frame(index, time);
+            }
         }
     }
 }

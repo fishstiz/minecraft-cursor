@@ -1,5 +1,6 @@
 package io.github.fishstiz.minecraftcursor.cursor;
 
+import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.config.AnimatedCursorConfig;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
@@ -9,14 +10,18 @@ import net.minecraft.util.Identifier;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
 
 public class AnimatedCursor extends Cursor {
+    private AnimationMode mode = AnimationMode.LOOP;
+    private HashMap<Integer, Cursor> cursors = new HashMap<>();
     private List<Frame> frames = new ArrayList<>();
     private boolean animated = true;
-    private AnimationMode mode = AnimationMode.LOOP;
+    private int availableFrames;
 
     public AnimatedCursor(CursorType type, Consumer<Cursor> onLoad) {
         super(type, onLoad);
@@ -27,24 +32,52 @@ public class AnimatedCursor extends Cursor {
             BufferedImage image,
             CursorConfig.Settings settings,
             AnimatedCursorConfig config
-    ) throws IOException {
+    ) throws IOException, UncheckedIOException {
         super.loadImage(sprite, image, settings);
 
-        int frameCount = image.getHeight() / SIZE;
-        List<Frame> temp = new ArrayList<>();
-        temp.add(new Frame(this, config.getTime(0)));
+        HashMap<Integer, Cursor> tempCursors = new HashMap<>();
+        List<Frame> tempFrames = new ArrayList<>();
+        this.availableFrames = image.getHeight() / SIZE;
 
-        for (int i = 1; i < frameCount; i++) {
-            Cursor cursor = new Cursor(this.getType(), this.onLoad);
-            BufferedImage cropped = BufferedImageUtil.cropImage(image, new Rectangle(0, i * SIZE, SIZE, SIZE));
-            cursor.loadImage(sprite, cropped, settings);
-            cropped.flush();
-            temp.add(new Frame(cursor, config.getTime(i)));
+        for (int i = 1; i < this.availableFrames; i++) {
+            Cursor cursor = createCursor(sprite, image, settings, i);
+            tempCursors.put(i, cursor);
+
+            if (config.getFrames().isEmpty()) {
+                tempFrames.add(new Frame(cursor, config.getFrametime(), i));
+            }
+        }
+
+        if (!config.getFrames().isEmpty()) {
+            for (AnimatedCursorConfig.Frame frame : config.getFrames()) {
+                int i = frame.getIndex();
+                if (i < 0 || i >= availableFrames) {
+                    MinecraftCursor.LOGGER.warn("Sprite does not exist on index {}, skipping frame.", i);
+                    continue;
+                }
+                tempFrames.add(new Frame(i == 0 ? this : tempCursors.get(i), frame.getTime(config), i));
+            }
+        } else {
+            tempFrames.addFirst(new Frame(this, config.getFrametime(), 0));
         }
 
         this.animated = settings.isAnimated() == null || settings.isAnimated();
         this.mode = config.mode;
-        this.frames = temp;
+        this.cursors = tempCursors;
+        this.frames = tempFrames;
+    }
+
+    private Cursor createCursor(
+            Identifier sprite,
+            BufferedImage image,
+            CursorConfig.Settings settings,
+            int index
+    ) throws IOException {
+        Cursor cursor = new Cursor(this.getType(), this.onLoad);
+        BufferedImage cropped = BufferedImageUtil.cropImage(image, new Rectangle(0, index * SIZE, SIZE, SIZE));
+        cursor.loadImage(sprite, cropped, settings);
+        cropped.flush();
+        return cursor;
     }
 
     @Override
@@ -54,10 +87,8 @@ public class AnimatedCursor extends Cursor {
     }
 
     private void applyToFrames(Consumer<Cursor> action) {
-        if (frames.size() == 1) return;
-
-        for (int i = 1; i < frames.size(); i++) {
-            action.accept(frames.get(i).cursor());
+        for (Cursor cursor : cursors.values()) {
+            action.accept(cursor);
         }
     }
 
@@ -85,6 +116,10 @@ public class AnimatedCursor extends Cursor {
         return this.mode;
     }
 
-    public record Frame(Cursor cursor, int time) {
+    public int getAvailableFrames() {
+        return this.availableFrames;
+    }
+
+    public record Frame(Cursor cursor, int time, int spriteIndex) {
     }
 }
