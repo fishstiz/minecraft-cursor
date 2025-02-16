@@ -39,11 +39,9 @@ public class SelectedCursorHotspotWidget extends ClickableWidget implements Curs
     private void drawCursorTexture(DrawContext context) {
         CursorOptionsScreen optionsScreen = optionsWidget.optionsScreen;
         Cursor cursor = optionsScreen.getSelectedCursor();
-        int textureHeight = CURSOR_SIZE;
         int frameIndex = 0;
 
         if (cursor instanceof AnimatedCursor animatedCursor) {
-            textureHeight *= animatedCursor.getAvailableFrames();
             frameIndex = optionsScreen.animationHelper.getCurrentSpriteIndex(animatedCursor);
         }
 
@@ -56,7 +54,7 @@ public class SelectedCursorHotspotWidget extends ClickableWidget implements Curs
                 0, vOffset, // starting point
                 width, height, // width/height to stretch/shrink
                 CURSOR_SIZE, CURSOR_SIZE, // cropped width/height from actual image
-                CURSOR_SIZE, textureHeight // actual width/height
+                cursor.getTrueWidth(), cursor.getTrueHeight() // actual width/height
         );
     }
 

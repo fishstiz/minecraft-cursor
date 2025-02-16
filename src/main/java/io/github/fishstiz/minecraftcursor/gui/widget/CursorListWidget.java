@@ -135,11 +135,9 @@ public class CursorListWidget extends ElementListWidget<CursorListWidget.CursorW
         private void renderTexture(DrawContext context) {
             int x = getX() + PADDING_LEFT;
             int y = getY() + (getHeight() / 2) - (TEXTURE_SIZE / 2);
-            int textureHeight = CURSOR_SIZE;
             int frameIndex = 0;
 
             if (cursor instanceof AnimatedCursor animatedCursor) {
-                textureHeight *= animatedCursor.getAvailableFrames();
                 frameIndex = optionsScreen.animationHelper.getCurrentSpriteIndex(animatedCursor);
             }
 
@@ -152,7 +150,7 @@ public class CursorListWidget extends ElementListWidget<CursorListWidget.CursorW
                     0, vOffset, // starting point
                     TEXTURE_SIZE, TEXTURE_SIZE, // width/height to stretch/shrink
                     CURSOR_SIZE, CURSOR_SIZE, // cropped width/height from actual image
-                    CURSOR_SIZE, textureHeight // actual width/height
+                    cursor.getTrueWidth(), cursor.getTrueHeight() // actual width/height
             );
         }
 
