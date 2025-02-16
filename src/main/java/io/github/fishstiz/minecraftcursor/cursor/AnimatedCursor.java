@@ -10,7 +10,6 @@ import net.minecraft.util.Identifier;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,43 +29,51 @@ public class AnimatedCursor extends Cursor {
             Identifier sprite,
             BufferedImage image,
             CursorConfig.Settings settings,
-            AnimatedCursorConfig config
-    ) throws IOException, UncheckedIOException {
+            AnimatedCursorConfig animation
+    ) throws IOException {
         super.loadImage(sprite, image, settings);
 
-        HashMap<Integer, Cursor> tempCursors = new HashMap<>();
-        List<Frame> tempFrames = new ArrayList<>();
         int availableFrames = image.getHeight() / SIZE;
 
+        HashMap<Integer, Cursor> newCursors = createCursors(sprite, image, settings, availableFrames);
+        List<Frame> newFrames = createFrames(animation, newCursors, availableFrames);
+
+        updateState(settings, animation, newCursors, newFrames);
+    }
+
+    private HashMap<Integer, Cursor> createCursors(
+            Identifier sprite,
+            BufferedImage image,
+            CursorConfig.Settings settings,
+            int availableFrames
+    ) throws IOException {
+        HashMap<Integer, Cursor> newCursors = new HashMap<>();
         for (int i = 1; i < availableFrames; i++) {
-            Cursor cursor = createCursor(sprite, image, settings, i);
-            tempCursors.put(i, cursor);
+            newCursors.put(i, createCursor(sprite, image, settings, i));
+        }
+        return newCursors;
+    }
 
-            if (config.getFrames().isEmpty()) {
-                tempFrames.add(new Frame(cursor, config.getFrametime(), i));
+    private List<Frame> createFrames(AnimatedCursorConfig animation, HashMap<Integer, Cursor> cursors, int availableFrames) {
+        List<Frame> newFrames = new ArrayList<>();
+
+        if (animation.getFrames().isEmpty()) {
+            newFrames.add(new Frame(this, animation.getFrametime(), 0));
+            for (int i = 1; i < availableFrames; i++) {
+                newFrames.add(new Frame(cursors.get(i), animation.getFrametime(), i));
             }
+            return newFrames;
         }
 
-        if (!config.getFrames().isEmpty()) {
-            for (AnimatedCursorConfig.Frame frame : config.getFrames()) {
-                int i = frame.getIndex();
-                if (i < 0 || i >= availableFrames) {
-                    MinecraftCursor.LOGGER.warn("Sprite does not exist on index {}, skipping frame.", i);
-                    continue;
-                }
-                tempFrames.add(new Frame(i == 0 ? this : tempCursors.get(i), frame.getTime(config), i));
+        for (AnimatedCursorConfig.Frame frame : animation.getFrames()) {
+            int index = frame.getIndex();
+            if (index < 0 || index >= availableFrames) {
+                MinecraftCursor.LOGGER.warn("Sprite does not exist on index {} for cursor type '{}', skipping frame.", index, getType());
+                continue;
             }
-        } else {
-            tempFrames.addFirst(new Frame(this, config.getFrametime(), 0));
+            newFrames.add(new Frame(index == 0 ? this : cursors.get(index), frame.getTime(animation), index));
         }
-
-        this.animated = settings.isAnimated() == null || settings.isAnimated();
-        this.mode = config.mode;
-        this.frames = tempFrames;
-
-        List<Cursor> oldCursors = List.copyOf(this.cursors.values());
-        this.cursors = tempCursors;
-        oldCursors.forEach(Cursor::destroy);
+        return newFrames;
     }
 
     private Cursor createCursor(
@@ -80,6 +87,21 @@ public class AnimatedCursor extends Cursor {
         cursor.loadImage(sprite, cropped, settings);
         cropped.flush();
         return cursor;
+    }
+
+    private void updateState(
+            CursorConfig.Settings settings,
+            AnimatedCursorConfig animation,
+            HashMap<Integer, Cursor> newCursors,
+            List<Frame> newFrames
+    ) {
+        this.animated = settings.isAnimated() == null || settings.isAnimated();
+        this.mode = animation.mode;
+        this.frames = newFrames;
+
+        List<Cursor> oldCursors = List.copyOf(this.cursors.values());
+        this.cursors = newCursors;
+        oldCursors.forEach(Cursor::destroy);
     }
 
     @Override
