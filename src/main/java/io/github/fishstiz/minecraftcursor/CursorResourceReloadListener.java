@@ -52,10 +52,10 @@ class CursorResourceReloadListener implements SimpleSynchronousResourceReloadLis
                 config.set_hash(resourceConfig.get_hash());
                 config.setSettings(resourceConfig.getSettings());
                 config.save();
-                MinecraftCursor.LOGGER.info("New resource pack settings detected for minecraft-cursor '{}'", configResource.getPackId());
+                MinecraftCursor.LOGGER.info("New resource pack settings detected for minecraft-cursor '{}'", configResource.getResourcePackName());
             }
         } catch (IOException e) {
-            MinecraftCursor.LOGGER.error("Failed to load settings of resource pack '{}'", configResource.getPackId());
+            MinecraftCursor.LOGGER.error("Failed to load settings of resource pack '{}'", configResource.getResourcePackName());
         }
     }
 
@@ -94,7 +94,7 @@ class CursorResourceReloadListener implements SimpleSynchronousResourceReloadLis
                 .getResource(Identifier.of(namespace, basePath + ANIMATION_TYPE))
                 .orElse(null);
 
-        if (animationResource != null && animationResource.getPackId().equals(cursorResource.getPackId())) {
+        if (animationResource != null && animationResource.getResourcePackName().equals(cursorResource.getResourcePackName())) {
             try (InputStream stream = animationResource.getInputStream()) {
                 return CursorConfigLoader.getAnimationConfig(stream);
             } catch (IOException e) {

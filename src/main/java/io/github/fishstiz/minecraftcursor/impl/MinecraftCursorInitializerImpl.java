@@ -13,9 +13,9 @@ import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.DownloadingTerrainScreen;
+import net.minecraft.client.gui.screen.LevelLoadingScreen;
 import net.minecraft.client.gui.screen.MessageScreen;
 import net.minecraft.client.gui.screen.ProgressScreen;
-import net.minecraft.client.gui.screen.world.LevelLoadingScreen;
 import net.minecraft.client.gui.widget.*;
 
 public class MinecraftCursorInitializerImpl implements MinecraftCursorInitializer {
