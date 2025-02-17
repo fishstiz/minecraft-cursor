@@ -20,6 +20,7 @@ public class AnimatedCursor extends Cursor {
     private HashMap<Integer, Cursor> cursors = new HashMap<>();
     private List<Frame> frames = new ArrayList<>();
     private boolean animated = true;
+    private Frame fallbackFrame;
 
     public AnimatedCursor(CursorType type, Consumer<Cursor> onLoad) {
         super(type, onLoad);
@@ -95,6 +96,7 @@ public class AnimatedCursor extends Cursor {
             HashMap<Integer, Cursor> newCursors,
             List<Frame> newFrames
     ) {
+        this.fallbackFrame = new Frame(this, 1, 0);
         this.animated = settings.isAnimated() == null || settings.isAnimated();
         this.mode = animation.mode;
 
@@ -125,7 +127,7 @@ public class AnimatedCursor extends Cursor {
     public Frame getFrame(int index) {
         Frame frame = frames.get(index);
         if (!isAnimated() || frame.cursor() == null || !frame.cursor().isEnabled()) {
-            return frames.getFirst();
+            return this.fallbackFrame != null ? this.fallbackFrame : new Frame(this, 1, 0);
         }
         return frame;
     }
