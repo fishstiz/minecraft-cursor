@@ -81,6 +81,8 @@ public class MinecraftCursor implements ClientModInitializer {
             double mouseX = client.mouse.getX() / scale;
             double mouseY = client.mouse.getY() / scale;
             cursorManager.setCurrentCursor(getCursorType(visibleNonCurrentScreen, mouseX, mouseY));
+        } else if (client.currentScreen == null && visibleNonCurrentScreen == null) {
+            cursorManager.setCurrentCursor(CursorType.DEFAULT);
         }
     }
 
