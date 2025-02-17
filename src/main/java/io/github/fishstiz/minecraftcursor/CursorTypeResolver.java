@@ -4,15 +4,8 @@ import io.github.fishstiz.minecraftcursor.api.CursorHandler;
 import io.github.fishstiz.minecraftcursor.api.CursorProvider;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.api.ElementRegistrar;
-import io.github.fishstiz.minecraftcursor.cursorhandler.ingame.*;
-import io.github.fishstiz.minecraftcursor.cursorhandler.modmenu.ModScreenCursorHandler;
-import io.github.fishstiz.minecraftcursor.cursorhandler.multiplayer.MultiplayerServerListWidgetCursorHandler;
-import io.github.fishstiz.minecraftcursor.cursorhandler.world.WorldListWidgetCursorHandler;
-import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.ParentElement;
-import net.minecraft.client.gui.widget.*;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -31,45 +24,6 @@ class CursorTypeResolver implements ElementRegistrar {
     private String lastFailedElement;
 
     CursorTypeResolver() {
-        init();
-    }
-
-    private void init() {
-        initElements();
-        initCursorHandlers();
-    }
-
-    private void initElements() {
-        register(PressableWidget.class, CursorTypeResolver::clickableWidgetCursor);
-        register(TabButtonWidget.class, CursorTypeResolver::tabButtonWidgetCursor);
-        register(SliderWidget.class, CursorTypeResolver::sliderWidgetCursor);
-        register(TextFieldWidget.class, CursorTypeResolver::textFieldWidgetCursor);
-    }
-
-    private void initCursorHandlers() {
-        register(new WorldListWidgetCursorHandler());
-        register(new MultiplayerServerListWidgetCursorHandler());
-        register(new HandledScreenCursorHandler<>());
-        register(RecipeBookScreenCursorHandler.INVENTORY);
-        register(RecipeBookScreenCursorHandler.CRAFTING);
-        register(RecipeBookScreenCursorHandler.FURNACE);
-        register(new CreativeInventoryScreenCursorHandler());
-        register(new BookEditScreenCursorHandler());
-        register(new EnchantmentScreenCursorHandler());
-        register(new StonecutterScreenCursorHandler());
-        register(new LoomScreenCursorHandler());
-        register(new MerchantScreenButtonCursorHandler());
-        register(new AdvancementsScreenCursorHandler());
-
-        try {
-            if (FabricLoader.getInstance().isModLoaded("modmenu")) {
-                register(new ModScreenCursorHandler());
-                register("com.terraformersmc.modmenu.gui.widget.DescriptionListWidget$MojangCreditsEntry", ElementRegistrar::elementToPointer);
-                register("com.terraformersmc.modmenu.gui.widget.DescriptionListWidget$LinkEntry", ElementRegistrar::elementToPointer);
-            }
-        } catch (NoClassDefFoundError e) {
-            MinecraftCursor.LOGGER.warn("Could not register cursor type for Mod Menu");
-        }
     }
 
     @Override
@@ -159,25 +113,5 @@ class CursorTypeResolver implements ElementRegistrar {
             }
         }
         return cursorType;
-    }
-
-    private static <T extends ClickableWidget> CursorType clickableWidgetCursor(T clickable, double mouseX, double mouseY) {
-        return clickable.active && clickable.visible ? CursorType.POINTER : CursorType.DEFAULT;
-    }
-
-    private static <T extends TabButtonWidget> CursorType tabButtonWidgetCursor(T tabButton, double mouseX, double mouseY) {
-        return tabButton.active && tabButton.visible && !tabButton.isCurrentTab() ?
-                CursorType.POINTER : CursorType.DEFAULT;
-    }
-
-    private static <T extends SliderWidget> CursorType sliderWidgetCursor(T slider, double mouseX, double mouseY) {
-        if (slider.isFocused() && (CursorTypeUtil.isLeftClickHeld() || CursorTypeUtil.isGrabbing())) {
-            return CursorType.GRABBING;
-        }
-        return slider.active && slider.visible ? CursorType.POINTER : CursorType.DEFAULT;
-    }
-
-    private static <T extends TextFieldWidget> CursorType textFieldWidgetCursor(T textField, double mouseX, double mouseY) {
-        return textField.visible ? CursorType.TEXT : CursorType.DEFAULT;
     }
 }
