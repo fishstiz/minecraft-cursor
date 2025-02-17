@@ -1,6 +1,7 @@
 package io.github.fishstiz.minecraftcursor.gui.screen;
 
 import io.github.fishstiz.minecraftcursor.CursorManager;
+import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
 import io.github.fishstiz.minecraftcursor.gui.widget.ContainerWidget;
@@ -63,6 +64,7 @@ public class CursorOptionsScreen extends Screen {
         this.layout.addFooter(doneButton);
 
         this.layout.forEachChild(this::addDrawableChild);
+        this.addDrawableChild(body.cursorsColumn);
 
         if (this.body != null) {
             this.refreshWidgetPositions();
@@ -183,11 +185,13 @@ public class CursorOptionsScreen extends Screen {
 
         @Override
         public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-            boolean isScrolled = super.mouseScrolled(mouseX, mouseY, amount);
-            if (isScrolled && cursorsColumn.isMouseOver(mouseX, mouseY)) {
-                cursorsColumn.mouseScrolled(mouseX, mouseY, amount);
+            MinecraftCursor.LOGGER.info("SCROLLING");
+            if (cursorsColumn.isMouseOver(mouseX, mouseY)) {
+                MinecraftCursor.LOGGER.info("SCROLL THIS");
+
+                return cursorsColumn.mouseScrolled(mouseX, mouseY, amount);
             }
-            return isScrolled;
+            return super.mouseScrolled(mouseX, mouseY, amount);
         }
 
         @Override

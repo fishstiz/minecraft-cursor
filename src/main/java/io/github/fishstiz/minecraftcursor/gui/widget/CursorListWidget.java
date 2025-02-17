@@ -33,6 +33,9 @@ public class CursorListWidget extends ElementListWidget<CursorListWidget.CursorW
         );
         this.top = optionsScreen.layout.getHeaderHeight();
         this.optionsScreen = optionsScreen;
+        setRenderBackground(false);
+        setRenderHeader(false, 0);
+        setRenderHorizontalShadows(false);
         populateEntries();
     }
 
@@ -82,7 +85,7 @@ public class CursorListWidget extends ElementListWidget<CursorListWidget.CursorW
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void renderList(DrawContext context, int mouseX, int mouseY, float delta) {
         for (int i = 0; i < entries.size(); i++) {
             this.renderEntry(
                     context,
@@ -99,7 +102,7 @@ public class CursorListWidget extends ElementListWidget<CursorListWidget.CursorW
     }
 
     public class CursorWidgetEntry extends ElementListWidget.Entry<CursorListWidget.CursorWidgetEntry> {
-        public CursorClickableWidget button;
+        public final CursorClickableWidget button;
 
         public CursorWidgetEntry(Cursor cursor, int y, int width, int height, MinecraftClient client, CursorOptionsScreen optionsScreen) {
             button = new CursorClickableWidget(0, y, width, height, cursor, client, optionsScreen);
@@ -191,17 +194,6 @@ public class CursorListWidget extends ElementListWidget<CursorListWidget.CursorW
             Text name = Text.translatable(PREFIX_TEXT_KEY + cursor.getType().getKey());
             context.drawText(client.textRenderer, name, x, y + Math.round(getHeight() / 3.0f), cursor.isEnabled() ? TEXT_COLOR : TEXT_DISABLED_COLOR, false);
         }
-
-//        @Override
-//        public boolean isMouseOver(double mouseX, double mouseY) {
-//            boolean isMouseOverWidget = super.isMouseOver(mouseX, mouseY);
-//            hovered = isMouseOverWidget;
-//
-//            if (isMouseOverWidget) {
-//                System.out.println("hovered over: " + cursor.getType());
-//            }
-//            return isMouseOverWidget;
-//        }
 
         @Override
         protected void appendClickableNarrations(NarrationMessageBuilder builder) {
