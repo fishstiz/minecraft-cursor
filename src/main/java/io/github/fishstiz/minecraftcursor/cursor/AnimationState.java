@@ -36,7 +36,7 @@ public class AnimationState {
                 while (newFrame == currentFrame);
                 yield newFrame;
             }
-            case RANDOM_LOOP -> {
+            case RANDOM_CYCLE -> {
                 if (remainingFrames == null || remainingFrames.isEmpty()) {
                     remainingFrames = new ArrayList<>(cursor.getFrameCount());
                     for (int i = 0; i < cursor.getFrameCount(); i++) {
