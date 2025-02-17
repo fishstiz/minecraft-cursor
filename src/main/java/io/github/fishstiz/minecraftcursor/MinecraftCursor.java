@@ -4,8 +4,9 @@ import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.api.MinecraftCursorInitializer;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.config.CursorConfigLoader;
-import io.github.fishstiz.minecraftcursor.cursor.CursorControllerImpl;
+import io.github.fishstiz.minecraftcursor.impl.CursorControllerImpl;
 import io.github.fishstiz.minecraftcursor.impl.CursorControllerProvider;
+import io.github.fishstiz.minecraftcursor.impl.MinecraftCursorInitializerImpl;
 import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -35,10 +36,11 @@ public class MinecraftCursor implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        new MinecraftCursorInitializerImpl().init(CURSOR_REGISTRY, CURSOR_RESOLVER);
         FabricLoader.getInstance().getEntrypointContainers(MOD_ID, MinecraftCursorInitializer.class).forEach(entrypoint -> {
             try {
                 entrypoint.getEntrypoint().init(CURSOR_REGISTRY, CURSOR_RESOLVER);
-            } catch (Throwable e) {
+            } catch (LinkageError | Exception e) {
                 LOGGER.error(
                         "Invalid implementation of MinecraftCursorInitializer in mod: {}",
                         entrypoint.getProvider().getMetadata().getId()
