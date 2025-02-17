@@ -1,0 +1,1 @@
+- Fix cursors list on options screen overflowing
