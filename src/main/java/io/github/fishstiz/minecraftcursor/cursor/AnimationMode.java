@@ -15,7 +15,7 @@ public enum AnimationMode {
     REVERSE,
     OSCILLATE,
     RANDOM,
-    RANDOM_LOOP;
+    RANDOM_CYCLE;
 
     @Override
     public String toString() {
