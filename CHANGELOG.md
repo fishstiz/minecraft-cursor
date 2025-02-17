@@ -1,7 +1,6 @@
-- API Changes:
-  - Separated the API from the Root Project, API is now its own library.
-    - Check the wiki for the updated installation guide.
-    - It can still be accessed from the root project like before as it's an api dependency and included.
-      - It would better to use `modCompileOnly` for API and `modRuntimeOnly` for the mod itself.
-  - Converted `CursorController` to interface. Methods remain unchanged.
-  - Added `AbstractHandledScreenCursorHandler` for `HandledScreen` subclasses.
+- Added Support for ✨Animated✨ Cursors
+  - Check the Resource Pack Support section in the [README.md](https://github.com/fishstiz/minecraft-cursor/blob/master/README.md) for details.
+- Added Busy ![busy](https://github.com/user-attachments/assets/2b4e338a-7068-4998-8f79-e7ccfc3a97fa) Cursor (new Animated Cursor) for loading screens.
+- Added Option to view and toggle animations in the Cursor Options Screen.
+  ![busy-gif](https://github.com/user-attachments/assets/2846a7d5-1834-4525-8e14-50efadfe2ac3)
+- Fix resource pack priority not being respected.
