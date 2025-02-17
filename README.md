@@ -12,6 +12,7 @@ A Fabric mod that replaces the boring old default system cursor with a Minecraft
 ![grabbing](https://github.com/user-attachments/assets/bdcd6392-a8bb-40af-b2fa-10a465363545)
 ![text](https://github.com/user-attachments/assets/049fc447-6f3f-4c7a-a0a2-b87d0348c593)
 ![shift](https://github.com/user-attachments/assets/27f97a5c-be91-45c9-ad5d-91a5e162fb50)
+![busy](https://github.com/user-attachments/assets/2b4e338a-7068-4998-8f79-e7ccfc3a97fa)
 
 - Adaptive cursors when hovering over buttons, text fields, and when grabbing sliders (limited to common GUI elements only).
 - You may submit an issue if you think this feature should be updated/removed on certain contexts.
@@ -109,6 +110,20 @@ A Fabric mod that replaces the boring old default system cursor with a Minecraft
           </ul>
         </td>
       </tr>
+      <tr>
+        <td>Busy</td>
+        <td><code>busy</code></td>
+        <td><img src="https://github.com/user-attachments/assets/2b4e338a-7068-4998-8f79-e7ccfc3a97fa" width="32" alt="busy"/></td>
+        <td>
+          <span>In loading screens: </span>
+          <ul>
+            <li><code>MessageScreen</code></li>
+            <li><code>DownloadingTerrainScreen</code></li>
+            <li><code>ProgressScreen</code></li>
+            <li><code>LevelLoadingScreen</code></li>
+          </ul>
+        </td>
+      </tr>
     </tbody>
   </table>
 </details>
@@ -127,6 +142,7 @@ A Fabric mod that replaces the boring old default system cursor with a Minecraft
     │   └── cursors.json
     └── textures/
         └── cursors/
+            ├── busy.png
             ├── default.png
             ├── grabbing.png
             ├── pointer.png
@@ -169,12 +185,168 @@ A Fabric mod that replaces the boring old default system cursor with a Minecraft
 }</code></pre>
 
   <p><strong>All Settings:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Key</th>
+        <th>Type</th>
+        <th>Range</th>
+        <th>Default</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>enabled</code></td>
+        <td><code>boolean</code></td>
+        <td><code>true</code> or <code>false</code></td>
+        <td><code>true</code></td>
+        <td>Determines whether the cursor type is enabled or not.</td>
+      </tr>
+      <tr>
+        <td><code>scale</code></td>
+        <td><code>float</code></td>
+        <td><code>0.50</code> - <code>3.00</code> (incrementing by <code>0.05</code>)</td>
+        <td><code>1.00</code></td>
+        <td>Specifies the scale factor for the cursor type.</td>
+      </tr>
+      <tr>
+        <td><code>xhot</code></td>
+        <td><code>int</code></td>
+        <td><code>0</code> - <code>31</code></td>
+        <td><code>0</code></td>
+        <td>Specifies the x hotspot position.</td>
+      </tr>
+      <tr>
+        <td><code>yhot</code></td>
+        <td><code>int</code></td>
+        <td><code>0</code> - <code>31</code></td>
+        <td><code>0</code></td>
+        <td>Specifies the y hotspot position.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Animated Cursors</h3>
   <ul>
-    <li><code>enabled</code>: <code>true</code>/<code>false</code></li>
-    <li><code>scale</code>: <code>0.50</code> - <code>3.00</code> (incrementing in 0.05)</li>
-    <li><code>xhot</code>: <code>0</code> - <code>31</code></li>
-    <li><code>yhot</code>: <code>0</code> - <code>31</code></li>
+    <li>Create a sprite sheet in PNG format for the cursor type. The sprites will be evaluated from top to bottom.</li>
+    <li>Each sprite must be 32x32 pixels as per usual with no gaps in between.</li>
+    <li>The first sprite serves as the fallback cursor type when the animation is disabled by the user, or if the animation data does not load.</li>
+    <li>Add a <code>.mcmeta</code> file for the cursor type to register the animation and to specify the animation data.</li>
   </ul>
+  <p><strong>Example structure:</strong></p>
+  <pre><code>└── minecraft-cursor/
+    └── textures/
+        └── cursors/
+            ├── busy.png
+            └── busy.png.mcmeta</code></pre>
+  <p><strong>The <code>.mcmeta</code> file is in JSON format: </strong></p>
+  <table>
+    <thead>
+      <th>Key</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Description</th>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>mode</code></td>
+        <td><code>String</code></td>
+        <td><code>loop</code></td>
+        <td>
+          <p>Determines the animation mode.</p>          
+          <table>
+            <thead>
+              <tr><th colspan="2" align="left">Animation Modes</th></tr>
+              <tr>
+                <th>Name</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>loop</code></td>
+                <td>Repeats in a continuous loop. The default mode.</td>
+              </tr>
+              <tr>
+                <td><code>loop_reverse</code></td>
+                <td>Repeats in a continuous loop but in reverse.</td>
+              </tr>
+              <tr>
+                <td><code>forwards</code></td>
+                <td>Plays the animation and stops at the last frame.</td>
+              </tr>
+              <tr>
+                <td><code>reverse</code></td>
+                <td>Plays the animation in reverse and stops at the first frame.</td>
+              </tr>
+              <tr>
+                <td><code>oscillate</code></td>
+                <td>Loops back and forth continuously.</td>
+              </tr>
+              <tr>
+                <td><code>random</code></td>
+                <td>Randomly selects frames in a loop. Does not repeat the same frame twice.</td>
+              </tr>
+              <tr>
+                <td><code>random_cycle</code></td>
+                <td>Randomly selects frames in a loop, cycling through all frames before repeating.</td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td><code>frametime</code></td>
+        <td><code>int</code></td>
+        <td><code>1</code></td>
+        <td>The amount of ticks per frame. Minimum value: <code>1</code>.</td>
+      </tr>
+      <tr>
+        <td><code>frames</code></td>
+        <td><code>Array</code></td>
+        <td><code>null</code></td>
+        <td>
+          <p>Determines the order and/or time of the frames to be played.</p>
+          <ul>
+            <li>If this is <code>null</code>, then the frames will be auto-generated based on the sprite sheet and the given <code>timeframe</code>.</li>
+            <li>The array element can either be an <code>int</code> or a <code>Frame</code> object.</li>
+            <li>An array element of type <code>int</code> specifies the index of the sprite starting from <code>0</code>.</li>
+          </ul>
+          <table>
+            <thead>
+              <tr><th colspan="3" align="left">Frame</th><tr>
+              <tr>            
+                <th>Key</th>
+                <th>Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>index</code></td>
+                <td><code>int</code></td>
+                <td>The index of the sprite starting from <code>0</code>.</td>
+              </tr>
+              <tr>
+                <td><code>time</code></td>
+                <td><code>int</code></td>
+                <td>The amount of ticks before going to the next frame. Minimum value: <code>1</code>.</td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <p><strong>Example <code>.mcmeta</code> file:</strong></p>
+  <pre><code>{
+  "mode": "loop",
+  "frametime": 1,
+  "frames": [{ "index": 0, "time": 2 }, 1, 2, 3, 2]
+}    
+</code></pre>
+
 </details>
 
 <details>
