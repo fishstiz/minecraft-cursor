@@ -1,4 +1,4 @@
-package io.github.fishstiz.minecraftcursor.cursor;
+package io.github.fishstiz.minecraftcursor.impl;
 
 import io.github.fishstiz.minecraftcursor.CursorManager;
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;

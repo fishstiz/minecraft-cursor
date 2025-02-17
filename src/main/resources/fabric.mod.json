@@ -22,7 +22,7 @@
       "io.github.fishstiz.minecraftcursor.MinecraftCursor"
     ],
     "modmenu": [
-      "io.github.fishstiz.minecraftcursor.MinecraftCursorModMenuApiImpl"
+      "io.github.fishstiz.minecraftcursor.impl.MinecraftCursorModMenuApiImpl"
     ]
   },
   "mixins": [

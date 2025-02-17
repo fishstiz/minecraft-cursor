@@ -2,27 +2,14 @@ package io.github.fishstiz.minecraftcursor;
 
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.api.CursorTypeRegistrar;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 public class CursorTypeRegistry implements CursorTypeRegistrar {
     private static final LinkedHashMap<String, CursorType> TYPES = new LinkedHashMap<>();
 
     CursorTypeRegistry() {
-    }
-
-    static {
-        addEntries(
-                CursorType.DEFAULT,
-                CursorType.POINTER,
-                CursorType.GRABBING,
-                CursorType.TEXT,
-                CursorType.SHIFT,
-                CursorType.BUSY
-        );
     }
 
     @Override
@@ -45,11 +32,7 @@ public class CursorTypeRegistry implements CursorTypeRegistrar {
         }
     }
 
-    public static Collection<CursorType> types() {
-        return Collections.unmodifiableCollection(TYPES.values());
-    }
-
-    public static @Nullable CursorType getCursorTypeOrNull(String key) {
-        return TYPES.get(key);
+    public static List<CursorType> types() {
+        return List.copyOf(TYPES.values());
     }
 }
