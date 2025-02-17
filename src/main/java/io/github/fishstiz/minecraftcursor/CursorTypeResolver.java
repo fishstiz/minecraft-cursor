@@ -75,7 +75,7 @@ class CursorTypeResolver implements ElementRegistrar {
                     .computeIfAbsent(element.getClass().getName(), k -> computeCursorType(element)))
                     .getCursorType(element, mouseX, mouseY);
             return cursorType != null ? cursorType : CursorType.DEFAULT;
-        } catch (Exception e) {
+        } catch (LinkageError | Exception e) {
             String failedElement = element.getClass().getName();
             if (!failedElement.equals(lastFailedElement)) {
                 lastFailedElement = failedElement;
