@@ -13,7 +13,7 @@ public enum AnimationMode {
     REVERSE,
     OSCILLATE,
     RANDOM,
-    RANDOM_LOOP;
+    RANDOM_CYCLE;
 
     @JsonValue
     public String toLowerCase() {
