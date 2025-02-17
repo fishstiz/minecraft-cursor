@@ -11,6 +11,11 @@ import io.github.fishstiz.minecraftcursor.cursorhandler.multiplayer.MultiplayerS
 import io.github.fishstiz.minecraftcursor.cursorhandler.world.WorldListWidgetCursorHandler;
 import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.screen.DownloadingTerrainScreen;
+import net.minecraft.client.gui.screen.MessageScreen;
+import net.minecraft.client.gui.screen.ProgressScreen;
+import net.minecraft.client.gui.screen.world.LevelLoadingScreen;
 import net.minecraft.client.gui.widget.*;
 
 public class MinecraftCursorInitializerImpl implements MinecraftCursorInitializer {
@@ -25,6 +30,10 @@ public class MinecraftCursorInitializerImpl implements MinecraftCursorInitialize
                 CursorType.BUSY
         );
 
+        elementRegistrar.register(MessageScreen.class, MinecraftCursorInitializerImpl::elementToBusy);
+        elementRegistrar.register(DownloadingTerrainScreen.class, MinecraftCursorInitializerImpl::elementToBusy);
+        elementRegistrar.register(ProgressScreen.class, MinecraftCursorInitializerImpl::elementToBusy);
+        elementRegistrar.register(LevelLoadingScreen.class, MinecraftCursorInitializerImpl::elementToBusy);
         elementRegistrar.register(PressableWidget.class, MinecraftCursorInitializerImpl::clickableWidgetCursor);
         elementRegistrar.register(TabButtonWidget.class, MinecraftCursorInitializerImpl::tabButtonWidgetCursor);
         elementRegistrar.register(SliderWidget.class, MinecraftCursorInitializerImpl::sliderWidgetCursor);
@@ -52,6 +61,10 @@ public class MinecraftCursorInitializerImpl implements MinecraftCursorInitialize
         } catch (LinkageError | Exception e) {
             MinecraftCursor.LOGGER.warn("Could not register cursor type for Mod Menu");
         }
+    }
+
+    private static <T extends Element> CursorType elementToBusy(T ignoreElement, double ignoreMouseX, double ignoreMouseY) {
+        return CursorType.BUSY;
     }
 
     private static <T extends ClickableWidget> CursorType clickableWidgetCursor(T clickable, double mouseX, double mouseY) {
