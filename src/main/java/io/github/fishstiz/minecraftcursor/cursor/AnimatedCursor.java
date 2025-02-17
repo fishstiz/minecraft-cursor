@@ -127,7 +127,7 @@ public class AnimatedCursor extends Cursor {
     public Frame getFrame(int index) {
         Frame frame = frames.get(index);
         if (!isAnimated() || frame.cursor() == null || !frame.cursor().isEnabled()) {
-            return this.fallbackFrame != null ? this.fallbackFrame : new Frame(this, 1, 0);
+            return getFallbackFrame();
         }
         return frame;
     }
@@ -148,6 +148,13 @@ public class AnimatedCursor extends Cursor {
     public void enable(boolean enabled) {
         super.enable(enabled);
         applyToFrames(cursor -> cursor.enable(enabled));
+    }
+
+    public Frame getFallbackFrame() {
+        if (this.fallbackFrame == null) {
+            this.fallbackFrame = new Frame(this, 1, 0);
+        }
+        return this.fallbackFrame;
     }
 
     public record Frame(Cursor cursor, int time, int spriteIndex) {
