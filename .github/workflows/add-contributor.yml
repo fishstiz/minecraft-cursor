@@ -24,10 +24,9 @@ jobs:
         with:
           contributor: ${{ github.event.pull_request.user.login }}
       - name: Send First Contribution Message
-        uses: fishstiz/is-first-interaction@no-action-check
+        uses: thollander/actions-comment-pull-request@v3
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          pr-message: 'Thank you for the contribution! Your name will be added to the list of contributors 📃.'
+          message: 'Thank you for the contribution! Your name will be added to the list of contributors 📃.'
   add-contributor-all:
     needs: [ is-first-interaction ]
     if: ${{ contains(github.event.pull_request.labels.*.name, 'translation') }}

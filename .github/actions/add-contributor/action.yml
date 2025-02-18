@@ -36,9 +36,11 @@ runs:
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
         git commit -a -m "${{ inputs.message }}"
-        echo "Pushing changes..."
+        echo "Creating pull request..."
     - name: Push changes
-      uses: ad-m/github-push-action@master
+      uses: peter-evans/create-pull-request@v7
       with:
-        github_token: ${{ inputs.token }}
-        branch: ${{ inputs.branch }}
+        token: ${{ inputs.token }}
+        title: "[Github Action] Add ${{ inputs.contributor }} to contributors in ${{ inputs.branch }}"
+        branch: "action-contributor/${{ inputs.branch }}"
+        delete-branch: true
