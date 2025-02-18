@@ -69,15 +69,14 @@ public class Cursor {
         int scaledXHot = scale == 1 ? xhot : (int) Math.round(xhot * scale);
         int scaledYHot = scale == 1 ? yhot : (int) Math.round(yhot * scale);
 
-        @SuppressWarnings("resource")
-        GLFWImage.Buffer glfwImageBuffer = GLFWImage.create(1);
-        glfwImageBuffer.width(scaledImage.getWidth());
-        glfwImageBuffer.height(scaledImage.getHeight());
-        glfwImageBuffer.pixels(BufferedImageUtil.getPixelsRGBA(scaledImage));
+        GLFWImage glfwImage = GLFWImage.create();
+        glfwImage.width(scaledImage.getWidth());
+        glfwImage.height(scaledImage.getHeight());
+        glfwImage.pixels(BufferedImageUtil.getPixelsRGBA(scaledImage));
         scaledImage.flush();
 
         long previousId = this.id;
-        this.id = GLFW.glfwCreateCursor(glfwImageBuffer.get(), scaledXHot, scaledYHot);
+        this.id = GLFW.glfwCreateCursor(glfwImage, scaledXHot, scaledYHot);
 
         if (onLoad != null) {
             onLoad.accept(this);
