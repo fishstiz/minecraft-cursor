@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   cherry-pick:
-    if: ${{ contains(github.event.pull_request.labels.*.name, 'translation') && github.event.pull_request.merged == true }}
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'translation') && github.event.pull_request.merged == true && contains(github.event.pull_request.user.type, 'User') }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -40,16 +40,19 @@ jobs:
             git cherry-pick --abort
             echo "status=failed" >> $GITHUB_OUTPUT
           fi
-      - name: Push Changes
+      - name: Pull Request
         if: steps.cherry-pick.outputs.status == 'success'
-        uses: ad-m/github-push-action@master
+        uses: peter-evans/create-pull-request@v7
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ matrix.branch }}
+          title: "[Github Action] Cherry-pick PR #${{ github.event.pull_request.number }} to branch ${{ matrix.branch }"
+          branch: "action-translation/${{ matrix.branch }}"
+          labels: translation
+          delete-branch: true
       - name: Create an Issue
         if: ${{ steps.cherry-pick.outputs.status == 'failed' || failure() }}
         uses: actions-ecosystem/action-create-issue@v1
         with:
           github_token: ${{ secrets.github_token }}
-          title: Could not cherry-pick translation from PR \#${{ github.event.pull_request.number }} to ${{ matrix.branch }}
+          title: "[Github Action] Cherry-pick failed for PR #${{ github.event.pull_request.number }} to ${{ matrix.branch }}"
           labels: translation
+          body: "Could not cherry-pick translation from PR #${{ github.event.pull_request.number }} to ${{ matrix.branch }}"
