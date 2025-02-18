@@ -3,6 +3,7 @@ package io.github.fishstiz.minecraftcursor.gui.widget;
 import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
 import io.github.fishstiz.minecraftcursor.gui.screen.CursorOptionsScreen;
+import io.github.fishstiz.minecraftcursor.util.DrawUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
@@ -47,7 +48,7 @@ public class CursorListWidget extends ElementListWidget<CursorListWidget.CursorW
 
     @Override
     protected int getScrollbarX() {
-        return getRight() - 6;
+        return getRight() - SCROLLBAR_OFFSET;
     }
 
     @Override
@@ -155,10 +156,13 @@ public class CursorListWidget extends ElementListWidget<CursorListWidget.CursorW
         }
 
         private void renderMessage(DrawContext context) {
+            Text message = Text.translatable(PREFIX_TEXT_KEY + this.cursor.getType().getKey());
+            int color = cursor.isEnabled() ? TEXT_COLOR : TEXT_DISABLED_COLOR;
             int x = getX() + TEXTURE_SIZE + PADDING_LEFT * 2;
-            int y = getY() + (getHeight() / 2) - Math.round(client.textRenderer.fontHeight * 1.5f);
-            Text name = Text.translatable(PREFIX_TEXT_KEY + cursor.getType().getKey());
-            context.drawText(client.textRenderer, name, x, y + Math.round(getHeight() / 3.0f), cursor.isEnabled() ? TEXT_COLOR : TEXT_DISABLED_COLOR, false);
+            int endX = (getX() + getWidth()) - SCROLLBAR_OFFSET;
+            int endY = getY() + getHeight();
+
+            DrawUtil.drawScrollableTextLeftAlign(context, client.textRenderer, message, x, getY(), endX, endY, color);
         }
 
         @Override
