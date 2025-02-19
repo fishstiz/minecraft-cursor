@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 import static io.github.fishstiz.minecraftcursor.config.CursorConfig.Settings.Default.*;
 
 public class SelectedCursorOptionsWidget extends ContainerWidget {
-    protected static final int OPTIONS_HEIGHT = 24;
+    private static final int OPTIONS_HEIGHT = 24;
     private static final int GRID_PADDING = 4;
     private static final int BOX_WIDGET_TEXTURE_SIZE = 96;
     private static final Text ENABLED_TEXT = Text.translatable("minecraft-cursor.options.enabled");
@@ -48,15 +48,15 @@ public class SelectedCursorOptionsWidget extends ContainerWidget {
         enableButton = new SelectedCursorToggleWidget(ENABLED_TEXT, cursor.isEnabled(), this::handleEnableButton);
         scaleSlider = new SelectedCursorSliderWidget(
                 SCALE_TEXT, cursor.getScale(), SCALE_MIN, SCALE_MAX, SCALE_STEP,
-                optionsScreen::onChangeScale, optionsScreen::removeOverride, this);
+                optionsScreen::onChangeScale, optionsScreen::removeOverride);
         xhotSlider = new SelectedCursorSliderWidget(
                 XHOT_TEXT, cursor.getXhot(),
                 HOT_MIN, HOT_MAX, 1, HOT_UNIT,
-                handleChangeHotspots(optionsScreen::onChangeXHot), this);
+                handleChangeHotspots(optionsScreen::onChangeXHot));
         yhotSlider = new SelectedCursorSliderWidget(
                 YHOT_TEXT, cursor.getYhot(),
                 HOT_MIN, HOT_MAX, 1, HOT_UNIT,
-                handleChangeHotspots(optionsScreen::onChangeYHot), this);
+                handleChangeHotspots(optionsScreen::onChangeYHot));
         animateButton = new SelectedCursorToggleWidget(
                 ANIMATE_TEXT,
                 cursor instanceof AnimatedCursor animatedCursor && animatedCursor.isAnimated(),
