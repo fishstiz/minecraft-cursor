@@ -180,4 +180,30 @@ public final class CursorManager {
             }
         });
     }
+
+    public boolean hasAnimations() {
+        for (Cursor cursor : cursors.values()) {
+            if (cursor instanceof AnimatedCursor) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isAnimated() {
+        for (Cursor cursor : cursors.values()) {
+            if (cursor instanceof AnimatedCursor animatedCursor && animatedCursor.isAnimated()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void setIsAnimated(boolean isAnimated) {
+        cursors.values().forEach(cursor -> {
+            if (cursor instanceof AnimatedCursor animatedCursor) {
+                animatedCursor.setAnimated(isAnimated);
+            }
+        });
+    }
 }
