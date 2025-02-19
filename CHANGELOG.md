@@ -1,1 +1,3 @@
-- Add de_at, de_ch, de_de Translations ([@Lucanoria](https://github.com/fishstiz/minecraft-cursor/pull/5))
+- Added de_at, de_ch, de_de Translations. ([@Lucanoria](https://github.com/fishstiz/minecraft-cursor/pull/5))
+- API Changes:
+  - Fixed disabled overrides clogging the override list.
