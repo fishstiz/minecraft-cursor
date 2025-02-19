@@ -1,7 +1,9 @@
 package io.github.fishstiz.minecraftcursor.gui.screen;
 
 import io.github.fishstiz.minecraftcursor.CursorManager;
+import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
 import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorToggleWidget;
+import io.github.fishstiz.minecraftcursor.util.DrawUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
@@ -23,8 +25,12 @@ import java.util.function.Consumer;
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
 
 public class RegistryOptionsScreen extends Screen {
-    private static final Tooltip ADAPTIVE_CURSOR_TOOLTIP = Tooltip.of(Text.translatable("minecraft-cursor.options.more.adapt.tooltip"));
     private static final Text ENABLED_TEXT = Text.translatable("minecraft-cursor.options.enabled");
+
+    private static final Tooltip ANIMATION_TOOLTIP = Tooltip.of(Text.translatable("minecraft-cursor.options.more.animation.tooltip"));
+    private static final Text ANIMATION_TEXT = Text.translatable("minecraft-cursor.options.more.animation");
+
+    private static final Tooltip ADAPTIVE_CURSOR_TOOLTIP = Tooltip.of(Text.translatable("minecraft-cursor.options.more.adapt.tooltip"));
     private static final Text ADAPTIVE_CURSOR_TEXT = Text.translatable("minecraft-cursor.options.more.adapt");
     private static final Text ITEM_SLOT_TEXT = Text.translatable("minecraft-cursor.options.item_slot");
     private static final Text ITEM_GRAB_TEXT = Text.translatable("minecraft-cursor.options.item_grab");
@@ -36,6 +42,7 @@ public class RegistryOptionsScreen extends Screen {
     private static final Text ADVANCEMENTS_TEXT = Text.translatable("minecraft-cursor.options.advancements");
     private static final Text WORLD_ICON_TEXT = Text.translatable("minecraft-cursor.options.world");
     private static final Text SERVER_ICON_TEXT = Text.translatable("minecraft-cursor.options.server");
+
     private static final int BUTTON_WIDTH = 40;
     private static final int ITEM_HEIGHT = 20;
     private static final int ROW_GAP = 6;
@@ -78,14 +85,24 @@ public class RegistryOptionsScreen extends Screen {
     }
 
     public class RegistryListWidget extends ElementListWidget<RegistryListWidget.RegistryEntry> {
-        public final List<RegistryToggleEntry> adaptiveOptions = new ArrayList<>();
+        private final List<RegistryToggleEntry> adaptiveOptions = new ArrayList<>();
 
         public RegistryListWidget(MinecraftClient minecraftClient, RegistryOptionsScreen options) {
             super(minecraftClient, options.width, options.layout.getContentHeight(), options.layout.getHeaderHeight(), ITEM_HEIGHT + ROW_GAP);
-            populateEntries();
+            addOptions();
         }
 
-        public void toggleAdaptive(boolean isEnabled) {
+        private void toggleAnimations(boolean isAnimated) {
+            cursorManager.setIsAnimated(isAnimated);
+
+            CONFIG.getSettings().forEach((key, settings) -> {
+                if (cursorManager.getCursor(key) instanceof AnimatedCursor) {
+                    settings.setAnimated(isAnimated);
+                }
+            });
+        }
+
+        private void toggleAdaptive(boolean isEnabled) {
             adaptiveOptions.forEach(option -> {
                 option.toggleButton.active = isEnabled;
                 option.toggleButton.setValue(isEnabled);
@@ -101,11 +118,13 @@ public class RegistryOptionsScreen extends Screen {
             ));
         }
 
-        public void populateEntries() {
-            boolean isAdaptive = cursorManager.isAdaptive();
+        private void addOptions() {
+            addEntry(new RegistryTitleEntry(ANIMATION_TEXT));
+            addEntry(new RegistryToggleEntry(ENABLED_TEXT, cursorManager.isAnimated(), cursorManager.hasAnimations(), ANIMATION_TOOLTIP, this::toggleAnimations));
 
-            this.addEntry(new RegistryTitleEntry(ADAPTIVE_CURSOR_TEXT));
-            this.addEntry(new RegistryToggleEntry(ENABLED_TEXT, isAdaptive, true, ADAPTIVE_CURSOR_TOOLTIP, this::toggleAdaptive));
+            boolean isAdaptive = cursorManager.isAdaptive();
+            addEntry(new RegistryTitleEntry(ADAPTIVE_CURSOR_TEXT));
+            addEntry(new RegistryToggleEntry(ENABLED_TEXT, isAdaptive, true, ADAPTIVE_CURSOR_TOOLTIP, this::toggleAdaptive));
             addAdaptiveEntry(ITEM_SLOT_TEXT, CONFIG.isItemSlotEnabled(), isAdaptive, CONFIG::setItemSlotEnabled);
             addAdaptiveEntry(ITEM_GRAB_TEXT, CONFIG.isItemGrabbingEnabled(), isAdaptive, CONFIG::setItemGrabbingEnabled);
             addAdaptiveEntry(CREATIVE_TABS_TEXT, CONFIG.isCreativeTabsEnabled(), isAdaptive, CONFIG::setCreativeTabsEnabled);
@@ -118,7 +137,7 @@ public class RegistryOptionsScreen extends Screen {
             addAdaptiveEntry(SERVER_ICON_TEXT, CONFIG.isServerIconEnabled(), isAdaptive, CONFIG::setServerIconEnabled);
         }
 
-        public void addAdaptiveEntry(Text label, boolean isEnabled, boolean active, Consumer<Boolean> onPress) {
+        private void addAdaptiveEntry(Text label, boolean isEnabled, boolean active, Consumer<Boolean> onPress) {
             RegistryToggleEntry entry = new RegistryToggleEntry(label, isEnabled, active, onPress);
             adaptiveOptions.add(entry);
             this.addEntry(entry);
@@ -196,10 +215,14 @@ public class RegistryOptionsScreen extends Screen {
             @Override
             public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
                 int itemY = Math.round(y + entryHeight / 3.0f);
-                context.drawText(textRenderer, label, x, itemY, 0xFFFFFFFF, false);
                 toggleButton.render(context, mouseX, mouseY, tickDelta);
                 toggleButton.setX(getRowRight() - BUTTON_WIDTH);
                 toggleButton.setY(layout.getHeaderHeight() + itemHeight * index + ROW_GAP - (int) Math.round(getScrollY()));
+
+                int textEndX = toggleButton.getX() - ROW_GAP;
+                int textEndY = itemY + entryHeight;
+                int textColor = 0xFFFFFFFF;
+                DrawUtil.drawScrollableTextLeftAlign(context, textRenderer, label, x, itemY, textEndX, textEndY, textColor);
             }
         }
     }
