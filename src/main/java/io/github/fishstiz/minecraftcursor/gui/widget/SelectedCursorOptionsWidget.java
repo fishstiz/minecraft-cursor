@@ -11,10 +11,7 @@ import net.minecraft.client.gui.widget.ContainerWidget;
 import net.minecraft.text.Text;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static io.github.fishstiz.minecraftcursor.config.CursorConfig.Settings.Default.*;
 
@@ -48,8 +45,7 @@ public class SelectedCursorOptionsWidget extends ContainerWidget {
     private void initWidgets() {
         Cursor cursor = optionsScreen.getSelectedCursor();
 
-        enableButton = SelectedCursorToggleWidget.build(
-                ENABLED_TEXT, cursor.isEnabled(), optionsScreen::onPressEnabled);
+        enableButton = new SelectedCursorToggleWidget(ENABLED_TEXT, cursor.isEnabled(), this::handleEnableButton);
         scaleSlider = new SelectedCursorSliderWidget(
                 SCALE_TEXT, cursor.getScale(), SCALE_MIN, SCALE_MAX, SCALE_STEP,
                 optionsScreen::onChangeScale, optionsScreen::removeOverride, this);
@@ -61,18 +57,51 @@ public class SelectedCursorOptionsWidget extends ContainerWidget {
                 YHOT_TEXT, cursor.getYhot(),
                 HOT_MIN, HOT_MAX, 1, HOT_UNIT,
                 handleChangeHotspots(optionsScreen::onChangeYHot), this);
-
-        animateButton = SelectedCursorToggleWidget.build(
+        animateButton = new SelectedCursorToggleWidget(
                 ANIMATE_TEXT,
                 cursor instanceof AnimatedCursor animatedCursor && animatedCursor.isAnimated(),
                 this::handlePressAnimate);
         resetAnimation = new SelectedCursorButtonWidget(RESET_ANIMATION_TEXT, this::handleResetAnimation);
-
         cursorHotspot = new SelectedCursorHotspotWidget(BOX_WIDGET_TEXTURE_SIZE, this);
         cursorTest = new SelectedCursorTestWidget(BOX_WIDGET_TEXTURE_SIZE, this);
 
-        placeWidgets();
         refreshWidgets();
+    }
+
+    public void refreshWidgets() {
+        Cursor cursor = optionsScreen.getSelectedCursor();
+
+        enableButton.setValue(cursor.isEnabled());
+        scaleSlider.setValue(cursor.getScale());
+        xhotSlider.setValue(cursor.getXhot());
+        yhotSlider.setValue(cursor.getYhot());
+
+        boolean isAnimated = cursor instanceof AnimatedCursor animatedCursor && animatedCursor.isAnimated();
+        animateButton.active = cursor instanceof AnimatedCursor;
+        resetAnimation.active = enableButton.value && isAnimated;
+        animateButton.setValue(isAnimated);
+
+        cursorHotspot.setRulerRendered(true, true);
+
+        children().forEach(widget -> widget.setFocused(false));
+    }
+
+    @Override
+    public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+        placeWidgets();
+
+        enableButton.render(context, mouseX, mouseY, delta);
+        scaleSlider.renderWidget(context, mouseX, mouseY, delta);
+        xhotSlider.renderWidget(context, mouseX, mouseY, delta);
+        yhotSlider.renderWidget(context, mouseX, mouseY, delta);
+
+        if (optionsScreen.getSelectedCursor() instanceof AnimatedCursor && animateButton != null) {
+            animateButton.render(context, mouseX, mouseY, delta);
+            resetAnimation.render(context, mouseX, mouseY, delta);
+        }
+
+        cursorHotspot.renderWidget(context, mouseX, mouseY, delta);
+        cursorTest.renderWidget(context, mouseX, mouseY, delta);
     }
 
     private void placeWidgets() {
@@ -105,53 +134,12 @@ public class SelectedCursorOptionsWidget extends ContainerWidget {
         widget.setY(getY() + (OPTIONS_HEIGHT * (gridY)));
     }
 
-    public void refreshWidgets() {
-        Cursor cursor = optionsScreen.getSelectedCursor();
+    private void handleEnableButton(boolean value) {
+        optionsScreen.onPressEnabled(value);
 
-        enableButton.setValue(cursor.isEnabled());
-        scaleSlider.setValue(cursor.getScale());
-        xhotSlider.setValue(cursor.getXhot());
-        yhotSlider.setValue(cursor.getYhot());
-
-        if (cursor instanceof AnimatedCursor animatedCursor && animateButton != null) {
-            animateButton.setValue(animatedCursor.isAnimated());
-            resetAnimation.active = animatedCursor.isAnimated();
+        if (optionsScreen.getSelectedCursor() instanceof AnimatedCursor) {
+            resetAnimation.active = animateButton.value && value;
         }
-
-        cursorHotspot.setRulerRendered(true, true);
-
-        children().forEach(widget -> widget.setFocused(false));
-        placeWidgets();
-    }
-
-    @Override
-    public List<? extends Element> children() {
-        return Stream.of(
-                enableButton,
-                scaleSlider,
-                xhotSlider,
-                yhotSlider,
-                animateButton,
-                resetAnimation,
-                cursorHotspot,
-                cursorTest
-        ).filter(Objects::nonNull).collect(Collectors.toList());
-    }
-
-    @Override
-    public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
-        enableButton.render(context, mouseX, mouseY, delta);
-        scaleSlider.renderWidget(context, mouseX, mouseY, delta);
-        xhotSlider.renderWidget(context, mouseX, mouseY, delta);
-        yhotSlider.renderWidget(context, mouseX, mouseY, delta);
-
-        if (optionsScreen.getSelectedCursor() instanceof AnimatedCursor && animateButton != null) {
-            animateButton.render(context, mouseX, mouseY, delta);
-            resetAnimation.render(context, mouseX, mouseY, delta);
-        }
-
-        cursorHotspot.renderWidget(context, mouseX, mouseY, delta);
-        cursorTest.renderWidget(context, mouseX, mouseY, delta);
     }
 
     private Consumer<Double> handleChangeHotspots(Consumer<Double> onChangeHotspot) {
@@ -163,7 +151,7 @@ public class SelectedCursorOptionsWidget extends ContainerWidget {
 
     private void handlePressAnimate(boolean value) {
         optionsScreen.onPressAnimate(value);
-        resetAnimation.active = value;
+        resetAnimation.active = enableButton.value && value;
         if (!value) cursorHotspot.setRulerRendered(true, true);
     }
 
@@ -173,9 +161,17 @@ public class SelectedCursorOptionsWidget extends ContainerWidget {
     }
 
     @Override
-    public void setX(int x) {
-        super.setX(x);
-        placeWidgets();
+    public List<? extends Element> children() {
+        return List.of(
+                enableButton,
+                scaleSlider,
+                xhotSlider,
+                yhotSlider,
+                animateButton,
+                resetAnimation,
+                cursorHotspot,
+                cursorTest
+        );
     }
 
     @Override
