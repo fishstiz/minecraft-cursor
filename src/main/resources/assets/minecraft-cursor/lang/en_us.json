@@ -1,5 +1,6 @@
 {
   "modmenu.descriptionTranslation.minecraft-cursor": "Configurable cursor for Minecraft.",
+
   "minecraft-cursor.options": "Cursor Settings",
   "minecraft-cursor.options.enabled": "Enabled",
   "minecraft-cursor.options.scale": "Scale",
@@ -7,13 +8,19 @@
   "minecraft-cursor.options.yhot": "Offset Y",
   "minecraft-cursor.options.animate": "Animate",
   "minecraft-cursor.options.animate-reset": "Restart Animation",
+
   "minecraft-cursor.options.cursor-type.default": "Default",
   "minecraft-cursor.options.cursor-type.pointer": "Pointer",
   "minecraft-cursor.options.cursor-type.grabbing": "Grabbing",
   "minecraft-cursor.options.cursor-type.text": "Text",
   "minecraft-cursor.options.cursor-type.shift": "Shift",
   "minecraft-cursor.options.cursor-type.busy": "Busy",
+
   "minecraft-cursor.options.more": "More Cursor Options",
+
+  "minecraft-cursor.options.more.animation": "Animations",
+  "minecraft-cursor.options.more.animation.tooltip": "Updates the animated setting on all animated cursors.",
+
   "minecraft-cursor.options.more.adapt": "Adaptive Cursor",
   "minecraft-cursor.options.more.adapt.tooltip": "Updates the enabled setting on all cursors except for the Default cursor.",
   "minecraft-cursor.options.item_slot": "Inventory Item Slot",
