@@ -190,8 +190,8 @@ public class RegistryOptionsScreen extends Screen {
         public void forEachChild(Consumer<ClickableWidget> consumer) {
         }
 
-        public class RegistryEntry extends ElementListWidget.Entry<RegistryListWidget.RegistryEntry> {
-            public Text label;
+        public class RegistryEntry extends Entry<RegistryEntry> {
+            public final Text label;
             public RegistryToggleWidget toggleButton;
 
             public RegistryEntry(Text title) {
@@ -246,29 +246,14 @@ public class RegistryOptionsScreen extends Screen {
 
     public static class RegistryToggleWidget extends SelectedCursorToggleWidget {
         protected RegistryToggleWidget(int x, int y, int width, int height, boolean defaultValue, Tooltip tooltip, Consumer<Boolean> onPress) {
-            super(x, y, width, height, Text.empty(), RegistryToggleWidget::onPressButton, ButtonWidget.DEFAULT_NARRATION_SUPPLIER);
-            value = defaultValue;
-            onPressConsumer = onPress;
-            updateMessage();
+            super(x, y, width, height, Text.empty(), defaultValue, onPress);
 
             if (tooltip != null) setTooltip(tooltip);
         }
 
         @Override
         protected void updateMessage() {
-            Text message = value ? ScreenTexts.ON : ScreenTexts.OFF;
-            setMessage(message);
-        }
-
-        @Override
-        public void setValue(boolean value) {
-            if (value == this.value) {
-                return;
-            }
-
-            this.value = value;
-            updateMessage();
-            onPressConsumer.accept(value);
+            setMessage(value ? ScreenTexts.ON : ScreenTexts.OFF);
         }
     }
 }

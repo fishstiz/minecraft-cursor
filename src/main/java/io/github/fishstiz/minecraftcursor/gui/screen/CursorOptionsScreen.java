@@ -185,10 +185,7 @@ public class CursorOptionsScreen extends Screen {
 
         @Override
         public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-            MinecraftCursor.LOGGER.info("SCROLLING");
             if (cursorsColumn.isMouseOver(mouseX, mouseY)) {
-                MinecraftCursor.LOGGER.info("SCROLL THIS");
-
                 return cursorsColumn.mouseScrolled(mouseX, mouseY, amount);
             }
             return super.mouseScrolled(mouseX, mouseY, amount);
