@@ -170,11 +170,10 @@ public class CursorOptionsScreen extends Screen {
 
         @Override
         public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-            boolean isScrolled = super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
-            if (isScrolled && cursorsColumn.isMouseOver(mouseX, mouseY)) {
-                cursorsColumn.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+            if (cursorsColumn.isMouseOver(mouseX, mouseY)) {
+                return cursorsColumn.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
             }
-            return isScrolled;
+            return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
         }
 
         @Override
@@ -191,7 +190,6 @@ public class CursorOptionsScreen extends Screen {
         public void position(int width, ThreePartsLayoutWidget layout) {
             this.setDimensions(width, layout.getContentHeight());
             this.setPosition(this.getX(), layout.getHeaderHeight());
-            this.setHeight(layout.getContentHeight());
 
             cursorsColumn.setHeight(layout.getContentHeight());
             selectedCursorColumn.setHeight(layout.getContentHeight());
