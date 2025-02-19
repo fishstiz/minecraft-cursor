@@ -8,17 +8,15 @@ import io.github.fishstiz.minecraftcursor.cursor.AnimationState;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 
-public class CursorManager {
+public final class CursorManager {
     private final LinkedHashMap<String, Cursor> cursors = new LinkedHashMap<>();
     private final TreeMap<Integer, String> overrides = new TreeMap<>();
     private final MinecraftClient client;
@@ -63,31 +61,34 @@ public class CursorManager {
     }
 
     private void handleCursorLoad(Cursor cursor) {
-        Cursor current = getCurrentCursor();
-        if (current != null && current.getId() == cursor.getId()) {
+        if (getCurrentCursor().getId() == cursor.getId()) {
             reloadCursor();
         }
     }
 
     void setCurrentCursor(CursorType type) {
-        Cursor cursor = getCursor(overrides.isEmpty() ? type.getKey() : overrides.lastEntry().getValue());
+        Cursor override = getOverride().orElse(null);
+        Cursor cursor = override != null ? override : getCursor(type.getKey());
 
         if (cursor instanceof AnimatedCursor animatedCursor && cursor.getId() != 0) {
             handleCursorAnimation(animatedCursor);
             return;
         }
 
-        if (cursor == null || (type != CursorType.DEFAULT && cursor.getId() == 0) || !cursor.isEnabled()) {
+        if (type != CursorType.DEFAULT && cursor.getId() == 0 || !cursor.isEnabled()) {
             cursor = getCursor(CursorType.DEFAULT);
         }
-
-        if (cursor == null) return;
 
         updateCursor(cursor);
     }
 
     private void handleCursorAnimation(AnimatedCursor cursor) {
-        if (currentCursor == null || !currentCursor.getType().getKey().equals(cursor.getType().getKey())) {
+        if (cursor == null) {
+            updateCursor(getCursor(CursorType.DEFAULT));
+            return;
+        }
+
+        if (!getCurrentCursor().getType().getKey().equals(cursor.getType().getKey())) {
             animationState.reset();
         } else {
             animationState.nextFrame(cursor);
@@ -98,9 +99,16 @@ public class CursorManager {
     }
 
     private void updateCursor(Cursor cursor) {
-        if (currentCursor != null && cursor.getId() == currentCursor.getId()) return;
+        if (currentCursor != null && cursor.getId() == currentCursor.getId()) {
+            return;
+        }
+
         currentCursor = cursor;
         GLFW.glfwSetCursor(client.getWindow().getHandle(), currentCursor.getId());
+    }
+
+    public void reloadCursor() {
+        GLFW.glfwSetCursor(client.getWindow().getHandle(), getCurrentCursor().getId());
     }
 
     public void overrideCurrentCursor(CursorType type, int index) {
@@ -115,14 +123,24 @@ public class CursorManager {
         overrides.remove(index);
     }
 
-    public void reloadCursor() {
-        GLFW.glfwSetCursor(client.getWindow().getHandle(), getCurrentCursor().getId());
+    public Optional<Cursor> getOverride() {
+        while (!overrides.isEmpty()) {
+            Map.Entry<Integer, String> lastEntry = overrides.lastEntry();
+            Cursor cursor = getCursor(lastEntry.getValue());
+
+            if (cursor.getId() == 0) {
+                overrides.remove(lastEntry.getKey());
+            } else {
+                return Optional.of(cursor);
+            }
+        }
+
+        return Optional.empty();
     }
 
-    public Cursor getCurrentCursor() {
-        Cursor cursor = overrides.isEmpty()
-                ? currentCursor
-                : getCursor(overrides.lastEntry().getValue());
+    public @NotNull Cursor getCurrentCursor() {
+        Cursor override = getOverride().orElse(null);
+        Cursor cursor = override != null ? override : currentCursor;
 
         if (cursor instanceof AnimatedCursor animatedCursor) {
             return animatedCursor.getFrame(animationState.getCurrentFrame()).cursor();
@@ -131,11 +149,11 @@ public class CursorManager {
         return cursor;
     }
 
-    public Cursor getCursor(String key) {
+    public @NotNull Cursor getCursor(String key) {
         return cursors.computeIfAbsent(key, k -> new Cursor(CursorType.of(k), this::handleCursorLoad));
     }
 
-    public Cursor getCursor(CursorType type) {
+    public @NotNull Cursor getCursor(CursorType type) {
         return cursors.computeIfAbsent(type.getKey(), k -> new Cursor(type, this::handleCursorLoad));
     }
 
