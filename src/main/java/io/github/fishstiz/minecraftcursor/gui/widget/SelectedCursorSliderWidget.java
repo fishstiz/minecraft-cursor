@@ -19,20 +19,31 @@ public class SelectedCursorSliderWidget extends SliderWidget {
     private double translatedValue;
     private boolean held;
 
-    SelectedCursorSliderWidget(
+    public SelectedCursorSliderWidget(
             Text text,
             double defaultValue,
             double min,
             double max,
             double step,
             Consumer<Double> onApply,
-            Runnable onRelease,
-            SelectedCursorOptionsWidget optionsWidget
+            Runnable onRelease
     ) {
-        this(text, defaultValue, min, max, step, "", onApply, onRelease, optionsWidget);
+        this(text, defaultValue, min, max, step, "", onApply, onRelease);
     }
 
-    SelectedCursorSliderWidget(
+    public SelectedCursorSliderWidget(
+            Text text,
+            double defaultValue,
+            double min,
+            double max,
+            double step,
+            String suffix,
+            Consumer<Double> onApply
+    ) {
+        this(text, defaultValue, min, max, step, suffix, onApply, null);
+    }
+
+    public SelectedCursorSliderWidget(
             Text text,
             double defaultValue,
             double min,
@@ -40,23 +51,9 @@ public class SelectedCursorSliderWidget extends SliderWidget {
             double step,
             String suffix,
             Consumer<Double> onApply,
-            SelectedCursorOptionsWidget optionsWidget
+            @Nullable Runnable onRelease
     ) {
-        this(text, defaultValue, min, max, step, suffix, onApply, null, optionsWidget);
-    }
-
-    SelectedCursorSliderWidget(
-            Text text,
-            double defaultValue,
-            double min,
-            double max,
-            double step,
-            String suffix,
-            Consumer<Double> onApply,
-            @Nullable Runnable onRelease,
-            SelectedCursorOptionsWidget optionsWidget
-    ) {
-        super(optionsWidget.getX(), optionsWidget.getY(), optionsWidget.getWidth() / 2, SelectedCursorOptionsWidget.OPTIONS_HEIGHT, text, defaultValue);
+        super(0, 0, 0, 0, text, defaultValue);
 
         this.prefix = text;
         this.min = min;
@@ -66,13 +63,19 @@ public class SelectedCursorSliderWidget extends SliderWidget {
         this.onApply = onApply;
         this.onRelease = onRelease;
 
+        this.value = translatedValueToValue(defaultValue);
+
         translateValue();
         updateMessage();
     }
 
-    public void setValue(double translatedValue) {
+    private double translatedValueToValue(double translatedValue) {
         double clampedValue = Math.max(min, Math.min(translatedValue, max));
-        value = (clampedValue - min) / (max - min);
+        return (clampedValue - min) / (max - min);
+    }
+
+    public void setValue(double translatedValue) {
+        value = translatedValueToValue(translatedValue);
 
         applyValue();
         updateMessage();

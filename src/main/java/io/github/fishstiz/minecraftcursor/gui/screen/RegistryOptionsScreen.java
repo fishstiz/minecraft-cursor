@@ -2,6 +2,7 @@ package io.github.fishstiz.minecraftcursor.gui.screen;
 
 import io.github.fishstiz.minecraftcursor.CursorManager;
 import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
+import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorSliderWidget;
 import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorToggleWidget;
 import io.github.fishstiz.minecraftcursor.util.DrawUtil;
 import net.minecraft.client.MinecraftClient;
@@ -21,9 +22,14 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
+import static io.github.fishstiz.minecraftcursor.config.CursorConfig.Settings.Default;
 
 public class RegistryOptionsScreen extends Screen {
     private static final Text ENABLED_TEXT = Text.translatable("minecraft-cursor.options.enabled");
+
+    private static final String GLOBAL_TOOLTIP_STRING = "minecraft-cursor.options.more.global.tooltip";
+    private static final Text GLOBAL_SETTINGS_TEXT = Text.translatable("minecraft-cursor.options.more.global");
+    private static final Text SCALE_TEXT = Text.translatable("minecraft-cursor.options.scale");
 
     private static final Tooltip ANIMATION_TOOLTIP = Tooltip.of(Text.translatable("minecraft-cursor.options.more.animation.tooltip"));
     private static final Text ANIMATION_TEXT = Text.translatable("minecraft-cursor.options.more.animation");
@@ -118,6 +124,14 @@ public class RegistryOptionsScreen extends Screen {
             addOptions();
         }
 
+        public int getYOffset() {
+            return layout.getHeaderHeight();
+        }
+
+        public int getItemHeight() {
+            return itemHeight;
+        }
+
         private void toggleAnimations(boolean isAnimated) {
             cursorManager.setIsAnimated(isAnimated);
 
@@ -144,9 +158,25 @@ public class RegistryOptionsScreen extends Screen {
             ));
         }
 
+        private void applyGlobalScale(double scale) {
+
+        }
+
+        private void toggleGlobalScale(boolean enabled) {
+
+        }
+
         private void addOptions() {
-            addEntry(new RegistryTitleEntry(ANIMATION_TEXT));
-            addEntry(new RegistryToggleEntry(ENABLED_TEXT, cursorManager.isAnimated(), cursorManager.hasAnimations(), ANIMATION_TOOLTIP, this::toggleAnimations));
+            addEntry(new RegistryTitleEntry(GLOBAL_SETTINGS_TEXT));
+
+            addEntry(new RegistryToggleEntry(
+                    ANIMATION_TEXT, cursorManager.isAnimated(), cursorManager.hasAnimations(),
+                    ANIMATION_TOOLTIP, this::toggleAnimations));
+
+            var slider = new RegistrySliderEntry.Slider(SCALE_TEXT, Default.SCALE, this::applyGlobalScale);
+            var toggle = new RegistrySliderEntry.Toggle(ENABLED_TEXT, true, getSettingTooltip(SCALE_TEXT.getString()), this::toggleGlobalScale);
+            addEntry(new RegistrySliderEntry(slider, toggle));
+
 
             boolean isAdaptive = cursorManager.isAdaptive();
             addEntry(new RegistryTitleEntry(ADAPTIVE_CURSOR_TEXT));
@@ -218,11 +248,15 @@ public class RegistryOptionsScreen extends Screen {
 
             @Override
             public List<? extends Selectable> selectableChildren() {
-                return List.of();
+                return getChildren();
             }
 
             @Override
             public List<? extends Element> children() {
+                return getChildren();
+            }
+
+            protected List<ClickableWidget> getChildren() {
                 return List.of();
             }
         }
@@ -269,26 +303,71 @@ public class RegistryOptionsScreen extends Screen {
             }
 
             @Override
-            public List<? extends Selectable> selectableChildren() {
-                return List.of(toggleButton);
+            public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+                toggleButton.setPosition(index, RegistryListWidget.this);
+                toggleButton.render(context, mouseX, mouseY, tickDelta);
+
+                int textEndX = toggleButton.getX() - ROW_GAP;
+                int textEndY = y + entryHeight;
+                int textColor = 0xFFFFFFFF;
+                DrawUtil.drawScrollableTextLeftAlign(context, textRenderer, label, x, y, textEndX, textEndY, textColor);
             }
 
             @Override
-            public List<? extends Element> children() {
+            protected List<ClickableWidget> getChildren() {
                 return List.of(toggleButton);
+            }
+        }
+
+        public class RegistrySliderEntry extends RegistryEntry {
+            private final SelectedCursorSliderWidget sliderWidget;
+            private final ToggleWidget toggleButton;
+
+            public RegistrySliderEntry(Slider slider, Toggle toggle) {
+                super(slider.label);
+
+                sliderWidget = new SelectedCursorSliderWidget(
+                        slider.label,
+                        slider.value,
+                        Default.SCALE_MIN,
+                        Default.SCALE_MAX,
+                        Default.SCALE_STEP,
+                        "px",
+                        slider.applyFunction
+                );
+
+                toggleButton = new ToggleWidget(
+                        getRowRight() - BUTTON_WIDTH,
+                        layout.getHeaderHeight() + itemHeight * getEntryCount() + ROW_GAP,
+                        BUTTON_WIDTH,
+                        itemHeight - ROW_GAP,
+                        toggle.value,
+                        toggle.tooltip,
+                        toggle.toggleFunction
+                );
             }
 
             @Override
             public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-                int itemY = Math.round(y + entryHeight / 3.0f);
-                toggleButton.render(context, mouseX, mouseY, tickDelta);
-                toggleButton.setX(getRowRight() - BUTTON_WIDTH);
-                toggleButton.setY(layout.getHeaderHeight() + itemHeight * index + ROW_GAP - (int) Math.round(getScrollAmount()));
+                RegistryListWidget list = RegistryListWidget.this;
 
-                int textEndX = toggleButton.getX() - ROW_GAP;
-                int textEndY = itemY + entryHeight;
-                int textColor = 0xFFFFFFFF;
-                DrawUtil.drawScrollableTextLeftAlign(context, textRenderer, label, x, itemY, textEndX, textEndY, textColor);
+                toggleButton.setPosition(index, list);
+                toggleButton.render(context, mouseX, mouseY, tickDelta);
+
+                sliderWidget.setPosition(x - ROW_GAP / 2, getYEntry(index, list));
+                sliderWidget.setDimensions(toggleButton.getX() - x - ROW_GAP, 20);
+                sliderWidget.render(context, mouseX, mouseY, tickDelta);
+            }
+
+            @Override
+            protected List<ClickableWidget> getChildren() {
+                return List.of(sliderWidget, toggleButton);
+            }
+
+            public record Slider(Text label, double value, Consumer<Double> applyFunction) {
+            }
+
+            public record Toggle(Text label, boolean value, Tooltip tooltip, Consumer<Boolean> toggleFunction) {
             }
         }
     }
@@ -306,9 +385,22 @@ public class RegistryOptionsScreen extends Screen {
             if (tooltip != null) setTooltip(tooltip);
         }
 
+        public void setPosition(int index, RegistryListWidget list) {
+            setX(list.getRowRight() - BUTTON_WIDTH);
+            setY(getYEntry(index, list));
+        }
+
         @Override
         protected void updateMessage() {
             setMessage(value ? ScreenTexts.ON : ScreenTexts.OFF);
         }
+    }
+
+    public static int getYEntry(int index, RegistryListWidget list) {
+        return list.getYOffset() + list.getItemHeight() * index + ROW_GAP - (int) Math.round(list.getScrollAmount());
+    }
+
+    public static Tooltip getSettingTooltip(String setting) {
+        return Tooltip.of(Text.translatable(GLOBAL_TOOLTIP_STRING, setting));
     }
 }
