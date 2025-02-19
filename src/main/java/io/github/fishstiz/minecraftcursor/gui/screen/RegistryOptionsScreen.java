@@ -87,21 +87,6 @@ public class RegistryOptionsScreen extends Screen {
         }
     }
 
-    public void enableAll(boolean isEnabled) {
-        body.options.forEach(option -> {
-            option.toggleButton.active = isEnabled;
-            option.toggleButton.setValue(isEnabled);
-        });
-        cursorManager.setIsAdaptive(isEnabled);
-
-        CONFIG.getSettings().forEach((key, settings) -> settings.update(
-                settings.getScale(),
-                settings.getXHot(),
-                settings.getYHot(),
-                isEnabled
-        ));
-    }
-
     public int getContentHeight() {
         return height - layout.getHeaderHeight() - layout.getFooterHeight();
     }
@@ -112,7 +97,7 @@ public class RegistryOptionsScreen extends Screen {
     }
 
     public class RegistryListWidget extends ElementListWidget<RegistryListWidget.RegistryEntry> implements Widget {
-        public final List<RegistryEntry> options = new ArrayList<>();
+        public final List<RegistryToggleEntry> adaptiveOptions = new ArrayList<>();
 
         public RegistryListWidget(MinecraftClient minecraftClient, RegistryOptionsScreen options) {
             super(
@@ -126,27 +111,42 @@ public class RegistryOptionsScreen extends Screen {
             populateEntries();
         }
 
+        public void toggleAdaptive(boolean isEnabled) {
+            adaptiveOptions.forEach(option -> {
+                option.toggleButton.active = isEnabled;
+                option.toggleButton.setValue(isEnabled);
+            });
+
+            cursorManager.setIsAdaptive(isEnabled);
+
+            CONFIG.getSettings().forEach((key, settings) -> settings.update(
+                    settings.getScale(),
+                    settings.getXHot(),
+                    settings.getYHot(),
+                    isEnabled
+            ));
+        }
+
         public void populateEntries() {
             boolean isAdaptive = cursorManager.isAdaptive();
 
-            this.addEntry(new RegistryEntry(ADAPTIVE_CURSOR_TEXT));
-            this.addEntry(new RegistryEntry(
-                    ENABLED_TEXT, isAdaptive, true, ADAPTIVE_CURSOR_TOOLTIP, RegistryOptionsScreen.this::enableAll));
-            addOptionEntry(ITEM_SLOT_TEXT, CONFIG.isItemSlotEnabled(), isAdaptive, CONFIG::setItemSlotEnabled);
-            addOptionEntry(ITEM_GRAB_TEXT, CONFIG.isItemGrabbingEnabled(), isAdaptive, CONFIG::setItemGrabbingEnabled);
-            addOptionEntry(CREATIVE_TABS_TEXT, CONFIG.isCreativeTabsEnabled(), isAdaptive, CONFIG::setCreativeTabsEnabled);
-            addOptionEntry(ENCHANTMENTS_TEXT, CONFIG.isEnchantmentsEnabled(), isAdaptive, CONFIG::setEnchantmentsEnabled);
-            addOptionEntry(STONECUTTER_TEXT, CONFIG.isStonecutterRecipesEnabled(), isAdaptive, CONFIG::setStonecutterRecipesEnabled);
-            addOptionEntry(BOOK_EDIT_TEXT, CONFIG.isBookEditEnabled(), isAdaptive, CONFIG::setBookEditEnabled);
-            addOptionEntry(LOOM_TEXT, CONFIG.isLoomPatternsEnabled(), isAdaptive, CONFIG::setLoomPatternsEnabled);
-            addOptionEntry(ADVANCEMENTS_TEXT, CONFIG.isAdvancementTabsEnabled(), isAdaptive, CONFIG::setAdvancementTabsEnabled);
-            addOptionEntry(WORLD_ICON_TEXT, CONFIG.isWorldIconEnabled(), isAdaptive, CONFIG::setWorldIconEnabled);
-            addOptionEntry(SERVER_ICON_TEXT, CONFIG.isServerIconEnabled(), isAdaptive, CONFIG::setServerIconEnabled);
+            this.addEntry(new RegistryTitleEntry(ADAPTIVE_CURSOR_TEXT));
+            this.addEntry(new RegistryToggleEntry(ENABLED_TEXT, isAdaptive, true, ADAPTIVE_CURSOR_TOOLTIP, this::toggleAdaptive));
+            addAdaptiveEntry(ITEM_SLOT_TEXT, CONFIG.isItemSlotEnabled(), isAdaptive, CONFIG::setItemSlotEnabled);
+            addAdaptiveEntry(ITEM_GRAB_TEXT, CONFIG.isItemGrabbingEnabled(), isAdaptive, CONFIG::setItemGrabbingEnabled);
+            addAdaptiveEntry(CREATIVE_TABS_TEXT, CONFIG.isCreativeTabsEnabled(), isAdaptive, CONFIG::setCreativeTabsEnabled);
+            addAdaptiveEntry(ENCHANTMENTS_TEXT, CONFIG.isEnchantmentsEnabled(), isAdaptive, CONFIG::setEnchantmentsEnabled);
+            addAdaptiveEntry(STONECUTTER_TEXT, CONFIG.isStonecutterRecipesEnabled(), isAdaptive, CONFIG::setStonecutterRecipesEnabled);
+            addAdaptiveEntry(BOOK_EDIT_TEXT, CONFIG.isBookEditEnabled(), isAdaptive, CONFIG::setBookEditEnabled);
+            addAdaptiveEntry(LOOM_TEXT, CONFIG.isLoomPatternsEnabled(), isAdaptive, CONFIG::setLoomPatternsEnabled);
+            addAdaptiveEntry(ADVANCEMENTS_TEXT, CONFIG.isAdvancementTabsEnabled(), isAdaptive, CONFIG::setAdvancementTabsEnabled);
+            addAdaptiveEntry(WORLD_ICON_TEXT, CONFIG.isWorldIconEnabled(), isAdaptive, CONFIG::setWorldIconEnabled);
+            addAdaptiveEntry(SERVER_ICON_TEXT, CONFIG.isServerIconEnabled(), isAdaptive, CONFIG::setServerIconEnabled);
         }
 
-        public void addOptionEntry(Text label, boolean isEnabled, boolean defaultValue, Consumer<Boolean> onPress) {
-            RegistryEntry entry = new RegistryEntry(label, isEnabled, defaultValue, onPress);
-            options.add(entry);
+        public void addAdaptiveEntry(Text label, boolean isEnabled, boolean active, Consumer<Boolean> onPress) {
+            RegistryToggleEntry entry = new RegistryToggleEntry(label, isEnabled, active, onPress);
+            adaptiveOptions.add(entry);
             this.addEntry(entry);
         }
 
@@ -190,62 +190,94 @@ public class RegistryOptionsScreen extends Screen {
         public void forEachChild(Consumer<ClickableWidget> consumer) {
         }
 
-        public class RegistryEntry extends Entry<RegistryEntry> {
-            public final Text label;
-            public RegistryToggleWidget toggleButton;
+        public abstract class RegistryEntry extends RegistryListWidget.Entry<RegistryEntry> {
+            protected final Text label;
 
-            public RegistryEntry(Text title) {
-                this(Text.empty().append(title).formatted(Formatting.BOLD, Formatting.YELLOW), false, false, null);
-            }
-
-            public RegistryEntry(Text label, boolean defaultValue, boolean active, @Nullable Consumer<Boolean> onPress) {
-                this(label, defaultValue, active, null, onPress);
-            }
-
-            public RegistryEntry(Text label, boolean defaultValue, boolean active, @Nullable Tooltip tooltip, @Nullable Consumer<Boolean> onPress) {
+            protected RegistryEntry(Text label) {
                 this.label = label;
-                if (onPress != null) {
-                    toggleButton = new RegistryToggleWidget(
-                            getRowRight() - BUTTON_WIDTH,
-                            layout.getHeaderHeight() + itemHeight * getEntryCount() + ROW_GAP,
-                            BUTTON_WIDTH,
-                            itemHeight - ROW_GAP,
-                            defaultValue,
-                            tooltip,
-                            onPress
-                    );
-                    toggleButton.active = active;
-                }
             }
 
             @Override
             public List<? extends Selectable> selectableChildren() {
-                return toggleButton != null ? List.of(toggleButton) : List.of();
+                return List.of();
             }
 
             @Override
             public List<? extends Element> children() {
-                return toggleButton != null ? List.of(toggleButton) : List.of();
+                return List.of();
+            }
+        }
+
+        public class RegistryTitleEntry extends RegistryEntry {
+            public RegistryTitleEntry(Text label) {
+                super(Text.empty().append(label).formatted(Formatting.BOLD, Formatting.YELLOW));
             }
 
             @Override
             public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
                 int itemY = Math.round(y + entryHeight / 3.0f);
-                if (toggleButton != null) {
-                    context.drawText(textRenderer, label, x, itemY, 0xFFFFFFFF, false);
-                    toggleButton.render(context, mouseX, mouseY, tickDelta);
-                    toggleButton.setX(getRowRight() - BUTTON_WIDTH);
-                    toggleButton.setY(layout.getHeaderHeight() + itemHeight * index + ROW_GAP - (int) Math.round(getScrollAmount()));
-                    return;
-                }
                 int titleX = x + (getRowWidth() / 2 - textRenderer.getWidth(label) / 2);
                 context.drawText(textRenderer, label, titleX, itemY, 0xFFFFFFFF, false);
             }
         }
+
+        public class RegistryToggleEntry extends RegistryEntry {
+            private final ToggleWidget toggleButton;
+
+            public RegistryToggleEntry(Text label, boolean defaultValue, boolean active, Consumer<Boolean> onPress) {
+                this(label, defaultValue, active, null, onPress);
+            }
+
+            public RegistryToggleEntry(
+                    Text label,
+                    boolean defaultValue,
+                    boolean active,
+                    @Nullable Tooltip tooltip,
+                    Consumer<Boolean> onPress
+            ) {
+                super(label);
+
+                toggleButton = new ToggleWidget(
+                        getRowRight() - BUTTON_WIDTH,
+                        layout.getHeaderHeight() + itemHeight * getEntryCount() + ROW_GAP,
+                        BUTTON_WIDTH,
+                        itemHeight - ROW_GAP,
+                        defaultValue,
+                        tooltip,
+                        onPress
+                );
+                toggleButton.active = active;
+            }
+
+            @Override
+            public List<? extends Selectable> selectableChildren() {
+                return List.of(toggleButton);
+            }
+
+            @Override
+            public List<? extends Element> children() {
+                return List.of(toggleButton);
+            }
+
+            @Override
+            public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+                int itemY = Math.round(y + entryHeight / 3.0f);
+                context.drawText(textRenderer, label, x, itemY, 0xFFFFFFFF, false);
+                toggleButton.render(context, mouseX, mouseY, tickDelta);
+                toggleButton.setX(getRowRight() - BUTTON_WIDTH);
+                toggleButton.setY(layout.getHeaderHeight() + itemHeight * index + ROW_GAP - (int) Math.round(getScrollAmount()));
+            }
+        }
     }
 
-    public static class RegistryToggleWidget extends SelectedCursorToggleWidget {
-        protected RegistryToggleWidget(int x, int y, int width, int height, boolean defaultValue, Tooltip tooltip, Consumer<Boolean> onPress) {
+    public static class ToggleWidget extends SelectedCursorToggleWidget {
+        protected ToggleWidget(
+                int x, int y,
+                int width, int height,
+                boolean defaultValue,
+                @Nullable Tooltip tooltip,
+                Consumer<Boolean> onPress
+        ) {
             super(x, y, width, height, Text.empty(), defaultValue, onPress);
 
             if (tooltip != null) setTooltip(tooltip);
