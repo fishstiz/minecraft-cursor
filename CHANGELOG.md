@@ -1,3 +1,5 @@
 - Added de_at, de_ch, de_de Translations. ([@Lucanoria](https://github.com/fishstiz/minecraft-cursor/pull/5))
+- Made text automatically scroll when overflowing in the cursors list of Cursor Options Screen.
+- Fixed animate buttons in options screen capturing mouse events even when hidden.
 - API Changes:
   - Fixed disabled overrides clogging the override list.

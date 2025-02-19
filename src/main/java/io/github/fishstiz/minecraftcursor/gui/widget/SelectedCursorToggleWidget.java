@@ -9,31 +9,33 @@ import java.util.function.Consumer;
 public class SelectedCursorToggleWidget extends ButtonWidget {
     protected boolean value;
     protected Text prefix;
-    protected Consumer<Boolean> onPressConsumer;
+    protected Consumer<Boolean> handlePress;
 
-    protected SelectedCursorToggleWidget(int x, int y, int width, int height, Text message, PressAction onPress, NarrationSupplier narrationSupplier) {
-        super(x, y, width, height, message, onPress, narrationSupplier);
+    public SelectedCursorToggleWidget(Text prefix, boolean defaultValue, Consumer<Boolean> onPress) {
+        this(0, 0, 150, 20, prefix, defaultValue, onPress);
     }
 
-    public static SelectedCursorToggleWidget build(Text prefix, boolean defaultValue, Consumer<Boolean> onPress) {
-        return new SelectedCursorToggleWidget(0, 0, 150, 20,
-                prefix, SelectedCursorToggleWidget::onPressButton, ButtonWidget.DEFAULT_NARRATION_SUPPLIER)
-                .initialize(prefix, defaultValue, onPress);
-    }
+    protected SelectedCursorToggleWidget(
+            int x,
+            int y,
+            int width,
+            int height,
+            Text prefix,
+            boolean defaultValue,
+            Consumer<Boolean> onPress
+    ) {
+        super(x, y, width, height, prefix, SelectedCursorToggleWidget::handlePressButton, ButtonWidget.DEFAULT_NARRATION_SUPPLIER);
 
-    protected SelectedCursorToggleWidget initialize(Text prefix, boolean defaultValue, Consumer<Boolean> onPress) {
         this.prefix = prefix;
         this.value = defaultValue;
-        this.onPressConsumer = onPress;
+        this.handlePress = onPress;
         updateMessage();
-
-        return this;
     }
 
-    protected static void onPressButton(ButtonWidget buttonWidget) {
+    protected static void handlePressButton(ButtonWidget buttonWidget) {
         SelectedCursorToggleWidget toggleWidget = (SelectedCursorToggleWidget) buttonWidget;
         toggleWidget.toggleValue();
-        toggleWidget.onPressConsumer.accept(toggleWidget.value);
+        toggleWidget.handlePress.accept(toggleWidget.value);
     }
 
     protected void toggleValue() {
@@ -47,12 +49,7 @@ public class SelectedCursorToggleWidget extends ButtonWidget {
     }
 
     protected void updateMessage() {
-        Text message = Text.empty()
-                .append(prefix)
-                .append(": ")
-                .append(value ? ScreenTexts.ON : ScreenTexts.OFF);
-
-        setMessage(message);
+        setMessage(prefix.copy().append(": ").append(value ? ScreenTexts.ON : ScreenTexts.OFF));
     }
 
     @Override
