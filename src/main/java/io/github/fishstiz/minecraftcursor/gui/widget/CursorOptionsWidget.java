@@ -91,7 +91,7 @@ public class CursorOptionsWidget extends ContainerWidget {
     private void bindHelperButton(SelectedCursorSliderWidget sliderWidget) {
         var helperButton = new SelectedCursorButtonWidget(HELPER_ICON, HELPER_ICON_SIZE, HELPER_ICON_SIZE, parent::toMoreOptions);
         helperButton.setTooltip(Tooltip.of(Text.translatable(GLOBAL_TEXT_KEY, sliderWidget.getPrefix())));
-        sliderWidget.setHelperButton(helperButton, HELPER_BUTTON_SIZE, HELPER_BUTTON_SIZE);
+        sliderWidget.setInactiveHelperButton(helperButton, HELPER_BUTTON_SIZE, HELPER_BUTTON_SIZE);
     }
 
     private void refreshWidgets() {
@@ -197,7 +197,7 @@ public class CursorOptionsWidget extends ContainerWidget {
 
     private void addHelperButton(SelectedCursorSliderWidget slider, List<Element> children) {
         if (slider != null) {
-            var helperButton = slider.getHelperButton();
+            var helperButton = slider.getInactiveHelperButton();
             if (helperButton != null) {
                 children.add(helperButton);
             }
