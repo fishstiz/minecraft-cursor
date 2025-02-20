@@ -65,12 +65,12 @@ public class CursorOptionsHandler {
     }
 
     void handleChangeXHot(double xhot) {
-        getCursor().setXhot((int) xhot);
+        getCursor().setXHot((int) xhot);
         updateSettings();
     }
 
     void handleChangeYHot(double yhot) {
-        getCursor().setYhot((int) yhot);
+        getCursor().setYHot((int) yhot);
         updateSettings();
     }
 
@@ -92,10 +92,17 @@ public class CursorOptionsHandler {
         return CONFIG.getOrCreateCursorSettings(getCursor().getType());
     }
 
-    private void updateSettings() {
+    public void updateSettings() {
+        CursorConfig.GlobalSettings global = CONFIG.getGlobal();
+        CursorConfig.Settings settings = getSettings();
         Cursor cursor = getCursor();
 
-        getSettings().update(cursor.getScale(), cursor.getXhot(), cursor.getYhot(), cursor.isEnabled());
+        getSettings().update(
+                global.isScaleActive() ? settings.getScale() : cursor.getScale(),
+                global.isXHotActive() ? settings.getXHot() : cursor.getXHot(),
+                global.isYHotActive() ? settings.getYHot() : cursor.getYHot(),
+                cursor.isEnabled()
+        );
     }
 
     public static void removeScaleOverride() {

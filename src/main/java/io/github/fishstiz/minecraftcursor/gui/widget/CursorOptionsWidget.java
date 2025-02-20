@@ -1,30 +1,39 @@
 package io.github.fishstiz.minecraftcursor.gui.widget;
 
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
-import io.github.fishstiz.minecraftcursor.cursor.Cursor;
 import io.github.fishstiz.minecraftcursor.gui.screen.CursorOptionsScreen;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
+import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.DoubleConsumer;
 
+import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
 import static io.github.fishstiz.minecraftcursor.config.CursorConfig.Settings.Default.*;
 
 public class CursorOptionsWidget extends ContainerWidget {
     private static final int OPTIONS_HEIGHT = 24;
     private static final int GRID_PADDING = 4;
     private static final int BOX_WIDGET_TEXTURE_SIZE = 96;
-    private static final Text ENABLED_TEXT = Text.translatable("minecraft-cursor.options.enabled");
-    private static final Text SCALE_TEXT = Text.translatable("minecraft-cursor.options.scale");
-    private static final Text XHOT_TEXT = Text.translatable("minecraft-cursor.options.xhot");
-    private static final Text YHOT_TEXT = Text.translatable("minecraft-cursor.options.yhot");
+    private static final int HELPER_BUTTON_SIZE = 16;
+    private static final int HELPER_ICON_SIZE = 10;
+    private static final Identifier HELPER_ICON = Identifier.of("minecraft", "textures/gui/unseen_notification.png");
+    private static final String GLOBAL_TEXT_KEY = "minecraft-cursor.options.global.tooltip";
     private static final Text ANIMATE_TEXT = Text.translatable("minecraft-cursor.options.animate");
     private static final Text RESET_ANIMATION_TEXT = Text.translatable("minecraft-cursor.options.animate-reset");
     private static final String HOT_UNIT = "px";
+
+    public static final Text ENABLED_TEXT = Text.translatable("minecraft-cursor.options.enabled");
+    public static final Text SCALE_TEXT = Text.translatable("minecraft-cursor.options.scale");
+    public static final Text XHOT_TEXT = Text.translatable("minecraft-cursor.options.xhot");
+    public static final Text YHOT_TEXT = Text.translatable("minecraft-cursor.options.yhot");
+
     private final CursorOptionsScreen parent;
     private final CursorOptionsHandler handler;
     SelectedCursorToggleWidget enableButton;
@@ -54,37 +63,52 @@ public class CursorOptionsWidget extends ContainerWidget {
     }
 
     private void initWidgets() {
-        Cursor cursor = handler.getCursor();
         CursorConfig.Settings settings = handler.getSettings();
 
-        enableButton = new SelectedCursorToggleWidget(ENABLED_TEXT, cursor.isEnabled(), handler::handleEnable);
+        enableButton = new SelectedCursorToggleWidget(ENABLED_TEXT, settings.isEnabled(), handler::handleEnable);
         scaleSlider = new SelectedCursorSliderWidget(
                 SCALE_TEXT, settings.getScale(),
                 SCALE_MIN, SCALE_MAX, SCALE_STEP,
                 handler::handleChangeScale, CursorOptionsHandler::removeScaleOverride);
-        xhotSlider = new SelectedCursorSliderWidget(
-                XHOT_TEXT, cursor.getXhot(),
-                HOT_MIN, HOT_MAX, 1, HOT_UNIT,
-                handler.handleChangeHotspots(handler::handleChangeXHot));
-        yhotSlider = new SelectedCursorSliderWidget(
-                YHOT_TEXT, cursor.getYhot(),
-                HOT_MIN, HOT_MAX, 1, HOT_UNIT,
-                handler.handleChangeHotspots(handler::handleChangeYHot));
+        bindHelperButton(scaleSlider);
+
+        xhotSlider = createHotspotSlider(XHOT_TEXT, settings.getXHot(), handler::handleChangeXHot);
+        yhotSlider = createHotspotSlider(YHOT_TEXT, settings.getYHot(), handler::handleChangeYHot);
+
         animateButton = new SelectedCursorToggleWidget(ANIMATE_TEXT, handler.isAnimated(), handler::handlePressAnimate);
         resetAnimation = new SelectedCursorButtonWidget(RESET_ANIMATION_TEXT, handler::handleResetAnimation);
+
         cursorHotspot = new SelectedCursorHotspotWidget(BOX_WIDGET_TEXTURE_SIZE, this);
         cursorTest = new SelectedCursorTestWidget(BOX_WIDGET_TEXTURE_SIZE, this);
 
         refreshWidgets();
     }
 
-    private void refreshWidgets() {
-        Cursor cursor = handler.getCursor();
+    private SelectedCursorSliderWidget createHotspotSlider(Text prefix, int value, DoubleConsumer onApply) {
+        var slider = new SelectedCursorSliderWidget(
+                prefix, value,
+                HOT_MIN, HOT_MAX, 1, HOT_UNIT,
+                handler.handleChangeHotspots(onApply)
+        );
+        bindHelperButton(slider);
 
-        enableButton.setValue(cursor.isEnabled());
-        scaleSlider.setValue(cursor.getScale());
-        xhotSlider.setValue(cursor.getXhot());
-        yhotSlider.setValue(cursor.getYhot());
+        return slider;
+    }
+
+    private void bindHelperButton(SelectedCursorSliderWidget sliderWidget) {
+        var helperButton = new SelectedCursorButtonWidget(HELPER_ICON, HELPER_ICON_SIZE, HELPER_ICON_SIZE, parent::toMoreOptions);
+        helperButton.setTooltip(Tooltip.of(Text.translatable(GLOBAL_TEXT_KEY, sliderWidget.getPrefix())));
+        sliderWidget.setHelperButton(helperButton, HELPER_BUTTON_SIZE, HELPER_BUTTON_SIZE);
+    }
+
+    private void refreshWidgets() {
+        CursorConfig.GlobalSettings global = CONFIG.getGlobal();
+        CursorConfig.Settings settings = handler.getSettings();
+
+        enableButton.setValue(settings.isEnabled());
+        scaleSlider.update(settings.getScale(), !global.isScaleActive());
+        xhotSlider.update(settings.getXHot(), !global.isXHotActive());
+        yhotSlider.update(settings.getYHot(), !global.isYHotActive());
 
         boolean isAnimated = handler.isAnimated();
         animateButton.active = handler.getCursorAsAnimatedCursor().isPresent();
@@ -146,6 +170,10 @@ public class CursorOptionsWidget extends ContainerWidget {
         widget.setY((getY() + (OPTIONS_HEIGHT * (gridY))) + 1);
     }
 
+    public void save() {
+        handler.updateSettings();
+    }
+
     public void refresh() {
         refreshWidgets();
     }
@@ -156,7 +184,7 @@ public class CursorOptionsWidget extends ContainerWidget {
 
     @Override
     public List<? extends Element> children() {
-        return List.of(
+        List<Element> children = new ArrayList<>(List.of(
                 enableButton,
                 scaleSlider,
                 xhotSlider,
@@ -165,7 +193,22 @@ public class CursorOptionsWidget extends ContainerWidget {
                 resetAnimation,
                 cursorHotspot,
                 cursorTest
-        );
+        ));
+
+        addHelperButton(scaleSlider, children);
+        addHelperButton(xhotSlider, children);
+        addHelperButton(yhotSlider, children);
+
+        return children;
+    }
+
+    private void addHelperButton(SelectedCursorSliderWidget slider, List<Element> children) {
+        if (slider != null) {
+            var helperButton = slider.getHelperButton();
+            if (helperButton != null) {
+                children.add(helperButton);
+            }
+        }
     }
 
     public void setHeight(int height) {

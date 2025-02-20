@@ -127,27 +127,27 @@ public class Cursor {
     }
 
     public double getScale() {
-        return scale;
+        return this.scale;
     }
 
     public void setScale(double scale) {
-        updateImage(scale, getXhot(), getYhot());
+        updateImage(scale, this.xhot, this.yhot);
     }
 
-    public int getXhot() {
-        return xhot;
+    public int getXHot() {
+        return this.xhot;
     }
 
-    public void setXhot(int xhot) {
-        updateImage(getScale(), xhot, getYhot());
+    public void setXHot(int xhot) {
+        updateImage(this.scale, xhot, this.yhot);
     }
 
-    public int getYhot() {
-        return yhot;
+    public int getYHot() {
+        return this.yhot;
     }
 
-    public void setYhot(int yhot) {
-        updateImage(getScale(), getXhot(), yhot);
+    public void setYHot(int yhot) {
+        updateImage(this.scale, this.xhot, yhot);
     }
 
     public boolean isEnabled() {

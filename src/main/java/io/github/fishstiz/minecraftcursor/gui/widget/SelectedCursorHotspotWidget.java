@@ -74,8 +74,8 @@ public class SelectedCursorHotspotWidget extends SelectedCursorClickableWidget i
         int xhot = ((int) mouseX - getX()) / rulerSize;
         int yhot = ((int) mouseY - getY()) / rulerSize;
 
-        options.xhotSlider.setValue(xhot);
-        options.yhotSlider.setValue(yhot);
+        options.xhotSlider.setTranslatedValue(xhot);
+        options.yhotSlider.setTranslatedValue(yhot);
 
         setRulerRendered(true, true);
     }

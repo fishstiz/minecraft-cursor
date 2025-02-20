@@ -10,10 +10,10 @@ import java.util.Map;
 
 public class CursorAnimationHelper {
     private static final int CURSOR_SIZE = 32;
-    private final Map<AnimatedCursor, AnimationState> cursorStates = new HashMap<>();
+    private final Map<String, AnimationState> cursorStates = new HashMap<>();
 
     public void reset(AnimatedCursor cursor) {
-        cursorStates.computeIfAbsent(cursor, c -> new AnimationState()).reset();
+        cursorStates.computeIfAbsent(cursor.getType().getKey(), t -> new AnimationState()).reset();
     }
 
     public void drawSprite(DrawContext context, Cursor cursor, int x, int y, int size) {
@@ -36,7 +36,7 @@ public class CursorAnimationHelper {
     }
 
     private int getCurrentSpriteIndex(AnimatedCursor cursor) {
-        AnimationState state = cursorStates.computeIfAbsent(cursor, c -> new AnimationState());
+        AnimationState state = cursorStates.computeIfAbsent(cursor.getType().getKey(), t -> new AnimationState());
 
         if (!cursor.isAnimated()) {
             state.reset();
