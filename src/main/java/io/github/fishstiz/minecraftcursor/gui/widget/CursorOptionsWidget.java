@@ -79,6 +79,8 @@ public class CursorOptionsWidget extends ContainerWidget {
         resetAnimation = new SelectedCursorButtonWidget(RESET_ANIMATION_TEXT, handler::handleResetAnimation);
 
         cursorHotspot = new SelectedCursorHotspotWidget(BOX_WIDGET_TEXTURE_SIZE, this);
+        cursorHotspot.setChangeEventListener(handler::handleChangeHotspotWidget);
+
         cursorTest = new SelectedCursorTestWidget(BOX_WIDGET_TEXTURE_SIZE, this);
 
         refreshWidgets();
@@ -116,6 +118,7 @@ public class CursorOptionsWidget extends ContainerWidget {
         animateButton.setValue(isAnimated);
 
         cursorHotspot.setRulerRendered(true, true);
+        cursorHotspot.active = !(global.isXHotActive() && global.isYHotActive());
 
         children().forEach(widget -> widget.setFocused(false));
     }

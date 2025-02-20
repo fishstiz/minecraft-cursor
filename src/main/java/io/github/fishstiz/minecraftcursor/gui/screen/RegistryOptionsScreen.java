@@ -3,9 +3,12 @@ package io.github.fishstiz.minecraftcursor.gui.screen;
 import io.github.fishstiz.minecraftcursor.CursorManager;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
+import io.github.fishstiz.minecraftcursor.cursor.Cursor;
+import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorHotspotWidget;
 import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorSliderWidget;
 import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorToggleWidget;
 import io.github.fishstiz.minecraftcursor.util.DrawUtil;
+import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
@@ -20,14 +23,15 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.function.*;
 
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
 import static io.github.fishstiz.minecraftcursor.config.CursorConfig.Settings.Default;
-import static io.github.fishstiz.minecraftcursor.gui.widget.CursorOptionsWidget.ENABLED_TEXT;
-import static io.github.fishstiz.minecraftcursor.gui.widget.CursorOptionsWidget.SCALE_TEXT;
+import static io.github.fishstiz.minecraftcursor.gui.widget.CursorOptionsWidget.*;
 
 public class RegistryOptionsScreen extends Screen {
+    private static final CursorConfig.GlobalSettings GLOBAL = CONFIG.getGlobal();
+
     private static final String GLOBAL_TOOLTIP_KEY = "minecraft-cursor.options.more.global.tooltip";
     private static final Text GLOBAL_SETTINGS_TEXT = Text.translatable("minecraft-cursor.options.more.global");
 
@@ -50,9 +54,11 @@ public class RegistryOptionsScreen extends Screen {
     private static final int BUTTON_WIDTH = 40;
     private static final int ITEM_HEIGHT = 20;
     private static final int ROW_GAP = 6;
+    private static final int HOTSPOT_VIEWER_SIZE = 96;
     private final ThreePartsLayoutWidget layout = new ThreePartsLayoutWidget(this);
     private final Screen previousScreen;
     private final CursorManager cursorManager;
+    private final @Nullable SelectedCursorHotspotWidget hotspotWidget;
     private RegistryListWidget body;
     private ButtonWidget doneButton;
 
@@ -60,6 +66,18 @@ public class RegistryOptionsScreen extends Screen {
         super(Text.translatable("minecraft-cursor.options.more"));
         this.previousScreen = previousScreen;
         this.cursorManager = cursorManager;
+
+        if (previousScreen instanceof CursorOptionsScreen optionsScreen && optionsScreen.body != null) {
+            this.hotspotWidget = new SelectedCursorHotspotWidget(
+                    HOTSPOT_VIEWER_SIZE,
+                    optionsScreen.body.selectedCursorColumn
+            );
+
+            this.hotspotWidget.visible = false;
+            this.addSelectableChild(this.hotspotWidget);
+        } else {
+            this.hotspotWidget = null;
+        }
     }
 
     @Override
@@ -78,6 +96,24 @@ public class RegistryOptionsScreen extends Screen {
         this.renderBackgroundTexture(context);
         body.render(context, mouseX, mouseY, delta);
         doneButton.render(context, mouseX, mouseY, delta);
+
+        if (body == null || hotspotWidget == null) return;
+
+        if ((GLOBAL.isXHotActive() || GLOBAL.isYHotActive()) && (body.xhotEntry.isFocused() || body.yhotEntry.isFocused())) {
+            int x = body.getRowLeft() - hotspotWidget.getWidth() - ROW_GAP;
+            int y = getYEntry(1, body) + ROW_GAP / 2;
+
+            hotspotWidget.setPosition(x, y);
+            hotspotWidget.visible = true;
+            hotspotWidget.active = true;
+
+            context.enableScissor(x, layout.getHeaderHeight(), body.getRowLeft(), layout.getHeaderHeight() + getContentHeight());
+            hotspotWidget.render(context, mouseX, mouseY, delta);
+            context.disableScissor();
+        } else {
+            hotspotWidget.visible = false;
+            hotspotWidget.active = false;
+        }
     }
 
     protected void refreshWidgetPositions() {
@@ -113,6 +149,18 @@ public class RegistryOptionsScreen extends Screen {
     public class RegistryListWidget extends ElementListWidget<RegistryEntry> implements Widget {
         private static final CursorConfig.GlobalSettings global = CONFIG.getGlobal();
         private final List<RegistryToggleEntry> adaptiveOptions = new ArrayList<>();
+        private final RegistrySliderEntry xhotEntry = createSliderEntry(XHOT_TEXT, "px",
+                Default.HOT_MIN, Default.HOT_MAX, 1,
+                GLOBAL::isXHotActive, GLOBAL::setXhotActive,
+                GLOBAL::getXHot, GLOBAL::setXHotDouble,
+                CursorConfig.Settings::getXHot, Cursor::setXHot
+        );
+        private final RegistrySliderEntry yhotEntry = createSliderEntry(YHOT_TEXT, "px",
+                Default.HOT_MIN, Default.HOT_MAX, 1,
+                GLOBAL::isYHotActive, GLOBAL::setYhotActive,
+                GLOBAL::getYHot, GLOBAL::setYHotDouble,
+                CursorConfig.Settings::getYHot, Cursor::setYHot
+        );
 
         public RegistryListWidget(MinecraftClient minecraftClient, RegistryOptionsScreen options) {
             super(
@@ -141,9 +189,19 @@ public class RegistryOptionsScreen extends Screen {
                     this::toggleAnimations)
             );
 
-            var slider = new RegistrySliderEntry.Slider(SCALE_TEXT, global.getScale(), this::handleScaleChange);
-            var toggle = new RegistrySliderEntry.Toggle(ENABLED_TEXT, global.isScaleActive(), getSettingTooltip(SCALE_TEXT), this::toggleScale);
-            addEntry(new RegistrySliderEntry(slider, toggle));
+            addEntry(createSliderEntry(SCALE_TEXT, "",
+                    Default.SCALE_MIN, Default.SCALE_MAX, Default.SCALE_STEP,
+                    GLOBAL::isScaleActive, GLOBAL::setScaleActive,
+                    GLOBAL::getScale, GLOBAL::setScale,
+                    CursorConfig.Settings::getScale, Cursor::setScale
+            ));
+
+            if (hotspotWidget != null) {
+                hotspotWidget.setChangeEventListener(this::handleChangeHotspotWidget);
+            }
+
+            addEntry(xhotEntry);
+            addEntry(yhotEntry);
         }
 
         private void addAdaptiveOptions() {
@@ -168,24 +226,45 @@ public class RegistryOptionsScreen extends Screen {
             this.addEntry(entry);
         }
 
-        private void handleScaleChange(double scale) {
-            global.setScale(scale);
-            updateScale();
-        }
-
-        private void toggleScale(boolean isActive) {
-            global.setScaleActive(isActive);
-            updateScale();
-        }
-
-        private void updateScale() {
-            cursorManager.getLoadedCursors().forEach(cursor -> {
-                double scale = global.isScaleActive()
-                        ? global.getScale()
-                        : CONFIG.getOrCreateCursorSettings(cursor.getType()).getScale();
-
-                cursor.setScale(scale);
+        private RegistrySliderEntry createSliderEntry(
+                Text text, String suffix,
+                double min, double max, double step,
+                BooleanSupplier activeGetter,
+                BooleanConsumer activeSetter,
+                DoubleSupplier valueGetter,
+                DoubleConsumer valueSetter,
+                ToDoubleFunction<CursorConfig.Settings> settingsValueGetter,
+                ObjDoubleConsumer<Cursor> cursorAction
+        ) {
+            Runnable updateCursors = () -> cursorManager.getLoadedCursors().forEach(cursor -> {
+                double value = activeGetter.getAsBoolean()
+                        ? valueGetter.getAsDouble()
+                        : settingsValueGetter.applyAsDouble(CONFIG.getOrCreateCursorSettings(cursor.getType()));
+                cursorAction.accept(cursor, value);
             });
+            DoubleConsumer handleChange = value -> {
+                valueSetter.accept(value);
+                updateCursors.run();
+            };
+            BooleanConsumer handleToggle = active -> {
+                activeSetter.accept(active);
+                updateCursors.run();
+            };
+
+            var slider = new RegistrySliderEntry.Slider(text, suffix, valueGetter.getAsDouble(), min, max, step, handleChange::accept);
+            var toggle = new RegistrySliderEntry.Toggle(ENABLED_TEXT, activeGetter.getAsBoolean(), getSettingTooltip(text), handleToggle);
+            return new RegistrySliderEntry(slider, toggle);
+        }
+
+        private void handleChangeHotspotWidget(int xhot, int yhot) {
+            if (GLOBAL.isXHotActive()) {
+                GLOBAL.setXHot(xhot);
+                xhotEntry.sliderWidget.setTranslatedValue(xhot);
+            }
+            if (GLOBAL.isYHotActive()) {
+                GLOBAL.setYHot(yhot);
+                yhotEntry.sliderWidget.setTranslatedValue(yhot);
+            }
         }
 
         private void toggleAnimations(boolean isAnimated) {
@@ -220,6 +299,18 @@ public class RegistryOptionsScreen extends Screen {
 
         public int getItemHeight() {
             return itemHeight;
+        }
+
+        public ToggleWidget createToggleWidget(boolean defaultValue, Tooltip tooltip, Consumer<Boolean> onPress) {
+            return new ToggleWidget(
+                    getRowRight() - BUTTON_WIDTH,
+                    layout.getHeaderHeight() + itemHeight * getEntryCount() + ROW_GAP,
+                    BUTTON_WIDTH,
+                    itemHeight - ROW_GAP,
+                    defaultValue,
+                    tooltip,
+                    onPress
+            );
         }
 
         public void position(int width, int height, int y) {
@@ -291,15 +382,7 @@ public class RegistryOptionsScreen extends Screen {
             ) {
                 super(label);
 
-                toggleButton = new ToggleWidget(
-                        getRowRight() - BUTTON_WIDTH,
-                        layout.getHeaderHeight() + itemHeight * getEntryCount() + ROW_GAP,
-                        BUTTON_WIDTH,
-                        itemHeight - ROW_GAP,
-                        defaultValue,
-                        tooltip,
-                        onPress
-                );
+                toggleButton = createToggleWidget(defaultValue, tooltip, onPress);
                 toggleButton.active = active;
             }
 
@@ -330,27 +413,18 @@ public class RegistryOptionsScreen extends Screen {
                 sliderWidget = new SelectedCursorSliderWidget(
                         slider.label,
                         slider.value,
-                        Default.SCALE_MIN,
-                        Default.SCALE_MAX,
-                        Default.SCALE_STEP,
-                        "px",
+                        slider.min,
+                        slider.max,
+                        slider.step,
+                        slider.suffix,
                         slider.applyFunction
                 );
-
                 sliderWidget.active = toggle.value;
 
-                toggleButton = new ToggleWidget(
-                        getRowRight() - BUTTON_WIDTH,
-                        layout.getHeaderHeight() + itemHeight * getEntryCount() + ROW_GAP,
-                        BUTTON_WIDTH,
-                        itemHeight - ROW_GAP,
-                        toggle.value,
-                        toggle.tooltip,
-                        getToggleFunction(toggle.toggleFunction)
-                );
+                toggleButton = createToggleWidget(toggle.value, toggle.tooltip, handleToggle(toggle.toggleFunction));
             }
 
-            private Consumer<Boolean> getToggleFunction(Consumer<Boolean> toggleFunction) {
+            private Consumer<Boolean> handleToggle(Consumer<Boolean> toggleFunction) {
                 return active -> {
                     sliderWidget.active = active;
                     toggleFunction.accept(active);
@@ -375,7 +449,8 @@ public class RegistryOptionsScreen extends Screen {
                 return List.of(sliderWidget, toggleButton);
             }
 
-            public record Slider(Text label, double value, Consumer<Double> applyFunction) {
+            public record Slider(Text label, String suffix, double value, double min, double max, double step,
+                                 Consumer<Double> applyFunction) {
             }
 
             public record Toggle(Text label, boolean value, Tooltip tooltip, Consumer<Boolean> toggleFunction) {

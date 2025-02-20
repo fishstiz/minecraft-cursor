@@ -12,6 +12,7 @@ import java.util.function.DoubleConsumer;
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
 
 public class CursorOptionsHandler {
+    private static final CursorConfig.GlobalSettings GLOBAL = CONFIG.getGlobal();
     private static final int SCALE_OVERRIDE = -1;
     private final CursorOptionsWidget options;
 
@@ -27,6 +28,17 @@ public class CursorOptionsHandler {
 
         if (cursor instanceof AnimatedCursor) {
             options.resetAnimation.active = options.animateButton.value && enabled;
+        }
+    }
+
+    void handleChangeHotspotWidget(int xhot, int yhot) {
+        if (!GLOBAL.isXHotActive()) {
+            options.xhotSlider.setTranslatedValue(xhot);
+            handleChangeXHot(xhot);
+        }
+        if (!GLOBAL.isYHotActive()) {
+            options.yhotSlider.setTranslatedValue(yhot);
+            handleChangeYHot(yhot);
         }
     }
 
@@ -93,14 +105,13 @@ public class CursorOptionsHandler {
     }
 
     public void updateSettings() {
-        CursorConfig.GlobalSettings global = CONFIG.getGlobal();
         CursorConfig.Settings settings = getSettings();
         Cursor cursor = getCursor();
 
         getSettings().update(
-                global.isScaleActive() ? settings.getScale() : cursor.getScale(),
-                global.isXHotActive() ? settings.getXHot() : cursor.getXHot(),
-                global.isYHotActive() ? settings.getYHot() : cursor.getYHot(),
+                GLOBAL.isScaleActive() ? settings.getScale() : cursor.getScale(),
+                GLOBAL.isXHotActive() ? settings.getXHot() : cursor.getXHot(),
+                GLOBAL.isYHotActive() ? settings.getYHot() : cursor.getYHot(),
                 cursor.isEnabled()
         );
     }
