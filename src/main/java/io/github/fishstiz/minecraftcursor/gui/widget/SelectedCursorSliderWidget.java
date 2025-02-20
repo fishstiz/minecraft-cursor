@@ -17,7 +17,7 @@ public class SelectedCursorSliderWidget extends SliderWidget {
     private final Consumer<Double> onApply;
     private final @Nullable Runnable onRelease;
     private double translatedValue;
-    private SelectedCursorButtonWidget helperButton;
+    private SelectedCursorButtonWidget inactiveHelperButton;
     private boolean held;
 
     public SelectedCursorSliderWidget(
@@ -94,17 +94,21 @@ public class SelectedCursorSliderWidget extends SliderWidget {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
-        hovered = isMouseOver(mouseX, mouseY);
+        SelectedCursorButtonWidget helperButton = getInactiveHelperButton();
+        boolean isHelperButtonPresent = helperButton != null;
 
-        SelectedCursorButtonWidget helperBtn = getHelperButton();
-
-        if (helperBtn != null) {
-            helperBtn.active = !active;
-            if (isMouseOverInactive(mouseX, mouseY)) {
-                getHelperButton().render(context, mouseX, mouseY, delta);
-            }
+        if (isHelperButtonPresent) {
+            helperButton.active = !active;
         }
+
+        if (isHelperButtonPresent && isMouseOverInactive(mouseX, mouseY)) {
+            renderAroundHelperButton(context, mouseX, mouseY, delta, helperButton);
+            helperButton.render(context, mouseX, mouseY, delta);
+        } else {
+            super.render(context, mouseX, mouseY, delta);
+        }
+
+        hovered = isMouseOver(mouseX, mouseY);
 
         if (held && !CursorTypeUtil.isLeftClickHeld()) {
             if (this.onRelease != null) {
@@ -115,6 +119,33 @@ public class SelectedCursorSliderWidget extends SliderWidget {
         } else {
             held = CursorTypeUtil.isLeftClickHeld();
         }
+    }
+
+    private void renderAroundHelperButton(
+            DrawContext context,
+            int mouseX,
+            int mouseY,
+            float delta,
+            SelectedCursorButtonWidget helperButton
+    ) {
+        int x = getX();
+        int y = getY();
+        int right = x + getWidth();
+        int bottom = y + getHeight();
+        int helperY = helperButton.getY();
+        int helperBottom = helperY + helperButton.getHeight();
+        int helperRight = helperButton.getX() + helperButton.getWidth();
+
+        renderSection(context, mouseX, mouseY, delta, x, y, right, helperY); // top
+        renderSection(context, mouseX, mouseY, delta, x, helperBottom, right, bottom); // bottom
+        renderSection(context, mouseX, mouseY, delta, x, helperY, helperButton.getX(), helperBottom); // left
+        renderSection(context, mouseX, mouseY, delta, helperRight, helperY, right, helperBottom); // right
+    }
+
+    private void renderSection(DrawContext context, int mouseX, int mouseY, float delta, int x1, int y1, int x2, int y2) {
+        context.enableScissor(x1, y1, x2, y2);
+        super.render(context, mouseX, mouseY, delta);
+        context.disableScissor();
     }
 
     @Override
@@ -138,21 +169,21 @@ public class SelectedCursorSliderWidget extends SliderWidget {
         return translatedValue;
     }
 
-    public @Nullable SelectedCursorButtonWidget getHelperButton() {
-        if (helperButton == null) return null;
+    public @Nullable SelectedCursorButtonWidget getInactiveHelperButton() {
+        if (inactiveHelperButton == null) return null;
 
         int marginRight = 2;
-        int x = (getX() + getWidth()) - helperButton.getWidth() - marginRight;
-        int y = getY() + (getHeight() - helperButton.getHeight()) / 2;
+        int x = (getX() + getWidth()) - inactiveHelperButton.getWidth() - marginRight;
+        int y = getY() + (getHeight() - inactiveHelperButton.getHeight()) / 2;
 
-        helperButton.setPosition(x, y);
-        return helperButton;
+        inactiveHelperButton.setPosition(x, y);
+        return inactiveHelperButton;
     }
 
-    public void setHelperButton(SelectedCursorButtonWidget helperButton, int width, int height) {
-        this.helperButton = helperButton;
-        this.helperButton.setWidth(width);
-        this.helperButton.height = height;
+    public void setInactiveHelperButton(SelectedCursorButtonWidget helperButton, int width, int height) {
+        this.inactiveHelperButton = helperButton;
+        this.inactiveHelperButton.setWidth(width);
+        this.inactiveHelperButton.height = height;
     }
 
     public Text getPrefix() {
