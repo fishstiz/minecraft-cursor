@@ -15,30 +15,29 @@ import net.minecraft.util.Identifier;
 public class SelectedCursorTestWidget extends ClickableWidget implements CursorProvider {
     private static final Identifier BACKGROUND = Identifier.of(MinecraftCursor.MOD_ID, "textures/gui/test_background.png");
     private static final int HOTSPOT_RULER_COLOR = 0xFF00FF00; // green
-    private final SelectedCursorOptionsWidget optionsWidget;
-    ButtonWidget hoverButton = ButtonWidget.builder(Text.empty(),
+    private static final ButtonWidget BUTTON = ButtonWidget.builder(Text.empty(),
             b -> b.setFocused(false)).size(20, 20).build();
+    private final Cursor cursor;
 
-    public SelectedCursorTestWidget(int size, SelectedCursorOptionsWidget optionsWidget) {
+    public SelectedCursorTestWidget(int size, CursorOptionsWidget optionsWidget) {
         super(optionsWidget.getX(), optionsWidget.getY(), size, size, Text.empty());
-        this.optionsWidget = optionsWidget;
+        this.cursor = optionsWidget.parent().getSelectedCursor();
 
         this.active = false;
     }
 
     private void placeButton() {
-        int x = getX() + (getWidth() / 2 - hoverButton.getWidth() / 2);
-        int y = getY() + (getHeight() / 2 - hoverButton.getHeight() / 2);
-        hoverButton.setPosition(x, y);
+        int x = getX() + (getWidth() / 2 - BUTTON.getWidth() / 2);
+        int y = getY() + (getHeight() / 2 - BUTTON.getHeight() / 2);
+        BUTTON.setPosition(x, y);
     }
 
     @Override
     protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
-        Cursor cursor = optionsWidget.optionsScreen.getSelectedCursor();
         context.drawTexture(RenderLayer::getGuiTextured, BACKGROUND, getX(), getY(), 0, 0, width, height, width, height);
 
         if (cursor.isEnabled()) {
-            hoverButton.render(context, mouseX, mouseY, delta);
+            BUTTON.render(context, mouseX, mouseY, delta);
             renderRuler(context, mouseX, mouseY);
         } else {
             context.fill(getX(), getY(), getRight(), getBottom(), 0x7F000000); // 50% black overlay
@@ -57,7 +56,7 @@ public class SelectedCursorTestWidget extends ClickableWidget implements CursorP
 
     @Override
     public CursorType getCursorType(double mouseX, double mouseY) {
-        return optionsWidget.optionsScreen.getSelectedCursor().getType();
+        return cursor.getType();
     }
 
     @Override

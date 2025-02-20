@@ -3,9 +3,6 @@ package io.github.fishstiz.minecraftcursor.gui.widget;
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.api.CursorProvider;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
-import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
-import io.github.fishstiz.minecraftcursor.cursor.Cursor;
-import io.github.fishstiz.minecraftcursor.gui.screen.CursorOptionsScreen;
 import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
@@ -19,13 +16,13 @@ public class SelectedCursorHotspotWidget extends ClickableWidget implements Curs
     private static final Identifier BACKGROUND = Identifier.of(MinecraftCursor.MOD_ID, "textures/gui/hotspot_background.png");
     private static final int CURSOR_SIZE = 32;
     private static final int RULER_COLOR = 0xFFFF0000; // red
-    private final SelectedCursorOptionsWidget optionsWidget;
+    private final CursorOptionsWidget options;
     private boolean rulerRendered = true;
     private float rulerAlpha = 1f;
 
-    public SelectedCursorHotspotWidget(int size, SelectedCursorOptionsWidget optionsWidget) {
-        super(optionsWidget.getX(), optionsWidget.getY(), size, size, Text.empty());
-        this.optionsWidget = optionsWidget;
+    public SelectedCursorHotspotWidget(int size, CursorOptionsWidget options) {
+        super(options.getX(), options.getY(), size, size, Text.empty());
+        this.options = options;
     }
 
     @Override
@@ -37,25 +34,7 @@ public class SelectedCursorHotspotWidget extends ClickableWidget implements Curs
     }
 
     private void drawCursorTexture(DrawContext context) {
-        CursorOptionsScreen optionsScreen = optionsWidget.optionsScreen;
-        Cursor cursor = optionsScreen.getSelectedCursor();
-        int frameIndex = 0;
-
-        if (cursor instanceof AnimatedCursor animatedCursor) {
-            frameIndex = optionsScreen.animationHelper.getCurrentSpriteIndex(animatedCursor);
-        }
-
-        int vOffset = CURSOR_SIZE * frameIndex;
-
-        context.drawTexture(
-                RenderLayer::getGuiTextured,
-                cursor.getSprite(),
-                getX(), getY(),
-                0, vOffset, // starting point
-                width, height, // width/height to stretch/shrink
-                CURSOR_SIZE, CURSOR_SIZE, // cropped width/height from actual image
-                cursor.getTrueWidth(), cursor.getTrueHeight() // actual width/height
-        );
+        options.parent().animationHelper.drawSprite(context, options.parent().getSelectedCursor(), getX(), getY(), width);
     }
 
     private void renderRuler(DrawContext context, int mouseX, int mouseY) {
@@ -65,8 +44,8 @@ public class SelectedCursorHotspotWidget extends ClickableWidget implements Curs
 
         if (rulerAlpha <= 0.01f) return;
 
-        int xhot = (int) optionsWidget.xhotSlider.getTranslatedValue();
-        int yhot = (int) optionsWidget.yhotSlider.getTranslatedValue();
+        int xhot = (int) options.xhotSlider.getTranslatedValue();
+        int yhot = (int) options.yhotSlider.getTranslatedValue();
 
         int rulerSize = getRulerSize();
         int xhotX1 = (getX() + xhot * rulerSize);
@@ -97,8 +76,8 @@ public class SelectedCursorHotspotWidget extends ClickableWidget implements Curs
         int xhot = ((int) mouseX - getX()) / rulerSize;
         int yhot = ((int) mouseY - getY()) / rulerSize;
 
-        optionsWidget.xhotSlider.setValue(xhot);
-        optionsWidget.yhotSlider.setValue(yhot);
+        options.xhotSlider.setValue(xhot);
+        options.yhotSlider.setValue(yhot);
 
         setRulerRendered(true, true);
     }
