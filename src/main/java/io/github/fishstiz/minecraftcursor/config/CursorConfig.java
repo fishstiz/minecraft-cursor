@@ -167,9 +167,9 @@ public class CursorConfig {
     }
 
     public static class Settings {
-        private double scale = Default.SCALE;
-        private int xhot = Default.X_HOT;
-        private int yhot = Default.Y_HOT;
+        protected double scale = Default.SCALE;
+        protected int xhot = Default.X_HOT;
+        protected int yhot = Default.Y_HOT;
         private boolean enabled = Default.ENABLED;
         @JsonInclude(JsonInclude.Include.NON_NULL)
         private Boolean animated;
@@ -203,19 +203,6 @@ public class CursorConfig {
 
         public Boolean isAnimated() {
             return this.animated;
-        }
-
-        public void setScale(double scale) {
-            double clampedScale = Math.max(Default.SCALE_MIN, Math.min(scale, Default.SCALE_MAX));
-            this.scale = Math.round(clampedScale / Default.SCALE_STEP) * Default.SCALE_STEP;
-        }
-
-        public void setXhot(int xhot) {
-            this.xhot = Math.max(Default.HOT_MIN, Math.min(xhot, Default.HOT_MAX));
-        }
-
-        public void setYhot(int yhot) {
-            this.yhot = Math.max(Default.HOT_MIN, Math.min(yhot, Default.HOT_MAX));
         }
 
         public void setAnimated(boolean animated) {
@@ -265,6 +252,27 @@ public class CursorConfig {
 
         public void setYhotActive(boolean yhotActive) {
             this.yhotActive = yhotActive;
+        }
+
+        public void setScale(double scale) {
+            double clampedScale = Math.max(Default.SCALE_MIN, Math.min(scale, Default.SCALE_MAX));
+            this.scale = Math.round(clampedScale / Default.SCALE_STEP) * Default.SCALE_STEP;
+        }
+
+        public void setXHotDouble(double xhot) {
+            setXHot((int) xhot);
+        }
+
+        public void setXHot(int xhot) {
+            this.xhot = Math.max(Default.HOT_MIN, Math.min(xhot, Default.HOT_MAX));
+        }
+
+        public void setYHotDouble(double yhot) {
+            setYHot((int) yhot);
+        }
+
+        public void setYHot(int yhot) {
+            this.yhot = Math.max(Default.HOT_MIN, Math.min(yhot, Default.HOT_MAX));
         }
     }
 }
