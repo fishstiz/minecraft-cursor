@@ -3,7 +3,6 @@ package io.github.fishstiz.minecraftcursor.gui.widget;
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.api.CursorProvider;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
-import io.github.fishstiz.minecraftcursor.cursor.Cursor;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -17,11 +16,11 @@ public class SelectedCursorTestWidget extends ClickableWidget implements CursorP
     private static final int HOTSPOT_RULER_COLOR = 0xFF00FF00; // green
     private static final ButtonWidget BUTTON = ButtonWidget.builder(Text.empty(),
             b -> b.setFocused(false)).size(20, 20).build();
-    private final Cursor cursor;
+    private final CursorOptionsWidget options;
 
     public SelectedCursorTestWidget(int size, CursorOptionsWidget optionsWidget) {
         super(optionsWidget.getX(), optionsWidget.getY(), size, size, Text.empty());
-        this.cursor = optionsWidget.parent().getSelectedCursor();
+        this.options = optionsWidget;
 
         this.active = false;
     }
@@ -36,7 +35,7 @@ public class SelectedCursorTestWidget extends ClickableWidget implements CursorP
     protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
         context.drawTexture(RenderLayer::getGuiTextured, BACKGROUND, getX(), getY(), 0, 0, width, height, width, height);
 
-        if (cursor.isEnabled()) {
+        if (options.parent().getSelectedCursor().isEnabled()) {
             BUTTON.render(context, mouseX, mouseY, delta);
             renderRuler(context, mouseX, mouseY);
         } else {
@@ -56,7 +55,7 @@ public class SelectedCursorTestWidget extends ClickableWidget implements CursorP
 
     @Override
     public CursorType getCursorType(double mouseX, double mouseY) {
-        return cursor.getType();
+        return options.parent().getSelectedCursor().getType();
     }
 
     @Override

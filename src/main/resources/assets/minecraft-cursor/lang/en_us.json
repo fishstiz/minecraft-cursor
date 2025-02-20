@@ -19,13 +19,14 @@
   "minecraft-cursor.options.more": "More Cursor Options",
 
   "minecraft-cursor.options.more.global": "Global Cursor Settings",
-  "minecraft-cursor.options.more.global.tooltip": "Overrides the %1$s setting on all cursors. Does not update cursor's %1$s setting.",
+  "minecraft-cursor.options.more.global.tooltip": "Overrides the %1$s setting on all cursors. Does not update the cursor's %1$s setting.",
+  "minecraft-cursor.options.global.tooltip": "%1$s overridden by global cursor settings.",
 
   "minecraft-cursor.options.more.animation": "Cursor Animations",
-  "minecraft-cursor.options.more.animation.tooltip": "Updates the animated setting on all animated cursors.",
+  "minecraft-cursor.options.more.animation.tooltip": "Simply updates the animated setting on all animated cursors.",
 
   "minecraft-cursor.options.more.adapt": "Adaptive Cursor",
-  "minecraft-cursor.options.more.adapt.tooltip": "Updates the enabled setting on all cursors except for the Default cursor.",
+  "minecraft-cursor.options.more.adapt.tooltip": "Simply updates the enabled setting on all cursors except for the Default cursor.",
   "minecraft-cursor.options.item_slot": "Inventory Item Slot",
   "minecraft-cursor.options.item_grab": "Inventory Item Grab",
   "minecraft-cursor.options.creative_tabs": "Creative Inventory Tabs",
