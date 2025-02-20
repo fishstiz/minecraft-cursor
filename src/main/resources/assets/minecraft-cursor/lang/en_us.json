@@ -19,7 +19,7 @@
   "minecraft-cursor.options.more": "More Cursor Options",
 
   "minecraft-cursor.options.more.global": "Global Cursor Settings",
-  "minecraft-cursor.options.more.global.tooltip": "Overrides the %1$s on all cursors. Does not update individual cursor's %1$s.",
+  "minecraft-cursor.options.more.global.tooltip": "Overrides the %1$s setting on all cursors. Does not update cursor's %1$s setting.",
 
   "minecraft-cursor.options.more.animation": "Cursor Animations",
   "minecraft-cursor.options.more.animation.tooltip": "Updates the animated setting on all animated cursors.",

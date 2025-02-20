@@ -1,6 +1,7 @@
 package io.github.fishstiz.minecraftcursor.gui.screen;
 
 import io.github.fishstiz.minecraftcursor.CursorManager;
+import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
 import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorSliderWidget;
 import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorToggleWidget;
@@ -91,7 +92,8 @@ public class RegistryOptionsScreen extends Screen {
         }
     }
 
-    public class RegistryListWidget extends ElementListWidget<RegistryListWidget.RegistryEntry> {
+    public class RegistryListWidget extends ElementListWidget<RegistryEntry> {
+        private static final CursorConfig.GlobalSettings global = CONFIG.getGlobal();
         private final List<RegistryToggleEntry> adaptiveOptions = new ArrayList<>();
 
         public RegistryListWidget(MinecraftClient minecraftClient, RegistryOptionsScreen options) {
@@ -99,12 +101,47 @@ public class RegistryOptionsScreen extends Screen {
             addOptions();
         }
 
-        public int getYOffset() {
-            return layout.getHeaderHeight();
+        private void addOptions() {
+            addGlobalOptions();
+            addAdaptiveOptions();
         }
 
-        public int getItemHeight() {
-            return itemHeight;
+        private void addGlobalOptions() {
+            addEntry(new RegistryTitleEntry(GLOBAL_SETTINGS_TEXT));
+            addEntry(new RegistryToggleEntry(
+                    ANIMATION_TEXT, cursorManager.isAnimated(), cursorManager.hasAnimations(),
+                    ANIMATION_TOOLTIP, this::toggleAnimations));
+
+            var slider = new RegistrySliderEntry.Slider(SCALE_TEXT, global.getScale(), global::setScale);
+            var toggle = new RegistrySliderEntry.Toggle(
+                    ENABLED_TEXT,
+                    global.isScaleActive(),
+                    getSettingTooltip(SCALE_TEXT.getString()),
+                    global::setScaleActive
+            );
+            addEntry(new RegistrySliderEntry(slider, toggle));
+        }
+
+        private void addAdaptiveOptions() {
+            boolean isAdaptive = cursorManager.isAdaptive();
+            addEntry(new RegistryTitleEntry(ADAPTIVE_CURSOR_TEXT));
+            addEntry(new RegistryToggleEntry(ENABLED_TEXT, isAdaptive, true, ADAPTIVE_CURSOR_TOOLTIP, this::toggleAdaptive));
+            addAdaptiveEntry(ITEM_SLOT_TEXT, CONFIG.isItemSlotEnabled(), isAdaptive, CONFIG::setItemSlotEnabled);
+            addAdaptiveEntry(ITEM_GRAB_TEXT, CONFIG.isItemGrabbingEnabled(), isAdaptive, CONFIG::setItemGrabbingEnabled);
+            addAdaptiveEntry(CREATIVE_TABS_TEXT, CONFIG.isCreativeTabsEnabled(), isAdaptive, CONFIG::setCreativeTabsEnabled);
+            addAdaptiveEntry(ENCHANTMENTS_TEXT, CONFIG.isEnchantmentsEnabled(), isAdaptive, CONFIG::setEnchantmentsEnabled);
+            addAdaptiveEntry(STONECUTTER_TEXT, CONFIG.isStonecutterRecipesEnabled(), isAdaptive, CONFIG::setStonecutterRecipesEnabled);
+            addAdaptiveEntry(BOOK_EDIT_TEXT, CONFIG.isBookEditEnabled(), isAdaptive, CONFIG::setBookEditEnabled);
+            addAdaptiveEntry(LOOM_TEXT, CONFIG.isLoomPatternsEnabled(), isAdaptive, CONFIG::setLoomPatternsEnabled);
+            addAdaptiveEntry(ADVANCEMENTS_TEXT, CONFIG.isAdvancementTabsEnabled(), isAdaptive, CONFIG::setAdvancementTabsEnabled);
+            addAdaptiveEntry(WORLD_ICON_TEXT, CONFIG.isWorldIconEnabled(), isAdaptive, CONFIG::setWorldIconEnabled);
+            addAdaptiveEntry(SERVER_ICON_TEXT, CONFIG.isServerIconEnabled(), isAdaptive, CONFIG::setServerIconEnabled);
+        }
+
+        private void addAdaptiveEntry(Text label, boolean isEnabled, boolean active, Consumer<Boolean> onPress) {
+            RegistryToggleEntry entry = new RegistryToggleEntry(label, isEnabled, active, onPress);
+            adaptiveOptions.add(entry);
+            this.addEntry(entry);
         }
 
         private void toggleAnimations(boolean isAnimated) {
@@ -133,67 +170,12 @@ public class RegistryOptionsScreen extends Screen {
             ));
         }
 
-        private void applyGlobalScale(double scale) {
-
+        public int getYOffset() {
+            return layout.getHeaderHeight();
         }
 
-        private void toggleGlobalScale(boolean enabled) {
-
-        }
-
-        private void addOptions() {
-            addEntry(new RegistryTitleEntry(GLOBAL_SETTINGS_TEXT));
-
-            addEntry(new RegistryToggleEntry(
-                    ANIMATION_TEXT, cursorManager.isAnimated(), cursorManager.hasAnimations(),
-                    ANIMATION_TOOLTIP, this::toggleAnimations));
-
-            var slider = new RegistrySliderEntry.Slider(SCALE_TEXT, Default.SCALE, this::applyGlobalScale);
-            var toggle = new RegistrySliderEntry.Toggle(ENABLED_TEXT, true, getSettingTooltip(SCALE_TEXT.getString()), this::toggleGlobalScale);
-            addEntry(new RegistrySliderEntry(slider, toggle));
-
-
-            boolean isAdaptive = cursorManager.isAdaptive();
-            addEntry(new RegistryTitleEntry(ADAPTIVE_CURSOR_TEXT));
-            addEntry(new RegistryToggleEntry(ENABLED_TEXT, isAdaptive, true, ADAPTIVE_CURSOR_TOOLTIP, this::toggleAdaptive));
-            addAdaptiveEntry(ITEM_SLOT_TEXT, CONFIG.isItemSlotEnabled(), isAdaptive, CONFIG::setItemSlotEnabled);
-            addAdaptiveEntry(ITEM_GRAB_TEXT, CONFIG.isItemGrabbingEnabled(), isAdaptive, CONFIG::setItemGrabbingEnabled);
-            addAdaptiveEntry(CREATIVE_TABS_TEXT, CONFIG.isCreativeTabsEnabled(), isAdaptive, CONFIG::setCreativeTabsEnabled);
-            addAdaptiveEntry(ENCHANTMENTS_TEXT, CONFIG.isEnchantmentsEnabled(), isAdaptive, CONFIG::setEnchantmentsEnabled);
-            addAdaptiveEntry(STONECUTTER_TEXT, CONFIG.isStonecutterRecipesEnabled(), isAdaptive, CONFIG::setStonecutterRecipesEnabled);
-            addAdaptiveEntry(BOOK_EDIT_TEXT, CONFIG.isBookEditEnabled(), isAdaptive, CONFIG::setBookEditEnabled);
-            addAdaptiveEntry(LOOM_TEXT, CONFIG.isLoomPatternsEnabled(), isAdaptive, CONFIG::setLoomPatternsEnabled);
-            addAdaptiveEntry(ADVANCEMENTS_TEXT, CONFIG.isAdvancementTabsEnabled(), isAdaptive, CONFIG::setAdvancementTabsEnabled);
-            addAdaptiveEntry(WORLD_ICON_TEXT, CONFIG.isWorldIconEnabled(), isAdaptive, CONFIG::setWorldIconEnabled);
-            addAdaptiveEntry(SERVER_ICON_TEXT, CONFIG.isServerIconEnabled(), isAdaptive, CONFIG::setServerIconEnabled);
-        }
-
-        private void addAdaptiveEntry(Text label, boolean isEnabled, boolean active, Consumer<Boolean> onPress) {
-            RegistryToggleEntry entry = new RegistryToggleEntry(label, isEnabled, active, onPress);
-            adaptiveOptions.add(entry);
-            this.addEntry(entry);
-        }
-
-        public abstract class RegistryEntry extends RegistryListWidget.Entry<RegistryEntry> {
-            protected final Text label;
-
-            protected RegistryEntry(Text label) {
-                this.label = label;
-            }
-
-            @Override
-            public List<? extends Selectable> selectableChildren() {
-                return getChildren();
-            }
-
-            @Override
-            public List<? extends Element> children() {
-                return getChildren();
-            }
-
-            protected List<ClickableWidget> getChildren() {
-                return List.of();
-            }
+        public int getItemHeight() {
+            return itemHeight;
         }
 
         public class RegistryTitleEntry extends RegistryEntry {
@@ -271,6 +253,8 @@ public class RegistryOptionsScreen extends Screen {
                         slider.applyFunction
                 );
 
+                sliderWidget.active = toggle.value;
+
                 toggleButton = new ToggleWidget(
                         getRowRight() - BUTTON_WIDTH,
                         layout.getHeaderHeight() + itemHeight * getEntryCount() + ROW_GAP,
@@ -278,8 +262,15 @@ public class RegistryOptionsScreen extends Screen {
                         itemHeight - ROW_GAP,
                         toggle.value,
                         toggle.tooltip,
-                        toggle.toggleFunction
+                        getToggleFunction(toggle.toggleFunction)
                 );
+            }
+
+            private Consumer<Boolean> getToggleFunction(Consumer<Boolean> toggleFunction) {
+                return active -> {
+                    sliderWidget.active = active;
+                    toggleFunction.accept(active);
+                };
             }
 
             @Override
@@ -307,6 +298,14 @@ public class RegistryOptionsScreen extends Screen {
         }
     }
 
+    public static int getYEntry(int index, RegistryListWidget list) {
+        return list.getYOffset() + list.getItemHeight() * index + ROW_GAP - (int) Math.round(list.getScrollY());
+    }
+
+    public static Tooltip getSettingTooltip(String setting) {
+        return Tooltip.of(Text.translatable(GLOBAL_TOOLTIP_STRING, setting));
+    }
+
     public static class ToggleWidget extends SelectedCursorToggleWidget {
         protected ToggleWidget(
                 int x, int y,
@@ -331,11 +330,25 @@ public class RegistryOptionsScreen extends Screen {
         }
     }
 
-    public static int getYEntry(int index, RegistryListWidget list) {
-        return list.getYOffset() + list.getItemHeight() * index + ROW_GAP - (int) Math.round(list.getScrollY());
-    }
+    public abstract static class RegistryEntry extends ElementListWidget.Entry<RegistryEntry> {
+        protected final Text label;
 
-    public static Tooltip getSettingTooltip(String setting) {
-        return Tooltip.of(Text.translatable(GLOBAL_TOOLTIP_STRING, setting));
+        protected RegistryEntry(Text label) {
+            this.label = label;
+        }
+
+        @Override
+        public List<? extends Selectable> selectableChildren() {
+            return getChildren();
+        }
+
+        @Override
+        public List<? extends Element> children() {
+            return getChildren();
+        }
+
+        protected List<ClickableWidget> getChildren() {
+            return List.of();
+        }
     }
 }
