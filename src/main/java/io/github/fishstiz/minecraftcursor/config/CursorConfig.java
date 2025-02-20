@@ -20,6 +20,7 @@ public class CursorConfig implements Serializable {
     private boolean advancementTabsEnabled = true;
     private boolean worldIconEnabled = true;
     private boolean serverIconEnabled = true;
+    private final GlobalSettings global = new GlobalSettings();
     private Map<String, Settings> settings = new HashMap<>();
     transient File file;
 
@@ -71,6 +72,10 @@ public class CursorConfig implements Serializable {
             throw new NullPointerException("Cannot save config when initialized without file.");
         }
         CursorConfigLoader.saveConfig(file, this);
+    }
+
+    public GlobalSettings getGlobal() {
+        return global;
     }
 
     public Map<String, Settings> getSettings() {
@@ -162,7 +167,7 @@ public class CursorConfig implements Serializable {
     }
 
     public static class Settings implements Serializable {
-        private double scale;
+        protected double scale;
         private int xhot;
         private int yhot;
         private boolean enabled;
@@ -223,6 +228,22 @@ public class CursorConfig implements Serializable {
             public static final int HOT_MIN = 0;
             public static final int HOT_MAX = 31;
             public static final boolean ENABLED = true;
+        }
+    }
+
+    public static class GlobalSettings extends Settings {
+        private boolean scaleActive;
+
+        public void setScale(double scale) {
+            this.scale = scale;
+        }
+
+        public boolean isScaleActive() {
+            return scaleActive;
+        }
+
+        public void setScaleActive(boolean scaleEnabled) {
+            this.scaleActive = scaleEnabled;
         }
     }
 }
