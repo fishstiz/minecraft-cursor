@@ -86,7 +86,7 @@ public class RegistryOptionsScreen extends Screen {
     public void close() {
         if (this.client != null) {
             if (previousScreen instanceof CursorOptionsScreen screen && screen.body != null) {
-                screen.body.selectedCursorColumn.refreshWidgets();
+                screen.body.selectedCursorColumn.refresh();
             }
             this.client.setScreen(previousScreen);
         }

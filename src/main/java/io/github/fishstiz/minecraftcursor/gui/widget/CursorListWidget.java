@@ -1,6 +1,5 @@
 package io.github.fishstiz.minecraftcursor.gui.widget;
 
-import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
 import io.github.fishstiz.minecraftcursor.gui.screen.CursorOptionsScreen;
 import io.github.fishstiz.minecraftcursor.util.DrawUtil;
@@ -11,7 +10,6 @@ import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ElementListWidget;
 import net.minecraft.client.gui.widget.PressableWidget;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.text.Text;
 
 import java.util.ArrayList;
@@ -69,7 +67,7 @@ public class CursorListWidget extends ElementListWidget<CursorListWidget.CursorW
     }
 
     public class CursorWidgetEntry extends Entry<CursorWidgetEntry> {
-        public PressableWidget button;
+        public final PressableWidget button;
 
         public CursorWidgetEntry(Cursor cursor, int y, int width, int height, MinecraftClient client, CursorOptionsScreen optionsScreen) {
             button = new CursorClickableWidget(0, y, width, height, cursor, client, optionsScreen);
@@ -94,7 +92,6 @@ public class CursorListWidget extends ElementListWidget<CursorListWidget.CursorW
 
     public static class CursorClickableWidget extends PressableWidget {
         private static final String PREFIX_TEXT_KEY = "minecraft-cursor.options.cursor-type.";
-        private static final int CURSOR_SIZE = 32;
         private static final int TEXTURE_SIZE = 16;
         private static final int PADDING_LEFT = 8;
         private static final int BACKGROUND_COLOR = 0x7F000000; // black 50%
@@ -136,23 +133,7 @@ public class CursorListWidget extends ElementListWidget<CursorListWidget.CursorW
         private void renderTexture(DrawContext context) {
             int x = getX() + PADDING_LEFT;
             int y = getY() + (getHeight() / 2) - (TEXTURE_SIZE / 2);
-            int frameIndex = 0;
-
-            if (cursor instanceof AnimatedCursor animatedCursor) {
-                frameIndex = optionsScreen.animationHelper.getCurrentSpriteIndex(animatedCursor);
-            }
-
-            int vOffset = CURSOR_SIZE * frameIndex;
-
-            context.drawTexture(
-                    RenderLayer::getGuiTextured,
-                    cursor.getSprite(),
-                    x, y,
-                    0, vOffset, // starting point
-                    TEXTURE_SIZE, TEXTURE_SIZE, // width/height to stretch/shrink
-                    CURSOR_SIZE, CURSOR_SIZE, // cropped width/height from actual image
-                    cursor.getTrueWidth(), cursor.getTrueHeight() // actual width/height
-            );
+            optionsScreen.animationHelper.drawSprite(context, cursor, x, y, TEXTURE_SIZE);
         }
 
         private void renderMessage(DrawContext context) {
