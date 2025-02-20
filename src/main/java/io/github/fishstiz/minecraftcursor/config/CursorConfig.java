@@ -167,18 +167,11 @@ public class CursorConfig implements Serializable {
     }
 
     public static class Settings implements Serializable {
-        protected double scale;
-        private int xhot;
-        private int yhot;
-        private boolean enabled;
+        private double scale = Default.SCALE;
+        private int xhot = Default.X_HOT;
+        private int yhot = Default.Y_HOT;
+        private boolean enabled = Default.ENABLED;
         private Boolean animated;
-
-        public Settings() {
-            this.scale = Default.SCALE;
-            this.xhot = Default.X_HOT;
-            this.yhot = Default.Y_HOT;
-            this.enabled = Default.ENABLED;
-        }
 
         public void update(double scale, int xhot, int yhot, boolean enabled) {
             this.scale = scale;
@@ -211,6 +204,19 @@ public class CursorConfig implements Serializable {
             return this.animated;
         }
 
+        public void setScale(double scale) {
+            double clampedScale = Math.max(Default.SCALE_MIN, Math.min(scale, Default.SCALE_MAX));
+            this.scale = Math.round(clampedScale / Default.SCALE_STEP) * Default.SCALE_STEP;
+        }
+
+        public void setXhot(int xhot) {
+            this.xhot = Math.max(Default.HOT_MIN, Math.min(xhot, Default.HOT_MAX));
+        }
+
+        public void setYhot(int yhot) {
+            this.yhot = Math.max(Default.HOT_MIN, Math.min(yhot, Default.HOT_MAX));
+        }
+
         public void setAnimated(boolean animated) {
             this.animated = animated;
         }
@@ -232,11 +238,9 @@ public class CursorConfig implements Serializable {
     }
 
     public static class GlobalSettings extends Settings {
-        private boolean scaleActive;
-
-        public void setScale(double scale) {
-            this.scale = scale;
-        }
+        private boolean scaleActive = false;
+        private boolean xhotActive = false;
+        private boolean yhotActive = false;
 
         public boolean isScaleActive() {
             return scaleActive;
@@ -244,6 +248,22 @@ public class CursorConfig implements Serializable {
 
         public void setScaleActive(boolean scaleEnabled) {
             this.scaleActive = scaleEnabled;
+        }
+
+        public boolean isXHotActive() {
+            return xhotActive;
+        }
+
+        public void setXhotActive(boolean xhotActive) {
+            this.xhotActive = xhotActive;
+        }
+
+        public boolean isYHotActive() {
+            return yhotActive;
+        }
+
+        public void setYhotActive(boolean yhotActive) {
+            this.yhotActive = yhotActive;
         }
     }
 }

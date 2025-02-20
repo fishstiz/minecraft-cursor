@@ -16,6 +16,7 @@ public class SelectedCursorSliderWidget extends SliderWidget {
     private final Consumer<Double> onApply;
     private final @Nullable Runnable onRelease;
     private double translatedValue;
+    private SelectedCursorButtonWidget helperButton;
 
     public SelectedCursorSliderWidget(
             Text text,
@@ -72,7 +73,12 @@ public class SelectedCursorSliderWidget extends SliderWidget {
         return (clampedValue - min) / (max - min);
     }
 
-    public void setValue(double translatedValue) {
+    public void update(double translatedValue, boolean active) {
+        setTranslatedValue(translatedValue);
+        this.active = active;
+    }
+
+    public void setTranslatedValue(double translatedValue) {
         value = translatedValueToValue(translatedValue);
 
         applyValue();
@@ -88,6 +94,15 @@ public class SelectedCursorSliderWidget extends SliderWidget {
     public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
         super.renderWidget(context, mouseX, mouseY, delta);
         hovered = isMouseOver(mouseX, mouseY);
+
+        SelectedCursorButtonWidget helperBtn = getHelperButton();
+
+        if (helperBtn != null) {
+            helperBtn.active = !active;
+            if (isMouseOverInactive(mouseX, mouseY)) {
+                getHelperButton().render(context, mouseX, mouseY, delta);
+            }
+        }
     }
 
     @Override
@@ -96,7 +111,7 @@ public class SelectedCursorSliderWidget extends SliderWidget {
 
         translateValue();
 
-        if (previousTranslatedValue != translatedValue) {
+        if (isFocused() && previousTranslatedValue != translatedValue) {
             onApply.accept(translatedValue);
         }
     }
@@ -119,5 +134,33 @@ public class SelectedCursorSliderWidget extends SliderWidget {
         if (this.onRelease != null) {
             this.onRelease.run();
         }
+    }
+
+    public @Nullable SelectedCursorButtonWidget getHelperButton() {
+        if (helperButton == null) return null;
+
+        int marginRight = 2;
+        int x = (getX() + getWidth()) - helperButton.getWidth() - marginRight;
+        int y = getY() + (getHeight() - helperButton.getHeight()) / 2;
+
+        helperButton.setPosition(x, y);
+        return helperButton;
+    }
+
+    public void setHelperButton(SelectedCursorButtonWidget helperButton, int width, int height) {
+        this.helperButton = helperButton;
+        this.helperButton.setDimensions(width, height);
+    }
+
+    public Text getPrefix() {
+        return this.prefix;
+    }
+
+    public boolean isMouseOverInactive(int mouseX, int mouseY) {
+        return !active
+                && mouseX >= getX()
+                && mouseY >= getY()
+                && mouseX < getRight()
+                && mouseY < getBottom();
     }
 }

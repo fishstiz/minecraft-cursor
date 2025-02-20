@@ -16,6 +16,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.*;
 
+import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
+
 public final class CursorManager {
     private final LinkedHashMap<String, Cursor> cursors = new LinkedHashMap<>();
     private final TreeMap<Integer, String> overrides = new TreeMap<>();
@@ -40,6 +42,7 @@ public final class CursorManager {
     ) throws IOException {
         boolean animated = animation != null;
         Cursor cursor = getCursor(type);
+        CursorConfig.Settings updatedSettings = getUpdatedSettings(settings);
 
         if (animated != (cursor instanceof AnimatedCursor)) {
             cursor.destroy();
@@ -48,10 +51,28 @@ public final class CursorManager {
         }
 
         if (cursor instanceof AnimatedCursor animatedCursor) {
-            animatedCursor.loadImage(sprite, image, settings, animation);
+            animatedCursor.loadImage(sprite, image, updatedSettings, animation);
         } else {
-            cursor.loadImage(sprite, image, settings);
+            cursor.loadImage(sprite, image, updatedSettings);
         }
+    }
+
+    private CursorConfig.Settings getUpdatedSettings(CursorConfig.Settings settings) {
+        CursorConfig.GlobalSettings global = CONFIG.getGlobal();
+        CursorConfig.Settings updatedSettings = new CursorConfig.Settings();
+
+        updatedSettings.update(
+                global.isScaleActive() ? global.getScale() : settings.getScale(),
+                global.isXHotActive() ? global.getXHot() : settings.getXHot(),
+                global.isYHotActive() ? global.getYHot() : settings.getYHot(),
+                settings.isEnabled()
+        );
+
+        if (settings.isAnimated() != null) {
+            updatedSettings.setAnimated(settings.isAnimated());
+        }
+
+        return updatedSettings;
     }
 
     private Cursor createAppropiateCursor(CursorType type, boolean animated) {
