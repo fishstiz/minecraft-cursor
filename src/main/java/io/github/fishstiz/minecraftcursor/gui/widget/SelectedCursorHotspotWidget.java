@@ -3,6 +3,7 @@ package io.github.fishstiz.minecraftcursor.gui.widget;
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.api.CursorProvider;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
+import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
@@ -11,13 +12,18 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
+import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
+
 public class SelectedCursorHotspotWidget extends ClickableWidget implements CursorProvider {
+    private static final CursorConfig.GlobalSettings global = CONFIG.getGlobal();
     private static final Identifier BACKGROUND = Identifier.of(MinecraftCursor.MOD_ID, "textures/gui/hotspot_background.png");
     private static final int CURSOR_SIZE = 32;
     private static final int RULER_COLOR = 0xFFFF0000; // red
+    private static final int OVERRIDE_RULER_COLOR = 0xFF00FF00; // green
     private final CursorOptionsWidget options;
     private boolean rulerRendered = true;
     private float rulerAlpha = 1f;
+    private ChangeEventListener changeEventListener;
 
     public SelectedCursorHotspotWidget(int size, CursorOptionsWidget options) {
         super(options.getX(), options.getY(), size, size, Text.empty());
@@ -27,6 +33,8 @@ public class SelectedCursorHotspotWidget extends ClickableWidget implements Curs
     @Override
     protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
         context.drawTexture(BACKGROUND, getX(), getY(), 0, 0, width, height, width, height);
+        if (!active) context.fill(getX(), getY(), getRight(), getBottom(), 0xAF000000); // 70% black
+
         drawCursorTexture(context);
         renderRuler(context, mouseX, mouseY);
         context.drawBorder(getX(), getY(), getWidth(), getHeight(), 0xFF000000);
@@ -43,8 +51,11 @@ public class SelectedCursorHotspotWidget extends ClickableWidget implements Curs
 
         if (rulerAlpha <= 0.01f) return;
 
-        int xhot = (int) options.xhotSlider.getTranslatedValue();
-        int yhot = (int) options.yhotSlider.getTranslatedValue();
+        boolean isGlobalX = global.isXHotActive();
+        boolean isGlobalY = global.isYHotActive();
+
+        int xhot = isGlobalX ? global.getXHot() : (int) options.xhotSlider.getTranslatedValue();
+        int yhot = isGlobalY ? global.getYHot() : (int) options.yhotSlider.getTranslatedValue();
 
         int rulerSize = getRulerSize();
         int xhotX1 = (getX() + xhot * rulerSize);
@@ -53,10 +64,21 @@ public class SelectedCursorHotspotWidget extends ClickableWidget implements Curs
         int yhotY2 = (getY() + yhot * rulerSize) + rulerSize;
 
         int alpha = (int) (rulerAlpha * 255);
-        int blendedColor = (alpha << 24) | (RULER_COLOR & 0x00FFFFFF);
 
-        context.fill(xhotX1, getY(), xhotX2, getBottom(), blendedColor);
-        context.fill(getX(), yhotY1, getRight(), yhotY2, blendedColor);
+        int blendedColorX = getBlendedColor(isGlobalX ? OVERRIDE_RULER_COLOR : RULER_COLOR, alpha);
+        int blendedColorY = getBlendedColor(isGlobalY ? OVERRIDE_RULER_COLOR : RULER_COLOR, alpha);
+
+        if ((isGlobalX && !isGlobalY) || (isGlobalX == isGlobalY)) {
+            context.fill(getX(), yhotY1, getRight(), yhotY2, blendedColorY);
+            context.fill(xhotX1, getY(), xhotX2, getBottom(), blendedColorX);
+        } else {
+            context.fill(xhotX1, getY(), xhotX2, getBottom(), blendedColorX);
+            context.fill(getX(), yhotY1, getRight(), yhotY2, blendedColorY);
+        }
+    }
+
+    public int getBlendedColor(int color, int alpha) {
+        return (alpha << 24) | (color & 0x00FFFFFF);
     }
 
     @Override
@@ -70,13 +92,13 @@ public class SelectedCursorHotspotWidget extends ClickableWidget implements Curs
     }
 
     public void setHotspots(double mouseX, double mouseY) {
-        int rulerSize = getRulerSize();
+        if (changeEventListener != null) {
+            int rulerSize = getRulerSize();
+            int x = ((int) mouseX - getX()) / rulerSize;
+            int y = ((int) mouseY - getY()) / rulerSize;
 
-        int xhot = ((int) mouseX - getX()) / rulerSize;
-        int yhot = ((int) mouseY - getY()) / rulerSize;
-
-        options.xhotSlider.setTranslatedValue(xhot);
-        options.yhotSlider.setTranslatedValue(yhot);
+            changeEventListener.onChange(x, y);
+        }
 
         setRulerRendered(true, true);
     }
@@ -92,13 +114,34 @@ public class SelectedCursorHotspotWidget extends ClickableWidget implements Curs
 
     @Override
     public CursorType getCursorType(double mouseX, double mouseY) {
+        if (!active) {
+            return CursorType.DEFAULT;
+        }
         if (CursorTypeUtil.isLeftClickHeld() || CursorTypeUtil.isGrabbing()) {
             return CursorType.GRABBING;
         }
         return CursorType.POINTER;
     }
 
+    public void setChangeEventListener(ChangeEventListener changeEventListener) {
+        this.changeEventListener = changeEventListener;
+    }
+
+    @Override
+    public boolean isMouseOver(double mouseX, double mouseY) {
+        return this.visible
+                && mouseX >= this.getX()
+                && mouseY >= this.getY()
+                && mouseX < this.getRight()
+                && mouseY < this.getBottom();
+    }
+
     @Override
     protected void appendClickableNarrations(NarrationMessageBuilder builder) {
+    }
+
+    @FunctionalInterface
+    public interface ChangeEventListener {
+        void onChange(int xhot, int yhot);
     }
 }

@@ -138,12 +138,20 @@ public class Cursor {
         return this.xhot;
     }
 
+    public void setXHot(double xhot) {
+        setXHot((int) xhot);
+    }
+
     public void setXHot(int xhot) {
         updateImage(this.scale, xhot, this.yhot);
     }
 
     public int getYHot() {
         return this.yhot;
+    }
+
+    public void setYHot(double yhot) {
+        setYHot((int) yhot);
     }
 
     public void setYHot(int yhot) {
