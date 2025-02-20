@@ -94,6 +94,7 @@ public class RegistryOptionsScreen extends Screen {
                 CursorOptionsScreen optionsScreen = new CursorOptionsScreen(screen.previousScreen, cursorManager);
                 this.client.setScreen(optionsScreen);
                 optionsScreen.selectCursor(screen.getSelectedCursor());
+                screen.body.selectedCursorColumn.refresh();
             } else {
                 this.client.setScreen(previousScreen);
             }
@@ -355,7 +356,8 @@ public class RegistryOptionsScreen extends Screen {
                 toggleButton.render(context, mouseX, mouseY, tickDelta);
 
                 sliderWidget.setPosition(x - ROW_GAP / 2, getYEntry(index, list));
-                sliderWidget.setDimensions(toggleButton.getX() - x - ROW_GAP, 20);
+                sliderWidget.setWidth(toggleButton.getX() - x - ROW_GAP);
+                sliderWidget.height = 20;
                 sliderWidget.render(context, mouseX, mouseY, tickDelta);
             }
 

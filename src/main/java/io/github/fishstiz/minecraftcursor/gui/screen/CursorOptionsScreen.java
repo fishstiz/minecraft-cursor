@@ -1,12 +1,11 @@
 package io.github.fishstiz.minecraftcursor.gui.screen;
 
 import io.github.fishstiz.minecraftcursor.CursorManager;
-import io.github.fishstiz.minecraftcursor.MinecraftCursor;
-import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
 import io.github.fishstiz.minecraftcursor.gui.widget.ContainerWidget;
 import io.github.fishstiz.minecraftcursor.gui.widget.CursorListWidget;
-import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorOptionsWidget;
+import io.github.fishstiz.minecraftcursor.gui.widget.CursorOptionsHandler;
+import io.github.fishstiz.minecraftcursor.gui.widget.CursorOptionsWidget;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
@@ -50,7 +49,7 @@ public class CursorOptionsScreen extends Screen {
         selectedCursor = cursorManager.getLoadedCursors().get(0);
 
         this.layout.addHeader(new TextWidget(this.title, this.textRenderer));
-        this.body = this.layout.addBody(new CursorOptionsBody());
+        this.body = this.layout.addBody(new CursorOptionsBody(this));
 
         moreButton = ButtonWidget.builder(Text.translatable("minecraft-cursor.options.more").append("..."),
                 btn -> {
@@ -92,49 +91,12 @@ public class CursorOptionsScreen extends Screen {
         doneButton.setX(width / 2 + COLUMN_GAP / 2);
     }
 
-    public void onPressEnabled(boolean value) {
-        selectedCursor.enable(value);
-        updateSelectedCursorConfig();
-    }
-
-    public void onChangeScale(double value) {
-        if (selectedCursor.getScale() != value && body != null) {
-            cursorManager.overrideCurrentCursor(selectedCursor.getType(), -1);
-        }
-
-        selectedCursor.setScale(value);
-        updateSelectedCursorConfig();
-    }
-
-    public void onChangeXHot(double value) {
-        selectedCursor.setXhot((int) value);
-        updateSelectedCursorConfig();
-    }
-
-    public void onChangeYHot(double value) {
-        selectedCursor.setYhot((int) value);
-        updateSelectedCursorConfig();
-    }
-
     public void selectCursor(Cursor cursor) {
         updateSelectedCursorConfig();
         selectedCursor = cursor;
 
         if (body != null) {
-            body.selectedCursorColumn.refreshWidgets();
-        }
-    }
-
-    public void onPressAnimate(boolean value) {
-        if (selectedCursor instanceof AnimatedCursor animatedCursor) {
-            animatedCursor.setAnimated(value);
-            CONFIG.getOrCreateCursorSettings(selectedCursor.getType()).setAnimated(animatedCursor.isAnimated());
-        }
-    }
-
-    public void onResetAnimation() {
-        if (selectedCursor instanceof AnimatedCursor animatedCursor) {
-            animationHelper.reset(animatedCursor);
+            body.selectedCursorColumn.refresh();
         }
     }
 
@@ -157,7 +119,7 @@ public class CursorOptionsScreen extends Screen {
 
     @Override
     public void close() {
-        removeOverride();
+        CursorOptionsHandler.removeScaleOverride();
         CONFIG.save();
 
         if (this.client != null) {
@@ -169,18 +131,14 @@ public class CursorOptionsScreen extends Screen {
         return height - layout.getHeaderHeight() - layout.getFooterHeight();
     }
 
-    public void removeOverride() {
-        cursorManager.removeOverride(-1);
-    }
-
     public class CursorOptionsBody extends ContainerWidget {
         public final CursorListWidget cursorsColumn;
-        public final SelectedCursorOptionsWidget selectedCursorColumn;
+        public final CursorOptionsWidget selectedCursorColumn;
 
-        public CursorOptionsBody() {
-            super(layout.getX(), layout.getHeaderHeight(), CursorOptionsScreen.this.width, CursorOptionsScreen.this.getContentHeight(), Text.empty());
-            cursorsColumn = new CursorListWidget(client, CURSORS_COLUMN_WIDTH, CursorOptionsScreen.this);
-            selectedCursorColumn = new SelectedCursorOptionsWidget(SELECTED_CURSOR_COLUMN_WIDTH, CursorOptionsScreen.this);
+        public CursorOptionsBody(CursorOptionsScreen optionsScreen) {
+            super(optionsScreen.layout.getX(), optionsScreen.layout.getHeaderHeight(), optionsScreen.width, optionsScreen.getContentHeight(), Text.empty());
+            cursorsColumn = new CursorListWidget(client, CURSORS_COLUMN_WIDTH, optionsScreen);
+            selectedCursorColumn = new CursorOptionsWidget(SELECTED_CURSOR_COLUMN_WIDTH, optionsScreen);
         }
 
         @Override
