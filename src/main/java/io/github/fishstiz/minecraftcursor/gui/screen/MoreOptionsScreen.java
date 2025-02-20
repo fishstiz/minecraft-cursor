@@ -1,6 +1,8 @@
 package io.github.fishstiz.minecraftcursor.gui.screen;
 
 import io.github.fishstiz.minecraftcursor.CursorManager;
+import io.github.fishstiz.minecraftcursor.api.CursorProvider;
+import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
@@ -29,7 +31,7 @@ import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
 import static io.github.fishstiz.minecraftcursor.config.CursorConfig.Settings.Default;
 import static io.github.fishstiz.minecraftcursor.gui.widget.CursorOptionsWidget.*;
 
-public class RegistryOptionsScreen extends Screen {
+public class MoreOptionsScreen extends Screen implements CursorProvider {
     private static final CursorConfig.GlobalSettings GLOBAL = CONFIG.getGlobal();
 
     private static final String GLOBAL_TOOLTIP_KEY = "minecraft-cursor.options.more.global.tooltip";
@@ -59,11 +61,12 @@ public class RegistryOptionsScreen extends Screen {
     private final Screen previousScreen;
     private final CursorManager cursorManager;
     private final @Nullable SelectedCursorHotspotWidget hotspotWidget;
-    private RegistryListWidget body;
-    private ButtonWidget doneButton;
+    private final ButtonWidget doneButton = ButtonWidget.builder(ScreenTexts.DONE, btn -> this.close()).build();
+    private OptionListWidget body;
 
-    protected RegistryOptionsScreen(Screen previousScreen, CursorManager cursorManager) {
+    protected MoreOptionsScreen(Screen previousScreen, CursorManager cursorManager) {
         super(Text.translatable("minecraft-cursor.options.more"));
+
         this.previousScreen = previousScreen;
         this.cursorManager = cursorManager;
 
@@ -83,8 +86,7 @@ public class RegistryOptionsScreen extends Screen {
     @Override
     protected void init() {
         this.layout.addHeader(new TextWidget(this.title, this.textRenderer));
-        this.body = this.layout.addBody(new RegistryListWidget(this.client, this));
-        doneButton = ButtonWidget.builder(ScreenTexts.DONE, btn -> this.close()).build();
+        this.body = this.layout.addBody(new OptionListWidget(this.client, this));
         this.layout.addFooter(doneButton);
         this.layout.forEachChild(this::addDrawableChild);
         this.refreshWidgetPositions();
@@ -137,6 +139,16 @@ public class RegistryOptionsScreen extends Screen {
         }
     }
 
+    @Override
+    public CursorType getCursorType(double mouseX, double mouseY) {
+        int headerHeight = layout.getHeaderHeight();
+        if ((mouseY < headerHeight || mouseY > headerHeight + getContentHeight())
+                && mouseX > doneButton.getX() + doneButton.getWidth()) {
+            return CursorType.DEFAULT_FORCE;
+        }
+        return CursorType.DEFAULT;
+    }
+
     public int getContentHeight() {
         return height - layout.getHeaderHeight() - layout.getFooterHeight();
     }
@@ -146,23 +158,22 @@ public class RegistryOptionsScreen extends Screen {
         return List.of(body, doneButton);
     }
 
-    public class RegistryListWidget extends ElementListWidget<RegistryEntry> implements Widget {
-        private static final CursorConfig.GlobalSettings global = CONFIG.getGlobal();
-        private final List<RegistryToggleEntry> adaptiveOptions = new ArrayList<>();
-        private final RegistrySliderEntry xhotEntry = createSliderEntry(XHOT_TEXT, "px",
+    public class OptionListWidget extends ElementListWidget<OptionEntry> implements Widget {
+        private final List<ToggleEntry> adaptiveOptions = new ArrayList<>();
+        private final SliderEntry xhotEntry = createSliderEntry(XHOT_TEXT, "px",
                 Default.HOT_MIN, Default.HOT_MAX, 1,
                 GLOBAL::isXHotActive, GLOBAL::setXhotActive,
                 GLOBAL::getXHot, GLOBAL::setXHotDouble,
                 CursorConfig.Settings::getXHot, Cursor::setXHot
         );
-        private final RegistrySliderEntry yhotEntry = createSliderEntry(YHOT_TEXT, "px",
+        private final SliderEntry yhotEntry = createSliderEntry(YHOT_TEXT, "px",
                 Default.HOT_MIN, Default.HOT_MAX, 1,
                 GLOBAL::isYHotActive, GLOBAL::setYhotActive,
                 GLOBAL::getYHot, GLOBAL::setYHotDouble,
                 CursorConfig.Settings::getYHot, Cursor::setYHot
         );
 
-        public RegistryListWidget(MinecraftClient minecraftClient, RegistryOptionsScreen options) {
+        public OptionListWidget(MinecraftClient minecraftClient, MoreOptionsScreen options) {
             super(
                     minecraftClient,
                     options.width,
@@ -171,17 +182,14 @@ public class RegistryOptionsScreen extends Screen {
                     options.layout.getHeaderHeight() + options.getContentHeight(),
                     ITEM_HEIGHT + ROW_GAP
             );
-            addOptions();
-        }
 
-        private void addOptions() {
             addGlobalOptions();
             addAdaptiveOptions();
         }
 
         private void addGlobalOptions() {
-            addEntry(new RegistryTitleEntry(GLOBAL_SETTINGS_TEXT));
-            addEntry(new RegistryToggleEntry(
+            addEntry(new TitleEntry(GLOBAL_SETTINGS_TEXT));
+            addEntry(new ToggleEntry(
                     ANIMATION_TEXT,
                     cursorManager.isAnimated(),
                     cursorManager.hasAnimations(),
@@ -206,8 +214,8 @@ public class RegistryOptionsScreen extends Screen {
 
         private void addAdaptiveOptions() {
             boolean isAdaptive = cursorManager.isAdaptive();
-            addEntry(new RegistryTitleEntry(ADAPTIVE_CURSOR_TEXT));
-            addEntry(new RegistryToggleEntry(ENABLED_TEXT, isAdaptive, true, ADAPTIVE_CURSOR_TOOLTIP, this::toggleAdaptive));
+            addEntry(new TitleEntry(ADAPTIVE_CURSOR_TEXT));
+            addEntry(new ToggleEntry(ENABLED_TEXT, isAdaptive, true, ADAPTIVE_CURSOR_TOOLTIP, this::toggleAdaptive));
             addAdaptiveEntry(ITEM_SLOT_TEXT, CONFIG.isItemSlotEnabled(), isAdaptive, CONFIG::setItemSlotEnabled);
             addAdaptiveEntry(ITEM_GRAB_TEXT, CONFIG.isItemGrabbingEnabled(), isAdaptive, CONFIG::setItemGrabbingEnabled);
             addAdaptiveEntry(CREATIVE_TABS_TEXT, CONFIG.isCreativeTabsEnabled(), isAdaptive, CONFIG::setCreativeTabsEnabled);
@@ -221,12 +229,12 @@ public class RegistryOptionsScreen extends Screen {
         }
 
         private void addAdaptiveEntry(Text label, boolean isEnabled, boolean active, Consumer<Boolean> onPress) {
-            RegistryToggleEntry entry = new RegistryToggleEntry(label, isEnabled, active, onPress);
+            ToggleEntry entry = new ToggleEntry(label, isEnabled, active, onPress);
             adaptiveOptions.add(entry);
             this.addEntry(entry);
         }
 
-        private RegistrySliderEntry createSliderEntry(
+        private SliderEntry createSliderEntry(
                 Text text, String suffix,
                 double min, double max, double step,
                 BooleanSupplier activeGetter,
@@ -251,9 +259,9 @@ public class RegistryOptionsScreen extends Screen {
                 updateCursors.run();
             };
 
-            var slider = new RegistrySliderEntry.Slider(text, suffix, valueGetter.getAsDouble(), min, max, step, handleChange::accept);
-            var toggle = new RegistrySliderEntry.Toggle(ENABLED_TEXT, activeGetter.getAsBoolean(), getSettingTooltip(text), handleToggle);
-            return new RegistrySliderEntry(slider, toggle);
+            var slider = new SliderEntry.Slider(text, suffix, valueGetter.getAsDouble(), min, max, step, handleChange::accept);
+            var toggle = new SliderEntry.Toggle(ENABLED_TEXT, activeGetter.getAsBoolean(), getSettingTooltip(text), handleToggle);
+            return new SliderEntry(slider, toggle);
         }
 
         private void handleChangeHotspotWidget(int xhot, int yhot) {
@@ -353,8 +361,8 @@ public class RegistryOptionsScreen extends Screen {
         public void forEachChild(Consumer<ClickableWidget> consumer) {
         }
 
-        public class RegistryTitleEntry extends RegistryEntry {
-            public RegistryTitleEntry(Text label) {
+        public class TitleEntry extends OptionEntry {
+            public TitleEntry(Text label) {
                 super(Text.empty().append(label).formatted(Formatting.BOLD, Formatting.YELLOW));
             }
 
@@ -366,14 +374,14 @@ public class RegistryOptionsScreen extends Screen {
             }
         }
 
-        public class RegistryToggleEntry extends RegistryEntry {
+        public class ToggleEntry extends OptionEntry {
             private final ToggleWidget toggleButton;
 
-            public RegistryToggleEntry(Text label, boolean defaultValue, boolean active, Consumer<Boolean> onPress) {
+            public ToggleEntry(Text label, boolean defaultValue, boolean active, Consumer<Boolean> onPress) {
                 this(label, defaultValue, active, null, onPress);
             }
 
-            public RegistryToggleEntry(
+            public ToggleEntry(
                     Text label,
                     boolean defaultValue,
                     boolean active,
@@ -388,7 +396,7 @@ public class RegistryOptionsScreen extends Screen {
 
             @Override
             public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-                toggleButton.setPosition(index, RegistryListWidget.this);
+                toggleButton.setPosition(index, OptionListWidget.this);
                 toggleButton.render(context, mouseX, mouseY, tickDelta);
 
                 int textEndX = toggleButton.getX() - ROW_GAP;
@@ -403,11 +411,11 @@ public class RegistryOptionsScreen extends Screen {
             }
         }
 
-        public class RegistrySliderEntry extends RegistryEntry {
+        public class SliderEntry extends OptionEntry {
             private final SelectedCursorSliderWidget sliderWidget;
             private final ToggleWidget toggleButton;
 
-            public RegistrySliderEntry(Slider slider, Toggle toggle) {
+            public SliderEntry(Slider slider, Toggle toggle) {
                 super(slider.label);
 
                 sliderWidget = new SelectedCursorSliderWidget(
@@ -433,7 +441,7 @@ public class RegistryOptionsScreen extends Screen {
 
             @Override
             public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-                RegistryListWidget list = RegistryListWidget.this;
+                OptionListWidget list = OptionListWidget.this;
 
                 toggleButton.setPosition(index, list);
                 toggleButton.render(context, mouseX, mouseY, tickDelta);
@@ -458,7 +466,7 @@ public class RegistryOptionsScreen extends Screen {
         }
     }
 
-    public static int getYEntry(int index, RegistryListWidget list) {
+    public static int getYEntry(int index, OptionListWidget list) {
         return list.getYOffset() + list.getItemHeight() * index + ROW_GAP - (int) Math.round(list.getScrollAmount());
     }
 
@@ -479,7 +487,7 @@ public class RegistryOptionsScreen extends Screen {
             if (tooltip != null) setTooltip(tooltip);
         }
 
-        public void setPosition(int index, RegistryListWidget list) {
+        public void setPosition(int index, OptionListWidget list) {
             setX(list.getRowRight() - BUTTON_WIDTH);
             setY(getYEntry(index, list));
         }
@@ -490,10 +498,10 @@ public class RegistryOptionsScreen extends Screen {
         }
     }
 
-    public abstract static class RegistryEntry extends ElementListWidget.Entry<RegistryEntry> {
+    public abstract static class OptionEntry extends ElementListWidget.Entry<OptionEntry> {
         protected final Text label;
 
-        protected RegistryEntry(Text label) {
+        protected OptionEntry(Text label) {
             this.label = label;
         }
 
