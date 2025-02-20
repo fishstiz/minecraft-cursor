@@ -1,6 +1,6 @@
 package io.github.fishstiz.minecraftcursor.gui.widget;
 
-import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
+import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
 import io.github.fishstiz.minecraftcursor.gui.screen.CursorOptionsScreen;
 import net.minecraft.client.gui.DrawContext;
@@ -11,11 +11,10 @@ import net.minecraft.client.gui.widget.ContainerWidget;
 import net.minecraft.text.Text;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 import static io.github.fishstiz.minecraftcursor.config.CursorConfig.Settings.Default.*;
 
-public class SelectedCursorOptionsWidget extends ContainerWidget {
+public class CursorOptionsWidget extends ContainerWidget {
     private static final int OPTIONS_HEIGHT = 24;
     private static final int GRID_PADDING = 4;
     private static final int BOX_WIDGET_TEXTURE_SIZE = 96;
@@ -26,7 +25,8 @@ public class SelectedCursorOptionsWidget extends ContainerWidget {
     private static final Text ANIMATE_TEXT = Text.translatable("minecraft-cursor.options.animate");
     private static final Text RESET_ANIMATION_TEXT = Text.translatable("minecraft-cursor.options.animate-reset");
     private static final String HOT_UNIT = "px";
-    protected final CursorOptionsScreen optionsScreen;
+    private final CursorOptionsScreen parent;
+    private final CursorOptionsHandler handler;
     SelectedCursorToggleWidget enableButton;
     SelectedCursorSliderWidget scaleSlider;
     SelectedCursorSliderWidget xhotSlider;
@@ -36,49 +36,51 @@ public class SelectedCursorOptionsWidget extends ContainerWidget {
     SelectedCursorHotspotWidget cursorHotspot;
     SelectedCursorTestWidget cursorTest;
 
-    public SelectedCursorOptionsWidget(int width, CursorOptionsScreen optionsScreen) {
+    public CursorOptionsWidget(int width, CursorOptionsScreen optionsScreen) {
         super(0, optionsScreen.layout.getHeaderHeight(), width, optionsScreen.layout.getContentHeight(), Text.empty());
-        this.optionsScreen = optionsScreen;
+
+        this.parent = optionsScreen;
+        this.handler = new CursorOptionsHandler(this);
+
         initWidgets();
     }
 
     private void initWidgets() {
-        Cursor cursor = optionsScreen.getSelectedCursor();
+        Cursor cursor = handler.getCursor();
+        CursorConfig.Settings settings = handler.getSettings();
 
-        enableButton = new SelectedCursorToggleWidget(ENABLED_TEXT, cursor.isEnabled(), this::handleEnableButton);
+        enableButton = new SelectedCursorToggleWidget(ENABLED_TEXT, cursor.isEnabled(), handler::handleEnable);
         scaleSlider = new SelectedCursorSliderWidget(
-                SCALE_TEXT, cursor.getScale(), SCALE_MIN, SCALE_MAX, SCALE_STEP,
-                optionsScreen::onChangeScale, optionsScreen::removeOverride);
+                SCALE_TEXT, settings.getScale(),
+                SCALE_MIN, SCALE_MAX, SCALE_STEP,
+                handler::handleChangeScale, CursorOptionsHandler::removeScaleOverride);
         xhotSlider = new SelectedCursorSliderWidget(
                 XHOT_TEXT, cursor.getXhot(),
                 HOT_MIN, HOT_MAX, 1, HOT_UNIT,
-                handleChangeHotspots(optionsScreen::onChangeXHot));
+                handler.handleChangeHotspots(handler::handleChangeXHot));
         yhotSlider = new SelectedCursorSliderWidget(
                 YHOT_TEXT, cursor.getYhot(),
                 HOT_MIN, HOT_MAX, 1, HOT_UNIT,
-                handleChangeHotspots(optionsScreen::onChangeYHot));
-        animateButton = new SelectedCursorToggleWidget(
-                ANIMATE_TEXT,
-                cursor instanceof AnimatedCursor animatedCursor && animatedCursor.isAnimated(),
-                this::handlePressAnimate);
-        resetAnimation = new SelectedCursorButtonWidget(RESET_ANIMATION_TEXT, this::handleResetAnimation);
+                handler.handleChangeHotspots(handler::handleChangeYHot));
+        animateButton = new SelectedCursorToggleWidget(ANIMATE_TEXT, handler.isAnimated(), handler::handlePressAnimate);
+        resetAnimation = new SelectedCursorButtonWidget(RESET_ANIMATION_TEXT, handler::handleResetAnimation);
         cursorHotspot = new SelectedCursorHotspotWidget(BOX_WIDGET_TEXTURE_SIZE, this);
         cursorTest = new SelectedCursorTestWidget(BOX_WIDGET_TEXTURE_SIZE, this);
 
         refreshWidgets();
     }
 
-    public void refreshWidgets() {
-        Cursor cursor = optionsScreen.getSelectedCursor();
+    private void refreshWidgets() {
+        Cursor cursor = handler.getCursor();
 
         enableButton.setValue(cursor.isEnabled());
         scaleSlider.setValue(cursor.getScale());
         xhotSlider.setValue(cursor.getXhot());
         yhotSlider.setValue(cursor.getYhot());
 
-        boolean isAnimated = cursor instanceof AnimatedCursor animatedCursor && animatedCursor.isAnimated();
-        animateButton.active = cursor instanceof AnimatedCursor;
-        resetAnimation.active = enableButton.value && isAnimated;
+        boolean isAnimated = handler.isAnimated();
+        animateButton.active = handler.getCursorAsAnimatedCursor().isPresent();
+        resetAnimation.active = isAnimated && enableButton.value;
         animateButton.setValue(isAnimated);
 
         cursorHotspot.setRulerRendered(true, true);
@@ -95,7 +97,7 @@ public class SelectedCursorOptionsWidget extends ContainerWidget {
         xhotSlider.renderWidget(context, mouseX, mouseY, delta);
         yhotSlider.renderWidget(context, mouseX, mouseY, delta);
 
-        if (optionsScreen.getSelectedCursor() instanceof AnimatedCursor && animateButton != null) {
+        if (handler.getCursorAsAnimatedCursor().isPresent()) {
             animateButton.render(context, mouseX, mouseY, delta);
             resetAnimation.render(context, mouseX, mouseY, delta);
         }
@@ -105,20 +107,22 @@ public class SelectedCursorOptionsWidget extends ContainerWidget {
     }
 
     private void placeWidgets() {
-        boolean isAnimatedCursor = optionsScreen.getSelectedCursor() instanceof AnimatedCursor;
+        boolean isAnimatedCursor = handler.getCursorAsAnimatedCursor().isPresent();
 
         grid(enableButton, 0, 0);
         grid(scaleSlider, 1, 0);
         grid(xhotSlider, 0, 1);
         grid(yhotSlider, 1, 1);
 
-        if (isAnimatedCursor && animateButton != null) {
+        if (isAnimatedCursor) {
             grid(animateButton, 0, 2);
             grid(resetAnimation, 1, 2);
+            grid(cursorHotspot, 0, 3, true);
+            grid(cursorTest, 1, 3, true);
+        } else {
+            grid(cursorHotspot, 0, 2, true);
+            grid(cursorTest, 1, 2, true);
         }
-
-        grid(cursorHotspot, 0, isAnimatedCursor ? 3 : 2, true);
-        grid(cursorTest, 1, isAnimatedCursor ? 3 : 2, true);
     }
 
     private void grid(ClickableWidget widget, int gridX, int gridY) {
@@ -134,30 +138,12 @@ public class SelectedCursorOptionsWidget extends ContainerWidget {
         widget.setY(getY() + (OPTIONS_HEIGHT * (gridY)));
     }
 
-    private void handleEnableButton(boolean value) {
-        optionsScreen.onPressEnabled(value);
-
-        if (optionsScreen.getSelectedCursor() instanceof AnimatedCursor) {
-            resetAnimation.active = animateButton.value && value;
-        }
+    public void refresh() {
+        refreshWidgets();
     }
 
-    private Consumer<Double> handleChangeHotspots(Consumer<Double> onChangeHotspot) {
-        return value -> {
-            onChangeHotspot.accept(value);
-            cursorHotspot.setRulerRendered(true, true);
-        };
-    }
-
-    private void handlePressAnimate(boolean value) {
-        optionsScreen.onPressAnimate(value);
-        resetAnimation.active = enableButton.value && value;
-        if (!value) cursorHotspot.setRulerRendered(true, true);
-    }
-
-    private void handleResetAnimation() {
-        optionsScreen.onResetAnimation();
-        cursorHotspot.setRulerRendered(false, false);
+    public CursorOptionsScreen parent() {
+        return parent;
     }
 
     @Override

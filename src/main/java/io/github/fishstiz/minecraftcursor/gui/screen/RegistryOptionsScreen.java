@@ -88,6 +88,7 @@ public class RegistryOptionsScreen extends Screen {
                 CursorOptionsScreen optionsScreen = new CursorOptionsScreen(screen.previousScreen, cursorManager);
                 this.client.setScreen(optionsScreen);
                 optionsScreen.selectCursor(screen.getSelectedCursor());
+                screen.body.selectedCursorColumn.refresh();
             } else {
                 this.client.setScreen(previousScreen);
             }
