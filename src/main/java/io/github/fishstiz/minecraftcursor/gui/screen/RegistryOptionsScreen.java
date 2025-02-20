@@ -27,13 +27,12 @@ import java.util.function.Consumer;
 
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
 import static io.github.fishstiz.minecraftcursor.config.CursorConfig.Settings.Default;
+import static io.github.fishstiz.minecraftcursor.gui.widget.CursorOptionsWidget.ENABLED_TEXT;
+import static io.github.fishstiz.minecraftcursor.gui.widget.CursorOptionsWidget.SCALE_TEXT;
 
 public class RegistryOptionsScreen extends Screen {
-    private static final Text ENABLED_TEXT = Text.translatable("minecraft-cursor.options.enabled");
-
-    private static final String GLOBAL_TOOLTIP_STRING = "minecraft-cursor.options.more.global.tooltip";
+    private static final String GLOBAL_TOOLTIP_KEY = "minecraft-cursor.options.more.global.tooltip";
     private static final Text GLOBAL_SETTINGS_TEXT = Text.translatable("minecraft-cursor.options.more.global");
-    private static final Text SCALE_TEXT = Text.translatable("minecraft-cursor.options.scale");
 
     private static final Tooltip ANIMATION_TOOLTIP = Tooltip.of(Text.translatable("minecraft-cursor.options.more.animation.tooltip"));
     private static final Text ANIMATION_TEXT = Text.translatable("minecraft-cursor.options.more.animation");
@@ -109,16 +108,15 @@ public class RegistryOptionsScreen extends Screen {
         private void addGlobalOptions() {
             addEntry(new RegistryTitleEntry(GLOBAL_SETTINGS_TEXT));
             addEntry(new RegistryToggleEntry(
-                    ANIMATION_TEXT, cursorManager.isAnimated(), cursorManager.hasAnimations(),
-                    ANIMATION_TOOLTIP, this::toggleAnimations));
-
-            var slider = new RegistrySliderEntry.Slider(SCALE_TEXT, global.getScale(), global::setScale);
-            var toggle = new RegistrySliderEntry.Toggle(
-                    ENABLED_TEXT,
-                    global.isScaleActive(),
-                    getSettingTooltip(SCALE_TEXT.getString()),
-                    global::setScaleActive
+                    ANIMATION_TEXT,
+                    cursorManager.isAnimated(),
+                    cursorManager.hasAnimations(),
+                    ANIMATION_TOOLTIP,
+                    this::toggleAnimations)
             );
+
+            var slider = new RegistrySliderEntry.Slider(SCALE_TEXT, global.getScale(), this::handleScaleChange);
+            var toggle = new RegistrySliderEntry.Toggle(ENABLED_TEXT, global.isScaleActive(), getSettingTooltip(SCALE_TEXT), this::toggleScale);
             addEntry(new RegistrySliderEntry(slider, toggle));
         }
 
@@ -142,6 +140,26 @@ public class RegistryOptionsScreen extends Screen {
             RegistryToggleEntry entry = new RegistryToggleEntry(label, isEnabled, active, onPress);
             adaptiveOptions.add(entry);
             this.addEntry(entry);
+        }
+
+        private void handleScaleChange(double scale) {
+            global.setScale(scale);
+            updateScale();
+        }
+
+        private void toggleScale(boolean isActive) {
+            global.setScaleActive(isActive);
+            updateScale();
+        }
+
+        private void updateScale() {
+            cursorManager.getLoadedCursors().forEach(cursor -> {
+                double scale = global.isScaleActive()
+                        ? global.getScale()
+                        : CONFIG.getOrCreateCursorSettings(cursor.getType()).getScale();
+
+                cursor.setScale(scale);
+            });
         }
 
         private void toggleAnimations(boolean isAnimated) {
@@ -302,8 +320,8 @@ public class RegistryOptionsScreen extends Screen {
         return list.getYOffset() + list.getItemHeight() * index + ROW_GAP - (int) Math.round(list.getScrollAmount());
     }
 
-    public static Tooltip getSettingTooltip(String setting) {
-        return Tooltip.of(Text.translatable(GLOBAL_TOOLTIP_STRING, setting));
+    public static Tooltip getSettingTooltip(Text settingText) {
+        return Tooltip.of(Text.translatable(GLOBAL_TOOLTIP_KEY, settingText));
     }
 
     public static class ToggleWidget extends SelectedCursorToggleWidget {

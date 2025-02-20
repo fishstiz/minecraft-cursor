@@ -50,12 +50,9 @@ public class CursorOptionsScreen extends Screen {
         this.layout.addHeader(this.title, this.textRenderer);
         this.body = this.layout.addBody(new CursorOptionsBody(this));
 
-        moreButton = ButtonWidget.builder(Text.translatable("minecraft-cursor.options.more").append("..."),
-                btn -> {
-                    if (client != null) {
-                        client.setScreen(new RegistryOptionsScreen(this, cursorManager));
-                    }
-                }).build();
+        moreButton = ButtonWidget.builder(
+                Text.translatable("minecraft-cursor.options.more").append("..."),
+                btn -> toMoreOptions()).build();
         this.layout.addFooter(moreButton);
 
         doneButton = ButtonWidget.builder(ScreenTexts.DONE, btn -> this.close()).build();
@@ -91,12 +88,9 @@ public class CursorOptionsScreen extends Screen {
     }
 
     private void updateSelectedCursorConfig() {
-        CONFIG.getOrCreateCursorSettings(selectedCursor.getType()).update(
-                selectedCursor.getScale(),
-                selectedCursor.getXhot(),
-                selectedCursor.getYhot(),
-                selectedCursor.isEnabled()
-        );
+        if (body != null) {
+            body.selectedCursorColumn.save();
+        }
     }
 
     public Cursor getSelectedCursor() {
@@ -105,6 +99,12 @@ public class CursorOptionsScreen extends Screen {
 
     public List<Cursor> getCursors() {
         return cursors;
+    }
+
+    public void toMoreOptions() {
+        if (client != null) {
+            client.setScreen(new RegistryOptionsScreen(this, cursorManager));
+        }
     }
 
     @Override
