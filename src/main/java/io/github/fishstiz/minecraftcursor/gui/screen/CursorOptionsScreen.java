@@ -103,7 +103,7 @@ public class CursorOptionsScreen extends Screen {
 
     public void toMoreOptions() {
         if (client != null) {
-            client.setScreen(new RegistryOptionsScreen(this, cursorManager));
+            client.setScreen(new MoreOptionsScreen(this, cursorManager));
         }
     }
 
