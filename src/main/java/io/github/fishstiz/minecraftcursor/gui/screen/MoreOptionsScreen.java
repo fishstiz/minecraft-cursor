@@ -94,6 +94,8 @@ public class MoreOptionsScreen extends Screen implements CursorProvider {
 
     @Override
     public void close() {
+        list.applyConfig();
+
         if (this.client != null) {
             if (previousScreen instanceof CursorOptionsScreen screen && screen.body != null) {
                 screen.body.selectedCursorColumn.refresh();
