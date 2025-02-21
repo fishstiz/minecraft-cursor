@@ -5,12 +5,15 @@ import io.github.fishstiz.minecraftcursor.api.CursorProvider;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
+import io.github.fishstiz.minecraftcursor.util.MouseEvent;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
+
+import java.util.function.BiConsumer;
 
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
 
@@ -23,7 +26,7 @@ public class SelectedCursorHotspotWidget extends ClickableWidget implements Curs
     private final CursorOptionsWidget options;
     private boolean rulerRendered = true;
     private float rulerAlpha = 1f;
-    private ChangeEventListener changeEventListener;
+    private MouseEventListener changeEventListener;
 
     public SelectedCursorHotspotWidget(int size, CursorOptionsWidget options) {
         super(options.getX(), options.getY(), size, size, Text.empty());
@@ -83,21 +86,21 @@ public class SelectedCursorHotspotWidget extends ClickableWidget implements Curs
 
     @Override
     public void onClick(double mouseX, double mouseY) {
-        setHotspots(mouseX, mouseY);
+        setHotspots(MouseEvent.CLICK, mouseX, mouseY);
     }
 
     @Override
     protected void onDrag(double mouseX, double mouseY, double deltaX, double deltaY) {
-        setHotspots(mouseX, mouseY);
+        setHotspots(MouseEvent.DRAG, mouseX, mouseY);
     }
 
-    public void setHotspots(double mouseX, double mouseY) {
+    public void setHotspots(MouseEvent mouseEvent, double mouseX, double mouseY) {
         if (changeEventListener != null) {
             int rulerSize = getRulerSize();
             int x = ((int) mouseX - getX()) / rulerSize;
             int y = ((int) mouseY - getY()) / rulerSize;
 
-            changeEventListener.onChange(x, y);
+            changeEventListener.onChange(mouseEvent, x, y);
         }
 
         setRulerRendered(true, true);
@@ -123,7 +126,11 @@ public class SelectedCursorHotspotWidget extends ClickableWidget implements Curs
         return CursorType.POINTER;
     }
 
-    public void setChangeEventListener(ChangeEventListener changeEventListener) {
+    public void setChangeEventListener(BiConsumer<Integer, Integer> changeEventListener) {
+        setChangeEventListener((mouseEvent, x, y) -> changeEventListener.accept(x, y));
+    }
+
+    public void setChangeEventListener(MouseEventListener changeEventListener) {
         this.changeEventListener = changeEventListener;
     }
 
@@ -137,11 +144,18 @@ public class SelectedCursorHotspotWidget extends ClickableWidget implements Curs
     }
 
     @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        setHotspots(MouseEvent.RELEASE, mouseX, mouseY);
+        return super.mouseReleased(mouseX, mouseY, button);
+    }
+
+    @Override
     protected void appendClickableNarrations(NarrationMessageBuilder builder) {
+        // not supported
     }
 
     @FunctionalInterface
-    public interface ChangeEventListener {
-        void onChange(int xhot, int yhot);
+    public interface MouseEventListener {
+        void onChange(MouseEvent mouseEvent, int xhot, int yhot);
     }
 }
