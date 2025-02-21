@@ -254,6 +254,9 @@ public class MoreOptionsScreen extends Screen implements CursorProvider {
                 GLOBAL.setYHot(yhot);
                 yhotEntry.sliderWidget.setTranslatedValue(yhot);
             }
+            if (GLOBAL.isXHotActive() || GLOBAL.isYHotActive()) {
+                cursorManager.getLoadedCursors().forEach(cursor -> cursor.setHotspots(xhot, yhot));
+            }
         }
 
         private void toggleAnimations(boolean isAnimated) {
