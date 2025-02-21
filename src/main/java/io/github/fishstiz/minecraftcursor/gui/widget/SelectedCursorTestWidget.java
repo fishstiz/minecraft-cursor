@@ -65,12 +65,7 @@ public class SelectedCursorTestWidget extends SelectedCursorClickableWidget impl
     }
 
     @Override
-    public void setX(int x) {
-        super.setX(x);
-        placeButton();
-    }
-
-    @Override
     protected void appendClickableNarrations(NarrationMessageBuilder builder) {
+        // not supported
     }
 }

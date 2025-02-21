@@ -45,8 +45,8 @@ public class CursorOptionsWidget extends ContainerWidget {
     SelectedCursorHotspotWidget cursorHotspot;
     SelectedCursorTestWidget cursorTest;
 
-    public CursorOptionsWidget(int width, CursorOptionsScreen optionsScreen) {
-        super(0, optionsScreen.layout.getHeaderHeight(), width, optionsScreen.getContentHeight(), Text.empty());
+    public CursorOptionsWidget(int x, int width, int height, int y,  CursorOptionsScreen optionsScreen) {
+        super(x, y, width, height, Text.empty());
 
         this.parent = optionsScreen;
         this.handler = new CursorOptionsHandler(this);
@@ -56,10 +56,12 @@ public class CursorOptionsWidget extends ContainerWidget {
 
     @Override
     protected void drawBox(DrawContext context) {
+        // override to remove box
     }
 
     @Override
     public void drawTexture(DrawContext context, Identifier texture, int x, int y, int u, int v, int hoveredVOffset, int width, int height, int textureWidth, int textureHeight) {
+        // override to remove texture
     }
 
     private void initWidgets() {
@@ -226,6 +228,7 @@ public class CursorOptionsWidget extends ContainerWidget {
 
     @Override
     protected void appendClickableNarrations(NarrationMessageBuilder builder) {
+        // not supported
     }
 
     @Override
