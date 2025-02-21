@@ -66,12 +66,7 @@ public class SelectedCursorTestWidget extends ClickableWidget implements CursorP
     }
 
     @Override
-    public void setX(int x) {
-        super.setX(x);
-        placeButton();
-    }
-
-    @Override
     protected void appendClickableNarrations(NarrationMessageBuilder builder) {
+        // not supported
     }
 }

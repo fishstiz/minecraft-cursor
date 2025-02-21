@@ -24,15 +24,20 @@ public class CursorOptionsScreen extends Screen {
     private static final int CURSORS_COLUMN_WIDTH = 96;
     private static final int SELECTED_CURSOR_COLUMN_WIDTH = 200;
     private static final int COLUMN_GAP = 8;
+
+    private final ThreePartsLayoutWidget layout = new ThreePartsLayoutWidget(this);
+    private final ButtonWidget moreButton = ButtonWidget.builder(
+            Text.translatable("minecraft-cursor.options.more").append("..."),
+            btn -> toMoreOptions()).build();
+    private final ButtonWidget doneButton = ButtonWidget.builder(
+            ScreenTexts.DONE, btn -> this.close()).build();
+
+    public final CursorAnimationHelper animationHelper = new CursorAnimationHelper();
     private final CursorManager cursorManager;
     private final List<Cursor> cursors;
-    protected final Screen previousScreen;
-    public final ThreePartsLayoutWidget layout = new ThreePartsLayoutWidget(this);
-    public final CursorAnimationHelper animationHelper = new CursorAnimationHelper();
-    protected CursorOptionsBody body;
+    final Screen previousScreen;
     private Cursor selectedCursor;
-    ButtonWidget moreButton;
-    ButtonWidget doneButton;
+    CursorOptionsBody body;
 
     public CursorOptionsScreen(Screen previousScreen, CursorManager cursorManager) {
         super(TITLE_TEXT);
@@ -48,14 +53,9 @@ public class CursorOptionsScreen extends Screen {
         selectedCursor = cursorManager.getLoadedCursors().getFirst();
 
         this.layout.addHeader(this.title, this.textRenderer);
-        this.body = this.layout.addBody(new CursorOptionsBody(this));
+        this.body = this.layout.addBody(new CursorOptionsBody());
 
-        moreButton = ButtonWidget.builder(
-                Text.translatable("minecraft-cursor.options.more").append("..."),
-                btn -> toMoreOptions()).build();
         this.layout.addFooter(moreButton);
-
-        doneButton = ButtonWidget.builder(ScreenTexts.DONE, btn -> this.close()).build();
         this.layout.addFooter(doneButton);
 
         this.layout.forEachChild(this::addDrawableChild);
@@ -67,14 +67,19 @@ public class CursorOptionsScreen extends Screen {
 
     protected void refreshWidgetPositions() {
         this.layout.refreshPositions();
-        if (this.body != null) {
-            this.body.position(this.width, this.layout);
-        }
+
         int bodyWidth = CURSORS_COLUMN_WIDTH + SELECTED_CURSOR_COLUMN_WIDTH + COLUMN_GAP;
-        moreButton.setWidth(bodyWidth / 2 - COLUMN_GAP / 2);
-        moreButton.setX(width / 2 - moreButton.getWidth() - COLUMN_GAP / 2);
-        doneButton.setWidth(bodyWidth / 2 - COLUMN_GAP / 2 - 2);
-        doneButton.setX(width / 2 + COLUMN_GAP / 2);
+        int buttonWidth = bodyWidth / 2 - COLUMN_GAP / 2;
+        int centerX = width / 2;
+        int gapHalf = COLUMN_GAP / 2;
+
+        moreButton.setWidth(buttonWidth);
+        doneButton.setWidth(buttonWidth - 2);
+
+        moreButton.setX(centerX - buttonWidth - gapHalf);
+        doneButton.setX(centerX + gapHalf);
+
+        body.position();
     }
 
     public void selectCursor(Cursor cursor) {
@@ -120,10 +125,17 @@ public class CursorOptionsScreen extends Screen {
         public final CursorListWidget cursorsColumn;
         public final CursorOptionsWidget selectedCursorColumn;
 
-        public CursorOptionsBody(CursorOptionsScreen optionsScreen) {
-            super(optionsScreen.layout.getX(), optionsScreen.layout.getHeaderHeight(), optionsScreen.width, optionsScreen.layout.getContentHeight(), Text.of("BODY"));
-            cursorsColumn = new CursorListWidget(client, CURSORS_COLUMN_WIDTH, optionsScreen);
-            selectedCursorColumn = new CursorOptionsWidget(SELECTED_CURSOR_COLUMN_WIDTH, optionsScreen);
+        public CursorOptionsBody() {
+            super(layout.getX(), layout.getHeaderHeight(), CursorOptionsScreen.this.width, layout.getContentHeight(), Text.empty());
+
+            int y = layout.getHeaderHeight();
+            int height = layout.getContentHeight();
+            var screen = CursorOptionsScreen.this;
+
+            cursorsColumn = new CursorListWidget(client, CURSORS_COLUMN_WIDTH, height, y, screen);
+            selectedCursorColumn = new CursorOptionsWidget(computedX2(), SELECTED_CURSOR_COLUMN_WIDTH, height, y, screen);
+
+            position();
         }
 
         @Override
@@ -145,24 +157,32 @@ public class CursorOptionsScreen extends Screen {
             selectedCursorColumn.renderWidget(context, mouseX, mouseY, delta);
         }
 
-        public void position(int width, ThreePartsLayoutWidget layout) {
-            this.setDimensions(width, layout.getContentHeight());
-            this.setPosition(this.getX(), layout.getHeaderHeight());
+        public void position() {
+            int width = CursorOptionsScreen.this.width;
+            int height = layout.getContentHeight();
+            int y = layout.getHeaderHeight();
 
-            cursorsColumn.setHeight(layout.getContentHeight());
-            selectedCursorColumn.setHeight(layout.getContentHeight());
+            this.setDimensions(width, height);
+            this.setPosition(0, y);
 
-            int cursorsColumnX = width / 2 - CURSORS_COLUMN_WIDTH;
-            int selectedCursorColumnX = width / 2;
-            int leftShift = (selectedCursorColumnX + SELECTED_CURSOR_COLUMN_WIDTH) -
-                    (((CURSORS_COLUMN_WIDTH + SELECTED_CURSOR_COLUMN_WIDTH) / 2) + (width / 2));
+            cursorsColumn.setHeight(height);
+            selectedCursorColumn.setHeight(height);
 
-            cursorsColumn.setX(cursorsColumnX - leftShift - COLUMN_GAP / 2);
-            selectedCursorColumn.setX(selectedCursorColumnX - leftShift + COLUMN_GAP / 2);
+            cursorsColumn.setPosition(computedX(), y);
+            selectedCursorColumn.setPosition(computedX2(), y);
+        }
+
+        private int computedX() {
+            return CursorOptionsScreen.this.width / 2 - (CURSORS_COLUMN_WIDTH + SELECTED_CURSOR_COLUMN_WIDTH + COLUMN_GAP) / 2;
+        }
+
+        private int computedX2() {
+            return computedX() + CURSORS_COLUMN_WIDTH + COLUMN_GAP;
         }
 
         @Override
         protected void appendClickableNarrations(NarrationMessageBuilder builder) {
+            // not supported
         }
     }
 }
