@@ -89,6 +89,7 @@ public class MoreOptionsScreen extends Screen implements CursorProvider {
         this.body = this.layout.addBody(new OptionListWidget(this.client, this));
         this.layout.addFooter(doneButton);
         this.layout.forEachChild(this::addDrawableChild);
+        this.addSelectableChild(body);
         this.refreshWidgetPositions();
     }
 
@@ -99,7 +100,7 @@ public class MoreOptionsScreen extends Screen implements CursorProvider {
         body.render(context, mouseX, mouseY, delta);
         doneButton.render(context, mouseX, mouseY, delta);
 
-        if (body == null || hotspotWidget == null) return;
+        if (hotspotWidget == null) return;
 
         if ((GLOBAL.isXHotActive() || GLOBAL.isYHotActive()) && (body.xhotEntry.isFocused() || body.yhotEntry.isFocused())) {
             int x = body.getRowLeft() - hotspotWidget.getWidth() - ROW_GAP;
@@ -110,7 +111,7 @@ public class MoreOptionsScreen extends Screen implements CursorProvider {
             hotspotWidget.active = true;
 
             context.enableScissor(x, layout.getHeaderHeight(), body.getRowLeft(), layout.getHeaderHeight() + getContentHeight());
-            hotspotWidget.render(context, mouseX, mouseY, delta);
+            hotspotWidget.renderButton(context, mouseX, mouseY, delta);
             context.disableScissor();
         } else {
             hotspotWidget.visible = false;
@@ -151,11 +152,6 @@ public class MoreOptionsScreen extends Screen implements CursorProvider {
 
     public int getContentHeight() {
         return height - layout.getHeaderHeight() - layout.getFooterHeight();
-    }
-
-    @Override
-    public List<? extends Element> children() {
-        return List.of(body, doneButton);
     }
 
     public class OptionListWidget extends ElementListWidget<OptionEntry> implements Widget {

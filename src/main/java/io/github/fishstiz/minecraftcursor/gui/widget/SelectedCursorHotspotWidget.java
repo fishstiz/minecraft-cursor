@@ -30,7 +30,7 @@ public class SelectedCursorHotspotWidget extends SelectedCursorClickableWidget i
     }
 
     @Override
-    protected void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
         context.drawTexture(BACKGROUND, getX(), getY(), 0, 0, width, height, width, height);
         if (!active) context.fill(getX(), getY(), getRight(), getBottom(), 0xAF000000); // 70% black
 
