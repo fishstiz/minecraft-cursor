@@ -158,6 +158,10 @@ public class Cursor {
         updateImage(this.scale, this.xhot, yhot);
     }
 
+    public void setHotspots(int xhot, int yhot) {
+        updateImage(this.scale, xhot, yhot);
+    }
+
     public boolean isEnabled() {
         return enabled;
     }
