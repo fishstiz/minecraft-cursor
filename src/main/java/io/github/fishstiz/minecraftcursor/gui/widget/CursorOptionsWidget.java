@@ -128,9 +128,9 @@ public class CursorOptionsWidget extends ContainerWidget {
         placeWidgets();
 
         enableButton.render(context, mouseX, mouseY, delta);
-        scaleSlider.render(context, mouseX, mouseY, delta);
-        xhotSlider.render(context, mouseX, mouseY, delta);
-        yhotSlider.render(context, mouseX, mouseY, delta);
+        scaleSlider.renderButton(context, mouseX, mouseY, delta);
+        xhotSlider.renderButton(context, mouseX, mouseY, delta);
+        yhotSlider.renderButton(context, mouseX, mouseY, delta);
 
         if (handler.getCursorAsAnimatedCursor().isPresent()) {
             animateButton.render(context, mouseX, mouseY, delta);

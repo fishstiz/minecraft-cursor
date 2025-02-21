@@ -110,8 +110,8 @@ public class CursorListWidget extends ElementListWidget<CursorListWidget.CursorW
 
         @Override
         public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float delta) {
-            button.render(context, mouseX, mouseY, delta);
             button.setY(optionsScreen.layout.getHeaderHeight() + (itemHeight + ROW_GAP) * index - (int) Math.round(getScrollAmount()));
+            button.renderButton(context, mouseX, mouseY, delta);
         }
 
         @Override
@@ -150,7 +150,7 @@ public class CursorListWidget extends ElementListWidget<CursorListWidget.CursorW
         }
 
         @Override
-        public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        public void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
             renderBox(context);
             renderTexture(context);
             renderMessage(context);

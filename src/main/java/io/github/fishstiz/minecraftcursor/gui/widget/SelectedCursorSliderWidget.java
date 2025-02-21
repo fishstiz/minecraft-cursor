@@ -93,7 +93,7 @@ public class SelectedCursorSliderWidget extends SliderWidget {
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
         SelectedCursorButtonWidget helperButton = getInactiveHelperButton();
         boolean isHelperButtonPresent = helperButton != null;
 
@@ -105,7 +105,7 @@ public class SelectedCursorSliderWidget extends SliderWidget {
             renderAroundHelperButton(context, mouseX, mouseY, delta, helperButton);
             helperButton.render(context, mouseX, mouseY, delta);
         } else {
-            super.render(context, mouseX, mouseY, delta);
+            super.renderButton(context, mouseX, mouseY, delta);
         }
 
         hovered = isMouseOver(mouseX, mouseY);
@@ -144,7 +144,7 @@ public class SelectedCursorSliderWidget extends SliderWidget {
 
     private void renderSection(DrawContext context, int mouseX, int mouseY, float delta, int x1, int y1, int x2, int y2) {
         context.enableScissor(x1, y1, x2, y2);
-        super.render(context, mouseX, mouseY, delta);
+        super.renderButton(context, mouseX, mouseY, delta);
         context.disableScissor();
     }
 
