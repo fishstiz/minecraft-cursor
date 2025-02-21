@@ -5,6 +5,7 @@ import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
 import io.github.fishstiz.minecraftcursor.util.DrawUtil;
+import io.github.fishstiz.minecraftcursor.util.MouseEvent;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -140,7 +141,7 @@ public class MoreOptionsListWidget extends ElementListWidget<MoreOptionsListWidg
         });
         DoubleConsumer handleChange = value -> {
             valueSetter.accept(value);
-            updateCursors.run();
+            cursorAction.accept(cursorManager.getCurrentCursor(), value);
         };
         BooleanConsumer handleToggle = active -> {
             activeSetter.accept(active);
@@ -149,21 +150,58 @@ public class MoreOptionsListWidget extends ElementListWidget<MoreOptionsListWidg
 
         var slider = new SliderEntry.Slider(text, suffix, valueGetter.getAsDouble(), min, max, step, handleChange::accept);
         var toggle = new SliderEntry.Toggle(ENABLED_TEXT, activeGetter.getAsBoolean(), getSettingTooltip(text), handleToggle);
-        return new SliderEntry(slider, toggle);
+        return new SliderEntry(slider, toggle, updateCursors);
     }
 
-    public void handleChangeHotspotWidget(int xhot, int yhot) {
-        if (GLOBAL.isXHotActive()) {
+    public void handleChangeHotspotWidget(MouseEvent mouseEvent, int xhot, int yhot) {
+        boolean applyX = GLOBAL.isXHotActive();
+        boolean applyY = GLOBAL.isYHotActive();
+
+        if (applyX) {
             GLOBAL.setXHot(xhot);
             xhotEntry.sliderWidget.setTranslatedValue(xhot);
         }
-        if (GLOBAL.isYHotActive()) {
+        if (applyY) {
             GLOBAL.setYHot(yhot);
             yhotEntry.sliderWidget.setTranslatedValue(yhot);
         }
-        if (GLOBAL.isXHotActive() || GLOBAL.isYHotActive()) {
-            cursorManager.getLoadedCursors().forEach(cursor -> cursor.setHotspots(xhot, yhot));
+
+        if (applyX && applyY) {
+            cursorManager.getCurrentCursor().setHotspots(xhot, yhot);
+        } else if (applyX) {
+            cursorManager.getCurrentCursor().setXHot(xhot);
+        } else if (applyY) {
+            cursorManager.getCurrentCursor().setYHot(yhot);
         }
+
+        if (mouseEvent == MouseEvent.RELEASE) {
+            applyHotspotsToAll();
+        }
+    }
+
+    private void applyHotspotsToAll() {
+        boolean applyX = GLOBAL.isXHotActive();
+        boolean applyY = GLOBAL.isYHotActive();
+
+        if (applyX && applyY) {
+            cursorManager.getLoadedCursors().forEach(cursor -> cursor.setHotspots(GLOBAL.getXHot(), GLOBAL.getYHot()));
+        } else if (applyX) {
+            cursorManager.getLoadedCursors().forEach(cursor -> cursor.setXHot(GLOBAL.getXHot()));
+        } else if (applyY) {
+            cursorManager.getLoadedCursors().forEach(cursor -> cursor.setYHot(GLOBAL.getYHot()));
+        }
+    }
+
+    private void applyScaleToAll() {
+        if (GLOBAL.isScaleActive()) {
+            cursorManager.getLoadedCursors().forEach(cursor -> cursor.setScale(GLOBAL.getScale()));
+        }
+    }
+
+    // in case the user escapes the screen before releasing slider.
+    public void applyConfig() {
+        applyScaleToAll();
+        applyHotspotsToAll();
     }
 
     private void toggleAnimations(boolean isAnimated) {
@@ -367,7 +405,7 @@ public class MoreOptionsListWidget extends ElementListWidget<MoreOptionsListWidg
         private final SelectedCursorSliderWidget sliderWidget;
         private final ToggleWidget toggleButton;
 
-        public SliderEntry(Slider slider, Toggle toggle) {
+        public SliderEntry(Slider slider, Toggle toggle, Runnable onRelease) {
             super(slider.label);
 
             sliderWidget = new SelectedCursorSliderWidget(
@@ -377,7 +415,8 @@ public class MoreOptionsListWidget extends ElementListWidget<MoreOptionsListWidg
                     slider.max,
                     slider.step,
                     slider.suffix,
-                    slider.applyFunction
+                    slider.applyFunction,
+                    onRelease
             );
             sliderWidget.active = toggle.value;
 
