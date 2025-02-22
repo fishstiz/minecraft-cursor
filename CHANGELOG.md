@@ -1,5 +1,10 @@
-- Added de_at, de_ch, de_de Translations. ([@Lucanoria](https://github.com/fishstiz/minecraft-cursor/pull/5))
-- Made text automatically scroll when overflowing in the cursors list of Cursor Options Screen.
+- Added Global Cursor Settings in More Options Screen.
+  - Toggle the animation of all animated cursors in one click. 
+  - Globally override scale, x-hotspot, and y-hotspot of all cursors.
+- Added Reset Cursor Settings (does not affect Global Cursor Settings) in More Options Screen.
+- Added German Translations. ([@Lucanoria](https://github.com/fishstiz/minecraft-cursor/pull/5))
+- Made text automatically scroll when overflowing in the config screen.
 - Fixed animate buttons in options screen capturing mouse events even when hidden.
+- Fixed scale values not rounding.
 - API Changes:
   - Fixed disabled overrides clogging the override list.
