@@ -4,6 +4,7 @@ import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.util.BufferedImageUtil;
+import io.github.fishstiz.minecraftcursor.util.SettingsUtil;
 import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWImage;
@@ -57,7 +58,7 @@ public class Cursor {
 
         try {
             BufferedImage image = BufferedImageUtil.decompressBase64ToImage(cachedBufferedImage);
-            create(image, scale, xhot, yhot);
+            create(image, SettingsUtil.sanitizeScale(scale), SettingsUtil.sanitizeHotspot(xhot), SettingsUtil.sanitizeHotspot(yhot));
             image.flush();
         } catch (IOException e) {
             MinecraftCursor.LOGGER.error("Error updating image of {}: {}", type, e);
