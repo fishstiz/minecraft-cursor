@@ -438,7 +438,7 @@ public class MoreOptionsListWidget extends ElementListWidget<MoreOptionsListWidg
             sliderWidget.setPosition(x - ROW_GAP / 2, getYEntry(index));
             sliderWidget.setWidth(toggleButton.getX() - x - ROW_GAP);
             sliderWidget.height = 20;
-            sliderWidget.render(context, mouseX, mouseY, tickDelta);
+            sliderWidget.renderButton(context, mouseX, mouseY, tickDelta);
         }
 
         @Override
