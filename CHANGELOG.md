@@ -1,1 +1,1 @@
-- Fix cursors list on options screen overflowing
+- Fixed clicking on more cursor options button being blocked by the cursor list.
