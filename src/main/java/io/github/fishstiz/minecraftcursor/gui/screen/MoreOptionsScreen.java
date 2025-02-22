@@ -43,6 +43,10 @@ public class MoreOptionsScreen extends Screen implements CursorProvider {
 
     @Override
     protected void init() {
+        if (this.list != null && this.list.isReloaded()) {
+            close();
+        }
+
         this.layout.addHeader(this.title, this.textRenderer);
 
         this.list = this.layout.addBody(new MoreOptionsListWidget(
