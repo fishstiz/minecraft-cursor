@@ -10,7 +10,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 
 import java.util.function.BiConsumer;
@@ -24,7 +23,6 @@ public class SelectedCursorHotspotWidget extends SelectedCursorClickableWidget i
     private static final int RULER_COLOR = 0xFFFF0000; // red
     private static final int OVERRIDE_RULER_COLOR = 0xFF00FF00; // green
     private final CursorOptionsWidget options;
-    private final long loadTime = Util.getMeasuringTimeMs();
     private boolean rulerRendered = true;
     private float rulerAlpha = 1f;
     private MouseEventListener changeEventListener;
@@ -121,7 +119,7 @@ public class SelectedCursorHotspotWidget extends SelectedCursorClickableWidget i
         if (!active) {
             return CursorType.DEFAULT;
         }
-        if (CursorTypeUtil.isLeftClickHeld() || CursorTypeUtil.isGrabbing()) {
+        if (isFocused() && (CursorTypeUtil.isLeftClickHeld() || CursorTypeUtil.isGrabbing())) {
             return CursorType.GRABBING;
         }
         return CursorType.POINTER;
@@ -146,7 +144,7 @@ public class SelectedCursorHotspotWidget extends SelectedCursorClickableWidget i
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        if (Util.getMeasuringTimeMs() > loadTime + 100) { // for accidental clicks
+        if (isFocused()) {
             setHotspots(MouseEvent.RELEASE, mouseX, mouseY);
         }
 
