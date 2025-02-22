@@ -25,7 +25,6 @@ import java.util.function.*;
 
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
 import static io.github.fishstiz.minecraftcursor.gui.widget.CursorOptionsWidget.*;
-import static io.github.fishstiz.minecraftcursor.gui.widget.CursorOptionsWidget.ENABLED_TEXT;
 
 public class MoreOptionsListWidget extends ElementListWidget<MoreOptionsListWidget.OptionEntry> {
     private static final CursorConfig.GlobalSettings GLOBAL = CONFIG.getGlobal();
@@ -48,6 +47,10 @@ public class MoreOptionsListWidget extends ElementListWidget<MoreOptionsListWidg
     private static final Text ADVANCEMENTS_TEXT = Text.translatable("minecraft-cursor.options.advancements");
     private static final Text WORLD_ICON_TEXT = Text.translatable("minecraft-cursor.options.world");
     private static final Text SERVER_ICON_TEXT = Text.translatable("minecraft-cursor.options.server");
+
+    private static final Text RESOURCE_TEXT = Text.translatable("minecraft-cursor.options.more.resource_pack");
+    private static final Text RESOURCE_RELOAD_TEXT = Text.translatable("minecraft-cursor.options.more.resource_pack.reset");
+    private static final Text RESOURCE_RELOAD_TOOLTIP_TEXT = Text.translatable("minecraft-cursor.options.more.resource_pack.reset.tooltip");
 
     private static final int BUTTON_WIDTH = 40;
     private static final int ITEM_HEIGHT = 20;
@@ -75,6 +78,7 @@ public class MoreOptionsListWidget extends ElementListWidget<MoreOptionsListWidg
 
         addGlobalOptions();
         addAdaptiveOptions();
+        addResourcePackOptions();
     }
 
     private void addGlobalOptions() {
@@ -112,6 +116,16 @@ public class MoreOptionsListWidget extends ElementListWidget<MoreOptionsListWidg
         addAdaptiveEntry(ADVANCEMENTS_TEXT, CONFIG.isAdvancementTabsEnabled(), isAdaptive, CONFIG::setAdvancementTabsEnabled);
         addAdaptiveEntry(WORLD_ICON_TEXT, CONFIG.isWorldIconEnabled(), isAdaptive, CONFIG::setWorldIconEnabled);
         addAdaptiveEntry(SERVER_ICON_TEXT, CONFIG.isServerIconEnabled(), isAdaptive, CONFIG::setServerIconEnabled);
+    }
+
+    private void addResourcePackOptions() {
+        addEntry(new TitleEntry(RESOURCE_TEXT));
+        addEntry(new FullButtonEntry(RESOURCE_RELOAD_TEXT, RESOURCE_RELOAD_TOOLTIP_TEXT, this::reloadConfiguration));
+    }
+
+    private void reloadConfiguration() {
+        CONFIG.set_hash(String.valueOf(Math.random()));
+        client.reloadResources();
     }
 
     private void addAdaptiveEntry(Text label, boolean isEnabled, boolean active, Consumer<Boolean> onPress) {
@@ -213,8 +227,8 @@ public class MoreOptionsListWidget extends ElementListWidget<MoreOptionsListWidg
 
     private void toggleAdaptive(boolean isEnabled) {
         adaptiveOptions.forEach(option -> {
-            option.toggleButton.active = isEnabled;
-            option.toggleButton.setValue(isEnabled);
+            option.button.active = isEnabled;
+            option.button.setValue(isEnabled);
         });
 
         cursorManager.setIsAdaptive(isEnabled);
@@ -227,12 +241,8 @@ public class MoreOptionsListWidget extends ElementListWidget<MoreOptionsListWidg
         ));
     }
 
-    public int getItemHeight() {
-        return itemHeight;
-    }
-
     public int getYEntry(int index) {
-        return getY() + getItemHeight() * index + ROW_GAP - (int) Math.round(getScrollAmount());
+        return getY() + itemHeight * index + ROW_GAP - (int) Math.round(getScrollAmount());
     }
 
     public int getRowGap() {
@@ -276,12 +286,38 @@ public class MoreOptionsListWidget extends ElementListWidget<MoreOptionsListWidg
             return getChildren();
         }
 
+        protected abstract List<ClickableWidget> getChildren();
+    }
+
+    public class LabeledButtonEntry<T extends ClickableWidget> extends OptionEntry {
+        protected final T button;
+
+        protected LabeledButtonEntry(Text label, Supplier<T> buttonFactory) {
+            super(label);
+
+            this.button = buttonFactory.get();
+            this.button.setDimensions(BUTTON_WIDTH, 20);
+        }
+
+        @Override
+        public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+            button.setX(getRowRight() - BUTTON_WIDTH);
+            button.setY(getYEntry(index));
+            button.render(context, mouseX, mouseY, tickDelta);
+
+            int textEndX = button.getX() - ROW_GAP;
+            int textEndY = y + entryHeight;
+            int textColor = 0xFFFFFFFF; // white
+            DrawUtil.drawScrollableTextLeftAlign(context, client.textRenderer, label, x, y, textEndX, textEndY, textColor);
+        }
+
+        @Override
         protected List<ClickableWidget> getChildren() {
-            return List.of();
+            return List.of(button);
         }
     }
 
-    public class ToggleWidget extends SelectedCursorToggleWidget {
+    public static class ToggleWidget extends SelectedCursorToggleWidget {
         protected ToggleWidget(
                 int x, int y,
                 int width, int height,
@@ -292,11 +328,6 @@ public class MoreOptionsListWidget extends ElementListWidget<MoreOptionsListWidg
             super(x, y, width, height, Text.empty(), defaultValue, onPress);
 
             if (tooltip != null) setTooltip(tooltip);
-        }
-
-        public void setIndex(int index) {
-            setX(getRowRight() - BUTTON_WIDTH);
-            setY(getYEntry(index));
         }
 
         @Override
@@ -316,11 +347,14 @@ public class MoreOptionsListWidget extends ElementListWidget<MoreOptionsListWidg
             int titleX = x + (getRowWidth() / 2 - client.textRenderer.getWidth(label) / 2);
             context.drawText(client.textRenderer, label, titleX, itemY, 0xFFFFFFFF, false);
         }
+
+        @Override
+        protected List<ClickableWidget> getChildren() {
+            return List.of();
+        }
     }
 
-    public class ToggleEntry extends OptionEntry {
-        private final ToggleWidget toggleButton;
-
+    public class ToggleEntry extends LabeledButtonEntry<ToggleWidget> {
         public ToggleEntry(Text label, boolean defaultValue, boolean active, Consumer<Boolean> onPress) {
             this(label, defaultValue, active, null, onPress);
         }
@@ -332,35 +366,39 @@ public class MoreOptionsListWidget extends ElementListWidget<MoreOptionsListWidg
                 @Nullable Tooltip tooltip,
                 Consumer<Boolean> onPress
         ) {
+            super(label, () -> createToggleWidget(defaultValue, tooltip, onPress));
+            button.active = active;
+        }
+    }
+
+    public class FullButtonEntry extends OptionEntry {
+        private final SelectedCursorButtonWidget button;
+
+        protected FullButtonEntry(Text label, Text tooltipText, Runnable onPress) {
             super(label);
 
-            toggleButton = createToggleWidget(defaultValue, tooltip, onPress);
-            toggleButton.active = active;
+            this.button = new SelectedCursorButtonWidget(label, onPress);
+            this.button.setDimensions(getRowWidth(), 20);
+            this.button.setTooltip(Tooltip.of(tooltipText));
         }
 
         @Override
         public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-            toggleButton.setIndex(index);
-            toggleButton.render(context, mouseX, mouseY, tickDelta);
-
-            int textEndX = toggleButton.getX() - ROW_GAP;
-            int textEndY = y + entryHeight;
-            int textColor = 0xFFFFFFFF;
-            DrawUtil.drawScrollableTextLeftAlign(context, client.textRenderer, label, x, y, textEndX, textEndY, textColor);
+            button.setPosition(getRowLeft(), getYEntry(index));
+            button.render(context, mouseX, mouseY, tickDelta);
         }
 
         @Override
         protected List<ClickableWidget> getChildren() {
-            return List.of(toggleButton);
+            return List.of(button);
         }
     }
 
-    public class SliderEntry extends OptionEntry {
+    public class SliderEntry extends ToggleEntry {
         private final SelectedCursorSliderWidget sliderWidget;
-        private final ToggleWidget toggleButton;
 
         public SliderEntry(Slider slider, Toggle toggle, Runnable onRelease) {
-            super(slider.label);
+            super(Text.empty(), toggle.value, true, toggle.toggleFunction);
 
             sliderWidget = new SelectedCursorSliderWidget(
                     slider.label,
@@ -372,31 +410,21 @@ public class MoreOptionsListWidget extends ElementListWidget<MoreOptionsListWidg
                     slider.applyFunction,
                     onRelease
             );
-            sliderWidget.active = toggle.value;
-
-            toggleButton = createToggleWidget(toggle.value, toggle.tooltip, handleToggle(toggle.toggleFunction));
-        }
-
-        private Consumer<Boolean> handleToggle(Consumer<Boolean> toggleFunction) {
-            return active -> {
-                sliderWidget.active = active;
-                toggleFunction.accept(active);
-            };
         }
 
         @Override
         public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-            toggleButton.setIndex(index);
-            toggleButton.render(context, mouseX, mouseY, tickDelta);
+            super.render(context, index, y, x, entryWidth, entryHeight, mouseX, mouseY, hovered, tickDelta);
 
+            sliderWidget.active = this.button.value;
             sliderWidget.setPosition(x - ROW_GAP / 2, getYEntry(index));
-            sliderWidget.setDimensions(toggleButton.getX() - x - ROW_GAP, 20);
+            sliderWidget.setDimensions(this.button.getX() - x - ROW_GAP, 20);
             sliderWidget.renderWidget(context, mouseX, mouseY, tickDelta);
         }
 
         @Override
         protected List<ClickableWidget> getChildren() {
-            return List.of(sliderWidget, toggleButton);
+            return List.of(sliderWidget, this.button);
         }
 
         public record Slider(Text label, String suffix, double value, double min, double max, double step,

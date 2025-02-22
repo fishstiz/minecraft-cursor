@@ -36,5 +36,9 @@
   "minecraft-cursor.options.loom": "Loom Screen Pattern Buttons",
   "minecraft-cursor.options.advancements": "Advancements Tabs",
   "minecraft-cursor.options.world": "World Icon Play Button",
-  "minecraft-cursor.options.server": "Server Icon Play Button"
+  "minecraft-cursor.options.server": "Server Icon Play Button",
+
+  "minecraft-cursor.options.more.resource_pack": "Resource Pack",
+  "minecraft-cursor.options.more.resource_pack.reset": "Reset Cursor Settings",
+  "minecraft-cursor.options.more.resource_pack.reset.tooltip": "Resets personal cursor settings to the one provided by the resource pack (or the built-in default)."
 }
