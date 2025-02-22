@@ -446,7 +446,7 @@ public class MoreOptionsListWidget extends ElementListWidget<MoreOptionsListWidg
         private final SelectedCursorSliderWidget sliderWidget;
 
         public SliderEntry(Slider slider, Toggle toggle, Runnable onRelease) {
-            super(Text.empty(), toggle.value, true, toggle.toggleFunction);
+            super(Text.empty(), toggle.value, true, toggle.tooltip, toggle.toggleFunction);
 
             sliderWidget = new SelectedCursorSliderWidget(
                     slider.label,
