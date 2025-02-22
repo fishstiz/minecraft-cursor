@@ -3,6 +3,7 @@ package io.github.fishstiz.minecraftcursor.config;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.fishstiz.minecraftcursor.CursorTypeRegistry;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
+import io.github.fishstiz.minecraftcursor.util.SettingsUtil;
 
 import java.io.File;
 import java.util.HashMap;
@@ -175,26 +176,22 @@ public class CursorConfig {
         private Boolean animated;
 
         public void update(double scale, int xhot, int yhot, boolean enabled) {
-            this.scale = scale;
-            this.xhot = xhot;
-            this.yhot = yhot;
+            this.scale = SettingsUtil.sanitizeScale(scale);
+            this.xhot = SettingsUtil.sanitizeHotspot(xhot);
+            this.yhot = SettingsUtil.sanitizeHotspot(yhot);
             this.enabled = enabled;
         }
 
         public double getScale() {
-            double clampedScale = Math.clamp(this.scale, Default.SCALE_MIN, Default.SCALE_MAX);
-            this.scale = Math.round(clampedScale / Default.SCALE_STEP) * Default.SCALE_STEP;
-            return this.scale;
+            return SettingsUtil.sanitizeScale(this.scale);
         }
 
         public int getXHot() {
-            this.xhot = Math.clamp(this.xhot, Default.HOT_MIN, Default.HOT_MAX);
-            return this.xhot;
+            return SettingsUtil.sanitizeHotspot(this.xhot);
         }
 
         public int getYHot() {
-            this.yhot = Math.clamp(this.yhot, Default.HOT_MIN, Default.HOT_MAX);
-            return this.yhot;
+            return SettingsUtil.sanitizeHotspot(this.yhot);
         }
 
         public boolean isEnabled() {
@@ -255,8 +252,7 @@ public class CursorConfig {
         }
 
         public void setScale(double scale) {
-            double clampedScale = Math.max(Default.SCALE_MIN, Math.min(scale, Default.SCALE_MAX));
-            this.scale = Math.round(clampedScale / Default.SCALE_STEP) * Default.SCALE_STEP;
+            this.scale = SettingsUtil.sanitizeScale(scale);
         }
 
         public void setXHotDouble(double xhot) {
@@ -264,7 +260,7 @@ public class CursorConfig {
         }
 
         public void setXHot(int xhot) {
-            this.xhot = Math.max(Default.HOT_MIN, Math.min(xhot, Default.HOT_MAX));
+            this.xhot = SettingsUtil.sanitizeHotspot(xhot);
         }
 
         public void setYHotDouble(double yhot) {
@@ -272,7 +268,7 @@ public class CursorConfig {
         }
 
         public void setYHot(int yhot) {
-            this.yhot = Math.max(Default.HOT_MIN, Math.min(yhot, Default.HOT_MAX));
+            this.yhot = SettingsUtil.sanitizeHotspot(yhot);
         }
     }
 }
