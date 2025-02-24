@@ -1,7 +1,7 @@
 package io.github.fishstiz.minecraftcursor.config;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.fishstiz.minecraftcursor.CursorTypeRegistry;
+import io.github.fishstiz.minecraftcursor.CursorManager;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.util.SettingsUtil;
 
@@ -26,7 +26,7 @@ public class CursorConfig {
     File file;
 
     CursorConfig() {
-        for (CursorType type : CursorTypeRegistry.types()) {
+        for (CursorType type : CursorManager.getInstance().getCursorTypes()) {
             this.getOrCreateCursorSettings(type);
         }
     }

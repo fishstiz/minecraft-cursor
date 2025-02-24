@@ -1,6 +1,6 @@
 package io.github.fishstiz.minecraftcursor.mixin.client;
 
-import io.github.fishstiz.minecraftcursor.MinecraftCursor;
+import io.github.fishstiz.minecraftcursor.CursorManager;
 import io.github.fishstiz.minecraftcursor.gui.screen.CursorOptionsScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.option.GameOptionsScreen;
@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(MouseOptionsScreen.class)
 public abstract class MouseOptionsScreenMixin extends GameOptionsScreen {
-    public MouseOptionsScreenMixin(Screen parent, GameOptions gameOptions, Text title) {
+    protected MouseOptionsScreenMixin(Screen parent, GameOptions gameOptions, Text title) {
         super(parent, gameOptions, title);
     }
 
@@ -29,7 +29,7 @@ public abstract class MouseOptionsScreenMixin extends GameOptionsScreen {
                 Text.translatable("minecraft-cursor.options").append("..."),
                 btn -> {
                     if (this.client != null) {
-                        this.client.setScreen(new CursorOptionsScreen(this, MinecraftCursor.getCursorManager()));
+                        this.client.setScreen(new CursorOptionsScreen(this, CursorManager.getInstance()));
                     }
                 }).build();
 

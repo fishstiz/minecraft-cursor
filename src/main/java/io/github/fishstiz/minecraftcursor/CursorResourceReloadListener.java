@@ -60,7 +60,7 @@ class CursorResourceReloadListener implements SimpleSynchronousResourceReloadLis
     }
 
     private void loadCursorTextures(ResourceManager manager) {
-        for (CursorType cursorType : CursorTypeRegistry.types()) {
+        for (CursorType cursorType : cursorManager.getCursorTypes()) {
             String basePath = CURSORS_DIR + "/" + cursorType.getKey();
             loadCursorTexture(manager, cursorType, basePath);
         }
@@ -80,8 +80,8 @@ class CursorResourceReloadListener implements SimpleSynchronousResourceReloadLis
                 return;
             }
 
-            AnimatedCursorConfig animaton = loadAnimationConfig(manager, basePath, cursorResource);
-            cursorManager.loadCursorImage(cursorType, cursorId, image, config.getOrCreateCursorSettings(cursorType), animaton);
+            AnimatedCursorConfig animation = loadAnimationConfig(manager, basePath, cursorResource);
+            cursorManager.loadCursorImage(cursorType, cursorId, image, config.getOrCreateCursorSettings(cursorType), animation);
         } catch (IOException e) {
             MinecraftCursor.LOGGER.error("Failed to load cursor image for '{}'", basePath);
         } finally {

@@ -6,10 +6,10 @@ import io.github.fishstiz.minecraftcursor.api.CursorController;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 
 public final class CursorControllerImpl implements CursorController {
-    private final CursorManager cursorManager;
+    public static final CursorController INSTANCE = new CursorControllerImpl();
+    private final CursorManager cursorManager = CursorManager.getInstance();
 
-    private CursorControllerImpl(CursorManager cursorManager) {
-        this.cursorManager = cursorManager;
+    private CursorControllerImpl() {
     }
 
     @Override
@@ -25,21 +25,5 @@ public final class CursorControllerImpl implements CursorController {
     @Override
     public void removeOverride(int index) {
         cursorManager.removeOverride(index);
-    }
-
-    public static CursorControllerImpl getInstance() {
-        return Holder.INSTANCE;
-    }
-
-    private static class Holder {
-        private static final CursorControllerImpl INSTANCE = createInstance();
-
-        private static CursorControllerImpl createInstance() {
-            CursorManager manager = MinecraftCursor.getCursorManager();
-            if (manager == null) {
-                throw new IllegalStateException("CursorController accessed at an invalid time");
-            }
-            return new CursorControllerImpl(manager);
-        }
     }
 }
