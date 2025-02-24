@@ -1,6 +1,6 @@
 package io.github.fishstiz.minecraftcursor.mixin.client;
 
-import io.github.fishstiz.minecraftcursor.MinecraftCursor;
+import io.github.fishstiz.minecraftcursor.CursorManager;
 import io.github.fishstiz.minecraftcursor.gui.screen.CursorOptionsScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.option.GameOptionsScreen;
@@ -27,7 +27,7 @@ public abstract class MouseOptionsScreenMixin extends GameOptionsScreen {
     @Shadow
     private OptionListWidget buttonList;
 
-    public MouseOptionsScreenMixin(Screen parent, GameOptions gameOptions, Text title) {
+    protected MouseOptionsScreenMixin(Screen parent, GameOptions gameOptions, Text title) {
         super(parent, gameOptions, title);
     }
 
@@ -39,7 +39,7 @@ public abstract class MouseOptionsScreenMixin extends GameOptionsScreen {
                 false,
                 value -> {
                     if (this.client != null) {
-                        this.client.setScreen(new CursorOptionsScreen(this, MinecraftCursor.getCursorManager()));
+                        this.client.setScreen(new CursorOptionsScreen(this, CursorManager.getInstance()));
                     }
                 });
         buttonList.addSingleOptionEntry(button);
