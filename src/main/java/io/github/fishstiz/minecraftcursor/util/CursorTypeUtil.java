@@ -10,30 +10,23 @@ public class CursorTypeUtil {
     private CursorTypeUtil() {
     }
 
-    private static final MinecraftClient client = MinecraftClient.getInstance();
+    private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
+    private static final CursorManager MANAGER = CursorManager.getInstance();
 
     public static boolean canShift() {
-        long handle = client.getWindow().getHandle();
-        return getCursorManager().getCursor(CursorType.SHIFT).getId() != 0
+        long handle = CLIENT.getWindow().getHandle();
+        return MANAGER.getCursor(CursorType.SHIFT).getId() != 0
                 && (InputUtil.isKeyPressed(handle, GLFW.GLFW_KEY_LEFT_SHIFT)
                 || InputUtil.isKeyPressed(handle, GLFW.GLFW_KEY_RIGHT_SHIFT));
     }
 
     public static boolean isGrabbing() {
-        return getCursorManager().getCursor(CursorType.GRABBING).getId() != 0
-                && getCursorManager().getCurrentCursor().getType() == CursorType.GRABBING
+        return MANAGER.getCursor(CursorType.GRABBING).getId() != 0
+                && MANAGER.getCurrentCursor().getType() == CursorType.GRABBING
                 && isLeftClickHeld();
     }
 
     public static boolean isLeftClickHeld() {
-        return GLFW.glfwGetMouseButton(client.getWindow().getHandle(), GLFW.GLFW_MOUSE_BUTTON_1) == GLFW.GLFW_PRESS;
-    }
-
-    private static class CursorManagerHolder {
-        private static final CursorManager INSTANCE = io.github.fishstiz.minecraftcursor.MinecraftCursor.getCursorManager();
-    }
-
-    private static CursorManager getCursorManager() {
-        return CursorManagerHolder.INSTANCE;
+        return GLFW.glfwGetMouseButton(CLIENT.getWindow().getHandle(), GLFW.GLFW_MOUSE_BUTTON_1) == GLFW.GLFW_PRESS;
     }
 }

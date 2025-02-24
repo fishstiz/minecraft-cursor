@@ -125,11 +125,15 @@ public class AnimatedCursor extends Cursor {
     }
 
     public Frame getFrame(int index) {
-        Frame frame = frames.get(index);
-        if (!isAnimated() || frame.cursor() == null || !frame.cursor().isEnabled()) {
+        try {
+            Frame frame = frames.get(index);
+            if (!isAnimated() || frame.cursor() == null || !frame.cursor().isEnabled()) {
+                return getFallbackFrame();
+            }
+            return frame;
+        } catch (IndexOutOfBoundsException e) {
             return getFallbackFrame();
         }
-        return frame;
     }
 
     public boolean isAnimated() {

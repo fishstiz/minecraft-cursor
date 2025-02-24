@@ -1,6 +1,7 @@
 package io.github.fishstiz.minecraftcursor;
 
 import io.github.fishstiz.minecraftcursor.api.CursorType;
+import io.github.fishstiz.minecraftcursor.api.CursorTypeRegistrar;
 import io.github.fishstiz.minecraftcursor.config.AnimatedCursorConfig;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
@@ -18,19 +19,33 @@ import java.util.*;
 
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
 
-public final class CursorManager {
+public final class CursorManager implements CursorTypeRegistrar {
+    private static final CursorManager INSTANCE = new CursorManager();
+    private final MinecraftClient client = MinecraftClient.getInstance();
     private final LinkedHashMap<String, Cursor> cursors = new LinkedHashMap<>();
     private final TreeMap<Integer, String> overrides = new TreeMap<>();
-    private final MinecraftClient client;
     private final AnimationState animationState = new AnimationState();
     private Cursor currentCursor = new Cursor(CursorType.of(""), null);
 
-    CursorManager(MinecraftClient client) {
-        this.client = client;
+    private CursorManager() {
+    }
 
-        for (CursorType cursorType : CursorTypeRegistry.types()) {
+    public static CursorManager getInstance() {
+        return INSTANCE;
+    }
+
+    @Override
+    public void register(CursorType... cursorTypes) {
+        for (CursorType cursorType : cursorTypes) {
             cursors.put(cursorType.getKey(), new Cursor(cursorType, this::handleCursorLoad));
         }
+    }
+
+    @Override
+    public CursorType register(String key) {
+        CursorType cursorType = CursorType.of(key);
+        cursors.put(key, new Cursor(cursorType, this::handleCursorLoad));
+        return cursorType;
     }
 
     public void loadCursorImage(
@@ -176,6 +191,10 @@ public final class CursorManager {
 
     public @NotNull Cursor getCursor(CursorType type) {
         return cursors.computeIfAbsent(type.getKey(), k -> new Cursor(type, this::handleCursorLoad));
+    }
+
+    public List<CursorType> getCursorTypes() {
+        return cursors.keySet().stream().map(CursorType::of).toList();
     }
 
     public List<Cursor> getLoadedCursors() {
