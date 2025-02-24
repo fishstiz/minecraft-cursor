@@ -11,18 +11,17 @@ public class CursorTypeUtil {
     }
 
     private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
-    private static final CursorManager MANAGER = CursorManager.getInstance();
 
     public static boolean canShift() {
         long handle = CLIENT.getWindow().getHandle();
-        return MANAGER.getCursor(CursorType.SHIFT).getId() != 0
+        return CursorManager.INSTANCE.getCursor(CursorType.SHIFT).getId() != 0
                 && (InputUtil.isKeyPressed(handle, GLFW.GLFW_KEY_LEFT_SHIFT)
                 || InputUtil.isKeyPressed(handle, GLFW.GLFW_KEY_RIGHT_SHIFT));
     }
 
     public static boolean isGrabbing() {
-        return MANAGER.getCursor(CursorType.GRABBING).getId() != 0
-                && MANAGER.getCurrentCursor().getType() == CursorType.GRABBING
+        return CursorManager.INSTANCE.getCursor(CursorType.GRABBING).getId() != 0
+                && CursorManager.INSTANCE.getCurrentCursor().getType() == CursorType.GRABBING
                 && isLeftClickHeld();
     }
 
