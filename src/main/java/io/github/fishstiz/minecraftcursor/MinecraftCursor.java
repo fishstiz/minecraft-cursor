@@ -21,29 +21,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class MinecraftCursor implements ClientModInitializer {
     public static final String MOD_ID = "minecraft-cursor";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-    private static final CursorTypeRegistry CURSOR_REGISTRY = new CursorTypeRegistry();
+    private static final CursorManager CURSOR_MANAGER = CursorManager.getInstance();
     private static final CursorTypeResolver CURSOR_RESOLVER = new CursorTypeResolver();
     public static final CursorConfig CONFIG = CursorConfigLoader
             .fromFile(new File(FabricLoader.getInstance().getConfigDir().toString(), MOD_ID + ".json"));
 
     private static MinecraftCursor instance;
-    private CursorManager cursorManager;
-    private CursorType singleCycleCursor;
+
+    private final AtomicReference<CursorType> singleCycleCursor = new AtomicReference<>();
     private Screen visibleNonCurrentScreen;
 
     @Override
     public void onInitializeClient() {
-        createInstance(this);
+        instance = this;
 
-        new MinecraftCursorInitializerImpl().init(CURSOR_REGISTRY, CURSOR_RESOLVER);
+        new MinecraftCursorInitializerImpl().init(CURSOR_MANAGER, CURSOR_RESOLVER);
         FabricLoader.getInstance().getEntrypointContainers(MOD_ID, MinecraftCursorInitializer.class).forEach(entrypoint -> {
             try {
-                entrypoint.getEntrypoint().init(CURSOR_REGISTRY, CURSOR_RESOLVER);
+                entrypoint.getEntrypoint().init(CURSOR_MANAGER, CURSOR_RESOLVER);
             } catch (LinkageError | Exception e) {
                 LOGGER.error(
                         "Invalid implementation of MinecraftCursorInitializer in mod: {}",
@@ -52,10 +53,9 @@ public class MinecraftCursor implements ClientModInitializer {
             }
         });
 
-        instance.cursorManager = new CursorManager(MinecraftClient.getInstance());
-        CursorResourceReloadListener reloadListener = new CursorResourceReloadListener(cursorManager, MOD_ID, CONFIG);
+        CursorResourceReloadListener reloadListener = new CursorResourceReloadListener(CURSOR_MANAGER, MOD_ID, CONFIG);
         ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(reloadListener);
-        CursorControllerProvider.init(CursorControllerImpl.getInstance());
+        CursorControllerProvider.init(CursorControllerImpl.INSTANCE);
 
         ScreenEvents.BEFORE_INIT.register(this::beforeScreenInit);
         ClientTickEvents.START_CLIENT_TICK.register(this::tick);
@@ -63,7 +63,7 @@ public class MinecraftCursor implements ClientModInitializer {
 
     private void beforeScreenInit(MinecraftClient client, Screen screen, int width, int height) {
         if (client.currentScreen == null) {
-            cursorManager.setCurrentCursor(CursorType.DEFAULT);
+            CURSOR_MANAGER.setCurrentCursor(CursorType.DEFAULT);
             visibleNonCurrentScreen = screen;
             return;
         }
@@ -72,7 +72,7 @@ public class MinecraftCursor implements ClientModInitializer {
     }
 
     private void afterRenderScreen(Screen currentScreen, DrawContext context, int mouseX, int mouseY, float tickDelta) {
-        cursorManager.setCurrentCursor(getCursorType(currentScreen, mouseX, mouseY));
+        CURSOR_MANAGER.setCurrentCursor(getCursorType(currentScreen, mouseX, mouseY));
     }
 
     private void tick(MinecraftClient client) {
@@ -80,20 +80,20 @@ public class MinecraftCursor implements ClientModInitializer {
             double scale = client.getWindow().getScaleFactor();
             double mouseX = client.mouse.getX() / scale;
             double mouseY = client.mouse.getY() / scale;
-            cursorManager.setCurrentCursor(getCursorType(visibleNonCurrentScreen, mouseX, mouseY));
+            CURSOR_MANAGER.setCurrentCursor(getCursorType(visibleNonCurrentScreen, mouseX, mouseY));
         } else if (client.currentScreen == null && visibleNonCurrentScreen == null) {
-            cursorManager.setCurrentCursor(CursorType.DEFAULT);
+            CURSOR_MANAGER.setCurrentCursor(CursorType.DEFAULT);
         }
     }
 
     private CursorType getCursorType(Screen currentScreen, double mouseX, double mouseY) {
-        if (!cursorManager.isAdaptive()) return CursorType.DEFAULT;
+        if (!CURSOR_MANAGER.isAdaptive()) return CursorType.DEFAULT;
 
         if (CursorTypeUtil.isGrabbing()) return CursorType.GRABBING;
 
-        if (singleCycleCursor != null) {
-            CursorType cursorType = singleCycleCursor;
-            singleCycleCursor = null;
+        if (singleCycleCursor.get() != null) {
+            CursorType cursorType = singleCycleCursor.get();
+            singleCycleCursor.set(null);
             return cursorType;
         }
 
@@ -106,21 +106,10 @@ public class MinecraftCursor implements ClientModInitializer {
         return cursorType;
     }
 
-    public static void setSingleCycleCursor(CursorType cursorType) {
+    public static synchronized void setSingleCycleCursor(CursorType cursorType) {
         if (instance == null) {
             throw new IllegalStateException("MinecraftCursor not yet initialized.");
         }
-        instance.singleCycleCursor = cursorType;
-    }
-
-    public static CursorManager getCursorManager() {
-        if (instance == null || instance.cursorManager == null) {
-            throw new IllegalStateException("CursorManager not yet initialized.");
-        }
-        return instance.cursorManager;
-    }
-
-    private static void createInstance(MinecraftCursor instance) {
-        MinecraftCursor.instance = instance;
+        instance.singleCycleCursor.set(cursorType);
     }
 }
