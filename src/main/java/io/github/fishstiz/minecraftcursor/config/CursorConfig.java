@@ -26,7 +26,7 @@ public class CursorConfig {
     File file;
 
     CursorConfig() {
-        for (CursorType type : CursorManager.getInstance().getCursorTypes()) {
+        for (CursorType type : CursorManager.INSTANCE.getCursorTypes()) {
             this.getOrCreateCursorSettings(type);
         }
     }
