@@ -20,8 +20,8 @@ import java.util.*;
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
 
 public final class CursorManager implements CursorTypeRegistrar {
-    private static final CursorManager INSTANCE = new CursorManager();
-    private final MinecraftClient client = MinecraftClient.getInstance();
+    public static final CursorManager INSTANCE = new CursorManager();
+    private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
     private final LinkedHashMap<String, Cursor> cursors = new LinkedHashMap<>();
     private final TreeMap<Integer, String> overrides = new TreeMap<>();
     private final AnimationState animationState = new AnimationState();
@@ -30,14 +30,17 @@ public final class CursorManager implements CursorTypeRegistrar {
     private CursorManager() {
     }
 
-    public static CursorManager getInstance() {
-        return INSTANCE;
-    }
-
     @Override
     public void register(CursorType... cursorTypes) {
         for (CursorType cursorType : cursorTypes) {
-            cursors.put(cursorType.getKey(), new Cursor(cursorType, this::handleCursorLoad));
+            String key = cursorType.getKey();
+
+            if (cursors.containsKey(key)) {
+                MinecraftCursor.LOGGER.error("Cursor type '{}' is already registered.", key);
+                continue;
+            }
+
+            cursors.put(key, new Cursor(cursorType, this::handleCursorLoad));
         }
     }
 
@@ -140,11 +143,11 @@ public final class CursorManager implements CursorTypeRegistrar {
         }
 
         currentCursor = cursor;
-        GLFW.glfwSetCursor(client.getWindow().getHandle(), currentCursor.getId());
+        GLFW.glfwSetCursor(CLIENT.getWindow().getHandle(), currentCursor.getId());
     }
 
     public void reloadCursor() {
-        GLFW.glfwSetCursor(client.getWindow().getHandle(), getCurrentCursor().getId());
+        GLFW.glfwSetCursor(CLIENT.getWindow().getHandle(), getCurrentCursor().getId());
     }
 
     public void overrideCurrentCursor(CursorType type, int index) {

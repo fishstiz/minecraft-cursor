@@ -29,7 +29,7 @@ public abstract class MouseOptionsScreenMixin extends GameOptionsScreen {
                 Text.translatable("minecraft-cursor.options").append("..."),
                 btn -> {
                     if (this.client != null) {
-                        this.client.setScreen(new CursorOptionsScreen(this, CursorManager.getInstance()));
+                        this.client.setScreen(new CursorOptionsScreen(this, CursorManager.INSTANCE));
                     }
                 }).build();
 
