@@ -39,7 +39,7 @@ public abstract class MouseOptionsScreenMixin extends GameOptionsScreen {
                 false,
                 value -> {
                     if (this.client != null) {
-                        this.client.setScreen(new CursorOptionsScreen(this, CursorManager.getInstance()));
+                        this.client.setScreen(new CursorOptionsScreen(this, CursorManager.INSTANCE));
                     }
                 });
         buttonList.addSingleOptionEntry(button);

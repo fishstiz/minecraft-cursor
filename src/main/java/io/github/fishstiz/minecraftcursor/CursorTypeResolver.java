@@ -15,7 +15,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import static io.github.fishstiz.minecraftcursor.util.LookupUtil.NAMESPACE;
 import static io.github.fishstiz.minecraftcursor.util.LookupUtil.RESOLVER;
 
-class CursorTypeResolver implements ElementRegistrar {
+final class CursorTypeResolver implements ElementRegistrar {
+    static final CursorTypeResolver INSTANCE = new CursorTypeResolver();
     private final List<AbstractMap.SimpleImmutableEntry<Class<? extends Element>,
             CursorTypeFunction<? extends Element>>>
             registry = new ArrayList<>();
@@ -23,7 +24,7 @@ class CursorTypeResolver implements ElementRegistrar {
             cachedRegistry = new ConcurrentHashMap<>();
     private String lastFailedElement;
 
-    CursorTypeResolver() {
+    private CursorTypeResolver() {
     }
 
     @Override
