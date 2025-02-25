@@ -33,21 +33,24 @@ public final class CursorManager implements CursorTypeRegistrar {
     @Override
     public void register(CursorType... cursorTypes) {
         for (CursorType cursorType : cursorTypes) {
-            String key = cursorType.getKey();
-
-            if (cursors.containsKey(key)) {
-                MinecraftCursor.LOGGER.error("Cursor type '{}' is already registered.", key);
-                continue;
-            }
-
-            cursors.put(key, new Cursor(cursorType, this::handleCursorLoad));
+            register(cursorType);
         }
     }
 
     @Override
     public CursorType register(String key) {
-        CursorType cursorType = CursorType.of(key);
+        return register(CursorType.of(key));
+    }
+
+    private CursorType register(CursorType cursorType) {
+        String key = cursorType.getKey();
+
+        if (cursors.containsKey(key)) {
+            MinecraftCursor.LOGGER.error("Cursor type '{}' is already registered.", key);
+        }
+
         cursors.put(key, new Cursor(cursorType, this::handleCursorLoad));
+
         return cursorType;
     }
 
