@@ -1,10 +1,3 @@
-- Added Global Cursor Settings in More Options Screen.
-  - Toggle the animation of all animated cursors in one click. 
-  - Globally override scale, x-hotspot, and y-hotspot of all cursors.
-- Added Reset Cursor Settings (does not affect Global Cursor Settings) in More Options Screen.
-- Added German Translations. ([@Lucanoria](https://github.com/fishstiz/minecraft-cursor/pull/5))
-- Made text automatically scroll when overflowing in the config screen.
-- Fixed animate buttons in options screen capturing mouse events even when hidden.
-- Fixed scale values not rounding.
-- API Changes:
-  - Fixed disabled overrides clogging the override list.
+- Allowed resource pack settings to be layered instead of using only the settings of the highest priority.
+  - Previously, if the resource pack had a custom cursors.json but did not include all the cursors, it would default scale, xhot, yhot, enabled to `1.0`,`0`,`0`,`enabled`, respectively.
+- Minor optimizations
