@@ -1,7 +1,6 @@
 package io.github.fishstiz.minecraftcursor.config;
 
 import io.github.fishstiz.minecraftcursor.api.CursorType;
-import io.github.fishstiz.minecraftcursor.CursorManager;
 import io.github.fishstiz.minecraftcursor.util.SettingsUtil;
 
 import java.io.File;
@@ -22,13 +21,10 @@ public class CursorConfig implements Serializable {
     private boolean worldIconEnabled = true;
     private boolean serverIconEnabled = true;
     private final GlobalSettings global = new GlobalSettings();
-    private Map<String, Settings> settings = new HashMap<>();
+    private final Map<String, Settings> settings = new HashMap<>();
     transient File file;
 
     CursorConfig() {
-        for (CursorType type : CursorManager.INSTANCE.getCursorTypes()) {
-            this.getOrCreateCursorSettings(type);
-        }
     }
 
     public Settings getOrCreateCursorSettings(CursorType type) {
@@ -84,7 +80,7 @@ public class CursorConfig implements Serializable {
     }
 
     public void setSettings(Map<String, Settings> settings) {
-        this.settings = settings;
+        this.settings.putAll(settings);
     }
 
     public boolean isCreativeTabsEnabled() {
