@@ -13,6 +13,8 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
+import java.util.Optional;
 
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.MOD_ID;
@@ -40,21 +42,38 @@ class CursorResourceReloadListener implements SimpleSynchronousResourceReloadLis
     }
 
     private void loadConfig(ResourceManager manager) {
-        Resource configResource = manager.getResource(Identifier.of(MOD_ID, CONFIG_PATH)).orElse(null);
+        List<Resource> configResources = manager.getAllResources(Identifier.of(MOD_ID, CONFIG_PATH));
 
-        if (configResource == null) return;
+        if (configResources == null || configResources.isEmpty()) return;
 
-        try (InputStream stream = configResource.getInputStream()) {
-            CursorConfig resourceConfig = CursorConfigLoader.fromStream(stream);
-            if (!resourceConfig.get_hash().equals(CONFIG.get_hash())) {
-                CONFIG.set_hash(resourceConfig.get_hash());
-                CONFIG.setSettings(resourceConfig.getSettings());
+        getConfigFromResources(configResources).ifPresent(config -> {
+            if (!config.get_hash().equals(CONFIG.get_hash())) {
+                CONFIG.set_hash(config.get_hash());
+                CONFIG.setSettings(config.getSettings());
                 CONFIG.save();
-                MinecraftCursor.LOGGER.info("New resource pack settings detected for minecraft-cursor '{}'", configResource.getResourcePackName());
+                MinecraftCursor.LOGGER.info("New resource pack settings detected for minecraft-cursor");
             }
-        } catch (IOException e) {
-            MinecraftCursor.LOGGER.error("Failed to load settings of resource pack '{}'", configResource.getResourcePackName());
+        });
+    }
+
+    private Optional<CursorConfig> getConfigFromResources(List<Resource> configResources) {
+        CursorConfig combinedConfig = null;
+
+        for (Resource configResource : configResources) {
+            try (InputStream stream = configResource.getInputStream()) {
+                CursorConfig loadedConfig = CursorConfigLoader.fromStream(stream);
+
+                if (combinedConfig == null) {
+                    combinedConfig = loadedConfig;
+                } else {
+                    combinedConfig.setSettings(loadedConfig.getSettings());
+                }
+            } catch (IOException e) {
+                MinecraftCursor.LOGGER.error("Failed to load settings of resource pack '{}'", configResource.getResourcePackName());
+            }
         }
+
+        return Optional.ofNullable(combinedConfig);
     }
 
     private void loadCursorTextures(ResourceManager manager) {
