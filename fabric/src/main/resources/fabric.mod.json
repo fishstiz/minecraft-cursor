@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${version}",
+  "name": "${mod_name}",
+  "description": "${mod_description}",
+  "authors": [
+    "${mod_author}"
+  ],
+  "contributors": [
+    "${credits}"
+  ],
+  "contact": {
+    "sources": "${sources}",
+    "issues": "${issues}"
+  },
+  "license": "${license}",
+  "icon": "icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "io.github.fishstiz.minecraftcursor.MinecraftCursorFabric"
+    ],
+    "modmenu": [
+      "io.github.fishstiz.minecraftcursor.impl.MinecraftCursorModMenuApiImpl"
+    ],
+    "minecraft-cursor": [
+      "io.github.fishstiz.minecraftcursor.impl.MinecraftCursorFabricInitializer"
+    ]
+  },
+  "mixins": [
+    {
+      "config": "${mod_id}.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${fabric_loader_version}",
+    "minecraft": "${minecraft_version_range_semver}",
+    "java": ">=${java_version}",
+    "fabric-api": "*"
+  },
+  "suggests": {
+    "modmenu": "*"
+  }
+}

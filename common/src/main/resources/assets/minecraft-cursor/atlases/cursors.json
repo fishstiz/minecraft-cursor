@@ -1,0 +1,52 @@
+{
+  "settings": {
+    "default": {
+      "xhot": 7,
+      "yhot": 3
+    },
+    "pointer": {
+      "xhot": 7,
+      "yhot": 3
+    },
+    "text": {
+      "xhot": 12,
+      "yhot": 15
+    },
+    "grabbing": {
+      "xhot": 15,
+      "yhot": 3
+    },
+    "busy": {
+      "xhot": 13,
+      "yhot": 17
+    },
+    "shift": {
+      "xhot": 11,
+      "yhot": 3
+    },
+    "crosshair": {
+      "xhot": 13,
+      "yhot": 17
+    },
+    "resize_ew": {
+      "xhot": 15,
+      "yhot": 17
+    },
+    "resize_ns": {
+      "xhot": 9,
+      "yhot": 15
+    },
+    "resize_nwse": {
+      "xhot": 13,
+      "yhot": 12
+    },
+    "resize_nesw": {
+      "xhot": 13,
+      "yhot": 12
+    },
+    "not_allowed": {
+      "xhot": 15,
+      "yhot": 15
+    }
+  }
+}

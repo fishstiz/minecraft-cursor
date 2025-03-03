@@ -1,0 +1,24 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "io.github.fishstiz.minecraftcursor.mixin",
+  "refmap": "${mod_id}.refmap.json",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "MouseOptionsScreenMixin",
+    "access.AdvancementsScreenAccessor",
+    "access.BookEditScreenAccessor",
+    "access.CreativeInventoryScreenAccessor",
+    "access.HandledScreenAccessor",
+    "access.LoomScreenAccessor",
+    "access.RecipeAlternativesWidgetAccessor",
+    "access.RecipeBookResultsAccessor",
+    "access.RecipeBookScreenAccessor",
+    "access.RecipeBookWidgetAccessor",
+    "access.StonecutterScreenAccessor",
+    "compat.glfw.GlfwMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

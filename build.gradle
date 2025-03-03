@@ -1,104 +1,110 @@
 plugins {
-    id 'fabric-loom' version '1.9-SNAPSHOT'
-    id 'maven-publish'
-}
-
-version = project.mod_version
-group = project.maven_group
-
-base {
-    archivesName = project.archives_base_name
-}
-
-repositories {
-    maven {
-        name = "Terraformers"
-        url = "https://maven.terraformersmc.com/"
-    }
-}
-
-loom {
-    mods {
-        "minecraft-cursor" {
-            sourceSet sourceSets.main
-        }
-    }
-
-    accessWidenerPath = file("src/main/resources/minecraft-cursor.accesswidener")
-}
-
-dependencies {
-    api project(path: ":api", configuration: "namedElements")
-    include project(path: "api")
-
-    minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-    testImplementation "net.fabricmc:fabric-loader-junit:${project.loader_version}"
-
-    modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
+    // see https://fabricmc.net/develop/ for new versions
+    id 'fabric-loom' version '1.10-SNAPSHOT' apply false
+    // see https://projects.neoforged.net/neoforged/moddevgradle for new versions
+    id 'net.neoforged.moddev' version '2.0.78' apply false
+    id "me.modmuss50.mod-publish-plugin" version "0.8.4"
 }
 
 allprojects {
-    apply plugin: "java"
+    apply plugin: 'java'
 
-    processResources {
-        inputs.property "version", rootProject.version
+    version = project.mod_version
+    group = project.maven_group
 
-        filesMatching("fabric.mod.json") {
-            expand "version": rootProject.version
-        }
+    base {
+        archivesName = "${project.archives_base_name}-${convertToKebabCase(project.name)}"
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        it.options.release = java_version.toInteger()
     }
 }
 
-tasks.withType(JavaCompile).configureEach {
-    it.options.release = 21
+static String convertToKebabCase(String input) {
+    return input.replaceAll(/([a-z])([A-Z])/, '$1-$2').toLowerCase()
 }
 
-java {
-    // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-    // if it is present.
-    // If you remove this line, sources will not be generated.
-    withSourcesJar()
+Properties secrets = new Properties()
+File secretsFile = project.rootProject.file('local.properties')
 
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+if (secretsFile.exists()) {
+    secrets.load(secretsFile.newDataInputStream())
 }
 
-jar {
-    from("LICENSE") {
-        rename { "${it}_${project.base.archivesName.get()}" }
+publishMods {
+    changelog = file("CHANGELOG.md").text
+    type = ALPHA
+
+    def fabricOptions = publishOptions {
+        displayName = "${mod_name} for Fabric v${mod_version}"
+        file project(":fabric")
+        additionalFiles.from(project(":fabric").layout.buildDirectory.file(
+                "libs/${project(":fabric").base.archivesName.get()}-${mod_version}-sources.jar")
+        )
     }
-}
-
-// configure the maven publication
-publishing {
-    publications {
-        create("mavenJava", MavenPublication) {
-            artifactId = project.archives_base_name
-            from components.java
-        }
+    def neoforgeOptions = publishOptions {
+        displayName = "${mod_name} for NeoForge v${mod_version}"
+        file project(":neoforge")
+        additionalFiles.from(project(":neoforge").layout.buildDirectory.file(
+                "libs/${project(":neoforge").base.archivesName.get()}-${mod_version}-sources.jar")
+        )
     }
 
-    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-    repositories {
-        maven {
-            url = uri(new File(project.gradle.gradleUserHomeDir.parent, 'maven').absolutePath)
-        }
-    }
-}
+    def githubOptions = githubOptions {
+        accessToken = secrets.getProperty("GITHUB_TOKEN")
+        repository = "fishstiz/minecraft-cursor"
+        commitish = "release/${minecraft_version}"
+        tagName = "v${mod_version}"
+        displayName = "${mod_name} v${mod_version}"
 
-tasks.register('getProperties') {
-    doLast {
-        println "MINECRAFT_VERSION=${minecraft_version}"
-        println "MOD_VERSION=${mod_version}"
-        println "JAVA_VERSION=${java.targetCompatibility}"
-        println "RELEASE_NAME=Minecraft Cursor ${mod_version}"
+        file project(":fabric")
+        additionalFiles.from(project(":fabric").layout.buildDirectory.file(
+                "libs/${project(":fabric").base.archivesName.get()}-${mod_version}-sources.jar"
+        ))
+        additionalFiles.from(project(":neoforge").layout.buildDirectory.file(
+                "libs/${project(":neoforge").base.archivesName.get()}-${mod_version}.jar"
+        ))
+        additionalFiles.from(project(":neoforge").layout.buildDirectory.file(
+                "libs/${project(":neoforge").base.archivesName.get()}-${mod_version}-sources.jar"
+        ))
     }
-}
+    def modrinthOptions = modrinthOptions {
+        accessToken = secrets.getProperty("MODRINTH_TOKEN")
+        projectId = "o5fhgLeQ"
+        minecraftVersions.add(minecraft_version)
+    }
+    def curseforgeOptions = curseforgeOptions {
+        accessToken = secrets.getProperty("CURSEFORGE_TOKEN")
+        projectId = "1184736"
+        minecraftVersions.add(minecraft_version)
+    }
 
-test {
-    useJUnitPlatform()
+    github("github") {
+        from githubOptions
+    }
+
+    modrinth("modrinthFabric") {
+        from modrinthOptions, fabricOptions
+        modLoaders.add("fabric")
+        requires("fabric-api")
+        optional("modmenu")
+    }
+    modrinth("modrinthNeoForge") {
+        from modrinthOptions, neoforgeOptions
+        modLoaders.add("neoforge")
+    }
+
+    curseforge("curseforgeFabric") {
+        from curseforgeOptions, fabricOptions
+        modLoaders.add("fabric")
+        clientRequired = true
+        requires("fabric-api")
+        optional("modmenu")
+    }
+    curseforge("curseforgeNeoForge") {
+        from curseforgeOptions, neoforgeOptions
+        modLoaders.add("neoforge")
+        clientRequired = true
+    }
 }

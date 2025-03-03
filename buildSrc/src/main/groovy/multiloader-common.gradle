@@ -1,0 +1,97 @@
+plugins {
+    id 'java'
+}
+
+repositories {
+    mavenCentral()
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = 'Sponge'
+                url = 'https://repo.spongepowered.org/repository/maven-public'
+            }
+        }
+        filter { includeGroupAndSubgroups('org.spongepowered') }
+    }
+    exclusiveContent {
+        forRepositories(
+                maven {
+                    name = 'ParchmentMC'
+                    url = 'https://maven.parchmentmc.org/'
+                },
+                maven {
+                    name = "NeoForge"
+                    url = 'https://maven.neoforged.net/releases'
+                }
+        )
+        filter { includeGroup('org.parchmentmc.data') }
+    }
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(java_version.toInteger())
+    withSourcesJar()
+}
+
+processResources {
+    var expandProps = [
+            'version'                       : version,
+            'mod_id'                        : mod_id,
+            'mod_name'                      : mod_name,
+            'mod_author'                    : mod_author,
+            'mod_description'               : mod_description,
+            'license'                       : license,
+            'sources'                       : sources,
+            'issues'                        : issues,
+            'minecraft_version_range_maven' : minecraft_version_range_maven,
+            'minecraft_version_range_semver': minecraft_version_range_semver,
+            'fabric_loader_version'         : fabric_loader_version,
+            'neoforge_loader_version_range' : neoforge_loader_version_range,
+            'neoforge_mod_id'               : neoforge_mod_id,
+            'neoforge_version'              : neoforge_version,
+            'neoforge_version_range'        : neoforge_version_range,
+            'java_version'                  : java_version,
+            'credits'                       : credits
+    ]
+
+    var jsonExpandProps = expandProps.collectEntries {
+        key, value -> [(key): value instanceof String ? value.replace("\n", "\\\\n") : value]
+    }
+
+    filesMatching(['META-INF/mods.toml', 'META-INF/neoforge.mods.toml']) {
+        expand expandProps
+    }
+
+    filesMatching(['pack.mcmeta', 'fabric.mod.json', '*.mixins.json']) {
+        expand jsonExpandProps
+    }
+
+    inputs.properties(expandProps)
+}
+
+configurations {
+    commonJava {
+        canBeResolved = true
+    }
+    commonResources {
+        canBeResolved = true
+    }
+}
+
+tasks.named('compileJava', JavaCompile) {
+    dependsOn(configurations.commonJava)
+    source(configurations.commonJava)
+}
+
+processResources {
+    dependsOn(configurations.commonResources)
+    from(configurations.commonResources)
+}
+
+
+tasks.named('sourcesJar', Jar) {
+    dependsOn(configurations.commonJava)
+    from(configurations.commonJava)
+    dependsOn(configurations.commonResources)
+    from(configurations.commonResources)
+}

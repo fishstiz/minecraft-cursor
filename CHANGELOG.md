@@ -1,3 +1,3 @@
-- Allowed resource pack settings to be layered instead of using only the settings of the highest priority.
-  - Previously, if the resource pack had a custom cursors.json but did not include all the cursors, it would default scale, xhot, yhot, enabled to `1.0`,`0`,`0`,`enabled`, respectively.
-- Minor optimizations
+- Fixed cursor not reloading when toggling the enabled setting and it's the only enabled cursor.
+- Fixed default cursor also being toggled when toggling the Adaptive option.
+- Micro optimizations

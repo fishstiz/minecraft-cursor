@@ -1,0 +1,54 @@
+{
+  "modmenu.descriptionTranslation.minecraft-cursor": "Configurable cursor for Minecraft.",
+
+  "minecraft-cursor.options": "Cursor Settings",
+  "minecraft-cursor.options.enabled": "Enabled",
+  "minecraft-cursor.options.scale": "Scale",
+  "minecraft-cursor.options.xhot": "Offset X",
+  "minecraft-cursor.options.yhot": "Offset Y",
+  "minecraft-cursor.options.animate": "Animate",
+  "minecraft-cursor.options.animate-reset": "Restart Animation",
+
+  "minecraft-cursor.options.cursor-type.default": "Default",
+  "minecraft-cursor.options.cursor-type.pointer": "Pointer",
+  "minecraft-cursor.options.cursor-type.grabbing": "Grabbing",
+  "minecraft-cursor.options.cursor-type.text": "Text",
+  "minecraft-cursor.options.cursor-type.shift": "Shift",
+  "minecraft-cursor.options.cursor-type.busy": "Busy",
+  "minecraft-cursor.options.cursor-type.crosshair": "Crosshair",
+  "minecraft-cursor.options.cursor-type.resize_ew": "Resize EW",
+  "minecraft-cursor.options.cursor-type.resize_ns": "Resize NS",
+  "minecraft-cursor.options.cursor-type.resize_nwse": "Resize NWSE",
+  "minecraft-cursor.options.cursor-type.resize_nesw": "Resize NESW",
+  "minecraft-cursor.options.cursor-type.not_allowed": "Not Allowed",
+
+  "minecraft-cursor.options.more": "More Cursor Options",
+
+  "minecraft-cursor.options.more.global": "Global Cursor Settings",
+  "minecraft-cursor.options.more.global.tooltip": "Overrides the %1$s setting on all cursors. Does not update the cursor's %1$s setting.",
+  "minecraft-cursor.options.global.tooltip": "%1$s overridden by global cursor settings.",
+
+  "minecraft-cursor.options.more.animation": "Cursor Animations",
+  "minecraft-cursor.options.more.animation.tooltip": "Simply updates the animated setting on all animated cursors.",
+
+  "minecraft-cursor.options.more.adapt": "Adaptive Cursor",
+  "minecraft-cursor.options.more.adapt.tooltip": "Simply updates the enabled setting on all cursors except for the Default cursor.",
+  "minecraft-cursor.options.item_slot": "Inventory Item Slot",
+  "minecraft-cursor.options.item_grab": "Inventory Item Grab",
+  "minecraft-cursor.options.creative_tabs": "Creative Inventory Tabs",
+  "minecraft-cursor.options.enchantments": "Enchantment Buttons",
+  "minecraft-cursor.options.stonecutter": "Stonecutter Recipe Buttons",
+  "minecraft-cursor.options.book_edit": "Book and Quill Book",
+  "minecraft-cursor.options.loom": "Loom Screen Pattern Buttons",
+  "minecraft-cursor.options.advancements": "Advancements Tabs",
+  "minecraft-cursor.options.world": "World Icon Play Button",
+  "minecraft-cursor.options.server": "Server Icon Play Button",
+
+  "minecraft-cursor.options.more.resource_pack": "Resource Packs",
+  "minecraft-cursor.options.more.resource_pack.reset": "Reset Cursor Settings",
+  "minecraft-cursor.options.more.resource_pack.reset.tooltip": "Resets personal cursor settings to match the settings provided by resource packs (or the built-in default).",
+
+  "minecraft-cursor.options.more.compat": "Mod Compatibility",
+  "minecraft-cursor.options.more.compat.remap_cursors": "Remap Standard Cursors (GLFW)",
+  "minecraft-cursor.options.more.compat.remap_cursors.tooltip": "Remaps standard cursors to the equivalent Minecraft Cursor.\n\nWARNING: Disabling may cause compatibility issues with certain mods."
+}

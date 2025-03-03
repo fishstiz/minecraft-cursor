@@ -1,0 +1,10 @@
+plugins {
+    id 'multiloader-common'
+}
+
+dependencies {
+    compileOnly project(':commonApi')
+
+    commonJava project(path: ':commonApi', configuration: 'commonJava')
+    commonResources project(path: ':commonApi', configuration: 'commonResources')
+}
