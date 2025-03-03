@@ -1,0 +1,9 @@
+{
+  "required": true,
+  "package": "io.github.fishstiz.minecraftcursor.mixin",
+  "refmap": "minecraft-cursor.refmap.json",
+  "compatibilityLevel": "JAVA_21",
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

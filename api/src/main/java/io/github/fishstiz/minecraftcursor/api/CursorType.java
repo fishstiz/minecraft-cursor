@@ -48,19 +48,19 @@ public interface CursorType {
     CursorType DEFAULT_FORCE = CursorType.of("");
 
     /**
-     * The cursor type that is applied when the mouse is over {@link net.minecraft.client.gui.widget.PressableWidget}
+     * The cursor type that is applied when the mouse is over {@link net.minecraft.client.gui.components.AbstractButton}
      * elements and on other certain elements that can be clicked.
      */
     CursorType POINTER = CursorType.of("pointer");
 
     /**
-     * The cursor type that is applied when grabbing the slider of {@link net.minecraft.client.gui.widget.SliderWidget}
+     * The cursor type that is applied when grabbing the slider of {@link net.minecraft.client.gui.components.AbstractSliderButton}
      * elements and when grabbing items in the inventory.
      */
     CursorType GRABBING = CursorType.of("grabbing");
 
     /**
-     * The cursor type that is applied when the mouse is over {@link net.minecraft.client.gui.widget.TextFieldWidget} elements
+     * The cursor type that is applied when the mouse is over {@link net.minecraft.client.gui.components.EditBox} elements
      */
     CursorType TEXT = CursorType.of("text");
 
