@@ -32,6 +32,7 @@ public class MinecraftCursor implements ClientModInitializer {
 
     private static MinecraftCursor instance;
     private final AtomicReference<CursorType> singleCycleCursor = new AtomicReference<>();
+    private final AtomicReference<CursorType> externalCursor = new AtomicReference<>(CursorType.DEFAULT);
     private Screen visibleNonCurrentScreen;
 
     @Override
@@ -78,7 +79,7 @@ public class MinecraftCursor implements ClientModInitializer {
             double mouseY = client.mouse.getY() / scale;
             CursorManager.INSTANCE.setCurrentCursor(getCursorType(visibleNonCurrentScreen, mouseX, mouseY));
         } else if (client.currentScreen == null && visibleNonCurrentScreen == null) {
-            CursorManager.INSTANCE.setCurrentCursor(CursorType.DEFAULT);
+            CursorManager.INSTANCE.setCurrentCursor(externalCursor.get());
         }
     }
 
@@ -92,6 +93,8 @@ public class MinecraftCursor implements ClientModInitializer {
             singleCycleCursor.set(null);
             return cursorType;
         }
+
+        if (externalCursor.get() != CursorType.DEFAULT) return externalCursor.get();
 
         CursorType cursorType = CursorTypeResolver.INSTANCE.getCursorType(currentScreen, mouseX, mouseY);
         cursorType = cursorType != CursorType.DEFAULT ? cursorType
@@ -111,5 +114,9 @@ public class MinecraftCursor implements ClientModInitializer {
 
     public synchronized void setSingleCycleCursor(CursorType cursorType) {
         singleCycleCursor.set(cursorType);
+    }
+
+    public synchronized void setExternalCursor(CursorType externalCursor) {
+        this.externalCursor.set(externalCursor != null ? externalCursor : CursorType.DEFAULT);
     }
 }

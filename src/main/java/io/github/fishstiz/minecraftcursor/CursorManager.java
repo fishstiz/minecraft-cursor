@@ -252,4 +252,13 @@ public final class CursorManager implements CursorTypeRegistrar {
             }
         });
     }
+
+    public boolean isMinecraftCursor(long cursor) {
+        for (Cursor minecraftCursor : cursors.values()) {
+            if (minecraftCursor.isLoaded() && cursor == minecraftCursor.getId()) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

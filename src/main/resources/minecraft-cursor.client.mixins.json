@@ -13,7 +13,8 @@
     "access.RecipeBookResultsAccessor",
     "access.RecipeBookScreenAccessor",
     "access.RecipeBookWidgetAccessor",
-    "access.StonecutterScreenAccessor"
+    "access.StonecutterScreenAccessor",
+    "compat.GlfwMixin"
   ],
   "injectors": {
     "defaultRequire": 1
