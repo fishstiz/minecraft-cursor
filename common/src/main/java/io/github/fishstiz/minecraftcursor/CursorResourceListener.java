@@ -18,7 +18,7 @@ import java.util.Optional;
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.MOD_ID;
 
-public abstract class CursorResourceListener {
+abstract class CursorResourceListener {
     private static final String IMG_TYPE = ".png";
     private static final String ANIMATION_TYPE = IMG_TYPE + ".mcmeta";
     private static final String CONFIG_PATH = "atlases/cursors.json";
@@ -31,7 +31,7 @@ public abstract class CursorResourceListener {
         return ResourceLocation.fromNamespaceAndPath(MOD_ID, CURSORS_DIR);
     }
 
-    public void reload(ResourceManager manager) {
+    public void reloadMinecraftCursor(ResourceManager manager) {
         MinecraftCursor.LOGGER.info("Reloading Cursor Resources");
         loadConfig(manager);
         loadCursorTextures(manager);

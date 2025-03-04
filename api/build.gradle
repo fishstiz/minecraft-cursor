@@ -1,17 +1,23 @@
 plugins {
-    id 'net.neoforged.moddev'
-    id 'java'
+    id 'multiloader-publish'
+//    id 'net.neoforged.moddev'
+    id 'fabric-loom'
 }
 
-base {
-    archivesName = "${project.archives_base_name}-${project.name}"
-}
+dependencies {
+    minecraft "com.mojang:minecraft:${minecraft_version}"
 
-neoForge {
-    neoFormVersion = neo_form_version
-
-    parchment {
-        minecraftVersion = parchment_minecraft
-        mappingsVersion = parchment_version
+    mappings loom.layered() {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-${parchment_minecraft}:${parchment_version}@zip")
     }
 }
+
+//neoForge {
+//    neoFormVersion = neo_form_version
+//
+//    parchment {
+//        minecraftVersion = parchment_minecraft
+//        mappingsVersion = parchment_version
+//    }
+//}

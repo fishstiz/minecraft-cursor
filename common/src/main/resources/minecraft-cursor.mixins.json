@@ -1,6 +1,8 @@
 {
   "required": true,
+  "minVersion": "0.8",
   "package": "io.github.fishstiz.minecraftcursor.mixin",
+  "refmap": "minecraft-cursor.refmap.json",
   "compatibilityLevel": "JAVA_21",
   "client": [
     "MouseOptionsScreenMixin",

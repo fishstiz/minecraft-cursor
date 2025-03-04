@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    api project(path: ":api")
+    api project(path: ":api", configuration: "namedElements")
     include project(path: ":api")
 
     minecraft "com.mojang:minecraft:${minecraft_version}"

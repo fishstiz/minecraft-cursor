@@ -5,9 +5,45 @@ plugins {
     id 'net.neoforged.moddev' version '2.0.78' apply false
 }
 
-tasks.withType(JavaCompile).configureEach {
-    it.options.release = 21
+allprojects {
+    apply plugin: 'java'
+
+    version = project.mod_version
+    group = project.maven_group
+
+    base {
+        archivesName = "${project.archives_base_name}-${project.name}"
+    }
+
+    java {
+        withSourcesJar()
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        it.options.release = 21
+    }
+
+    processResources {
+        var expandProps = [
+                'version': version
+        ]
+
+        var jsonExpandProps = expandProps.collectEntries {
+            key, value -> [(key): value instanceof String ? value.replace("\n", "\\\\n") : value]
+        }
+
+        filesMatching(['META-INF/mods.toml', 'META-INF/neoforge.mods.toml']) {
+            expand expandProps
+        }
+
+        filesMatching(['pack.mcmeta', 'fabric.mod.json', '*.mixins.json']) {
+            expand jsonExpandProps
+        }
+
+        inputs.properties(expandProps)
+    }
 }
+
 
 tasks.register('getProperties') {
     doLast {
