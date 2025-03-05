@@ -88,4 +88,9 @@ public interface CursorType {
      * Replaces {@code GLFW_RESIZE_NS_CURSOR} standard cursor.
      */
     CursorType RESIZE_NS = CursorType.of("resize_ns");
+
+    /**
+     * Replaces {@code GLFW_RESIZE_NWSE_CURSOR} standard cursor.
+     */
+    CursorType RESIZE_NWSE = CursorType.of("resize_nwse");
 }
