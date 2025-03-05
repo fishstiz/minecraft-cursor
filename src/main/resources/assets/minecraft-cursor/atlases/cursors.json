@@ -43,6 +43,10 @@
     "resize_nesw": {
       "xhot": 13,
       "yhot": 12
+    },
+    "not_allowed": {
+      "xhot": 15,
+      "yhot": 15
     }
   }
 }
