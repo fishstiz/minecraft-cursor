@@ -62,6 +62,7 @@ public class GlfwMixin {
             case GLFW_IBEAM_CURSOR -> CursorType.TEXT;
             case GLFW_CROSSHAIR_CURSOR -> CursorType.CROSSHAIR;
             case GLFW_RESIZE_EW_CURSOR -> CursorType.RESIZE_EW;
+            case GLFW_RESIZE_NS_CURSOR -> CursorType.RESIZE_NS;
             default -> null;
         };
 
