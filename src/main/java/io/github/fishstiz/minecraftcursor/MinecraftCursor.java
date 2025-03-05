@@ -2,6 +2,7 @@ package io.github.fishstiz.minecraftcursor;
 
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.api.MinecraftCursorInitializer;
+import io.github.fishstiz.minecraftcursor.compat.ExternalCursorTracker;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.config.CursorConfigLoader;
 import io.github.fishstiz.minecraftcursor.impl.CursorControllerImpl;
@@ -32,7 +33,6 @@ public class MinecraftCursor implements ClientModInitializer {
 
     private static MinecraftCursor instance;
     private final AtomicReference<CursorType> singleCycleCursor = new AtomicReference<>();
-    private final AtomicReference<CursorType> externalCursor = new AtomicReference<>(CursorType.DEFAULT);
     private Screen visibleNonCurrentScreen;
 
     @Override
@@ -79,7 +79,7 @@ public class MinecraftCursor implements ClientModInitializer {
             double mouseY = client.mouse.getY() / scale;
             CursorManager.INSTANCE.setCurrentCursor(getCursorType(visibleNonCurrentScreen, mouseX, mouseY));
         } else if (client.currentScreen == null && visibleNonCurrentScreen == null) {
-            CursorManager.INSTANCE.setCurrentCursor(externalCursor.get());
+            CursorManager.INSTANCE.setCurrentCursor(ExternalCursorTracker.getCursorOrDefault());
         }
     }
 
@@ -94,7 +94,8 @@ public class MinecraftCursor implements ClientModInitializer {
             return cursorType;
         }
 
-        if (externalCursor.get() != CursorType.DEFAULT) return externalCursor.get();
+        CursorType externalCursor = ExternalCursorTracker.getCursorOrDefault();
+        if (externalCursor != CursorType.DEFAULT) return externalCursor;
 
         CursorType cursorType = CursorTypeResolver.INSTANCE.getCursorType(currentScreen, mouseX, mouseY);
         cursorType = cursorType != CursorType.DEFAULT ? cursorType
@@ -114,9 +115,5 @@ public class MinecraftCursor implements ClientModInitializer {
 
     public synchronized void setSingleCycleCursor(CursorType cursorType) {
         singleCycleCursor.set(cursorType);
-    }
-
-    public synchronized void setExternalCursor(CursorType externalCursor) {
-        this.externalCursor.set(externalCursor != null ? externalCursor : CursorType.DEFAULT);
     }
 }

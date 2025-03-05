@@ -3,8 +3,8 @@ package io.github.fishstiz.minecraftcursor.mixin.client.compat.glfw;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import io.github.fishstiz.minecraftcursor.CursorManager;
-import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
+import io.github.fishstiz.minecraftcursor.compat.ExternalCursorTracker;
 import net.minecraft.client.MinecraftClient;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
@@ -26,12 +26,7 @@ public class GlfwMixin {
     private static boolean isMinecraftCursor = false;
 
     @Unique
-    private static boolean hasStandardCursors = false;
-
-    @Unique
-    private static void setExternalCursor(CursorType externalCursor) {
-        MinecraftCursor.getInstance().setExternalCursor(externalCursor);
-    }
+    private static StackWalker walker;
 
     @WrapMethod(method = "glfwCreateStandardCursor")
     private static long mapStandardCursor(int shape, Operation<Long> original) {
@@ -53,7 +48,8 @@ public class GlfwMixin {
 
         if (cursorType != null) {
             standardCursors.put(id, cursorType);
-            hasStandardCursors = true;
+            ExternalCursorTracker.init();
+            if (walker == null) walker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
         }
 
         return id;
@@ -67,7 +63,7 @@ public class GlfwMixin {
 
     @WrapMethod(method = "glfwSetCursor")
     private static void setMinecraftCursor(long window, long cursor, Operation<Void> original) {
-        if (!hasStandardCursors || window != MINECRAFT.getWindow().getHandle()) {
+        if (!ExternalCursorTracker.isInitialized() || window != MINECRAFT.getWindow().getHandle()) {
             original.call(window, cursor);
             return;
         }
@@ -82,10 +78,16 @@ public class GlfwMixin {
 
         if (minecraftCursor == null || CursorManager.INSTANCE.getCursor(minecraftCursor).getId() == 0) {
             original.call(window, cursor);
-            setExternalCursor(CursorType.DEFAULT);
             isMinecraftCursor = false;
         } else {
-            setExternalCursor(minecraftCursor);
+            int callerHash = walker
+                    .walk(frames -> frames
+                            .skip(2)
+                            .findFirst()
+                            .map(frame -> System.identityHashCode(frame.getDeclaringClass()))
+                            .orElse(0));
+
+            ExternalCursorTracker.updateCursor(callerHash, minecraftCursor);
             if (!isMinecraftCursor) CursorManager.INSTANCE.reloadCursor();
         }
     }
