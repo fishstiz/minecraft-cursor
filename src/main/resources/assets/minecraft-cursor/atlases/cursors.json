@@ -23,6 +23,10 @@
     "shift": {
       "xhot": 11,
       "yhot": 3
+    },
+    "crosshair": {
+      "xhot": 13,
+      "yhot": 17
     }
   }
 }
