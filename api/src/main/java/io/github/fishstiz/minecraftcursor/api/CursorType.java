@@ -75,7 +75,12 @@ public interface CursorType {
     CursorType BUSY = CursorType.of("busy");
 
     /**
-     * Replaces {@code GLFW_CROSSHAIR_CURSOR} standard cursor
+     * Replaces {@code GLFW_CROSSHAIR_CURSOR} standard cursor.
      */
     CursorType CROSSHAIR = CursorType.of("crosshair");
+
+    /**
+     * Replaces {@code GLFW_RESIZE_EW_CURSOR} standard cursor.
+     */
+    CursorType RESIZE_EW = CursorType.of("resize_ew");
 }
