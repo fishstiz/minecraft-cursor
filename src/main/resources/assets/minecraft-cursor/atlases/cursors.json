@@ -31,6 +31,10 @@
     "resize_ew": {
       "xhot": 15,
       "yhot": 17
+    },
+    "resize_ns": {
+      "xhot": 9,
+      "yhot": 15
     }
   }
 }
