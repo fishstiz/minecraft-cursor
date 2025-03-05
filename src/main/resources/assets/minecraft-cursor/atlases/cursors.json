@@ -39,6 +39,10 @@
     "resize_nwse": {
       "xhot": 13,
       "yhot": 12
+    },
+    "resize_nesw": {
+      "xhot": 13,
+      "yhot": 12
     }
   }
 }
