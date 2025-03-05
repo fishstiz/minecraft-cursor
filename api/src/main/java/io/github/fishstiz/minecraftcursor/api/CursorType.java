@@ -73,4 +73,9 @@ public interface CursorType {
      * The cursor type that is applied when loading.
      */
     CursorType BUSY = CursorType.of("busy");
+
+    /**
+     * Replaces {@code GLFW_CROSSHAIR_CURSOR} standard cursor
+     */
+    CursorType CROSSHAIR = CursorType.of("crosshair");
 }
