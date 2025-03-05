@@ -28,7 +28,8 @@ public class MinecraftCursorInitializerImpl implements MinecraftCursorInitialize
                 CursorType.TEXT,
                 CursorType.SHIFT,
                 CursorType.BUSY,
-                CursorType.CROSSHAIR
+                CursorType.CROSSHAIR,
+                CursorType.RESIZE_EW
         );
 
         elementRegistrar.register(MessageScreen.class, MinecraftCursorInitializerImpl::elementToBusy);

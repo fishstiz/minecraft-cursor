@@ -27,6 +27,10 @@
     "crosshair": {
       "xhot": 13,
       "yhot": 17
+    },
+    "resize_ew": {
+      "xhot": 15,
+      "yhot": 17
     }
   }
 }
