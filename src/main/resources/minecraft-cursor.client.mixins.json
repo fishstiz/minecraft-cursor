@@ -16,7 +16,7 @@
     "access.RecipeBookResultsAccessor",
     "access.RecipeBookWidgetAccessor",
     "access.StonecutterScreenAccessor",
-    "compat.GlfwMixin"
+    "compat.glfw.GlfwMixin"
   ],
   "injectors": {
     "defaultRequire": 1
