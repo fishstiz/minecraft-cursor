@@ -61,6 +61,7 @@ public class GlfwMixin {
             case GLFW_POINTING_HAND_CURSOR -> CursorType.POINTER;
             case GLFW_IBEAM_CURSOR -> CursorType.TEXT;
             case GLFW_CROSSHAIR_CURSOR -> CursorType.CROSSHAIR;
+            case GLFW_RESIZE_EW_CURSOR -> CursorType.RESIZE_EW;
             default -> null;
         };
 
