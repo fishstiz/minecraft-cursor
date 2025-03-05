@@ -65,6 +65,8 @@ public class GlfwMixin {
             case GLFW_RESIZE_NS_CURSOR -> CursorType.RESIZE_NS;
             case GLFW_RESIZE_NWSE_CURSOR -> CursorType.RESIZE_NWSE;
             case GLFW_RESIZE_NESW_CURSOR -> CursorType.RESIZE_NESW;
+            case GLFW_RESIZE_ALL_CURSOR -> CursorType.GRABBING;
+            case GLFW_NOT_ALLOWED_CURSOR -> CursorType.NOT_ALLOWED;
             default -> null;
         };
 
