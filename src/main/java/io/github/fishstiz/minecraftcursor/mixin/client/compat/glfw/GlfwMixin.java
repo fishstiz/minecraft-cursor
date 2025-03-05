@@ -1,4 +1,4 @@
-package io.github.fishstiz.minecraftcursor.mixin.client.compat;
+package io.github.fishstiz.minecraftcursor.mixin.client.compat.glfw;
 
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -20,10 +20,13 @@ public class GlfwMixin {
     private static final MinecraftClient MINECRAFT = MinecraftClient.getInstance();
 
     @Unique
-    private static final HashMap<Long, Integer> standardCursors = new HashMap<>();
+    private static final HashMap<Long, CursorType> standardCursors = new HashMap<>();
 
     @Unique
     private static boolean isMinecraftCursor = false;
+
+    @Unique
+    private static boolean hasStandardCursors = false;
 
     @Unique
     private static void setExternalCursor(CursorType externalCursor) {
@@ -33,30 +36,8 @@ public class GlfwMixin {
     @WrapMethod(method = "glfwCreateStandardCursor")
     private static long mapStandardCursor(int shape, Operation<Long> original) {
         long id = original.call(shape);
-        standardCursors.put(id, shape);
-        return id;
-    }
 
-    @WrapMethod(method = "glfwDestroyCursor")
-    private static void removeStandardCursor(long cursor, Operation<Void> original) {
-        original.call(cursor);
-        standardCursors.remove(cursor);
-    }
-
-    @WrapMethod(method = "glfwSetCursor")
-    private static void convertToMinecraftCursor(long window, long cursor, Operation<Void> original) {
-        if (window != MINECRAFT.getWindow().getHandle()) {
-            original.call(window, cursor);
-            return;
-        }
-
-        if (CursorManager.INSTANCE.isMinecraftCursor(cursor)) {
-            original.call(window, cursor);
-            isMinecraftCursor = true;
-            return;
-        }
-
-        CursorType minecraftCursor = switch (standardCursors.getOrDefault(cursor, -1)) {
+        CursorType cursorType = switch (shape) {
             case GLFW_ARROW_CURSOR -> CursorType.DEFAULT;
             case GLFW_POINTING_HAND_CURSOR -> CursorType.POINTER;
             case GLFW_IBEAM_CURSOR -> CursorType.TEXT;
@@ -69,6 +50,35 @@ public class GlfwMixin {
             case GLFW_NOT_ALLOWED_CURSOR -> CursorType.NOT_ALLOWED;
             default -> null;
         };
+
+        if (cursorType != null) {
+            standardCursors.put(id, cursorType);
+            hasStandardCursors = true;
+        }
+
+        return id;
+    }
+
+    @WrapMethod(method = "glfwDestroyCursor")
+    private static void removeStandardCursor(long cursor, Operation<Void> original) {
+        original.call(cursor);
+        standardCursors.remove(cursor);
+    }
+
+    @WrapMethod(method = "glfwSetCursor")
+    private static void setMinecraftCursor(long window, long cursor, Operation<Void> original) {
+        if (!hasStandardCursors || window != MINECRAFT.getWindow().getHandle()) {
+            original.call(window, cursor);
+            return;
+        }
+
+        if (CursorManager.INSTANCE.isMinecraftCursor(cursor)) {
+            original.call(window, cursor);
+            isMinecraftCursor = true;
+            return;
+        }
+
+        CursorType minecraftCursor = standardCursors.get(cursor);
 
         if (minecraftCursor == null || CursorManager.INSTANCE.getCursor(minecraftCursor).getId() == 0) {
             original.call(window, cursor);
