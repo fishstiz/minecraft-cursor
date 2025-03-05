@@ -16,8 +16,9 @@
   "minecraft-cursor.options.cursor-type.shift": "Shift",
   "minecraft-cursor.options.cursor-type.busy": "Busy",
   "minecraft-cursor.options.cursor-type.crosshair": "Crosshair",
-  "minecraft-cursor.options.cursor-type.resize_ew": "Resize X",
-  "minecraft-cursor.options.cursor-type.resize_ns": "Resize Y",
+  "minecraft-cursor.options.cursor-type.resize_ew": "Resize EW",
+  "minecraft-cursor.options.cursor-type.resize_ns": "Resize NS",
+  "minecraft-cursor.options.cursor-type.resize_nwse": "Resize NWSE",
 
   "minecraft-cursor.options.more": "More Cursor Options",
 
