@@ -52,6 +52,10 @@ public class MoreOptionsListWidget extends ElementListWidget<MoreOptionsListWidg
     private static final Text RESOURCE_RELOAD_TEXT = Text.translatable("minecraft-cursor.options.more.resource_pack.reset");
     private static final Text RESOURCE_RELOAD_TOOLTIP_TEXT = Text.translatable("minecraft-cursor.options.more.resource_pack.reset.tooltip");
 
+    private static final Text COMPAT_TEXT = Text.translatable("minecraft-cursor.options.more.compat");
+    private static final Text REMAP_TEXT = Text.translatable("minecraft-cursor.options.more.compat.remap_cursors");
+    private static final Tooltip REMAP_TOOLTIP = Tooltip.of(Text.translatable("minecraft-cursor.options.more.compat.remap_cursors.tooltip"));
+
     private static final int BUTTON_WIDTH = 40;
     private static final int ITEM_HEIGHT = 20;
     private static final int ROW_GAP = 6;
@@ -79,6 +83,7 @@ public class MoreOptionsListWidget extends ElementListWidget<MoreOptionsListWidg
 
         addGlobalOptions();
         addAdaptiveOptions();
+        addModCompatOptions();
         addResourcePackOptions();
     }
 
@@ -117,6 +122,11 @@ public class MoreOptionsListWidget extends ElementListWidget<MoreOptionsListWidg
         addAdaptiveEntry(ADVANCEMENTS_TEXT, CONFIG.isAdvancementTabsEnabled(), isAdaptive, CONFIG::setAdvancementTabsEnabled);
         addAdaptiveEntry(WORLD_ICON_TEXT, CONFIG.isWorldIconEnabled(), isAdaptive, CONFIG::setWorldIconEnabled);
         addAdaptiveEntry(SERVER_ICON_TEXT, CONFIG.isServerIconEnabled(), isAdaptive, CONFIG::setServerIconEnabled);
+    }
+
+    private void addModCompatOptions() {
+        addEntry(new TitleEntry(COMPAT_TEXT));
+        addEntry(new ToggleEntry(REMAP_TEXT, CONFIG.isRemapCursorsEnabled(), true, REMAP_TOOLTIP, CONFIG::setRemapCursorsEnabled));
     }
 
     private void addResourcePackOptions() {

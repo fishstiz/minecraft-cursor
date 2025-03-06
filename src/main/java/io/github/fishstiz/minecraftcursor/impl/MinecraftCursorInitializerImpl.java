@@ -75,11 +75,11 @@ public class MinecraftCursorInitializerImpl implements MinecraftCursorInitialize
     }
 
     private static <T extends ClickableWidget> CursorType clickableWidgetCursor(T clickable, double mouseX, double mouseY) {
-        return clickable.active && clickable.visible ? CursorType.POINTER : CursorType.DEFAULT;
+        return clickable.active && clickable.visible && clickable.isHovered() ? CursorType.POINTER : CursorType.DEFAULT;
     }
 
     private static <T extends TabButtonWidget> CursorType tabButtonWidgetCursor(T tabButton, double mouseX, double mouseY) {
-        return tabButton.active && tabButton.visible && !tabButton.isCurrentTab() ?
+        return tabButton.active && tabButton.visible && tabButton.isHovered() && !tabButton.isCurrentTab() ?
                 CursorType.POINTER : CursorType.DEFAULT;
     }
 
@@ -91,6 +91,6 @@ public class MinecraftCursorInitializerImpl implements MinecraftCursorInitialize
     }
 
     private static <T extends TextFieldWidget> CursorType textFieldWidgetCursor(T textField, double mouseX, double mouseY) {
-        return textField.visible ? CursorType.TEXT : CursorType.DEFAULT;
+        return textField.visible && textField.isHovered() ? CursorType.TEXT : CursorType.DEFAULT;
     }
 }
