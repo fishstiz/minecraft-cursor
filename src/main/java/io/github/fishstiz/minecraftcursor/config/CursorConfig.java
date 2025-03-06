@@ -20,6 +20,7 @@ public class CursorConfig implements Serializable {
     private boolean advancementTabsEnabled = true;
     private boolean worldIconEnabled = true;
     private boolean serverIconEnabled = true;
+    private boolean remapCursorsEnabled = true;
     private final GlobalSettings global = new GlobalSettings();
     private final Map<String, Settings> settings = new HashMap<>();
     transient File file;
@@ -161,6 +162,14 @@ public class CursorConfig implements Serializable {
 
     public void setServerIconEnabled(boolean serverIconEnabled) {
         this.serverIconEnabled = serverIconEnabled;
+    }
+
+    public boolean isRemapCursorsEnabled() {
+        return remapCursorsEnabled;
+    }
+
+    public void setRemapCursorsEnabled(boolean remapCursorsEnabled) {
+        this.remapCursorsEnabled = remapCursorsEnabled;
     }
 
     public static class Settings implements Serializable {

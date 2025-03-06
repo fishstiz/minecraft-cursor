@@ -46,5 +46,9 @@
 
   "minecraft-cursor.options.more.resource_pack": "Resource Packs",
   "minecraft-cursor.options.more.resource_pack.reset": "Reset Cursor Settings",
-  "minecraft-cursor.options.more.resource_pack.reset.tooltip": "Resets personal cursor settings to match the settings provided by resource packs (or the built-in default)."
+  "minecraft-cursor.options.more.resource_pack.reset.tooltip": "Resets personal cursor settings to match the settings provided by resource packs (or the built-in default).",
+
+  "minecraft-cursor.options.more.compat": "Mod Compatibility",
+  "minecraft-cursor.options.more.compat.remap_cursors": "Remap Standard Cursors (GLFW)",
+  "minecraft-cursor.options.more.compat.remap_cursors.tooltip": "Remaps standard cursors to the equivalent Minecraft Cursor.\n\nWARNING: Disabling may cause compatibility issues with certain mods."
 }
