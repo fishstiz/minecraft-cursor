@@ -20,6 +20,7 @@ public class CursorConfig {
     private boolean advancementTabsEnabled = true;
     private boolean worldIconEnabled = true;
     private boolean serverIconEnabled = true;
+    private boolean remapCursorsEnabled = true;
     private final GlobalSettings global = new GlobalSettings();
     private final Map<String, Settings> settings = new HashMap<>();
     File file;
@@ -161,6 +162,14 @@ public class CursorConfig {
 
     public void setServerIconEnabled(boolean serverIconEnabled) {
         this.serverIconEnabled = serverIconEnabled;
+    }
+
+    public boolean isRemapCursorsEnabled() {
+        return remapCursorsEnabled;
+    }
+
+    public void setRemapCursorsEnabled(boolean remapCursorsEnabled) {
+        this.remapCursorsEnabled = remapCursorsEnabled;
     }
 
     public static class Settings {

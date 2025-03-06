@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.Unique;
 
 import java.util.HashMap;
 
+import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
 import static org.lwjgl.glfw.GLFW.*;
 
 @Mixin(value = GLFW.class, remap = false)
@@ -76,7 +77,9 @@ public class GlfwMixin {
 
         CursorType minecraftCursor = standardCursors.get(cursor);
 
-        if (minecraftCursor == null || CursorManager.INSTANCE.getCursor(minecraftCursor).getId() == 0) {
+        if (!CONFIG.isRemapCursorsEnabled()
+                || minecraftCursor == null
+                || CursorManager.INSTANCE.getCursor(minecraftCursor).getId() == 0) {
             original.call(window, cursor);
             isMinecraftCursor = false;
         } else {
