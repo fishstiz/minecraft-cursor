@@ -32,6 +32,8 @@ public interface CursorType {
 
     /**
      * The fallback cursor type
+     * <p>
+     * Replaces {@code GLFW_ARROW_CURSOR} standard cursor.
      */
     CursorType DEFAULT = CursorType.of("default");
 
@@ -50,17 +52,26 @@ public interface CursorType {
     /**
      * The cursor type that is applied when the mouse is over {@link net.minecraft.client.gui.widget.PressableWidget}
      * elements and on other certain elements that can be clicked.
+     *
+     * <p>
+     * Replaces {@code GLFW_POINTING_HAND_CURSOR} standard cursor.
      */
     CursorType POINTER = CursorType.of("pointer");
 
     /**
      * The cursor type that is applied when grabbing the slider of {@link net.minecraft.client.gui.widget.SliderWidget}
      * elements and when grabbing items in the inventory.
+     *
+     * <p>
+     * Replaces {@code GLFW_RESIZE_ALL_CURSOR} standard cursor.
      */
     CursorType GRABBING = CursorType.of("grabbing");
 
     /**
      * The cursor type that is applied when the mouse is over {@link net.minecraft.client.gui.widget.TextFieldWidget} elements
+     *
+     * <p>
+     * Replaces {@code GLFW_IBEAM_CURSOR} standard cursor.
      */
     CursorType TEXT = CursorType.of("text");
 
