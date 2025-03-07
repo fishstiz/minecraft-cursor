@@ -16,12 +16,14 @@ import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.resource.ResourceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class MinecraftCursor implements ClientModInitializer {
@@ -97,11 +99,14 @@ public class MinecraftCursor implements ClientModInitializer {
         CursorType externalCursor = ExternalCursorTracker.getCursorOrDefault();
         if (externalCursor != CursorType.DEFAULT) return externalCursor;
 
-        CursorType cursorType = CursorTypeResolver.INSTANCE.getCursorType(currentScreen, mouseX, mouseY);
-        cursorType = cursorType != CursorType.DEFAULT ? cursorType
-                : currentScreen.hoveredElement(mouseX, mouseY)
-                .map(element -> CursorTypeResolver.INSTANCE.getCursorType(element, mouseX, mouseY))
-                .orElse(CursorType.DEFAULT);
+        CursorType cursorType = CursorTypeResolver.INSTANCE.resolveCursorType(currentScreen, mouseX, mouseY);
+
+        if (cursorType == CursorType.DEFAULT) {
+            Optional<Element> hoveredElement = currentScreen.hoveredElement(mouseX, mouseY);
+            if (hoveredElement.isPresent()) {
+                cursorType = CursorTypeResolver.INSTANCE.resolveCursorType(hoveredElement.get(), mouseX, mouseY);
+            }
+        }
 
         return cursorType;
     }

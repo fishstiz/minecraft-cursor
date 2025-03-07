@@ -12,12 +12,30 @@ public class ExternalCursorTracker {
     private ExternalCursorTracker() {
     }
 
-    private record CursorTimestamp(CursorType cursorType, long timestamp) {
+    private static class CursorTimestamp {
+        CursorType cursorType;
+        long timestamp;
+
+        public CursorTimestamp(CursorType cursorType) {
+            this.cursorType = cursorType;
+            this.timestamp = Util.getMeasuringTimeMs();
+        }
+
+        public void update(CursorType cursorType) {
+            this.cursorType = cursorType;
+            this.timestamp = Util.getMeasuringTimeMs();
+        }
     }
 
     private void updateCursorTimestamp(int hash, CursorType cursorType) {
         if (cursorType == null) return;
-        externalCursors.put(hash, new CursorTimestamp(cursorType, Util.getMeasuringTimeMs()));
+
+        CursorTimestamp cursorTimestamp = externalCursors.get(hash);
+        if (cursorTimestamp == null) {
+            externalCursors.put(hash, new CursorTimestamp(cursorType));
+        } else {
+            cursorTimestamp.update(cursorType);
+        }
     }
 
     private CursorType getLatestCursorOrDefault() {
