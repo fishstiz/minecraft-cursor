@@ -1,6 +1,7 @@
 package io.github.fishstiz.minecraftcursor.gui.widget;
 
 import io.github.fishstiz.minecraftcursor.CursorManager;
+import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
@@ -248,12 +249,16 @@ public class MoreOptionsListWidget extends ElementListWidget<MoreOptionsListWidg
 
         cursorManager.setIsAdaptive(isEnabled);
 
-        CONFIG.getSettings().forEach((key, settings) -> settings.update(
-                settings.getScale(),
-                settings.getXHot(),
-                settings.getYHot(),
-                isEnabled
-        ));
+        CONFIG.getSettings().forEach((key, settings) -> {
+            if (key.equals(CursorType.DEFAULT.getKey())) return;
+
+            settings.update(
+                    settings.getScale(),
+                    settings.getXHot(),
+                    settings.getYHot(),
+                    isEnabled
+            );
+        });
     }
 
     public int getYEntry(int index) {
