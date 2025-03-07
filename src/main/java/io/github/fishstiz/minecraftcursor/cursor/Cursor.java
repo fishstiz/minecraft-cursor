@@ -100,23 +100,15 @@ public class Cursor {
     }
 
     public void enable(boolean enabled) {
-        if (enabled) {
-            enable();
-        } else {
-            disable();
-        }
+        if (this.enabled == enabled) return;
+
+        if (this.onLoad != null) this.onLoad.accept(this);
+
+        this.enabled = enabled;
     }
 
     public Identifier getSprite() {
         return sprite;
-    }
-
-    public void enable() {
-        this.enabled = true;
-    }
-
-    public void disable() {
-        this.enabled = false;
     }
 
     public long getId() {
