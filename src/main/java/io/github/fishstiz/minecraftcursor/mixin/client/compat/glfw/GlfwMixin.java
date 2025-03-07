@@ -69,6 +69,12 @@ public class GlfwMixin {
             return;
         }
 
+        if (!CONFIG.isRemapCursorsEnabled()) {
+            original.call(window, cursor);
+            isMinecraftCursor = false;
+            return;
+        }
+
         if (CursorManager.INSTANCE.isMinecraftCursor(cursor)) {
             original.call(window, cursor);
             isMinecraftCursor = true;
@@ -77,9 +83,7 @@ public class GlfwMixin {
 
         CursorType minecraftCursor = standardCursors.get(cursor);
 
-        if (!CONFIG.isRemapCursorsEnabled()
-                || minecraftCursor == null
-                || CursorManager.INSTANCE.getCursor(minecraftCursor).getId() == 0) {
+        if (minecraftCursor == null || CursorManager.INSTANCE.getCursor(minecraftCursor).getId() == 0) {
             original.call(window, cursor);
             isMinecraftCursor = false;
         } else {

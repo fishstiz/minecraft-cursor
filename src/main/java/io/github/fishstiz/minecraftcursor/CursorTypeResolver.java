@@ -9,8 +9,8 @@ import net.minecraft.client.gui.ParentElement;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static io.github.fishstiz.minecraftcursor.util.LookupUtil.NAMESPACE;
 import static io.github.fishstiz.minecraftcursor.util.LookupUtil.RESOLVER;
@@ -20,8 +20,8 @@ final class CursorTypeResolver implements ElementRegistrar {
     private final List<AbstractMap.SimpleImmutableEntry<Class<? extends Element>,
             CursorTypeFunction<? extends Element>>>
             registry = new ArrayList<>();
-    private final ConcurrentHashMap<String, CursorTypeFunction<? extends Element>>
-            cachedRegistry = new ConcurrentHashMap<>();
+    private final HashMap<String, CursorTypeFunction<? extends Element>>
+            cachedRegistry = new HashMap<>();
     private String lastFailedElement;
 
     private CursorTypeResolver() {
@@ -63,7 +63,10 @@ final class CursorTypeResolver implements ElementRegistrar {
         registry.add(new AbstractMap.SimpleImmutableEntry<>(elementClass, elementToCursorType));
     }
 
-    public <T extends Element> CursorType getCursorType(T element, double mouseX, double mouseY) {
+    @SuppressWarnings("unchecked")
+    public <T extends Element> CursorType resolveCursorType(T element, double mouseX, double mouseY) {
+        String elementName = element.getClass().getName();
+
         try {
             if (element instanceof CursorProvider cursorProvider) {
                 CursorType providedCursorType = cursorProvider.getCursorType(mouseX, mouseY);
@@ -71,18 +74,22 @@ final class CursorTypeResolver implements ElementRegistrar {
                     return providedCursorType;
                 }
             }
-            @SuppressWarnings("unchecked")
-            CursorType cursorType = ((CursorTypeFunction<T>) cachedRegistry
-                    .computeIfAbsent(element.getClass().getName(), k -> computeCursorType(element)))
-                    .getCursorType(element, mouseX, mouseY);
+
+            CursorTypeFunction<T> cursorTypeFunction = (CursorTypeFunction<T>) cachedRegistry.get(elementName);
+
+            if (cursorTypeFunction == null) {
+                cursorTypeFunction = (CursorTypeFunction<T>) computeCursorType(element);
+                cachedRegistry.put(elementName, cursorTypeFunction);
+            }
+
+            CursorType cursorType = cursorTypeFunction.getCursorType(element, mouseX, mouseY);
             return cursorType != null ? cursorType : CursorType.DEFAULT;
         } catch (LinkageError | Exception e) {
-            String failedElement = element.getClass().getName();
-            if (!failedElement.equals(lastFailedElement)) {
-                lastFailedElement = failedElement;
+            if (!elementName.equals(lastFailedElement)) {
+                lastFailedElement = elementName;
                 MinecraftCursor.LOGGER.error(
                         "Could not get cursor type for element: {}",
-                        RESOLVER.unmapClassName("named", failedElement)
+                        RESOLVER.unmapClassName("named", elementName)
                 );
             }
         }
@@ -96,20 +103,20 @@ final class CursorTypeResolver implements ElementRegistrar {
             }
         }
         if (element instanceof ParentElement) {
-            return (CursorTypeFunction<ParentElement>) this::getChildCursorType;
+            return (CursorTypeFunction<ParentElement>) this::resolveChildCursorType;
         }
         return ElementRegistrar::elementToDefault;
     }
 
-    private <T extends ParentElement> CursorType getChildCursorType(T parentElement, double mouseX, double mouseY) {
+    private <T extends ParentElement> CursorType resolveChildCursorType(T parentElement, double mouseX, double mouseY) {
         CursorType cursorType = CursorType.DEFAULT;
         for (Element child : parentElement.children()) {
             if (child instanceof ParentElement childParent) {
-                CursorType parentCursorType = getChildCursorType(childParent, mouseX, mouseY);
+                CursorType parentCursorType = resolveChildCursorType(childParent, mouseX, mouseY);
                 cursorType = parentCursorType != CursorType.DEFAULT ? parentCursorType : cursorType;
             }
             if (child.isMouseOver(mouseX, mouseY)) {
-                CursorType childCursorType = getCursorType(child, mouseX, mouseY);
+                CursorType childCursorType = resolveCursorType(child, mouseX, mouseY);
                 cursorType = childCursorType != CursorType.DEFAULT ? childCursorType : cursorType;
             }
         }
