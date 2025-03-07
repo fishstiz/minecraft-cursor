@@ -100,11 +100,8 @@ public class Cursor {
     }
 
     public void enable(boolean enabled) {
-        if (this.enabled == enabled) return;
-
-        if (this.onLoad != null) this.onLoad.accept(this);
-
         this.enabled = enabled;
+        if (this.onLoad != null) this.onLoad.accept(this);
     }
 
     public Identifier getSprite() {
