@@ -182,16 +182,6 @@ public class CursorOptionsScreen extends Screen {
         }
 
         @Override
-        protected int contentHeight() {
-            return 0;
-        }
-
-        @Override
-        protected double scrollRate() {
-            return 0;
-        }
-
-        @Override
         protected void updateWidgetNarration(NarrationElementOutput builder) {
             // not supported
         }

@@ -7,8 +7,8 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
@@ -23,10 +23,8 @@ public class MinecraftCursorNeoforge {
 
         MinecraftCursor.init();
 
-        modEventBus.addListener(AddClientReloadListenersEvent.class, event -> {
-            var listener = new CursorResourceReloadListener();
-            event.addListener(listener.getId(), listener);
-        });
+        modEventBus.addListener(RegisterClientReloadListenersEvent.class, event ->
+                event.registerReloadListener(new CursorResourceReloadListener()));
     }
 
     @EventBusSubscriber(modid = MOD_ID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)

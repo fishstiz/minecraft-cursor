@@ -40,7 +40,7 @@ public class CursorListWidget extends ContainerObjectSelectionList<CursorListWid
     }
 
     @Override
-    protected int scrollBarX() {
+    protected int getScrollbarPosition() {
         return getRight() - SCROLLBAR_OFFSET;
     }
 
@@ -64,7 +64,7 @@ public class CursorListWidget extends ContainerObjectSelectionList<CursorListWid
         @Override
         public void render(GuiGraphics context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float delta) {
             button.setX(CursorListWidget.this.getX());
-            button.setY(CursorListWidget.this.getY() + (itemHeight + ROW_GAP) * index - (int) Math.round(scrollAmount()));
+            button.setY(CursorListWidget.this.getY() + (itemHeight + ROW_GAP) * index - (int) Math.round(getScrollAmount()));
             button.render(context, mouseX, mouseY, delta);
         }
 

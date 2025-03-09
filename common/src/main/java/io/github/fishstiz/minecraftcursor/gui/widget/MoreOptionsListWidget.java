@@ -257,7 +257,7 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
     }
 
     public int getYEntry(int index) {
-        return getY() + itemHeight * index + ROW_GAP - (int) Math.round(scrollAmount());
+        return getY() + itemHeight * index + ROW_GAP - (int) Math.round(getScrollAmount());
     }
 
     public int getRowGap() {
