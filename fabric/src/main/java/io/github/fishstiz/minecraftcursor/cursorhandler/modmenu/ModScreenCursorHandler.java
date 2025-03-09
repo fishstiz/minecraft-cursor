@@ -27,8 +27,8 @@ public class ModScreenCursorHandler implements CursorHandler<ModsScreen> {
         }
 
         for (ModListEntry entry : modListWidget.children()) {
-            if (entry.isMouseOver(mouseX, mouseY) && modsScreen.getModHasConfigScreen(entry.mod.getId())) {
-                if (mouseX >= modListWidget.getX() && mouseX <= modListWidget.getX() + ICON_SIZE + ENTRY_OFFSET_X) {
+            if (entry.isMouseOver(mouseX, mouseY) && modsScreen.getModHasConfigScreen().get(entry.mod.getId())) {
+                if (mouseX >= modListWidget.getRowLeft() && mouseX <= modListWidget.getRowLeft() + ICON_SIZE + ENTRY_OFFSET_X) {
                     return CursorType.POINTER;
                 }
             }

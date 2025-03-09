@@ -7,6 +7,7 @@ import io.github.fishstiz.minecraftcursor.gui.widget.MoreOptionsListWidget;
 import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorHotspotWidget;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
@@ -43,14 +44,15 @@ public class MoreOptionsScreen extends Screen implements CursorProvider {
 
     @Override
     protected void init() {
-        if (this.list != null && this.list.isReloaded()) {
-            onClose();
-        }
-
-        this.layout.addTitleHeader(this.title, this.font);
+        this.layout.addToHeader(new StringWidget(this.title, this.font));
 
         this.list = this.layout.addToContents(new MoreOptionsListWidget(
-                this.minecraft, width, layout.getContentHeight(), layout.getHeaderHeight(), cursorManager
+                this.minecraft,
+                width,
+                getContentHeight(),
+                layout.getHeaderHeight(),
+                layout.getHeaderHeight() + getContentHeight(),
+                cursorManager
         ));
 
         if (this.hotspotWidget != null) {
@@ -60,6 +62,7 @@ public class MoreOptionsScreen extends Screen implements CursorProvider {
         this.layout.addToFooter(doneButton);
 
         this.layout.visitWidgets(this::addRenderableWidget);
+        this.addWidget(this.list);
 
         this.refreshWidgetPositions();
     }
@@ -67,15 +70,18 @@ public class MoreOptionsScreen extends Screen implements CursorProvider {
     protected void refreshWidgetPositions() {
         if (this.list != null) {
             this.layout.arrangeElements();
-            this.list.updateSize(width, layout);
+            this.list.position(width, getContentHeight(), layout.getHeaderHeight());
         }
     }
 
     @Override
     public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
+        this.renderDirtBackground(context);
+        list.render(context, mouseX, mouseY, delta);
+        doneButton.render(context, mouseX, mouseY, delta);
 
-        if (list == null || hotspotWidget == null) return;
+        if (hotspotWidget == null) return;
 
         if (list.isEditingHotspot()) {
             int rowGap = list.getRowGap();
@@ -86,8 +92,8 @@ public class MoreOptionsScreen extends Screen implements CursorProvider {
             hotspotWidget.visible = true;
             hotspotWidget.active = true;
 
-            context.enableScissor(x, layout.getHeaderHeight(), list.getRowLeft(), layout.getHeaderHeight() + layout.getContentHeight());
-            hotspotWidget.render(context, mouseX, mouseY, delta);
+            context.enableScissor(x, layout.getHeaderHeight(), list.getRowLeft(), layout.getHeaderHeight() + getContentHeight());
+            hotspotWidget.renderWidget(context, mouseX, mouseY, delta);
             context.disableScissor();
         } else {
             hotspotWidget.visible = false;
@@ -102,8 +108,8 @@ public class MoreOptionsScreen extends Screen implements CursorProvider {
         if (this.minecraft != null) {
             if (previousScreen instanceof CursorOptionsScreen options && options.body != null) {
                 CursorOptionsScreen optionsScreen = new CursorOptionsScreen(options.previousScreen, cursorManager);
-                optionsScreen.selectCursor(options.getSelectedCursor());
                 this.minecraft.setScreen(optionsScreen);
+                optionsScreen.selectCursor(options.getSelectedCursor());
             } else {
                 this.minecraft.setScreen(previousScreen);
             }
@@ -113,10 +119,14 @@ public class MoreOptionsScreen extends Screen implements CursorProvider {
     @Override
     public CursorType getCursorType(double mouseX, double mouseY) {
         int headerHeight = layout.getHeaderHeight();
-        if ((mouseY < headerHeight || mouseY > headerHeight + layout.getContentHeight())
+        if ((mouseY < headerHeight || mouseY > headerHeight + getContentHeight())
                 && mouseX > doneButton.getX() + doneButton.getWidth()) {
             return CursorType.DEFAULT_FORCE;
         }
         return CursorType.DEFAULT;
+    }
+
+    public int getContentHeight() {
+        return height - layout.getHeaderHeight() - layout.getFooterHeight();
     }
 }

@@ -7,7 +7,6 @@ import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
 import io.github.fishstiz.minecraftcursor.util.MouseEvent;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -17,9 +16,9 @@ import java.util.function.BiConsumer;
 
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
 
-public class SelectedCursorHotspotWidget extends AbstractWidget implements CursorProvider {
+public class SelectedCursorHotspotWidget extends SelectedCursorClickableWidget implements CursorProvider {
     private static final CursorConfig.GlobalSettings global = CONFIG.getGlobal();
-    private static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(MinecraftCursor.MOD_ID, "textures/gui/hotspot_background.png");
+    private static final ResourceLocation BACKGROUND = ResourceLocation.tryBuild(MinecraftCursor.MOD_ID, "textures/gui/hotspot_background.png");
     private static final int CURSOR_SIZE = 32;
     private static final int RULER_COLOR = 0xFFFF0000; // red
     private static final int OVERRIDE_RULER_COLOR = 0xFF00FF00; // green
@@ -34,7 +33,7 @@ public class SelectedCursorHotspotWidget extends AbstractWidget implements Curso
     }
 
     @Override
-    protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
+    public void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
         context.blit(BACKGROUND, getX(), getY(), 0, 0, width, height, width, height);
         if (!active) context.fill(getX(), getY(), getRight(), getBottom(), 0xAF000000); // 70% black
 

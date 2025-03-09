@@ -10,7 +10,7 @@ import io.github.fishstiz.minecraftcursor.cursorhandler.world.WorldListWidgetCur
 import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.screens.GenericMessageScreen;
+import net.minecraft.client.gui.screens.GenericDirtMessageScreen;
 import net.minecraft.client.gui.screens.LevelLoadingScreen;
 import net.minecraft.client.gui.screens.ProgressScreen;
 import net.minecraft.client.gui.screens.ReceivingLevelScreen;
@@ -33,7 +33,7 @@ public class MinecraftCursorInitializerImpl implements MinecraftCursorInitialize
                 CursorType.NOT_ALLOWED
         );
 
-        elementRegistrar.register(GenericMessageScreen.class, MinecraftCursorInitializerImpl::elementToBusy);
+        elementRegistrar.register(GenericDirtMessageScreen.class, MinecraftCursorInitializerImpl::elementToBusy);
         elementRegistrar.register(ReceivingLevelScreen.class, MinecraftCursorInitializerImpl::elementToBusy);
         elementRegistrar.register(ProgressScreen.class, MinecraftCursorInitializerImpl::elementToBusy);
         elementRegistrar.register(LevelLoadingScreen.class, MinecraftCursorInitializerImpl::elementToBusy);
@@ -52,7 +52,6 @@ public class MinecraftCursorInitializerImpl implements MinecraftCursorInitialize
         elementRegistrar.register(new EnchantmentScreenCursorHandler());
         elementRegistrar.register(new StonecutterScreenCursorHandler());
         elementRegistrar.register(new LoomScreenCursorHandler());
-        elementRegistrar.register(new CrafterScreenCursorHandler());
         elementRegistrar.register(new AdvancementsScreenCursorHandler());
     }
 

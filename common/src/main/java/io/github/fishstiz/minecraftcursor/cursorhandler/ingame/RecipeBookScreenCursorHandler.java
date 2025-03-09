@@ -11,7 +11,7 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.recipebook.OverlayRecipeComponent;
 import net.minecraft.world.inventory.RecipeBookMenu;
 
-public class RecipeBookScreenCursorHandler<T extends AbstractContainerScreen<? extends RecipeBookMenu<?, ?>>> extends HandledScreenCursorHandler<RecipeBookMenu<?, ?>, T> {
+public class RecipeBookScreenCursorHandler<T extends AbstractContainerScreen<? extends RecipeBookMenu<?>>> extends HandledScreenCursorHandler<RecipeBookMenu<?>, T> {
     public static final RecipeBookScreenCursorHandler<InventoryScreen> INVENTORY = new RecipeBookScreenCursorHandler<>();
     public static final RecipeBookScreenCursorHandler<CraftingScreen> CRAFTING = new RecipeBookScreenCursorHandler<>();
     public static final RecipeBookScreenCursorHandler<AbstractFurnaceScreen<?>> FURNACE = new RecipeBookScreenCursorHandler<>();
@@ -46,15 +46,15 @@ public class RecipeBookScreenCursorHandler<T extends AbstractContainerScreen<? e
     }
 
     private RecipeBookWidgetAccessor getRecipeBook(AbstractContainerScreen<?> screen) {
-        return switch (screen) {
-            case InventoryScreen inventory ->
-                    (RecipeBookWidgetAccessor) ((InventoryScreenAccessor) inventory).getRecipeBook();
-            case CraftingScreen crafting ->
-                    (RecipeBookWidgetAccessor) ((CraftingScreenAccessor) crafting).getRecipeBook();
-            case AbstractFurnaceScreen<?> furnace ->
-                    (RecipeBookWidgetAccessor) ((AbstractFurnaceScreenAccessor) furnace).getRecipeBook();
-            default -> null;
-        };
+        if (screen instanceof InventoryScreen inventory) {
+            return (RecipeBookWidgetAccessor) ((InventoryScreenAccessor) inventory).getRecipeBook();
+        } else if (screen instanceof CraftingScreen crafting) {
+            return (RecipeBookWidgetAccessor) ((CraftingScreenAccessor) crafting).getRecipeBook();
+        } else if (screen instanceof AbstractFurnaceScreen<?> furnace) {
+            return (RecipeBookWidgetAccessor) ((AbstractFurnaceScreenAccessor) furnace).getRecipeBook();
+        } else {
+            return null;
+        }
     }
 
     private CursorType getAlternatesWidgetCursor(RecipeAlternativesWidgetAccessor alternatesWidget) {

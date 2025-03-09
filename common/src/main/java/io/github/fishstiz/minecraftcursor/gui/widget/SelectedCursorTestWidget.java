@@ -4,14 +4,13 @@ import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.api.CursorProvider;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
-public class SelectedCursorTestWidget extends AbstractWidget implements CursorProvider {
-    private static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(MinecraftCursor.MOD_ID, "textures/gui/test_background.png");
+public class SelectedCursorTestWidget extends SelectedCursorClickableWidget implements CursorProvider {
+    private static final ResourceLocation BACKGROUND = ResourceLocation.tryBuild(MinecraftCursor.MOD_ID, "textures/gui/test_background.png");
     private static final int HOTSPOT_RULER_COLOR = 0xFF00FF00; // green
     private static final Button BUTTON = Button.builder(Component.empty(),
             b -> b.setFocused(false)).size(20, 20).build();

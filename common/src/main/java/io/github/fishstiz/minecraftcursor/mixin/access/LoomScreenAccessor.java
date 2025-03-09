@@ -1,6 +1,5 @@
 package io.github.fishstiz.minecraftcursor.mixin.access;
 
-import io.github.fishstiz.minecraftcursor.mixin.access.HandledScreenAccessor;
 import net.minecraft.client.gui.screens.inventory.LoomScreen;
 import net.minecraft.world.inventory.LoomMenu;
 import org.spongepowered.asm.mixin.Mixin;

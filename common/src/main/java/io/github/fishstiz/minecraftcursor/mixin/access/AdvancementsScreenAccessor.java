@@ -1,6 +1,6 @@
 package io.github.fishstiz.minecraftcursor.mixin.access;
 
-import net.minecraft.advancements.AdvancementHolder;
+import net.minecraft.advancements.Advancement;
 import net.minecraft.client.gui.screens.advancements.AdvancementTab;
 import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import org.spongepowered.asm.mixin.Mixin;
@@ -11,7 +11,7 @@ import java.util.Map;
 @Mixin(AdvancementsScreen.class)
 public interface AdvancementsScreenAccessor {
     @Accessor("tabs")
-    Map<AdvancementHolder, AdvancementTab> getTabs();
+    Map<Advancement, AdvancementTab> getTabs();
 
     @Accessor("selectedTab")
     AdvancementTab getSelectedTab();

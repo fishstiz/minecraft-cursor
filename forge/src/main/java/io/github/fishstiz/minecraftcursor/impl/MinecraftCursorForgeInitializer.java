@@ -5,7 +5,7 @@ import io.github.fishstiz.minecraftcursor.api.ElementRegistrar;
 import io.github.fishstiz.minecraftcursor.api.MinecraftCursorInitializer;
 import io.github.fishstiz.minecraftcursor.cursorhandler.ingame.TradeOfferButtonCursorHandler;
 
-public class MinecraftCursorNeoforgeInitializer implements MinecraftCursorInitializer {
+public class MinecraftCursorForgeInitializer implements MinecraftCursorInitializer {
     @Override
     public void init(CursorTypeRegistrar cursorRegistrar, ElementRegistrar elementRegistrar) {
         elementRegistrar.register(new TradeOfferButtonCursorHandler("net.minecraft.client.gui.screens.inventory.MerchantScreen$TradeOfferButton"));

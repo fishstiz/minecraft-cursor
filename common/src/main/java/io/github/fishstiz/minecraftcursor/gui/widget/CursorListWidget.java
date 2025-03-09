@@ -20,9 +20,13 @@ public class CursorListWidget extends ContainerObjectSelectionList<CursorListWid
     private static final int ROW_GAP = 1;
     private final CursorOptionsScreen optionsScreen;
 
-    public CursorListWidget(Minecraft client, int width, int height, int y, CursorOptionsScreen optionsScreen) {
-        super(client, width + SCROLLBAR_OFFSET, height, y, ITEM_HEIGHT + ROW_GAP);
+    public CursorListWidget(Minecraft client, int width, int height, int y, int bottom, CursorOptionsScreen optionsScreen) {
+        super(client, width + SCROLLBAR_OFFSET, height, y, bottom, ITEM_HEIGHT + ROW_GAP);
         this.optionsScreen = optionsScreen;
+        this.y0 = y;
+        setRenderBackground(false);
+        setRenderHeader(false, 0);
+        setRenderTopAndBottom(false);
         populateEntries();
     }
 
@@ -30,8 +34,8 @@ public class CursorListWidget extends ContainerObjectSelectionList<CursorListWid
         for (Cursor cursor : optionsScreen.getCursors()) {
             CursorEntry entry = new CursorEntry(
                     cursor,
-                    getX(),
-                    getY() + itemHeight * getItemCount(),
+                    x0,
+                    y0 + itemHeight * getItemCount(),
                     width - SCROLLBAR_OFFSET,
                     ITEM_HEIGHT
             );
@@ -41,17 +45,18 @@ public class CursorListWidget extends ContainerObjectSelectionList<CursorListWid
 
     @Override
     protected int getScrollbarPosition() {
-        return getRight() - SCROLLBAR_OFFSET;
+        return (x0 + width) - SCROLLBAR_OFFSET;
     }
 
     @Override
-    protected void renderListSeparators(GuiGraphics context) {
-        // override to remove header and footer
+    public void setLeftPos(int leftPos) {
+        this.x0 = leftPos;
+        super.setLeftPos(leftPos);
+        this.centerScrollOn(this.getFirstElement());
     }
 
-    @Override
-    public void renderListBackground(GuiGraphics context) {
-        // override to remove background
+    public void setHeight(int height) {
+        this.height = height;
     }
 
     class CursorEntry extends Entry<CursorEntry> {
@@ -63,9 +68,9 @@ public class CursorListWidget extends ContainerObjectSelectionList<CursorListWid
 
         @Override
         public void render(GuiGraphics context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float delta) {
-            button.setX(CursorListWidget.this.getX());
-            button.setY(CursorListWidget.this.getY() + (itemHeight + ROW_GAP) * index - (int) Math.round(getScrollAmount()));
-            button.render(context, mouseX, mouseY, delta);
+            button.setX(CursorListWidget.this.x0);
+            button.setY(CursorListWidget.this.y0 + (itemHeight + ROW_GAP) * index - (int) Math.round(getScrollAmount()));
+            button.renderWidget(context, mouseX, mouseY, delta);
         }
 
         @Override
@@ -101,13 +106,13 @@ public class CursorListWidget extends ContainerObjectSelectionList<CursorListWid
         }
 
         @Override
-        protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
+        public void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
             renderBox(context);
             renderTexture(context);
             renderMessage(context);
 
             context.renderOutline(getX(), getY(), getWidth(), getHeight(),
-                    isHoveredOrFocused() || cursor == optionsScreen.getSelectedCursor() ? BORDER_COLOR : 0xFF000000);
+                    isMouseOver(mouseX, mouseY) || cursor == optionsScreen.getSelectedCursor() ? BORDER_COLOR : 0xFF000000);
         }
 
         private void renderBox(GuiGraphics context) {

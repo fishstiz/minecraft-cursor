@@ -1,5 +1,6 @@
 package io.github.fishstiz.minecraftcursor.gui.widget;
 
+import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.network.chat.Component;
@@ -17,6 +18,7 @@ public class SelectedCursorSliderWidget extends AbstractSliderButton {
     private final @Nullable Runnable onRelease;
     private double translatedValue;
     private SelectedCursorButtonWidget inactiveHelperButton;
+    private boolean held;
 
     public SelectedCursorSliderWidget(
             Component text,
@@ -107,6 +109,16 @@ public class SelectedCursorSliderWidget extends AbstractSliderButton {
         }
 
         isHovered = isMouseOver(mouseX, mouseY);
+
+        if (held && !CursorTypeUtil.isLeftClickHeld()) {
+            if (this.onRelease != null) {
+                this.onRelease.run();
+            }
+            setFocused(false);
+            held = false;
+        } else {
+            held = CursorTypeUtil.isLeftClickHeld();
+        }
     }
 
     private void renderAroundHelperButton(
@@ -118,15 +130,16 @@ public class SelectedCursorSliderWidget extends AbstractSliderButton {
     ) {
         int x = getX();
         int y = getY();
-        int right = getRight();
-        int bottom = getBottom();
+        int right = x + getWidth();
+        int bottom = y + getHeight();
         int helperY = helperButton.getY();
-        int helperBottom = helperButton.getBottom();
+        int helperBottom = helperY + helperButton.getHeight();
+        int helperRight = helperButton.getX() + helperButton.getWidth();
 
         renderSection(context, mouseX, mouseY, delta, x, y, right, helperY); // top
         renderSection(context, mouseX, mouseY, delta, x, helperBottom, right, bottom); // bottom
         renderSection(context, mouseX, mouseY, delta, x, helperY, helperButton.getX(), helperBottom); // left
-        renderSection(context, mouseX, mouseY, delta, helperButton.getRight(), helperY, right, helperBottom); // right
+        renderSection(context, mouseX, mouseY, delta, helperRight, helperY, right, helperBottom); // right
     }
 
     private void renderSection(GuiGraphics context, int mouseX, int mouseY, float delta, int x1, int y1, int x2, int y2) {
@@ -156,16 +169,6 @@ public class SelectedCursorSliderWidget extends AbstractSliderButton {
         return translatedValue;
     }
 
-    @Override
-    public void onRelease(double mouseX, double mouseY) {
-        super.onRelease(mouseX, mouseY);
-        setFocused(false);
-
-        if (this.onRelease != null) {
-            this.onRelease.run();
-        }
-    }
-
     public @Nullable SelectedCursorButtonWidget getInactiveHelperButton() {
         if (inactiveHelperButton == null) return null;
 
@@ -179,7 +182,8 @@ public class SelectedCursorSliderWidget extends AbstractSliderButton {
 
     public void setInactiveHelperButton(SelectedCursorButtonWidget helperButton, int width, int height) {
         this.inactiveHelperButton = helperButton;
-        this.inactiveHelperButton.setSize(width, height);
+        this.inactiveHelperButton.setWidth(width);
+        this.inactiveHelperButton.height = height;
     }
 
     public Component getPrefix() {
@@ -190,7 +194,7 @@ public class SelectedCursorSliderWidget extends AbstractSliderButton {
         return !active
                 && mouseX >= getX()
                 && mouseY >= getY()
-                && mouseX < getRight()
-                && mouseY < getBottom();
+                && mouseX < getX() + getWidth()
+                && mouseY < getY() + getHeight();
     }
 }
