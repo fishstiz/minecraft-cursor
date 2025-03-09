@@ -1,41 +1,43 @@
 package io.github.fishstiz.minecraftcursor.cursorhandler.ingame;
 
 import io.github.fishstiz.minecraftcursor.api.CursorType;
-import io.github.fishstiz.minecraftcursor.mixin.access.RecipeAlternativesWidgetAccessor;
-import io.github.fishstiz.minecraftcursor.mixin.access.RecipeBookResultsAccessor;
-import io.github.fishstiz.minecraftcursor.mixin.access.RecipeBookScreenAccessor;
-import io.github.fishstiz.minecraftcursor.mixin.access.RecipeBookWidgetAccessor;
+import io.github.fishstiz.minecraftcursor.mixin.access.*;
 import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.StateSwitchingButton;
-import net.minecraft.client.gui.screens.inventory.AbstractRecipeBookScreen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.AbstractFurnaceScreen;
+import net.minecraft.client.gui.screens.inventory.CraftingScreen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.recipebook.OverlayRecipeComponent;
 import net.minecraft.world.inventory.RecipeBookMenu;
 
-public class RecipeBookScreenCursorHandler extends HandledScreenCursorHandler<RecipeBookMenu, AbstractRecipeBookScreen<? extends RecipeBookMenu>> {
-    private RecipeAlternativesWidgetAccessor alternatesWidget;
+public class RecipeBookScreenCursorHandler<T extends AbstractContainerScreen<? extends RecipeBookMenu<?, ?>>> extends HandledScreenCursorHandler<RecipeBookMenu<?, ?>, T> {
+    public static final RecipeBookScreenCursorHandler<InventoryScreen> INVENTORY = new RecipeBookScreenCursorHandler<>();
+    public static final RecipeBookScreenCursorHandler<CraftingScreen> CRAFTING = new RecipeBookScreenCursorHandler<>();
+    public static final RecipeBookScreenCursorHandler<AbstractFurnaceScreen<?>> FURNACE = new RecipeBookScreenCursorHandler<>();
+
+    private OverlayRecipeComponent alternatesWidget;
 
     @Override
-    public CursorType getCursorType(AbstractRecipeBookScreen<? extends RecipeBookMenu> recipeBookScreen, double mouseX, double mouseY) {
+    public CursorType getCursorType(T recipeBookScreen, double mouseX, double mouseY) {
         CursorType cursorType = super.getCursorType(recipeBookScreen, mouseX, mouseY);
-        if (cursorType != CursorType.DEFAULT && (alternatesWidget == null || !(((OverlayRecipeComponent) alternatesWidget).isVisible()))) {
+        if (cursorType != CursorType.DEFAULT && (alternatesWidget == null || !alternatesWidget.isVisible())) {
             return cursorType;
         }
 
-        RecipeBookWidgetAccessor recipeBook = (RecipeBookWidgetAccessor) ((RecipeBookScreenAccessor<?>) recipeBookScreen).getRecipeBook();
-        if (!recipeBook.invokeIsOpen()) return CursorType.DEFAULT;
+        RecipeBookWidgetAccessor recipeBook = getRecipeBook(recipeBookScreen);
+        if (recipeBook == null || !recipeBook.invokeIsOpen()) return CursorType.DEFAULT;
 
         RecipeBookResultsAccessor recipesArea = (RecipeBookResultsAccessor) recipeBook.getRecipesArea();
-        alternatesWidget = (RecipeAlternativesWidgetAccessor) recipesArea.getAlternatesWidget();
+        alternatesWidget = recipesArea.getAlternatesWidget();
 
-        if (((OverlayRecipeComponent) alternatesWidget).isVisible()) {
-            return getAlternatesWidgetCursor(alternatesWidget);
+        if (alternatesWidget.isVisible()) {
+            return getAlternatesWidgetCursor((RecipeAlternativesWidgetAccessor) alternatesWidget);
         }
 
-        boolean isResultHovered = recipesArea.getHoveredResultButton() != null;
-        if (isResultHovered && CursorTypeUtil.canShift()) {
+        if (recipesArea.getHoveredResultButton() != null && CursorTypeUtil.canShift()) {
             return CursorType.SHIFT;
-        } else if (isButtonHovered(recipeBook, recipesArea) || isResultHovered) {
+        } else if (isButtonHovered(recipeBook, recipesArea) || recipesArea.getHoveredResultButton() != null) {
             return CursorType.POINTER;
         } else if (recipeBook.getSearchField().isHovered()) {
             return CursorType.TEXT;
@@ -43,21 +45,33 @@ public class RecipeBookScreenCursorHandler extends HandledScreenCursorHandler<Re
         return getTabCursor(recipeBook);
     }
 
+    private RecipeBookWidgetAccessor getRecipeBook(AbstractContainerScreen<?> screen) {
+        return switch (screen) {
+            case InventoryScreen inventory ->
+                    (RecipeBookWidgetAccessor) ((InventoryScreenAccessor) inventory).getRecipeBook();
+            case CraftingScreen crafting ->
+                    (RecipeBookWidgetAccessor) ((CraftingScreenAccessor) crafting).getRecipeBook();
+            case AbstractFurnaceScreen<?> furnace ->
+                    (RecipeBookWidgetAccessor) ((AbstractFurnaceScreenAccessor) furnace).getRecipeBook();
+            default -> null;
+        };
+    }
+
     private CursorType getAlternatesWidgetCursor(RecipeAlternativesWidgetAccessor alternatesWidget) {
-        if (alternatesWidget.getAlternativeButtons().stream().anyMatch(AbstractWidget::isHovered)) {
-            return CursorTypeUtil.canShift() ? CursorType.SHIFT : CursorType.POINTER;
-        }
-        return CursorType.DEFAULT_FORCE;
+        return alternatesWidget.getAlternativeButtons().stream().anyMatch(AbstractWidget::isHovered)
+                ? (CursorTypeUtil.canShift() ? CursorType.SHIFT : CursorType.POINTER)
+                : CursorType.DEFAULT_FORCE;
     }
 
     private boolean isButtonHovered(RecipeBookWidgetAccessor recipeBook, RecipeBookResultsAccessor recipesArea) {
-        StateSwitchingButton prevPageButton = recipesArea.getPrevPageButton();
-        StateSwitchingButton nextPageButton = recipesArea.getNextPageButton();
-        return (prevPageButton.isHovered() && prevPageButton.visible) || (nextPageButton.isHovered() && nextPageButton.visible) || recipeBook.getToggleCraftableButton().isHovered();
+        return (recipesArea.getPrevPageButton().isHovered() && recipesArea.getPrevPageButton().visible) ||
+                (recipesArea.getNextPageButton().isHovered() && recipesArea.getNextPageButton().visible) ||
+                recipeBook.getToggleCraftableButton().isHovered();
     }
 
     private CursorType getTabCursor(RecipeBookWidgetAccessor recipeBook) {
-        boolean isUnselectedTabHovered = recipeBook.getTabButtons().stream().anyMatch(btn -> btn.isHovered() && btn != recipeBook.getCurrentTab());
-        return isUnselectedTabHovered ? CursorType.POINTER : CursorType.DEFAULT;
+        return recipeBook.getTabButtons().stream().anyMatch(btn -> btn.isHovered() && btn != recipeBook.getCurrentTab())
+                ? CursorType.POINTER
+                : CursorType.DEFAULT;
     }
 }

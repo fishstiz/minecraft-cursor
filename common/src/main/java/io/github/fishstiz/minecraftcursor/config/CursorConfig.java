@@ -1,14 +1,14 @@
 package io.github.fishstiz.minecraftcursor.config;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.util.SettingsUtil;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CursorConfig {
+public class CursorConfig implements Serializable {
     private String _hash;
     private boolean itemSlotEnabled = true;
     private boolean itemGrabbingEnabled = true;
@@ -23,7 +23,7 @@ public class CursorConfig {
     private boolean remapCursorsEnabled = true;
     private final GlobalSettings global = new GlobalSettings();
     private final Map<String, Settings> settings = new HashMap<>();
-    File file;
+    transient File file;
 
     CursorConfig() {
     }
@@ -172,12 +172,11 @@ public class CursorConfig {
         this.remapCursorsEnabled = remapCursorsEnabled;
     }
 
-    public static class Settings {
+    public static class Settings implements Serializable {
         protected double scale = Default.SCALE;
         protected int xhot = Default.X_HOT;
         protected int yhot = Default.Y_HOT;
         private boolean enabled = Default.ENABLED;
-        @JsonInclude(JsonInclude.Include.NON_NULL)
         private Boolean animated;
 
         public void update(double scale, int xhot, int yhot, boolean enabled) {

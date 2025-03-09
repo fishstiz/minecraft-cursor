@@ -35,7 +35,7 @@ public class CursorOptionsScreen extends Screen {
     public final CursorAnimationHelper animationHelper = new CursorAnimationHelper();
     private final CursorManager cursorManager;
     private final List<Cursor> cursors;
-    private final Screen previousScreen;
+    final Screen previousScreen;
     private Cursor selectedCursor;
     CursorOptionsBody body;
 
@@ -61,12 +61,11 @@ public class CursorOptionsScreen extends Screen {
         this.layout.visitWidgets(this::addRenderableWidget);
 
         if (this.body != null) {
-            this.repositionElements();
+            this.refreshWidgetPositions();
         }
     }
 
-    @Override
-    protected void repositionElements() {
+    protected void refreshWidgetPositions() {
         this.layout.arrangeElements();
 
         int bodyWidth = CURSORS_COLUMN_WIDTH + SELECTED_CURSOR_COLUMN_WIDTH + COLUMN_GAP;

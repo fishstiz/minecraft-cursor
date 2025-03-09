@@ -30,7 +30,7 @@ public class StonecutterScreenCursorHandler extends HandledScreenCursorHandler<S
         int recipesY = accessor.getY() + RECIPES_OFFSET_Y;
         int scrollOffset = accessor.getScrollOffset();
 
-        for (int i = scrollOffset; i < scrollOffset + RECIPES_SCROLLOFFSET && i < handler.getNumberOfVisibleRecipes(); i++) {
+        for (int i = scrollOffset; i < scrollOffset + RECIPES_SCROLLOFFSET && i < handler.getNumRecipes(); i++) {
             int recipeIndex = i - scrollOffset;
             int row = recipeIndex / GRID_SIZE;
             int slotX = recipesX + recipeIndex % GRID_SIZE * RECIPE_SLOT_WIDTH;

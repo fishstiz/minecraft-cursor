@@ -7,7 +7,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
@@ -33,7 +32,7 @@ public class SelectedCursorTestWidget extends AbstractWidget implements CursorPr
 
     @Override
     protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
-        context.blit(RenderType::guiTextured, BACKGROUND, getX(), getY(), 0, 0, width, height, width, height);
+        context.blit(BACKGROUND, getX(), getY(), 0, 0, width, height, width, height);
 
         if (options.parent().getSelectedCursor().isEnabled()) {
             BUTTON.render(context, mouseX, mouseY, delta);

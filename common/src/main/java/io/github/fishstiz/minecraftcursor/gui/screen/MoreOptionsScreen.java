@@ -43,6 +43,10 @@ public class MoreOptionsScreen extends Screen implements CursorProvider {
 
     @Override
     protected void init() {
+        if (this.list != null && this.list.isReloaded()) {
+            onClose();
+        }
+
         this.layout.addTitleHeader(this.title, this.font);
 
         this.list = this.layout.addToContents(new MoreOptionsListWidget(
@@ -57,11 +61,10 @@ public class MoreOptionsScreen extends Screen implements CursorProvider {
 
         this.layout.visitWidgets(this::addRenderableWidget);
 
-        this.repositionElements();
+        this.refreshWidgetPositions();
     }
 
-    @Override
-    protected void repositionElements() {
+    protected void refreshWidgetPositions() {
         if (this.list != null) {
             this.layout.arrangeElements();
             this.list.updateSize(width, layout);
@@ -97,10 +100,13 @@ public class MoreOptionsScreen extends Screen implements CursorProvider {
         list.applyConfig();
 
         if (this.minecraft != null) {
-            if (previousScreen instanceof CursorOptionsScreen screen && screen.body != null) {
-                screen.body.selectedCursorColumn.refresh();
+            if (previousScreen instanceof CursorOptionsScreen options && options.body != null) {
+                CursorOptionsScreen optionsScreen = new CursorOptionsScreen(options.previousScreen, cursorManager);
+                optionsScreen.selectCursor(options.getSelectedCursor());
+                this.minecraft.setScreen(optionsScreen);
+            } else {
+                this.minecraft.setScreen(previousScreen);
             }
-            this.minecraft.setScreen(previousScreen);
         }
     }
 

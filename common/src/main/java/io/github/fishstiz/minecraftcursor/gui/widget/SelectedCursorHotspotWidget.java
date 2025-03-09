@@ -9,7 +9,6 @@ import io.github.fishstiz.minecraftcursor.util.MouseEvent;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -36,7 +35,7 @@ public class SelectedCursorHotspotWidget extends AbstractWidget implements Curso
 
     @Override
     protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
-        context.blit(RenderType::guiTextured, BACKGROUND, getX(), getY(), 0, 0, width, height, width, height);
+        context.blit(BACKGROUND, getX(), getY(), 0, 0, width, height, width, height);
         if (!active) context.fill(getX(), getY(), getRight(), getBottom(), 0xAF000000); // 70% black
 
         drawCursorTexture(context);

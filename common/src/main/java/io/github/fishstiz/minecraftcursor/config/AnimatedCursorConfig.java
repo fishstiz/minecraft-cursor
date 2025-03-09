@@ -1,13 +1,13 @@
 package io.github.fishstiz.minecraftcursor.config;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.gson.*;
 import io.github.fishstiz.minecraftcursor.cursor.AnimationMode;
 
+import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.util.List;
 
-public class AnimatedCursorConfig {
+public class AnimatedCursorConfig implements Serializable {
     private static final int MIN_TIME = 1;
     public final AnimationMode mode;
     private final int frametime;
@@ -26,7 +26,7 @@ public class AnimatedCursorConfig {
         return List.copyOf(this.frames);
     }
 
-    public static class Frame {
+    public static class Frame implements Serializable {
         private final int index;
         private int time;
 
@@ -43,17 +43,20 @@ public class AnimatedCursorConfig {
             this.time = this.time > 0 ? this.time : Math.max(config.getFrametime(), MIN_TIME);
             return this.time;
         }
+    }
 
-        @JsonCreator
-        public static Frame setFrames(JsonNode node) {
-            if (node.isInt()) {
-                return new Frame(node.asInt(), 0);
-            } else {
-                ObjectNode obj = (ObjectNode) node;
-                int index = obj.has("index") ? obj.get("index").asInt() : 0;
-                int time = obj.has("time") ? obj.get("time").asInt() : 0;
+    public static class FrameDeserializer implements JsonDeserializer<Frame> {
+        @Override
+        public Frame deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            if (json.isJsonPrimitive() && json.getAsJsonPrimitive().isNumber()) {
+                return new Frame(json.getAsInt(), 0);
+            } else if (json.isJsonObject()) {
+                JsonObject obj = json.getAsJsonObject();
+                int index = obj.has("index") ? obj.get("index").getAsInt() : 0;
+                int time = obj.has("time") ? obj.get("time").getAsInt() : 0;
                 return new Frame(index, time);
             }
+            throw new JsonParseException("Invalid Frame format");
         }
     }
 }

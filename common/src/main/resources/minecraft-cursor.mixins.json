@@ -6,14 +6,16 @@
   "compatibilityLevel": "JAVA_21",
   "client": [
     "MouseOptionsScreenMixin",
+    "access.AbstractFurnaceScreenAccessor",
     "access.AdvancementsScreenAccessor",
     "access.BookEditScreenAccessor",
+    "access.CraftingScreenAccessor",
     "access.CreativeInventoryScreenAccessor",
     "access.HandledScreenAccessor",
+    "access.InventoryScreenAccessor",
     "access.LoomScreenAccessor",
     "access.RecipeAlternativesWidgetAccessor",
     "access.RecipeBookResultsAccessor",
-    "access.RecipeBookScreenAccessor",
     "access.RecipeBookWidgetAccessor",
     "access.StonecutterScreenAccessor",
     "compat.glfw.GlfwMixin"

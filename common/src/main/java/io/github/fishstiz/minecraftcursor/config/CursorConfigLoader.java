@@ -1,25 +1,32 @@
 package io.github.fishstiz.minecraftcursor.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
+import io.github.fishstiz.minecraftcursor.cursor.AnimationMode;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 public class CursorConfigLoader {
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson GSON_ANIMATION = new GsonBuilder()
+            .registerTypeAdapter(AnimatedCursorConfig.Frame.class, new AnimatedCursorConfig.FrameDeserializer())
+            .registerTypeAdapter(AnimationMode.class, new AnimationMode.Deserializer())
+            .create();
 
     private CursorConfigLoader() {
     }
 
     public static AnimatedCursorConfig getAnimationConfig(InputStream stream) throws IOException {
-        return MAPPER.readValue(stream, AnimatedCursorConfig.class);
+        try (InputStreamReader reader = new InputStreamReader(stream)) {
+            return GSON_ANIMATION.fromJson(reader, AnimatedCursorConfig.class);
+        }
     }
 
     public static CursorConfig fromStream(InputStream stream) throws IOException {
-        return MAPPER.readValue(stream, CursorConfig.class);
+        try (InputStreamReader reader = new InputStreamReader(stream)) {
+            return GSON.fromJson(reader, CursorConfig.class);
+        }
     }
 
     public static CursorConfig fromFile(File file) {
@@ -29,8 +36,8 @@ public class CursorConfigLoader {
 
         CursorConfig config = new CursorConfig();
 
-        try {
-            config = MAPPER.readValue(file, CursorConfig.class);
+        try (FileReader reader = new FileReader(file)) {
+            config = GSON.fromJson(reader, CursorConfig.class);
         } catch (FileNotFoundException e) {
             MinecraftCursor.LOGGER.info("Creating cursor config file at {}", file.getPath());
             saveConfig(file, config);
@@ -43,8 +50,8 @@ public class CursorConfigLoader {
     }
 
     public static void saveConfig(File file, CursorConfig config) {
-        try {
-            MAPPER.writerWithDefaultPrettyPrinter().writeValue(file, config);
+        try (FileWriter writer = new FileWriter(file)) {
+            GSON.toJson(config, writer);
         } catch (IOException e) {
             MinecraftCursor.LOGGER.error("Failed to save config file at {}", file.getPath());
         }

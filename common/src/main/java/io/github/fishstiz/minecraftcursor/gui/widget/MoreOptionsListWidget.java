@@ -75,9 +75,10 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
             GLOBAL::getYHot, GLOBAL::setYHotDouble,
             CursorConfig.Settings::getYHot, Cursor::setYHot
     );
+    private boolean reloaded = false;
 
-    public MoreOptionsListWidget(Minecraft minecraftClient, int width, int height, int y, CursorManager cursorManager) {
-        super(minecraftClient, width, height, y, ITEM_HEIGHT + ROW_GAP);
+    public MoreOptionsListWidget(Minecraft client, int width, int height, int y, CursorManager cursorManager) {
+        super(client, width, height, y, ITEM_HEIGHT + ROW_GAP);
 
         this.cursorManager = cursorManager;
 
@@ -136,7 +137,11 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
 
     private void reloadConfiguration() {
         CONFIG.set_hash(String.valueOf(Math.random()));
-        minecraft.reloadResourcePacks();
+        minecraft.reloadResourcePacks().thenRun(() -> this.reloaded = true);
+    }
+
+    public boolean isReloaded() {
+        return this.reloaded;
     }
 
     private void addAdaptiveEntry(Component label, boolean isEnabled, boolean active, Consumer<Boolean> onPress) {

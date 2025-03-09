@@ -4,7 +4,6 @@ import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
 import io.github.fishstiz.minecraftcursor.cursor.AnimationState;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,11 +26,10 @@ public class CursorAnimationHelper {
         int vOffset = CURSOR_SIZE * frameIndex;
 
         context.blit(
-                RenderType::guiTextured,
                 cursor.getSprite(),
                 x, y,
-                0, vOffset, // starting point
                 size, size, // width/height to stretch/shrink
+                0, vOffset, // starting point
                 CURSOR_SIZE, CURSOR_SIZE, // cropped width/height from actual image
                 cursor.getTrueWidth(), cursor.getTrueHeight() // actual width/height
         );

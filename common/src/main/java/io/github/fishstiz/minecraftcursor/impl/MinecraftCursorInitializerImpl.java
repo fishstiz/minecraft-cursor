@@ -44,7 +44,9 @@ public class MinecraftCursorInitializerImpl implements MinecraftCursorInitialize
         elementRegistrar.register(new WorldListWidgetCursorHandler());
         elementRegistrar.register(new HandledScreenCursorHandler<>());
         elementRegistrar.register(new MultiplayerServerListWidgetCursorHandler());
-        elementRegistrar.register(new RecipeBookScreenCursorHandler());
+        elementRegistrar.register(RecipeBookScreenCursorHandler.INVENTORY);
+        elementRegistrar.register(RecipeBookScreenCursorHandler.CRAFTING);
+        elementRegistrar.register(RecipeBookScreenCursorHandler.FURNACE);
         elementRegistrar.register(new CreativeInventoryScreenCursorHandler());
         elementRegistrar.register(new BookEditScreenCursorHandler());
         elementRegistrar.register(new EnchantmentScreenCursorHandler());
