@@ -1,3 +1,3 @@
-- **Minecraft Cursor** and **Minecraft Cursor API** are now available for **Forge** 1.20.1 and **NeoForge** 1.21.1+
-- **Dropped support** for 1.21, use 1.21.1 instead.
-- No functional changes for Fabric users, but this update involved significant internal changes to enable multiloader support.
+- Fix cursor list buttons not changing the cursors to pointer.
+- Fix Book and Quill not changing the cursor to Text.
+- Fix crash when opening the config screen in Fabric.
