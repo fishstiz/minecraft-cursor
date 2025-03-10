@@ -52,6 +52,9 @@ publishMods {
         displayName = "${mod_name} for Forge v${mod_version}"
         file project(":forge")
         additionalFiles.from(project(":forge").layout.buildDirectory.file(
+                "libs/${project(":forge").base.archivesName.get()}-${mod_version}.jar"
+        ))
+        additionalFiles.from(project(":forge").layout.buildDirectory.file(
                 "libs/${project(":forge").base.archivesName.get()}-${mod_version}-sources.jar")
         )
     }
@@ -111,6 +114,14 @@ publishMods {
         from curseforgeOptions, forgeOptions
         modLoaders.add("forge")
     }
+}
+
+tasks.named("publishModrinthForge") {
+    mustRunAfter(":forge:reobfJar")
+}
+
+tasks.named("publishCurseforgeForge") {
+    mustRunAfter(":forge:reobfJar")
 }
 
 tasks.named("publishGithub") {
