@@ -1,5 +1,7 @@
 package io.github.fishstiz.minecraftcursor.gui.widget;
 
+import io.github.fishstiz.minecraftcursor.api.CursorProvider;
+import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
 import io.github.fishstiz.minecraftcursor.gui.screen.CursorOptionsScreen;
 import io.github.fishstiz.minecraftcursor.util.DrawUtil;
@@ -84,7 +86,7 @@ public class CursorListWidget extends ContainerObjectSelectionList<CursorListWid
         }
     }
 
-    class CursorButtonWidget extends AbstractButton {
+    class CursorButtonWidget extends AbstractButton implements CursorProvider {
         private static final String PREFIX_TEXT_KEY = "minecraft-cursor.options.cursor-type.";
         private static final int TEXTURE_SIZE = 16;
         private static final int PADDING_LEFT = 8;
@@ -140,6 +142,11 @@ public class CursorListWidget extends ContainerObjectSelectionList<CursorListWid
         @Override
         protected void updateWidgetNarration(NarrationElementOutput builder) {
             // unsupported
+        }
+
+        @Override
+        public CursorType getCursorType(double mouseX, double mouseY) {
+            return CursorType.POINTER;
         }
     }
 }
