@@ -29,10 +29,10 @@ dependencies {
 
 loom {
     mixin {
-        defaultRefmapName.set("minecraft-cursor.refmap.json")
+        defaultRefmapName.set("${mod_id}.refmap.json")
     }
 
-    def aw = project(':common').file("src/main/resources/minecraft-cursor.accesswidener")
+    def aw = project(':common').file("src/main/resources/${mod_id}.accesswidener")
     if (aw.exists()) {
         accessWidenerPath.set(aw)
     }
