@@ -108,3 +108,7 @@ publishMods {
         clientRequired = true
     }
 }
+
+tasks.named("publishGithub") {
+    mustRunAfter(":neoforge:jar")
+}
