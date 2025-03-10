@@ -34,7 +34,7 @@ if (secretsFile.exists()) {
 
 publishMods {
     changelog = file("CHANGELOG.md").text
-    type = ALPHA
+    type = STABLE
 
     def fabricOptions = publishOptions {
         displayName = "${mod_name} for Fabric v${mod_version}"
@@ -73,11 +73,14 @@ publishMods {
         accessToken = secrets.getProperty("MODRINTH_TOKEN")
         projectId = "o5fhgLeQ"
         minecraftVersions.add(minecraft_version)
+        minecraftVersions.add("1.21.3")
     }
     def curseforgeOptions = curseforgeOptions {
         accessToken = secrets.getProperty("CURSEFORGE_TOKEN")
         projectId = "1184736"
         minecraftVersions.add(minecraft_version)
+        minecraftVersions.add("1.21.3")
+        clientRequired = true
     }
 
     github("github") {
@@ -98,13 +101,11 @@ publishMods {
     curseforge("curseforgeFabric") {
         from curseforgeOptions, fabricOptions
         modLoaders.add("fabric")
-        clientRequired = true
         requires("fabric-api")
         optional("modmenu")
     }
     curseforge("curseforgeNeoForge") {
         from curseforgeOptions, neoforgeOptions
         modLoaders.add("neoforge")
-        clientRequired = true
     }
 }
