@@ -34,7 +34,7 @@ if (secretsFile.exists()) {
 
 publishMods {
     changelog = file("CHANGELOG.md").text
-    type = ALPHA
+    type = STABLE
 
     def fabricOptions = publishOptions {
         displayName = "${mod_name} for Fabric v${mod_version}"
