@@ -1,3 +1,4 @@
 accessWidener v2 named
+accessible field net/minecraft/client/gui/components/AbstractWidget height I
 accessible class net/minecraft/client/gui/screens/inventory/BookEditScreen$Pos2i
 accessible method net/minecraft/client/gui/screens/inventory/BookEditScreen$Pos2i <init> (II)V

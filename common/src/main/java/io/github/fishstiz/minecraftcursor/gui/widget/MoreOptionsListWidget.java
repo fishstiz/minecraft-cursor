@@ -15,6 +15,7 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -27,7 +28,7 @@ import java.util.function.*;
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
 import static io.github.fishstiz.minecraftcursor.gui.widget.CursorOptionsWidget.*;
 
-public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOptionsListWidget.OptionEntry> {
+public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOptionsListWidget.OptionEntry> implements LayoutElement {
     private static final CursorConfig.GlobalSettings GLOBAL = CONFIG.getGlobal();
 
     private static final String GLOBAL_TOOLTIP_KEY = "minecraft-cursor.options.more.global.tooltip";
@@ -75,12 +76,13 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
             GLOBAL::getYHot, GLOBAL::setYHotDouble,
             CursorConfig.Settings::getYHot, Cursor::setYHot
     );
-    private boolean reloaded = false;
+    private int y;
 
-    public MoreOptionsListWidget(Minecraft client, int width, int height, int y, CursorManager cursorManager) {
-        super(client, width, height, y, ITEM_HEIGHT + ROW_GAP);
+    public MoreOptionsListWidget(Minecraft minecraftClient, int width, int height, int y, int bottom, CursorManager cursorManager) {
+        super(minecraftClient, width, height, y, bottom, ITEM_HEIGHT + ROW_GAP);
 
         this.cursorManager = cursorManager;
+        this.y = y;
 
         addGlobalOptions();
         addAdaptiveOptions();
@@ -137,11 +139,7 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
 
     private void reloadConfiguration() {
         CONFIG.set_hash(String.valueOf(Math.random()));
-        minecraft.reloadResourcePacks().thenRun(() -> this.reloaded = true);
-    }
-
-    public boolean isReloaded() {
-        return this.reloaded;
+        minecraft.reloadResourcePacks();
     }
 
     private void addAdaptiveEntry(Component label, boolean isEnabled, boolean active, Consumer<Boolean> onPress) {
@@ -289,6 +287,49 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
         return Tooltip.create(Component.translatable(GLOBAL_TOOLTIP_KEY, settingText));
     }
 
+    public void position(int width, int height, int y) {
+        this.width = width;
+        this.height = height;
+        this.setLeftPos(0);
+        this.y0 = y;
+    }
+
+
+    @Override
+    public void setX(int x) {
+        this.setLeftPos(x);
+    }
+
+    @Override
+    public void setY(int y) {
+        // unsupported
+    }
+
+    @Override
+    public int getX() {
+        return getRowLeft();
+    }
+
+    @Override
+    public int getY() {
+        return y;
+    }
+
+    @Override
+    public int getWidth() {
+        return this.getRowWidth();
+    }
+
+    @Override
+    public int getHeight() {
+        return this.itemHeight;
+    }
+
+    @Override
+    public void visitWidgets(Consumer<AbstractWidget> consumer) {
+        // unsupported
+    }
+
     public abstract static class OptionEntry extends Entry<OptionEntry> {
         protected final Component label;
 
@@ -316,7 +357,8 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
             super(label);
 
             this.button = buttonFactory.get();
-            this.button.setSize(BUTTON_WIDTH, 20);
+            this.button.setWidth(BUTTON_WIDTH);
+            this.button.height = 20;
         }
 
         @Override
@@ -398,7 +440,8 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
             super(label);
 
             this.button = new SelectedCursorButtonWidget(label, onPress);
-            this.button.setSize(getRowWidth(), 20);
+            this.button.setWidth(getRowWidth());
+            this.button.height = 20;
             this.button.setTooltip(Tooltip.create(tooltipText));
         }
 
@@ -438,7 +481,8 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
 
             sliderWidget.active = this.button.value;
             sliderWidget.setPosition(x - ROW_GAP / 2, getYEntry(index));
-            sliderWidget.setSize(this.button.getX() - x - ROW_GAP, 20);
+            sliderWidget.setWidth(this.button.getX() - x - ROW_GAP);
+            sliderWidget.height = 20;
             sliderWidget.renderWidget(context, mouseX, mouseY, tickDelta);
         }
 

@@ -11,6 +11,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
@@ -101,7 +102,9 @@ public class AnimatedCursor extends Cursor {
         this.mode = animation.mode;
 
         boolean isReversed = this.mode == AnimationMode.LOOP_REVERSE || this.mode == AnimationMode.REVERSE;
-        this.frames = isReversed ? newFrames.reversed() : newFrames;
+        if (isReversed) Collections.reverse(newFrames);
+        this.frames = newFrames;
+
 
         List<Cursor> oldCursors = List.copyOf(this.cursors.values());
         this.cursors = newCursors;

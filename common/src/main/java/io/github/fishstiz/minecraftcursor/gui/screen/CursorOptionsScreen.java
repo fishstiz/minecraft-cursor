@@ -2,12 +2,13 @@ package io.github.fishstiz.minecraftcursor.gui.screen;
 
 import io.github.fishstiz.minecraftcursor.CursorManager;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
+import io.github.fishstiz.minecraftcursor.gui.widget.ContainerWidget;
 import io.github.fishstiz.minecraftcursor.gui.widget.CursorListWidget;
 import io.github.fishstiz.minecraftcursor.gui.widget.CursorOptionsHandler;
 import io.github.fishstiz.minecraftcursor.gui.widget.CursorOptionsWidget;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractContainerWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -50,19 +51,29 @@ public class CursorOptionsScreen extends Screen {
 
     @Override
     protected void init() {
-        selectedCursor = cursorManager.getLoadedCursors().getFirst();
+        selectedCursor = cursorManager.getLoadedCursors().get(0);
 
-        this.layout.addTitleHeader(this.title, this.font);
+        this.layout.addToHeader(new StringWidget(this.title, this.font));
         this.body = this.layout.addToContents(new CursorOptionsBody());
 
         this.layout.addToFooter(moreButton);
         this.layout.addToFooter(doneButton);
 
         this.layout.visitWidgets(this::addRenderableWidget);
+        this.addRenderableWidget(body.cursorsColumn);
 
         if (this.body != null) {
             this.refreshWidgetPositions();
         }
+    }
+
+    @Override
+    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
+        super.render(context, mouseX, mouseY, delta);
+        this.renderDirtBackground(context);
+        body.render(context, mouseX, mouseY, delta);
+        moreButton.render(context, mouseX, mouseY, delta);
+        doneButton.render(context, mouseX, mouseY, delta);
     }
 
     protected void refreshWidgetPositions() {
@@ -121,29 +132,33 @@ public class CursorOptionsScreen extends Screen {
         }
     }
 
-    public class CursorOptionsBody extends AbstractContainerWidget {
+    public int getContentHeight() {
+        return height - layout.getHeaderHeight() - layout.getFooterHeight();
+    }
+
+    public class CursorOptionsBody extends ContainerWidget {
         public final CursorListWidget cursorsColumn;
         public final CursorOptionsWidget selectedCursorColumn;
 
         public CursorOptionsBody() {
-            super(layout.getX(), layout.getHeaderHeight(), CursorOptionsScreen.this.width, layout.getContentHeight(), Component.empty());
+            super(layout.getX(), layout.getHeaderHeight(), CursorOptionsScreen.this.width, getContentHeight(), Component.empty());
 
             int y = layout.getHeaderHeight();
-            int height = layout.getContentHeight();
+            int height = getContentHeight();
             var screen = CursorOptionsScreen.this;
 
-            cursorsColumn = new CursorListWidget(minecraft, CURSORS_COLUMN_WIDTH, height, y, screen);
+            cursorsColumn = new CursorListWidget(minecraft, CURSORS_COLUMN_WIDTH, height, y, y + height, screen);
             selectedCursorColumn = new CursorOptionsWidget(computedX2(), SELECTED_CURSOR_COLUMN_WIDTH, height, y, screen);
 
             position();
         }
 
         @Override
-        public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
             if (cursorsColumn.isMouseOver(mouseX, mouseY)) {
-                return cursorsColumn.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+                return cursorsColumn.mouseScrolled(mouseX, mouseY, amount);
             }
-            return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+            return super.mouseScrolled(mouseX, mouseY, amount);
         }
 
         @Override
@@ -152,24 +167,24 @@ public class CursorOptionsScreen extends Screen {
         }
 
         @Override
-        protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
-            cursorsColumn.renderWidget(context, mouseX, mouseY, delta);
-            selectedCursorColumn.renderWidget(context, mouseX, mouseY, delta);
+        public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
+            cursorsColumn.render(context, mouseX, mouseY, delta);
+            selectedCursorColumn.render(context, mouseX, mouseY, delta);
         }
 
         public void position() {
             int width = CursorOptionsScreen.this.width;
-            int height = layout.getContentHeight();
+            int height = getInnerHeight();
             int y = layout.getHeaderHeight();
 
-            this.setSize(width, height);
+            this.setDimensions(width, height);
             this.setPosition(0, y);
 
             cursorsColumn.setHeight(height);
             selectedCursorColumn.setHeight(height);
 
-            cursorsColumn.setPosition(computedX(), y);
-            selectedCursorColumn.setPosition(computedX2(), y);
+            cursorsColumn.setLeftPos(computedX());
+            selectedCursorColumn.setX(computedX2());
         }
 
         private int computedX() {
@@ -180,9 +195,29 @@ public class CursorOptionsScreen extends Screen {
             return computedX() + CURSORS_COLUMN_WIDTH + COLUMN_GAP;
         }
 
+        public void setDimensions(int width, int height) {
+            this.width = width;
+            this.height = height;
+        }
+
         @Override
         protected void updateWidgetNarration(NarrationElementOutput builder) {
             // not supported
+        }
+
+        @Override
+        protected int getInnerHeight() {
+            return getContentHeight();
+        }
+
+        @Override
+        protected double scrollRate() {
+            return 0;
+        }
+
+        @Override
+        protected void renderContents(GuiGraphics context, int mouseX, int mouseY, float delta) {
+            this.render(context, mouseX, mouseY, delta);
         }
     }
 }

@@ -1,11 +1,11 @@
 plugins {
     id 'multiloader-common'
     id 'multiloader-publish'
-    id 'net.neoforged.moddev'
+    id 'net.neoforged.moddev.legacyforge'
 }
 
-neoForge {
-    neoFormVersion = neo_form_version
+legacyForge {
+    mcpVersion = "${minecraft_version}"
 
     parchment {
         minecraftVersion = parchment_minecraft

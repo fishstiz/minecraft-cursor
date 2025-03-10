@@ -28,7 +28,7 @@ abstract class AbstractCursorResourceReloadListener {
     }
 
     public ResourceLocation getId() {
-        return ResourceLocation.fromNamespaceAndPath(MOD_ID, CURSORS_DIR);
+        return ResourceLocation.tryBuild(MOD_ID, CURSORS_DIR);
     }
 
     public void reloadMinecraftCursor(ResourceManager manager) {
@@ -38,7 +38,7 @@ abstract class AbstractCursorResourceReloadListener {
     }
 
     private void loadConfig(ResourceManager manager) {
-        List<Resource> configResources = manager.getResourceStack(ResourceLocation.fromNamespaceAndPath(MOD_ID, CONFIG_PATH));
+        List<Resource> configResources = manager.getResourceStack(ResourceLocation.tryBuild(MOD_ID, CONFIG_PATH));
 
         if (configResources.isEmpty()) return;
 
@@ -80,7 +80,7 @@ abstract class AbstractCursorResourceReloadListener {
     }
 
     private void loadCursorTexture(ResourceManager manager, CursorType cursorType, String basePath) {
-        ResourceLocation cursorId = ResourceLocation.fromNamespaceAndPath(MOD_ID, basePath + IMG_TYPE);
+        ResourceLocation cursorId = ResourceLocation.tryBuild(MOD_ID, basePath + IMG_TYPE);
         Resource cursorResource = manager.getResource(cursorId).orElse(null);
 
 
@@ -108,7 +108,7 @@ abstract class AbstractCursorResourceReloadListener {
 
     private AnimatedCursorConfig loadAnimationConfig(ResourceManager manager, String basePath, Resource cursorResource) {
         Resource animationResource = manager
-                .getResource(ResourceLocation.fromNamespaceAndPath(MOD_ID, basePath + ANIMATION_TYPE))
+                .getResource(ResourceLocation.tryBuild(MOD_ID, basePath + ANIMATION_TYPE))
                 .orElse(null);
 
         if (animationResource != null && animationResource.sourcePackId().equals(cursorResource.sourcePackId())) {

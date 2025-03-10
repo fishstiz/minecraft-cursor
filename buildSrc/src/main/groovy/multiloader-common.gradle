@@ -28,11 +28,6 @@ repositories {
     }
 }
 
-java {
-    toolchain.languageVersion = JavaLanguageVersion.of(java_version.toInteger())
-    withSourcesJar()
-}
-
 processResources {
     var expandProps = [
             'version'                       : version,
@@ -46,10 +41,9 @@ processResources {
             'minecraft_version_range_maven' : minecraft_version_range_maven,
             'minecraft_version_range_semver': minecraft_version_range_semver,
             'fabric_loader_version'         : fabric_loader_version,
-            'neoforge_loader_version_range' : neoforge_loader_version_range,
-            'neoforge_mod_id'               : neoforge_mod_id,
-            'neoforge_version'              : neoforge_version,
-            'neoforge_version_range'        : neoforge_version_range,
+            'forge_loader_version_range'    : forge_loader_version_range,
+            'forge_mod_id'                  : forge_mod_id,
+            'forge_version'                 : forge_version,
             'java_version'                  : java_version,
             'credits'                       : credits
     ]

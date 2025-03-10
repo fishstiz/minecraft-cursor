@@ -1,0 +1,63 @@
+plugins {
+    id 'multiloader-loader'
+    id 'net.neoforged.moddev.legacyforge'
+    id 'java-library'
+}
+
+tasks.build.dependsOn tasks.jarJar
+
+dependencies {
+    api project(":commonApi")
+    jarJar(project(":commonApi"))
+
+    annotationProcessor 'org.spongepowered:mixin:0.8.7:processor'
+
+    compileOnly annotationProcessor("io.github.llamalad7:mixinextras-common:${mixin_extras_version}")
+    jarJar(implementation("io.github.llamalad7:mixinextras-forge:${mixin_extras_version}") {
+        version {
+            strictly "[${mixin_extras_version},)"
+            prefer "${mixin_extras_version}"
+        }
+    })
+
+    implementation 'org.jetbrains:annotations:26.0.2'
+}
+
+legacyForge {
+    version = "${minecraft_version}-${forge_version}"
+
+    def at = project(':common').file('src/main/resources/META-INF/accesstransformer.cfg')
+    if (at.exists()) {
+        accessTransformers.from(at.absolutePath)
+    }
+
+    parchment {
+        minecraftVersion = parchment_minecraft
+        mappingsVersion = parchment_version
+    }
+
+    runs {
+        client {
+            client()
+            setIdeName("Forge Client (${project.path})")
+        }
+    }
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
+            sourceSet project(":commonApi").sourceSets.main
+        }
+    }
+}
+
+mixin {
+    add sourceSets.main, "${mod_id}.refmap.json"
+    config("${mod_id}.mixins.json")
+}
+
+jar {
+    finalizedBy("reobfJar")
+    manifest.attributes([
+            "MixinConfigs": "${mod_id}.mixins.json"
+    ])
+}

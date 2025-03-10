@@ -3,7 +3,6 @@ package io.github.fishstiz.minecraftcursor.gui.widget;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.gui.screen.CursorOptionsScreen;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractContainerWidget;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -18,13 +17,13 @@ import java.util.function.DoubleConsumer;
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
 import static io.github.fishstiz.minecraftcursor.config.CursorConfig.Settings.Default.*;
 
-public class CursorOptionsWidget extends AbstractContainerWidget {
+public class CursorOptionsWidget extends ContainerWidget {
     private static final int OPTIONS_HEIGHT = 24;
     private static final int GRID_PADDING = 4;
     private static final int BOX_WIDGET_TEXTURE_SIZE = 96;
     private static final int HELPER_BUTTON_SIZE = 16;
     private static final int HELPER_ICON_SIZE = 10;
-    private static final ResourceLocation HELPER_ICON = ResourceLocation.withDefaultNamespace("textures/gui/sprites/icon/unseen_notification.png");
+    private static final ResourceLocation HELPER_ICON = ResourceLocation.tryBuild("minecraft", "textures/gui/unseen_notification.png");
     private static final String GLOBAL_TEXT_KEY = "minecraft-cursor.options.global.tooltip";
     private static final Component ANIMATE_TEXT = Component.translatable("minecraft-cursor.options.animate");
     private static final Component RESET_ANIMATION_TEXT = Component.translatable("minecraft-cursor.options.animate-reset");
@@ -53,6 +52,16 @@ public class CursorOptionsWidget extends AbstractContainerWidget {
         this.handler = new CursorOptionsHandler(this);
 
         initWidgets();
+    }
+
+    @Override
+    protected void renderBackground(GuiGraphics context) {
+        // override to remove box
+    }
+
+    @Override
+    public void renderTexture(GuiGraphics context, ResourceLocation texture, int x, int y, int u, int v, int hoveredVOffset, int width, int height, int textureWidth, int textureHeight) {
+        // override to remove texture
     }
 
     private void initWidgets() {
@@ -117,7 +126,7 @@ public class CursorOptionsWidget extends AbstractContainerWidget {
     }
 
     @Override
-    public void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
+    protected void renderContents(GuiGraphics context, int mouseX, int mouseY, float delta) {
         placeWidgets();
 
         enableButton.render(context, mouseX, mouseY, delta);
@@ -130,7 +139,7 @@ public class CursorOptionsWidget extends AbstractContainerWidget {
             resetAnimation.render(context, mouseX, mouseY, delta);
         }
 
-        cursorHotspot.renderWidget(context, mouseX, mouseY, delta);
+        cursorHotspot.render(context, mouseX, mouseY, delta);
         cursorTest.renderWidget(context, mouseX, mouseY, delta);
     }
 
@@ -160,10 +169,10 @@ public class CursorOptionsWidget extends AbstractContainerWidget {
     private void grid(AbstractWidget widget, int gridX, int gridY, boolean absolute) {
         if (!absolute) {
             widget.setWidth((getWidth() / 2) - GRID_PADDING);
-            widget.setHeight(OPTIONS_HEIGHT - GRID_PADDING);
+            widget.height = OPTIONS_HEIGHT - GRID_PADDING;
         }
-        widget.setX(getX() + ((getWidth() / 2) * gridX));
-        widget.setY(getY() + (OPTIONS_HEIGHT * (gridY)));
+        widget.setX((getX() + ((getWidth() / 2) * gridX)) + 1);
+        widget.setY((getY() + (OPTIONS_HEIGHT * (gridY))) + 1);
     }
 
     public void save() {
@@ -207,8 +216,28 @@ public class CursorOptionsWidget extends AbstractContainerWidget {
         }
     }
 
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    @Override
+    public void setX(int x) {
+        super.setX(x);
+        placeWidgets();
+    }
+
     @Override
     protected void updateWidgetNarration(NarrationElementOutput builder) {
         // not supported
+    }
+
+    @Override
+    protected int getInnerHeight() {
+        return 0;
+    }
+
+    @Override
+    protected double scrollRate() {
+        return 0;
     }
 }

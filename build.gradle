@@ -1,8 +1,8 @@
 plugins {
     // see https://fabricmc.net/develop/ for new versions
     id 'fabric-loom' version '1.10-SNAPSHOT' apply false
-    // see https://projects.neoforged.net/neoforged/moddevgradle for new versions
-    id 'net.neoforged.moddev' version '2.0.78' apply false
+    id 'net.neoforged.moddev.legacyforge' version '2.0.78' apply false
+    id 'org.spongepowered.mixin' version '0.7-SNAPSHOT' apply false
     id "me.modmuss50.mod-publish-plugin" version "0.8.4"
 }
 
@@ -14,6 +14,11 @@ allprojects {
 
     base {
         archivesName = "${project.archives_base_name}-${convertToKebabCase(project.name)}"
+    }
+
+    java {
+        toolchain.languageVersion = JavaLanguageVersion.of(java_version.toInteger())
+        withSourcesJar()
     }
 
     tasks.withType(JavaCompile).configureEach {
@@ -36,75 +41,75 @@ publishMods {
     changelog = file("CHANGELOG.md").text
     type = ALPHA
 
-    def fabricOptions = publishOptions {
-        displayName = "${mod_name} for Fabric v${mod_version}"
-        file project(":fabric")
-        additionalFiles.from(project(":fabric").layout.buildDirectory.file(
-                "libs/${project(":fabric").base.archivesName.get()}-${mod_version}-sources.jar")
-        )
-    }
-    def neoforgeOptions = publishOptions {
-        displayName = "${mod_name} for NeoForge v${mod_version}"
-        file project(":neoforge")
-        additionalFiles.from(project(":neoforge").layout.buildDirectory.file(
-                "libs/${project(":neoforge").base.archivesName.get()}-${mod_version}-sources.jar")
-        )
-    }
-
-    def githubOptions = githubOptions {
-        accessToken = secrets.getProperty("GITHUB_TOKEN")
-        repository = "fishstiz/minecraft-cursor"
-        commitish = "release/${minecraft_version}"
-        tagName = "v${mod_version}"
-        displayName = "${mod_name} v${mod_version}"
-
-        file project(":fabric")
-        additionalFiles.from(project(":fabric").layout.buildDirectory.file(
-                "libs/${project(":fabric").base.archivesName.get()}-${mod_version}-sources.jar"
-        ))
-        additionalFiles.from(project(":neoforge").layout.buildDirectory.file(
-                "libs/${project(":neoforge").base.archivesName.get()}-${mod_version}.jar"
-        ))
-        additionalFiles.from(project(":neoforge").layout.buildDirectory.file(
-                "libs/${project(":neoforge").base.archivesName.get()}-${mod_version}-sources.jar"
-        ))
-    }
-    def modrinthOptions = modrinthOptions {
-        accessToken = secrets.getProperty("MODRINTH_TOKEN")
-        projectId = "o5fhgLeQ"
-        minecraftVersions.add(minecraft_version)
-    }
-    def curseforgeOptions = curseforgeOptions {
-        accessToken = secrets.getProperty("CURSEFORGE_TOKEN")
-        projectId = "1184736"
-        minecraftVersions.add(minecraft_version)
-    }
-
-    github("github") {
-        from githubOptions
-    }
-
-    modrinth("modrinthFabric") {
-        from modrinthOptions, fabricOptions
-        modLoaders.add("fabric")
-        requires("fabric-api")
-        optional("modmenu")
-    }
-    modrinth("modrinthNeoForge") {
-        from modrinthOptions, neoforgeOptions
-        modLoaders.add("neoforge")
-    }
-
-    curseforge("curseforgeFabric") {
-        from curseforgeOptions, fabricOptions
-        modLoaders.add("fabric")
-        clientRequired = true
-        requires("fabric-api")
-        optional("modmenu")
-    }
-    curseforge("curseforgeNeoForge") {
-        from curseforgeOptions, neoforgeOptions
-        modLoaders.add("neoforge")
-        clientRequired = true
-    }
+//    def fabricOptions = publishOptions {
+//        displayName = "${mod_name} for Fabric v${mod_version}"
+//        file project(":fabric")
+//        additionalFiles.from(project(":fabric").layout.buildDirectory.file(
+//                "libs/${project(":fabric").base.archivesName.get()}-${mod_version}-sources.jar")
+//        )
+//    }
+//    def neoforgeOptions = publishOptions {
+//        displayName = "${mod_name} for NeoForge v${mod_version}"
+//        file project(":neoforge")
+//        additionalFiles.from(project(":neoforge").layout.buildDirectory.file(
+//                "libs/${project(":neoforge").base.archivesName.get()}-${mod_version}-sources.jar")
+//        )
+//    }
+//
+//    def githubOptions = githubOptions {
+//        accessToken = secrets.getProperty("GITHUB_TOKEN")
+//        repository = "fishstiz/minecraft-cursor"
+//        commitish = "release/${minecraft_version}"
+//        tagName = "v${mod_version}"
+//        displayName = "${mod_name} v${mod_version}"
+//
+//        file project(":fabric")
+//        additionalFiles.from(project(":fabric").layout.buildDirectory.file(
+//                "libs/${project(":fabric").base.archivesName.get()}-${mod_version}-sources.jar"
+//        ))
+//        additionalFiles.from(project(":neoforge").layout.buildDirectory.file(
+//                "libs/${project(":neoforge").base.archivesName.get()}-${mod_version}.jar"
+//        ))
+//        additionalFiles.from(project(":neoforge").layout.buildDirectory.file(
+//                "libs/${project(":neoforge").base.archivesName.get()}-${mod_version}-sources.jar"
+//        ))
+//    }
+//    def modrinthOptions = modrinthOptions {
+//        accessToken = secrets.getProperty("MODRINTH_TOKEN")
+//        projectId = "o5fhgLeQ"
+//        minecraftVersions.add(minecraft_version)
+//    }
+//    def curseforgeOptions = curseforgeOptions {
+//        accessToken = secrets.getProperty("CURSEFORGE_TOKEN")
+//        projectId = "1184736"
+//        minecraftVersions.add(minecraft_version)
+//    }
+//
+//    github("github") {
+//        from githubOptions
+//    }
+//
+//    modrinth("modrinthFabric") {
+//        from modrinthOptions, fabricOptions
+//        modLoaders.add("fabric")
+//        requires("fabric-api")
+//        optional("modmenu")
+//    }
+//    modrinth("modrinthNeoForge") {
+//        from modrinthOptions, neoforgeOptions
+//        modLoaders.add("neoforge")
+//    }
+//
+//    curseforge("curseforgeFabric") {
+//        from curseforgeOptions, fabricOptions
+//        modLoaders.add("fabric")
+//        clientRequired = true
+//        requires("fabric-api")
+//        optional("modmenu")
+//    }
+//    curseforge("curseforgeNeoForge") {
+//        from curseforgeOptions, neoforgeOptions
+//        modLoaders.add("neoforge")
+//        clientRequired = true
+//    }
 }
