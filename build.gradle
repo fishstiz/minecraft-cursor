@@ -109,3 +109,7 @@ publishMods {
         modLoaders.add("neoforge")
     }
 }
+
+tasks.named("publishGithub") {
+    mustRunAfter(":neoforge:jar")
+}
