@@ -3,8 +3,7 @@
 A Fabric mod that replaces the boring old default system cursor with Minecraft-themed cursors.
 
 ## 📌 Requirements
-- Fabric for Minecraft 1.20.1 or 1.21+
-- (Optional) [Mod Menu](https://modrinth.com/mod/modmenu)
+- Minecraft 1.20.1 or 1.21.1+
 
 ## 🔄 Adaptive Cursor
 ![default](https://github.com/user-attachments/assets/6c632b54-e284-47a0-8634-f4ba1ef03f29)
@@ -22,7 +21,7 @@ A Fabric mod that replaces the boring old default system cursor with Minecraft-t
   - You can disable adaptive cursors for affected GUIs in More Cursor Options.
 
 ## 🔧 Configure Cursors
-- Configure from Mod Menu (if installed)
+- Configure from Mod Menu (if installed on Fabric)
 - Configure from Options > Controls > Mouse Settings... > Cursor Settings...
 - Configure More Cursor Options from Cursor Settings > More Cursor Options...
   - Override the Scale, Offset X, and Offset Y of all cursors.
@@ -67,6 +66,8 @@ Widgets are automatically detected (and registered) with the following condition
 - More on the source code [here](https://github.com/fishstiz/minecraft-cursor/blob/master/src/main/java/io/github/fishstiz/minecraftcursor/impl/MinecraftCursorInitializerImpl.java).
 
 The adaptive cursor can be disabled on these non-element "elements" in case of unexpected cursor switching:
+> **Note**: These are in yarn mappings.
+
 - `CreativeInventoryScreen` tabs
 - `EnchantmentScreen` choices
 - `StonecutterScreen` recipes
