@@ -50,10 +50,9 @@ publishMods {
     }
     def forgeOptions = publishOptions {
         displayName = "${mod_name} for Forge v${mod_version}"
-        file project(":forge")
-        additionalFiles.from(project(":forge").layout.buildDirectory.file(
+        file = project(":forge").layout.buildDirectory.file(
                 "libs/${project(":forge").base.archivesName.get()}-${mod_version}.jar"
-        ))
+        )
         additionalFiles.from(project(":forge").layout.buildDirectory.file(
                 "libs/${project(":forge").base.archivesName.get()}-${mod_version}-sources.jar")
         )
