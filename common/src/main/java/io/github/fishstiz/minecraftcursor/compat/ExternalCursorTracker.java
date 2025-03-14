@@ -1,15 +1,24 @@
 package io.github.fishstiz.minecraftcursor.compat;
 
+import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.minecraft.Util;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.Map;
 
-public class ExternalCursorTracker {
-    private static ExternalCursorTracker instance;
-    private final HashMap<Integer, CursorTimestamp> externalCursors = new HashMap<>();
+public class ExternalCursorTracker implements CursorTracker {
+    private static boolean tracking = false;
+    private final StackWalker walker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
+    private final Map<Long, ExternalCursor> externalCursors = new HashMap<>();
+    private final Map<Integer, CursorTimestamp> currentCursors = new HashMap<>();
+    private final LongOpenHashSet addresses = new LongOpenHashSet();
 
     private ExternalCursorTracker() {
+        MinecraftCursor.LOGGER.info("[minecraft-cursor] Tracking cursors from other mods.");
     }
 
     private static class CursorTimestamp {
@@ -22,17 +31,19 @@ public class ExternalCursorTracker {
         }
 
         public void update(CursorType cursorType) {
+            if (this.cursorType != cursorType) {
+                this.timestamp = Util.getMillis();
+            }
             this.cursorType = cursorType;
-            this.timestamp = Util.getMillis();
         }
     }
 
-    private void updateCursorTimestamp(int hash, CursorType cursorType) {
+    private void updateCursorTimestamp(int caller, CursorType cursorType) {
         if (cursorType == null) return;
 
-        CursorTimestamp cursorTimestamp = externalCursors.get(hash);
+        CursorTimestamp cursorTimestamp = currentCursors.get(caller);
         if (cursorTimestamp == null) {
-            externalCursors.put(hash, new CursorTimestamp(cursorType));
+            currentCursors.put(caller, new CursorTimestamp(cursorType));
         } else {
             cursorTimestamp.update(cursorType);
         }
@@ -41,7 +52,12 @@ public class ExternalCursorTracker {
     private CursorType getLatestCursorOrDefault() {
         CursorTimestamp latestCursorTimestamp = null;
 
-        for (CursorTimestamp cursorTimestamp : externalCursors.values()) {
+        for (CursorTimestamp cursorTimestamp : currentCursors.values()) {
+            if (cursorTimestamp.cursorType == ExternalCursor.PLACEHOLDER_CUSTOM) {
+                latestCursorTimestamp = cursorTimestamp;
+                break;
+            }
+
             if (latestCursorTimestamp == null
                     || latestCursorTimestamp.cursorType == CursorType.DEFAULT
                     || (cursorTimestamp.timestamp > latestCursorTimestamp.timestamp
@@ -53,21 +69,67 @@ public class ExternalCursorTracker {
         return latestCursorTimestamp != null ? latestCursorTimestamp.cursorType : CursorType.DEFAULT;
     }
 
-    public static void init() {
-        if (instance == null) instance = new ExternalCursorTracker();
+    private static class Holder {
+        private static final ExternalCursorTracker INSTANCE = new ExternalCursorTracker();
     }
 
-    public static boolean isInitialized() {
-        return instance != null;
+    public static boolean isTracking() {
+        return tracking;
     }
 
-    public static void updateCursor(int hash, CursorType cursorType) {
-        if (instance == null) return;
-        instance.updateCursorTimestamp(hash, cursorType);
+    public static CursorTracker get() {
+        if (!isTracking()) {
+            return DefaultCursorTracker.getInstance();
+        }
+        return Holder.INSTANCE;
     }
 
-    public static CursorType getCursorOrDefault() {
-        if (instance == null) return CursorType.DEFAULT;
-        return instance.getLatestCursorOrDefault();
+    public static StackWalker getWalker() {
+        tracking = true;
+        return Holder.INSTANCE.walker;
+    }
+
+    public static void trackCursor(long cursor, int caller, CursorType cursorType) {
+        tracking = true;
+        Holder.INSTANCE.externalCursors
+                .computeIfAbsent(cursor, c -> new ExternalCursor(caller, cursorType))
+                .update(cursorType);
+    }
+
+    public static void trackCursor(long cursor, int caller) {
+        tracking = true;
+        Holder.INSTANCE.externalCursors.putIfAbsent(cursor, new ExternalCursor(caller));
+    }
+
+    public @Nullable ExternalCursor getTrackedCursor(long cursor) {
+        return Holder.INSTANCE.externalCursors.get(cursor);
+    }
+
+    public void untrackCursor(long cursor) {
+        Holder.INSTANCE.externalCursors.remove(cursor);
+    }
+
+    public void updateCursor(int caller, CursorType cursorType) {
+        Holder.INSTANCE.updateCursorTimestamp(caller, cursorType);
+    }
+
+    public boolean isTracking(long cursor) {
+        return Holder.INSTANCE.externalCursors.containsKey(cursor);
+    }
+
+    public void storeAddress(long address) {
+        Holder.INSTANCE.addresses.add(address);
+    }
+
+    public boolean consumeAddress(long address) {
+        return Holder.INSTANCE.addresses.removeIf(a -> a == address);
+    }
+
+    public @NotNull CursorType getCursorOrDefault() {
+        return Holder.INSTANCE.getLatestCursorOrDefault();
+    }
+
+    public boolean isCustom() {
+        return getCursorOrDefault() == ExternalCursor.PLACEHOLDER_CUSTOM;
     }
 }
