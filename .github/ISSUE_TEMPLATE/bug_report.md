@@ -7,8 +7,10 @@ assignees: ''
 
 ---
 
-- Mod Loader: [e.g. Fabric]
- - Mod Version [e.g. 3.6.0+1.21.4]
+**Version Information**
+- Mod Loader: [e.g. Fabric 0.6.10]
+- Mod Version [e.g. 3.6.1+1.21.4]
+- Minecraft Version: [e.g. 1.21.4]
 
 **Describe the bug**
 A clear and concise description of what the bug is.
@@ -22,6 +24,12 @@ Steps to reproduce the behavior:
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.
+
+**Actual behavior**
+A clear and concise description of what actually happened.
+
+**Relevant logs/files**
+Attach logs, error messages, or relevant files to help diagnose the issue.
 
 **Additional context**
 Add any other context about the problem here.
