@@ -2,6 +2,7 @@ package io.github.fishstiz.minecraftcursor.cursor;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
+import io.github.fishstiz.minecraftcursor.compat.glfw.GlfwImageScope;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.util.BufferedImageUtil;
 import io.github.fishstiz.minecraftcursor.util.SettingsUtil;
@@ -71,6 +72,7 @@ public class Cursor {
         int scaledYHot = scale == 1 ? yhot : (int) Math.round(yhot * scale);
 
         GLFWImage glfwImage = GLFWImage.create();
+        ((GlfwImageScope) glfwImage).minecraft_cursor$setInternal(true);
         glfwImage.width(scaledImage.getWidth());
         glfwImage.height(scaledImage.getHeight());
         glfwImage.pixels(BufferedImageUtil.getPixelsRGBA(scaledImage));
