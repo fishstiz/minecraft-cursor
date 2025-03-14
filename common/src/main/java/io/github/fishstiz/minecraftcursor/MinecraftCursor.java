@@ -59,19 +59,23 @@ public class MinecraftCursor {
     }
 
     public void afterRenderScreen(int mouseX, int mouseY) {
+        if (ExternalCursorTracker.get().isCustom()) return;
+
         if (CLIENT.screen != null) {
             CursorManager.INSTANCE.setCurrentCursor(getCursorType(CLIENT.screen, mouseX, mouseY));
         }
     }
 
     public void tick() {
+        if (ExternalCursorTracker.get().isCustom()) return;
+
         if (CLIENT.screen == null && visibleNonCurrentScreen != null && !CLIENT.mouseHandler.isMouseGrabbed()) {
             double scale = CLIENT.getWindow().getGuiScale();
             double mouseX = CLIENT.mouseHandler.xpos() / scale;
             double mouseY = CLIENT.mouseHandler.ypos() / scale;
             CursorManager.INSTANCE.setCurrentCursor(getCursorType(visibleNonCurrentScreen, mouseX, mouseY));
         } else if (CLIENT.screen == null && visibleNonCurrentScreen == null) {
-            CursorManager.INSTANCE.setCurrentCursor(ExternalCursorTracker.getCursorOrDefault());
+            CursorManager.INSTANCE.setCurrentCursor(ExternalCursorTracker.get().getCursorOrDefault());
         }
     }
 
@@ -86,7 +90,7 @@ public class MinecraftCursor {
             return cursorType;
         }
 
-        CursorType externalCursor = ExternalCursorTracker.getCursorOrDefault();
+        CursorType externalCursor = ExternalCursorTracker.get().getCursorOrDefault();
         if (externalCursor != CursorType.DEFAULT) return externalCursor;
 
         CursorType cursorType = CursorTypeResolver.INSTANCE.resolveCursorType(currentScreen, mouseX, mouseY);

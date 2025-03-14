@@ -45,8 +45,13 @@ public final class CursorManager implements CursorTypeRegistrar {
     private CursorType register(CursorType cursorType) {
         String key = cursorType.getKey();
 
+        if (key.isEmpty()) {
+            throw new NullPointerException("Cursor type key cannot be empty.");
+        }
+
         if (cursors.containsKey(key)) {
             MinecraftCursor.LOGGER.error("Cursor type '{}' is already registered.", key);
+            return cursorType;
         }
 
         cursors.put(key, new Cursor(cursorType, this::handleCursorLoad));
@@ -200,7 +205,7 @@ public final class CursorManager implements CursorTypeRegistrar {
     }
 
     public List<CursorType> getCursorTypes() {
-        return cursors.keySet().stream().map(CursorType::of).toList();
+        return cursors.keySet().stream().filter(type -> !type.isEmpty()).map(CursorType::of).toList();
     }
 
     public List<Cursor> getLoadedCursors() {
@@ -251,14 +256,5 @@ public final class CursorManager implements CursorTypeRegistrar {
                 animatedCursor.setAnimated(isAnimated);
             }
         });
-    }
-
-    public boolean isMinecraftCursor(long cursor) {
-        for (Cursor minecraftCursor : cursors.values()) {
-            if (minecraftCursor.isLoaded() && cursor == minecraftCursor.getId()) {
-                return true;
-            }
-        }
-        return false;
     }
 }
