@@ -1,10 +1,12 @@
 package io.github.fishstiz.minecraftcursor.util;
 
+import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import org.lwjgl.BufferUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.RasterFormatException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -55,15 +57,21 @@ public class BufferedImageUtil {
         }
     }
 
-    public static BufferedImage cropImage(BufferedImage src, Rectangle rect) {
-        return src.getSubimage(rect.x, rect.y, rect.width, rect.height);
-    }
-
     public static BufferedImage decompressBase64ToImage(String base64Image) throws IOException {
         byte[] imageData = Base64.getDecoder().decode(base64Image);
 
         try (ByteArrayInputStream bais = new ByteArrayInputStream(imageData)) {
             return ImageIO.read(bais);
+        }
+    }
+
+    public static BufferedImage cropImage(BufferedImage src, Rectangle rect) {
+        try {
+            return src.getSubimage(rect.x, rect.y, rect.width, rect.height);
+        } catch (RasterFormatException e) {
+            MinecraftCursor.LOGGER.error("[minecraft-cursor] Image size {}x{} out of bounds. Required: {}x{} at index {} (y={})",
+                    src.getWidth(), src.getHeight(), rect.width, rect.height, rect.y == 0 ? rect.y : rect.y / rect.width, rect.y);
+            return src;
         }
     }
 }
