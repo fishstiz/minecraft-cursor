@@ -5,14 +5,8 @@ package io.github.fishstiz.minecraftcursor.api;
  *
  * <p>This is where you can initialize your cursor types and register elements.</p>
  *
- * <p>In {@code fabric.mod.json}, the entrypoint is defined with {@code minecraft-cursor} key.</p>
- *
- * <p><strong>Example:</strong></p>
- * <pre>
- * "entrypoints" {
- *   "minecraft-cursor": ["com.example.modid.MinecraftCursorApiImpl"]
- * }
- * </pre>
+ * <p><b>Fabric</b>: Register your entrypoint in {@code fabric.mod.json} under the {@code minecraft-cursor} key.</p>
+ * <p><b>Forge</b> & <b>NeoForge</b>: Register your entrypoint as a service using the {@code ServiceLoader} pattern.</p>
  */
 public interface MinecraftCursorInitializer {
     /**
