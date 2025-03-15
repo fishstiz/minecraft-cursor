@@ -53,15 +53,21 @@ public class ExternalCursorTracker implements CursorTracker {
         CursorTimestamp latestCursorTimestamp = null;
 
         for (CursorTimestamp cursorTimestamp : currentCursors.values()) {
-            if (cursorTimestamp.cursorType == ExternalCursor.PLACEHOLDER_CUSTOM) {
+            // if latest custom cursor
+            if ((cursorTimestamp.cursorType == ExternalCursor.PLACEHOLDER_CUSTOM)
+                    && (latestCursorTimestamp == null
+                    || latestCursorTimestamp.cursorType != ExternalCursor.PLACEHOLDER_CUSTOM
+                    || cursorTimestamp.timestamp > latestCursorTimestamp.timestamp)) {
                 latestCursorTimestamp = cursorTimestamp;
-                break;
+                continue;
             }
-
-            if (latestCursorTimestamp == null
+            // if latest non-default cursor
+            if ((latestCursorTimestamp == null
+                    || latestCursorTimestamp.cursorType != ExternalCursor.PLACEHOLDER_CUSTOM)
+                    && (latestCursorTimestamp == null
                     || latestCursorTimestamp.cursorType == CursorType.DEFAULT
                     || (cursorTimestamp.timestamp > latestCursorTimestamp.timestamp
-                    && cursorTimestamp.cursorType != CursorType.DEFAULT)) {
+                    && cursorTimestamp.cursorType != CursorType.DEFAULT))) {
                 latestCursorTimestamp = cursorTimestamp;
             }
         }
