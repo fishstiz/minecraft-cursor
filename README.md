@@ -76,3 +76,13 @@ The adaptive cursor can be disabled on these non-element "elements" in case of u
 - `AdvancementsScreen` tabs
 - `WorldListWidget` world icon play button
 - `MultiplayerServerListWidget` server icon play button
+
+### Fabric Only Features
+
+Minecraft Cursor for Fabric is semi-compatible with mods that use custom cursors, this however disables adaptive cursor if an external custom cursor is in use.
+
+Standard system cursors used by other mods will also be remapped to their Minecraft Cursor equivalents.
+
+The mod achieves this by tracking the cursor state of other mods (if detected) and acting as the central cursor manager.
+
+Unfortunately, this feature does not work on Forge & NeoForge due to loader limitations.
