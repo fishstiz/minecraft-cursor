@@ -54,7 +54,7 @@ publishMods {
     def githubOptions = githubOptions {
         accessToken = secrets.getProperty("GITHUB_TOKEN")
         repository = "fishstiz/minecraft-cursor"
-        commitish = "release/${minecraft_version}"
+        commitish = "mc/${minecraft_version}"
         tagName = "v${mod_version}"
         displayName = "${mod_name} v${mod_version}"
 
