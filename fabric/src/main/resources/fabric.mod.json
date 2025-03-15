@@ -12,7 +12,8 @@
   ],
   "contact": {
     "sources": "${sources}",
-    "issues": "${issues}"
+    "issues": "${issues}",
+    "homepage": "https://fishstiz.github.io/minecraft-cursor-wiki/"
   },
   "license": "${license}",
   "icon": "icon.png",
@@ -43,5 +44,12 @@
   "suggests": {
     "modmenu": "*"
   },
-  "accessWidener": "${mod_id}.accesswidener"
+  "accessWidener": "${mod_id}.accesswidener",
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.wiki": "https://fishstiz.github.io/minecraft-cursor-wiki/"
+      }
+    }
+  }
 }
