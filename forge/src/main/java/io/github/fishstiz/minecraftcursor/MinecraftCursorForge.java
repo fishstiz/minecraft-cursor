@@ -15,6 +15,7 @@ public class MinecraftCursorForge {
     // Forge does not support dashes in mod id
     public static final String MOD_ID = "minecraft_cursor";
 
+    @SuppressWarnings("removal")
     public MinecraftCursorForge() {
         ModLoadingContext.get().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class, () ->
                 new ConfigScreenHandler.ConfigScreenFactory((mc, screen) ->
