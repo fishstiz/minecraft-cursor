@@ -7,10 +7,8 @@ import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.compat.ExternalCursor;
 import io.github.fishstiz.minecraftcursor.compat.ExternalCursorTracker;
 import io.github.fishstiz.minecraftcursor.compat.CursorTracker;
-import io.github.fishstiz.minecraftcursor.compat.glfw.GlfwImageScope;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.GLFWImage;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
@@ -22,6 +20,7 @@ import static io.github.fishstiz.minecraftcursor.compat.ExternalCursorTracker.*;
 
 import static org.lwjgl.glfw.GLFW.*;
 
+// only works on Fabric, NeoForge doesn't allow mixin of library
 @Mixin(value = GLFW.class, remap = false)
 public abstract class GlfwMixin {
     @Unique
@@ -31,15 +30,6 @@ public abstract class GlfwMixin {
                 .findFirst()
                 .map(frame -> frame.getDeclaringClass().getPackageName())
                 .orElse("placeholder");
-    }
-
-    @WrapMethod(method = "glfwCreateCursor")
-    private static long trackCustomCursor(GLFWImage image, int xhot, int yhot, Operation<Long> original) {
-        if (((GlfwImageScope) image).minecraft_cursor$isInternal()) {
-            ExternalCursorTracker.get().storeAddress(image.address());
-        }
-
-        return original.call(image, xhot, yhot);
     }
 
     @WrapMethod(method = "nglfwCreateCursor")
