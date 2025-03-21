@@ -86,3 +86,6 @@ Standard system cursors used by other mods will also be remapped to their Minecr
 The mod achieves this by tracking the cursor state of other mods (if detected) and acting as the central cursor manager.
 
 Unfortunately, this feature does not work on Forge & NeoForge due to loader limitations.
+
+---
+NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT
