@@ -26,7 +26,7 @@ public enum AnimationMode {
         try {
             return AnimationMode.valueOf(name.toUpperCase());
         } catch (IllegalArgumentException e) {
-            MinecraftCursor.LOGGER.warn("Animation mode: '{}' does not exist. Using default 'loop'.", name);
+            MinecraftCursor.LOGGER.warn("[minecraft-cursor] Animation mode: '{}' does not exist. Using default 'loop'.", name);
             return AnimationMode.LOOP;
         }
     }

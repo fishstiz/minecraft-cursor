@@ -15,12 +15,10 @@ import java.util.List;
 
 final class CursorTypeResolver implements ElementRegistrar {
     static final CursorTypeResolver INSTANCE = new CursorTypeResolver();
-    private final List<AbstractMap.SimpleImmutableEntry<Class<? extends GuiEventListener>,
-            CursorTypeFunction<? extends GuiEventListener>>>
+    private final List<AbstractMap.SimpleImmutableEntry<Class<? extends GuiEventListener>, CursorTypeFunction<? extends GuiEventListener>>>
             registry = new ArrayList<>();
-    private final HashMap<String, CursorTypeFunction<? extends GuiEventListener>>
-            cachedRegistry = new HashMap<>();
-    private String lastFailedElement;
+    private final HashMap<String, CursorTypeFunction<? extends GuiEventListener>> cachedRegistry = new HashMap<>();
+    String lastFailedElement;
 
     private CursorTypeResolver() {
     }
@@ -34,7 +32,7 @@ final class CursorTypeResolver implements ElementRegistrar {
         } else if (targetElement.fullyQualifiedClassName().isPresent()) {
             register(targetElement.fullyQualifiedClassName().get(), cursorHandler::getCursorType);
         } else {
-            throw new NoClassDefFoundError("Could not register cursor handler: "
+            throw new NullPointerException("Could not register cursor handler: "
                     + cursorHandler.getClass().getName()
                     + " - Target Element Class and FQCN not present");
         }
@@ -50,9 +48,9 @@ final class CursorTypeResolver implements ElementRegistrar {
             }
             register(elementClass, elementToCursorType);
         } catch (ClassNotFoundException e) {
-            MinecraftCursor.LOGGER.error("Error registering element. Class not found: {}", fullyQualifiedClassName);
+            MinecraftCursor.LOGGER.error("[minecraft-cursor] Error registering element. Class not found: {}", fullyQualifiedClassName);
         } catch (ClassCastException e) {
-            MinecraftCursor.LOGGER.error("Error registering element. Invalid class: {}", e.getMessage());
+            MinecraftCursor.LOGGER.error("[minecraft-cursor] Error registering element. Invalid class: {}", e.getMessage());
         }
     }
 

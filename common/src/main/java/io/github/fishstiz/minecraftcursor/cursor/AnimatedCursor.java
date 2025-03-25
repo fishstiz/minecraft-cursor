@@ -69,7 +69,7 @@ public class AnimatedCursor extends Cursor {
         for (AnimatedCursorConfig.Frame frame : animation.getFrames()) {
             int index = frame.getIndex();
             if (index < 0 || index >= availableFrames) {
-                MinecraftCursor.LOGGER.warn("Sprite does not exist on index {} for cursor type '{}', skipping frame.", index, getType());
+                MinecraftCursor.LOGGER.warn("[minecraft-cursor] Sprite does not exist on index {} for cursor type '{}', skipping frame.", index, getType());
                 continue;
             }
             newFrames.add(new Frame(index == 0 ? this : cursors.get(index), frame.getTime(animation), index));
