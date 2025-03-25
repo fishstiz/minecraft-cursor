@@ -45,7 +45,7 @@ public class MinecraftCursor {
             try {
                 entrypoint.init(CursorManager.INSTANCE, CursorTypeResolver.INSTANCE);
             } catch (LinkageError | Exception e) {
-                LOGGER.error("Invalid implementation of MinecraftCursorInitializer");
+                LOGGER.error("[minecraft-cursor] Skipping invalid implementation of MinecraftCursorInitializer");
             }
         });
 
@@ -53,11 +53,14 @@ public class MinecraftCursor {
     }
 
     public void beforeScreenInit(Screen screen) {
+        CursorTypeResolver.INSTANCE.lastFailedElement = "";
+
         if (Client.MINECRAFT.screen == null) {
             CursorManager.INSTANCE.setCurrentCursor(CursorType.DEFAULT);
             visibleNonCurrentScreen = screen;
             return;
         }
+
         visibleNonCurrentScreen = null;
     }
 

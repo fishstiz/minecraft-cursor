@@ -53,7 +53,7 @@ public final class CursorManager implements CursorTypeRegistrar {
         }
 
         if (cursors.containsKey(key)) {
-            MinecraftCursor.LOGGER.error("Cursor type '{}' is already registered.", key);
+            MinecraftCursor.LOGGER.error("[minecraft-cursor] Cursor type '{}' is already registered.", key);
             return cursorType;
         }
 
