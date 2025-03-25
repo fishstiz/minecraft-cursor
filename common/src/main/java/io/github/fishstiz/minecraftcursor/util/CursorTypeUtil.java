@@ -10,10 +10,12 @@ public class CursorTypeUtil {
     private CursorTypeUtil() {
     }
 
-    private static final Minecraft CLIENT = Minecraft.getInstance();
+    private static class Client {
+        private static final Minecraft MINECRAFT = Minecraft.getInstance();
+    }
 
     public static boolean canShift() {
-        long handle = CLIENT.getWindow().getWindow();
+        long handle = Client.MINECRAFT.getWindow().getWindow();
         return CursorManager.INSTANCE.getCursor(CursorType.SHIFT).getId() != 0
                 && (InputConstants.isKeyDown(handle, GLFW.GLFW_KEY_LEFT_SHIFT)
                 || InputConstants.isKeyDown(handle, GLFW.GLFW_KEY_RIGHT_SHIFT));
@@ -26,6 +28,6 @@ public class CursorTypeUtil {
     }
 
     public static boolean isLeftClickHeld() {
-        return GLFW.glfwGetMouseButton(CLIENT.getWindow().getWindow(), GLFW.GLFW_MOUSE_BUTTON_1) == GLFW.GLFW_PRESS;
+        return GLFW.glfwGetMouseButton(Client.MINECRAFT.getWindow().getWindow(), GLFW.GLFW_MOUSE_BUTTON_1) == GLFW.GLFW_PRESS;
     }
 }
