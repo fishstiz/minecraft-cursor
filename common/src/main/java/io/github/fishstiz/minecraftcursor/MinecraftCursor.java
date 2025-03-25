@@ -118,7 +118,7 @@ public class MinecraftCursor {
         return instance;
     }
 
-    public synchronized void setSingleCycleCursor(CursorType cursorType) {
+    public void setSingleCycleCursor(CursorType cursorType) {
         singleCycleCursor.set(cursorType);
     }
 }
