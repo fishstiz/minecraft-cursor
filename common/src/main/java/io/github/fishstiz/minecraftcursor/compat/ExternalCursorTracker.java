@@ -18,7 +18,7 @@ public class ExternalCursorTracker implements CursorTracker {
     private final LongOpenHashSet addresses = new LongOpenHashSet();
 
     private ExternalCursorTracker() {
-        MinecraftCursor.LOGGER.info("[minecraft-cursor] Tracking cursors from other mods.");
+        MinecraftCursor.LOGGER.info("[minecraft-cursor] Tracking cursors from other mods...");
     }
 
     private static class CursorTimestamp {

@@ -44,10 +44,10 @@ abstract class AbstractCursorResourceReloadListener {
 
         getConfigFromResources(configResources).ifPresent(config -> {
             if (!config.get_hash().equals(CONFIG.get_hash())) {
+                MinecraftCursor.LOGGER.info("[minecraft-cursor] New resource pack settings detected, updating config...");
                 CONFIG.set_hash(config.get_hash());
                 CONFIG.setSettings(config.getSettings());
                 CONFIG.save();
-                MinecraftCursor.LOGGER.info("New resource pack settings detected for minecraft-cursor");
             }
         });
     }
@@ -65,7 +65,7 @@ abstract class AbstractCursorResourceReloadListener {
                     combinedConfig.setSettings(loadedConfig.getSettings());
                 }
             } catch (IOException e) {
-                MinecraftCursor.LOGGER.error("Failed to load settings of resource pack '{}'", configResource.sourcePackId());
+                MinecraftCursor.LOGGER.error("[minecraft-cursor] Failed to load settings of resource pack '{}'", configResource.sourcePackId());
             }
         }
 
@@ -85,7 +85,7 @@ abstract class AbstractCursorResourceReloadListener {
 
 
         if (cursorResource == null) {
-            MinecraftCursor.LOGGER.error("Cursor Type: '{}' not found", cursorType.getKey());
+            MinecraftCursor.LOGGER.error("[minecraft-cursor] Cursor Type: '{}' not found", cursorType.getKey());
             return;
         }
 
@@ -93,14 +93,14 @@ abstract class AbstractCursorResourceReloadListener {
         try (InputStream cursorStream = cursorResource.open()) {
             image = ImageIO.read(cursorStream);
             if (image == null) {
-                MinecraftCursor.LOGGER.error("Invalid file for cursor type '{}'", cursorType);
+                MinecraftCursor.LOGGER.error("[minecraft-cursor] Invalid file for cursor type '{}'", cursorType);
                 return;
             }
 
             AnimatedCursorConfig animation = loadAnimationConfig(manager, basePath, cursorResource);
             CursorManager.INSTANCE.loadCursorImage(cursorType, cursorId, image, CONFIG.getOrCreateCursorSettings(cursorType), animation);
         } catch (IOException e) {
-            MinecraftCursor.LOGGER.error("Failed to load cursor image for '{}'", basePath);
+            MinecraftCursor.LOGGER.error("[minecraft-cursor] Failed to load cursor image for '{}'", basePath);
         } finally {
             if (image != null) image.flush();
         }
@@ -115,7 +115,7 @@ abstract class AbstractCursorResourceReloadListener {
             try (InputStream stream = animationResource.open()) {
                 return CursorConfigLoader.getAnimationConfig(stream);
             } catch (IOException e) {
-                MinecraftCursor.LOGGER.error("Failed to load animation config for '{}'", basePath);
+                MinecraftCursor.LOGGER.error("[minecraft-cursor] Failed to load animation config for '{}'", basePath);
             }
         }
 
