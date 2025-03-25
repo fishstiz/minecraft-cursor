@@ -63,6 +63,16 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
 
     private final CursorManager cursorManager;
     private final List<ToggleEntry> adaptiveOptions = new ArrayList<>();
+
+    private final ToggleEntry animationEntry = new ToggleEntry(
+            ANIMATION_TEXT, false, false, ANIMATION_TOOLTIP, this::toggleAnimations
+    );
+    private final SliderEntry scaleEntry = createSliderEntry(SCALE_TEXT, "",
+            CursorConfig.Settings.Default.SCALE_MIN, CursorConfig.Settings.Default.SCALE_MAX, CursorConfig.Settings.Default.SCALE_STEP,
+            GLOBAL::isScaleActive, GLOBAL::setScaleActive,
+            GLOBAL::getScale, GLOBAL::setScale,
+            CursorConfig.Settings::getScale, Cursor::setScale
+    );
     private final SliderEntry xhotEntry = createSliderEntry(XHOT_TEXT, "px",
             CursorConfig.Settings.Default.HOT_MIN, CursorConfig.Settings.Default.HOT_MAX, 1,
             GLOBAL::isXHotActive, GLOBAL::setXhotActive,
@@ -89,23 +99,23 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
 
     private void addGlobalOptions() {
         addEntry(new TitleEntry(GLOBAL_SETTINGS_TEXT));
-        addEntry(new ToggleEntry(
-                ANIMATION_TEXT,
-                cursorManager.isAnimated(),
-                cursorManager.hasAnimations(),
-                ANIMATION_TOOLTIP,
-                this::toggleAnimations)
-        );
 
-        addEntry(createSliderEntry(SCALE_TEXT, "",
-                CursorConfig.Settings.Default.SCALE_MIN, CursorConfig.Settings.Default.SCALE_MAX, CursorConfig.Settings.Default.SCALE_STEP,
-                GLOBAL::isScaleActive, GLOBAL::setScaleActive,
-                GLOBAL::getScale, GLOBAL::setScale,
-                CursorConfig.Settings::getScale, Cursor::setScale
-        ));
-
+        reloadGlobalOptions();
+        addEntry(animationEntry);
+        addEntry(scaleEntry);
         addEntry(xhotEntry);
         addEntry(yhotEntry);
+    }
+
+    private void reloadGlobalOptions() {
+        try {
+            animationEntry.button.setValue(cursorManager.isAnimated());
+            animationEntry.button.active = cursorManager.hasAnimations();
+            scaleEntry.button.setValue(GLOBAL.isScaleActive());
+            xhotEntry.button.setValue(GLOBAL.isXHotActive());
+            yhotEntry.button.setValue(GLOBAL.isYHotActive());
+        } catch (NullPointerException ignore) { // when exiting the screen while reloading
+        }
     }
 
     private void addAdaptiveOptions() {
@@ -136,7 +146,7 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
 
     private void reloadConfiguration() {
         CONFIG.set_hash(String.valueOf(Math.random()));
-        minecraft.reloadResourcePacks();
+        minecraft.reloadResourcePacks().thenRun(this::reloadGlobalOptions);
     }
 
     private void addAdaptiveEntry(Component label, boolean isEnabled, boolean active, Consumer<Boolean> onPress) {

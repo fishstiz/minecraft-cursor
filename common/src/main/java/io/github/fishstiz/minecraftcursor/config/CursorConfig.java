@@ -232,6 +232,12 @@ public class CursorConfig {
         private boolean xhotActive = false;
         private boolean yhotActive = false;
 
+        public void setActiveAll(boolean active) {
+            setScaleActive(active);
+            setXhotActive(active);
+            setYhotActive(active);
+        }
+
         public boolean isScaleActive() {
             return scaleActive;
         }
