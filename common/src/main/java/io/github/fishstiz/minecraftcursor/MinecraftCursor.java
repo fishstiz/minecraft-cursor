@@ -99,12 +99,12 @@ public class MinecraftCursor {
         CursorType externalCursor = ExternalCursorTracker.get().getCursorOrDefault();
         if (externalCursor != CursorType.DEFAULT) return externalCursor;
 
-        CursorType cursorType = CursorTypeResolver.INSTANCE.resolveCursorType(currentScreen, mouseX, mouseY);
+        CursorType cursorType = CursorTypeResolver.INSTANCE.resolve(currentScreen, mouseX, mouseY);
 
         if (cursorType == CursorType.DEFAULT) {
             Optional<GuiEventListener> hoveredElement = currentScreen.getChildAt(mouseX, mouseY);
             if (hoveredElement.isPresent()) {
-                cursorType = CursorTypeResolver.INSTANCE.resolveCursorType(hoveredElement.get(), mouseX, mouseY);
+                cursorType = CursorTypeResolver.INSTANCE.resolve(hoveredElement.get(), mouseX, mouseY);
             }
         }
 
