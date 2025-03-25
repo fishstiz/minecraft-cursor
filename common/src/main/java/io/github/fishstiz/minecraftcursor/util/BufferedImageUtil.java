@@ -69,7 +69,7 @@ public class BufferedImageUtil {
         try {
             return src.getSubimage(rect.x, rect.y, rect.width, rect.height);
         } catch (RasterFormatException e) {
-            MinecraftCursor.LOGGER.error("[minecraft-cursor] Image size {}x{} out of bounds. Required: {}x{} at index {} (y={})",
+            MinecraftCursor.LOGGER.error("[minecraft-cursor] Image size {}x{} invalid. Required: {}x{} at index {} (y={})",
                     src.getWidth(), src.getHeight(), rect.width, rect.height, rect.y == 0 ? rect.y : rect.y / rect.width, rect.y);
             return src;
         }

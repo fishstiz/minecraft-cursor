@@ -20,7 +20,7 @@ public class MinecraftCursorFabricInitializer implements MinecraftCursorInitiali
                 elementRegistrar.register("com.terraformersmc.modmenu.gui.widget.DescriptionListWidget$LinkEntry", ElementRegistrar::elementToPointer);
             }
         } catch (LinkageError | Exception e) {
-            MinecraftCursor.LOGGER.warn("Could not register cursor type for Mod Menu");
+            MinecraftCursor.LOGGER.warn("[minecraft-cursor] Could not register cursor type for Mod Menu");
         }
     }
 }
