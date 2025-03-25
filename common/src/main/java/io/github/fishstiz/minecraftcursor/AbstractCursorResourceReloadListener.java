@@ -47,6 +47,7 @@ abstract class AbstractCursorResourceReloadListener {
                 MinecraftCursor.LOGGER.info("[minecraft-cursor] New resource pack settings detected, updating config...");
                 CONFIG.set_hash(config.get_hash());
                 CONFIG.setSettings(config.getSettings());
+                CONFIG.getGlobal().setActiveAll(false);
                 CONFIG.save();
             }
         });

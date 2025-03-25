@@ -11,8 +11,9 @@ import net.fabricmc.loader.api.FabricLoader;
 public class MinecraftCursorFabricInitializer implements MinecraftCursorInitializer {
     @Override
     public void init(CursorTypeRegistrar cursorRegistrar, ElementRegistrar elementRegistrar) {
+        elementRegistrar.register(new TradeOfferButtonCursorHandler("net.minecraft.class_492$class_493"));
+        
         try {
-            elementRegistrar.register(new TradeOfferButtonCursorHandler("net.minecraft.class_492$class_493"));
 
             if (FabricLoader.getInstance().isModLoaded("modmenu")) {
                 elementRegistrar.register(new ModScreenCursorHandler());
