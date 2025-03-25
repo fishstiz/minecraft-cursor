@@ -21,13 +21,16 @@ import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
 
 public final class CursorManager implements CursorTypeRegistrar {
     public static final CursorManager INSTANCE = new CursorManager();
-    private static final Minecraft CLIENT = Minecraft.getInstance();
     private final LinkedHashMap<String, Cursor> cursors = new LinkedHashMap<>();
     private final TreeMap<Integer, String> overrides = new TreeMap<>();
     private final AnimationState animationState = new AnimationState();
     private Cursor currentCursor = new Cursor(CursorType.of(""), null);
 
     private CursorManager() {
+    }
+
+    private static class Client {
+        private static final Minecraft MINECRAFT = Minecraft.getInstance();
     }
 
     @Override
@@ -151,11 +154,11 @@ public final class CursorManager implements CursorTypeRegistrar {
         }
 
         currentCursor = cursor;
-        GLFW.glfwSetCursor(CLIENT.getWindow().getWindow(), currentCursor.getId());
+        GLFW.glfwSetCursor(Client.MINECRAFT.getWindow().getWindow(), currentCursor.getId());
     }
 
     public void reloadCursor() {
-        GLFW.glfwSetCursor(CLIENT.getWindow().getWindow(), getCurrentCursor().getId());
+        GLFW.glfwSetCursor(Client.MINECRAFT.getWindow().getWindow(), getCurrentCursor().getId());
     }
 
     public void overrideCurrentCursor(CursorType type, int index) {
