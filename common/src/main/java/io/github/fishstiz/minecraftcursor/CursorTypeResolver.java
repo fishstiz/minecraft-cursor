@@ -60,7 +60,7 @@ final class CursorTypeResolver implements ElementRegistrar {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends GuiEventListener> CursorType resolveCursorType(T element, double mouseX, double mouseY) {
+    public <T extends GuiEventListener> CursorType resolve(T element, double mouseX, double mouseY) {
         String elementName = element.getClass().getName();
 
         try {
@@ -74,7 +74,7 @@ final class CursorTypeResolver implements ElementRegistrar {
             CursorTypeFunction<T> cursorTypeFunction = (CursorTypeFunction<T>) cachedRegistry.get(elementName);
 
             if (cursorTypeFunction == null) {
-                cursorTypeFunction = (CursorTypeFunction<T>) computeCursorType(element);
+                cursorTypeFunction = (CursorTypeFunction<T>) resolveFunction(element);
                 cachedRegistry.put(elementName, cursorTypeFunction);
             }
 
@@ -92,27 +92,27 @@ final class CursorTypeResolver implements ElementRegistrar {
         return CursorType.DEFAULT;
     }
 
-    private CursorTypeFunction<? extends GuiEventListener> computeCursorType(GuiEventListener element) {
+    private CursorTypeFunction<? extends GuiEventListener> resolveFunction(GuiEventListener element) {
         for (int i = registry.size() - 1; i >= 0; i--) {
             if (registry.get(i).getKey().isInstance(element)) {
                 return registry.get(i).getValue();
             }
         }
         if (element instanceof ContainerEventHandler) {
-            return (CursorTypeFunction<ContainerEventHandler>) this::resolveChildCursorType;
+            return (CursorTypeFunction<ContainerEventHandler>) this::resolveChild;
         }
         return ElementRegistrar::elementToDefault;
     }
 
-    private <T extends ContainerEventHandler> CursorType resolveChildCursorType(T parentElement, double mouseX, double mouseY) {
+    private <T extends ContainerEventHandler> CursorType resolveChild(T parentElement, double mouseX, double mouseY) {
         CursorType cursorType = CursorType.DEFAULT;
         for (GuiEventListener child : parentElement.children()) {
             if (child instanceof ContainerEventHandler childParent) {
-                CursorType parentCursorType = resolveChildCursorType(childParent, mouseX, mouseY);
+                CursorType parentCursorType = resolveChild(childParent, mouseX, mouseY);
                 cursorType = parentCursorType != CursorType.DEFAULT ? parentCursorType : cursorType;
             }
             if (child.isMouseOver(mouseX, mouseY)) {
-                CursorType childCursorType = resolveCursorType(child, mouseX, mouseY);
+                CursorType childCursorType = resolve(child, mouseX, mouseY);
                 cursorType = childCursorType != CursorType.DEFAULT ? childCursorType : cursorType;
             }
         }
