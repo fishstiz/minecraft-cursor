@@ -22,7 +22,6 @@ import java.util.concurrent.atomic.AtomicReference;
 public class MinecraftCursor {
     public static final String MOD_ID = "minecraft-cursor";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-    private static final Minecraft CLIENT = Minecraft.getInstance();
     public static final CursorConfig CONFIG = CursorConfigLoader
             .fromFile(new File(Services.PLATFORM.getConfigDir(), MOD_ID + ".json"));
 
@@ -31,6 +30,10 @@ public class MinecraftCursor {
     private Screen visibleNonCurrentScreen;
 
     private MinecraftCursor() {
+    }
+
+    private static class Client {
+        private static final Minecraft MINECRAFT = Minecraft.getInstance();
     }
 
     public static void init() {
@@ -50,7 +53,7 @@ public class MinecraftCursor {
     }
 
     public void beforeScreenInit(Screen screen) {
-        if (CLIENT.screen == null) {
+        if (Client.MINECRAFT.screen == null) {
             CursorManager.INSTANCE.setCurrentCursor(CursorType.DEFAULT);
             visibleNonCurrentScreen = screen;
             return;
@@ -61,20 +64,20 @@ public class MinecraftCursor {
     public void afterRenderScreen(int mouseX, int mouseY) {
         if (ExternalCursorTracker.get().isCustom()) return;
 
-        if (CLIENT.screen != null) {
-            CursorManager.INSTANCE.setCurrentCursor(getCursorType(CLIENT.screen, mouseX, mouseY));
+        if (Client.MINECRAFT.screen != null) {
+            CursorManager.INSTANCE.setCurrentCursor(getCursorType(Client.MINECRAFT.screen, mouseX, mouseY));
         }
     }
 
     public void tick() {
         if (ExternalCursorTracker.get().isCustom()) return;
 
-        if (CLIENT.screen == null && visibleNonCurrentScreen != null && !CLIENT.mouseHandler.isMouseGrabbed()) {
-            double scale = CLIENT.getWindow().getGuiScale();
-            double mouseX = CLIENT.mouseHandler.xpos() / scale;
-            double mouseY = CLIENT.mouseHandler.ypos() / scale;
+        if (Client.MINECRAFT.screen == null && visibleNonCurrentScreen != null && !Client.MINECRAFT.mouseHandler.isMouseGrabbed()) {
+            double scale = Client.MINECRAFT.getWindow().getGuiScale();
+            double mouseX = Client.MINECRAFT.mouseHandler.xpos() / scale;
+            double mouseY = Client.MINECRAFT.mouseHandler.ypos() / scale;
             CursorManager.INSTANCE.setCurrentCursor(getCursorType(visibleNonCurrentScreen, mouseX, mouseY));
-        } else if (CLIENT.screen == null && visibleNonCurrentScreen == null) {
+        } else if (Client.MINECRAFT.screen == null && visibleNonCurrentScreen == null) {
             CursorManager.INSTANCE.setCurrentCursor(ExternalCursorTracker.get().getCursorOrDefault());
         }
     }
