@@ -1,0 +1,74 @@
+name: Bug report
+description: Create a report to help us improve
+labels: [ "bug" ]
+assignees:
+  - fishstiz
+body:
+  - type: dropdown
+    id: loader
+    attributes:
+      label: Mod Loader
+      options:
+        - Fabric
+        - NeoForge
+        - Forge
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Mod Version
+      placeholder: 3.6.3+1.21.4
+    validations:
+      required: true
+  - type: input
+    id: minecraft-version
+    attributes:
+      label: Minecraft Version
+      placeholder: 1.21.5
+    validations:
+      required: true
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+  - type: textarea
+    id: to-reproduce
+    attributes:
+      label: To Reproduce
+      description: Steps to reproduce the bug
+      placeholder: |
+        Example:
+        1. Install mod '...'
+        2. Go to '...'
+        3. Click on '....'
+        4. See crash
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected behavior
+      description: A clear and concise description of what you expected to happen.
+    validations:
+      required: true
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Actual Behavior
+      description: A clear and concise description of what actually happened.
+  - type: textarea
+    id: files
+    attributes:
+      label: Relevant logs/screenshots/files
+      description: |
+        Attach any relevant logs, screenshots, or other files to help diagnose the issue. 
+        Use a paste site like https://mclo.gs/ for logs.
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Add any other context about the problem here.
