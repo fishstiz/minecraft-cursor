@@ -12,14 +12,6 @@ dependencies {
 
     annotationProcessor 'org.spongepowered:mixin:0.8.7:processor'
 
-    compileOnly annotationProcessor("io.github.llamalad7:mixinextras-common:${mixin_extras_version}")
-    jarJar(implementation("io.github.llamalad7:mixinextras-forge:${mixin_extras_version}") {
-        version {
-            strictly "[${mixin_extras_version},)"
-            prefer "${mixin_extras_version}"
-        }
-    })
-
     implementation 'org.jetbrains:annotations:26.0.2'
 }
 
