@@ -28,6 +28,7 @@ import java.util.function.*;
 
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
 import static io.github.fishstiz.minecraftcursor.gui.widget.CursorOptionsWidget.*;
+import static io.github.fishstiz.minecraftcursor.platform.Services.PLATFORM;
 
 public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOptionsListWidget.OptionEntry> {
     private static final CursorConfig.GlobalSettings GLOBAL = CONFIG.getGlobal();
@@ -130,7 +131,7 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
     private void addModCompatOptions() {
         addEntry(new TitleEntry(COMPAT_TEXT));
 
-        boolean active = Services.PLATFORM.getPlatform() == Platform.FABRIC;
+        boolean active = PLATFORM.getPlatform() == Platform.FABRIC && !PLATFORM.isModLoaded("earlyloadingscreen");
         addEntry(new ToggleEntry(REMAP_TEXT, active && CONFIG.isRemapCursorsEnabled(), active, REMAP_TOOLTIP, CONFIG::setRemapCursorsEnabled));
     }
 
