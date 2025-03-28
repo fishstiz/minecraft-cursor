@@ -4,9 +4,7 @@
   "package": "io.github.fishstiz.minecraftcursor.mixin",
   "refmap": "${mod_id}.refmap.json",
   "compatibilityLevel": "JAVA_21",
-  "client": [
-    "compat.glfw.GlfwMixin"
-  ],
+  "plugin": "io.github.fishstiz.minecraftcursor.FabricMixinConfigPlugin",
   "injectors": {
     "defaultRequire": 1
   }
