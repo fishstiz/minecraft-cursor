@@ -83,9 +83,9 @@ Minecraft Cursor for Fabric is semi-compatible with mods that use custom cursors
 
 Standard system cursors used by other mods will also be remapped to their Minecraft Cursor equivalents.
 
-The mod achieves this by tracking the cursor state of other mods (if detected) and acting as the central cursor manager.
+Note that some mods are unknowingly changing the cursor due to the libraries they are embedding/depending on, causing conflicts with Minecraft Cursor (e.g., CICADA, Veil, etc.). These features work around that.
 
-Unfortunately, this feature does not work on Forge & NeoForge due to loader limitations.
+Unfortunately, this does not work on Forge & NeoForge due to loader limitations.
 
 ---
 NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT
