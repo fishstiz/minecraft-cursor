@@ -48,6 +48,9 @@
   "suggests": {
     "modmenu": "*"
   },
+  "conflicts": {
+    "earlyloadingscreen": "*"
+  },
   "accessWidener": "${mod_id}.accesswidener",
   "custom": {
     "modmenu": {
