@@ -3,6 +3,7 @@ package io.github.fishstiz.minecraftcursor.platform;
 import io.github.fishstiz.minecraftcursor.api.MinecraftCursorInitializer;
 import io.github.fishstiz.minecraftcursor.platform.services.PlatformHelper;
 import net.fabricmc.loader.api.FabricLoader;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -12,6 +13,11 @@ public class FabricPlatformHelper implements PlatformHelper {
     @Override
     public boolean isModLoaded(String modId) {
         return FabricLoader.getInstance().isModLoaded(modId);
+    }
+
+    @Override
+    public @NotNull Platform getPlatform() {
+        return Platform.FABRIC;
     }
 
     @Override

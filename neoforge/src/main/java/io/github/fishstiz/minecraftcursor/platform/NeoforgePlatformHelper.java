@@ -5,6 +5,7 @@ import io.github.fishstiz.minecraftcursor.impl.MinecraftCursorInitializerImpl;
 import io.github.fishstiz.minecraftcursor.platform.services.PlatformHelper;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLPaths;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.ServiceLoader;
@@ -14,6 +15,11 @@ public class NeoforgePlatformHelper implements PlatformHelper {
     @Override
     public boolean isModLoaded(String modId) {
         return ModList.get().isLoaded(modId);
+    }
+
+    @Override
+    public @NotNull Platform getPlatform() {
+        return Platform.NEOFORGE;
     }
 
     @Override
