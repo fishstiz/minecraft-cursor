@@ -33,6 +33,10 @@
     {
       "config": "${mod_id}.mixins.json",
       "environment": "client"
+    },
+    {
+      "config": "${mod_id}.fabric.mixins.json",
+      "environment": "client"
     }
   ],
   "depends": {
