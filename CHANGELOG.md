@@ -1,4 +1,5 @@
-- Improved logs
-- Disable global cursor settings when resource pack is updated.
-- Fixed stale values on global cursor settings after reloading.
-- Fixed crash on 1.21.5 of NeoForge
+- **Fabric**: Fix crash with Early Loading Screen mod.
+  - Having Early Loading Screen mod will disable the Fabric-Only Compatibility Features (see Mod Description for info)
+- **Forge & Neoforge**:
+  - Disabled option 'Remap Standard Cursors (GLFW)' as it didn't work anyway.
+  - Reduced jar size by removing the dormant fabric-only features.
