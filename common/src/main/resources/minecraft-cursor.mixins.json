@@ -17,8 +17,7 @@
     "access.RecipeAlternativesWidgetAccessor",
     "access.RecipeBookResultsAccessor",
     "access.RecipeBookWidgetAccessor",
-    "access.StonecutterScreenAccessor",
-    "compat.glfw.GlfwMixin"
+    "access.StonecutterScreenAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

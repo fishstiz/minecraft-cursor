@@ -7,6 +7,7 @@ import io.github.fishstiz.minecraftcursor.platform.services.PlatformHelper;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.ServiceLoader;
@@ -16,6 +17,11 @@ public class ForgePlatformHelper implements PlatformHelper {
     @Override
     public boolean isModLoaded(String modId) {
         return ModList.get().isLoaded(modId);
+    }
+
+    @Override
+    public @NotNull Platform getPlatform() {
+        return Platform.FORGE;
     }
 
     @Override

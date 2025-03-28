@@ -5,6 +5,8 @@ import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
+import io.github.fishstiz.minecraftcursor.platform.Platform;
+import io.github.fishstiz.minecraftcursor.platform.Services;
 import io.github.fishstiz.minecraftcursor.util.DrawUtil;
 import io.github.fishstiz.minecraftcursor.util.MouseEvent;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
@@ -139,7 +141,9 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
 
     private void addModCompatOptions() {
         addEntry(new TitleEntry(COMPAT_TEXT));
-        addEntry(new ToggleEntry(REMAP_TEXT, CONFIG.isRemapCursorsEnabled(), true, REMAP_TOOLTIP, CONFIG::setRemapCursorsEnabled));
+
+        boolean active = Services.PLATFORM.getPlatform() == Platform.FABRIC;
+        addEntry(new ToggleEntry(REMAP_TEXT, active && CONFIG.isRemapCursorsEnabled(), active, REMAP_TOOLTIP, CONFIG::setRemapCursorsEnabled));
     }
 
     private void addResourcePackOptions() {
