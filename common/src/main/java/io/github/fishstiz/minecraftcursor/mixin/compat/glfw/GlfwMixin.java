@@ -86,14 +86,25 @@ public abstract class GlfwMixin {
 
     @WrapMethod(method = "glfwSetCursor")
     private static void setMinecraftCursor(long window, long cursor, Operation<Void> original) {
-        if (!isTracking() || window != Minecraft.getInstance().getWindow().getWindow()) {
+        if (!isTracking() || window != Minecraft.getInstance().getWindow().getWindow() || !CONFIG.isRemapCursorsEnabled()) {
             original.call(window, cursor);
             return;
         }
 
         CursorTracker tracker = ExternalCursorTracker.get();
-        if (!CONFIG.isRemapCursorsEnabled() || !tracker.isTracking(cursor)) {
+        if (!tracker.isTracking(cursor) && cursor != 0) {
             original.call(window, cursor);
+            return;
+        }
+
+        if (cursor == 0) {
+            String packageName = getWalker().walk(GlfwMixin::minecraft_cursor$getCaller);
+            if (packageName.contains("minecraftcursor")) {
+                original.call(window, cursor);
+            } else {
+                tracker.updateCursor(packageName.hashCode(), CursorType.DEFAULT);
+                if (!tracker.isCustom()) original.call(window, CursorManager.INSTANCE.getCurrentCursor().getId());
+            }
             return;
         }
 
@@ -103,9 +114,9 @@ public abstract class GlfwMixin {
                 || CursorManager.INSTANCE.getCursor(externalCursor.getCursorType()).getId() == 0) {
             original.call(window, cursor);
             tracker.updateCursor(externalCursor == null ? 0 : externalCursor.getCaller(), ExternalCursor.PLACEHOLDER_CUSTOM);
-        } else {
-            tracker.updateCursor(externalCursor.getCaller(), externalCursor.getCursorType());
-            if (!tracker.isCustom()) original.call(window, CursorManager.INSTANCE.getCurrentCursor().getId());
+            return;
         }
+        tracker.updateCursor(externalCursor.getCaller(), externalCursor.getCursorType());
+        if (!tracker.isCustom()) original.call(window, CursorManager.INSTANCE.getCurrentCursor().getId());
     }
 }
