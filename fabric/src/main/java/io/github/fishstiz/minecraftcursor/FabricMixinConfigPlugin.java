@@ -1,5 +1,6 @@
 package io.github.fishstiz.minecraftcursor;
 
+import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import org.objectweb.asm.tree.ClassNode;
 import org.slf4j.Logger;
@@ -35,7 +36,7 @@ public class FabricMixinConfigPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        return false;
+        return true;
     }
 
     @Override
@@ -45,12 +46,12 @@ public class FabricMixinConfigPlugin implements IMixinConfigPlugin {
 
     @Override
     public List<String> getMixins() {
+        if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) return null;
+
         if (!isGLFWEarlyLoaded()) return List.of("compat.glfw.GlfwMixin");
 
-        String infoLink = "https://github.com/fishstiz/minecraft-cursor/blob/mc/1.21.4/README.md#fabric-only-features";
-        LOGGER.error("[minecraft-cursor] Fabric-only compatibility features could not be applied due to one of these mods: {}", (Object) modsEarlyLoadingGLFW);
-        LOGGER.error("[minecraft-cursor] Learn more about the Fabric-only compatibility features: {}", infoLink);
-        return List.of();
+        LOGGER.warn("[minecraft-cursor] Fabric-only compatibility features could not be applied due to one of these mods: {}", (Object) modsEarlyLoadingGLFW);
+        return null;
     }
 
     @Override
