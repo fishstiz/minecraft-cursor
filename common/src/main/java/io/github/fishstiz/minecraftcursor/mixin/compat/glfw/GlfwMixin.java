@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.LOGGER;
+import static io.github.fishstiz.minecraftcursor.MinecraftCursor.MOD_ID;
 import static io.github.fishstiz.minecraftcursor.compat.ExternalCursorTracker.*;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -99,7 +100,7 @@ public abstract class GlfwMixin {
 
         if (cursor == 0) {
             String packageName = getWalker().walk(GlfwMixin::minecraft_cursor$getCaller);
-            if (packageName.contains("minecraftcursor")) {
+            if (packageName.contains(MOD_ID.replaceAll("[-_]", ""))) {
                 original.call(window, cursor);
             } else {
                 tracker.updateCursor(packageName.hashCode(), CursorType.DEFAULT);
