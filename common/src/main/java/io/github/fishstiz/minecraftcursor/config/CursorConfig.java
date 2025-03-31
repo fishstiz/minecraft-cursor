@@ -217,7 +217,7 @@ public class CursorConfig {
 
             public static final double SCALE = 1.0;
             public static final double SCALE_MIN = 0.5;
-            public static final double SCALE_MAX = 3.0;
+            public static final double SCALE_MAX = 8.0;
             public static final double SCALE_STEP = 0.05;
             public static final int X_HOT = 0;
             public static final int Y_HOT = 0;
