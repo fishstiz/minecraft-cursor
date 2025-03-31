@@ -1,4 +1,4 @@
-package io.github.fishstiz.minecraftcursor;
+package io.github.fishstiz.minecraftcursor.config.mixin;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
@@ -15,7 +15,7 @@ public class FabricMixinConfigPlugin implements IMixinConfigPlugin {
     private static final Logger LOGGER = LoggerFactory.getLogger("minecraft-cursor");
     private final String[] modsEarlyLoadingGLFW = {"earlyloadingscreen"};
 
-    private boolean isGLFWEarlyLoaded() {
+    private boolean isGLFWModsLoaded() {
         for (String modId : modsEarlyLoadingGLFW) {
             if (FabricLoader.getInstance().isModLoaded(modId)) {
                 return true;
@@ -48,7 +48,9 @@ public class FabricMixinConfigPlugin implements IMixinConfigPlugin {
     public List<String> getMixins() {
         if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) return null;
 
-        if (!isGLFWEarlyLoaded()) return List.of("compat.glfw.GlfwMixin");
+        MixinConfigProperties properties = new MixinConfigProperties(LOGGER);
+
+        if (properties.ignoreModCheckGlfw() || !isGLFWModsLoaded()) return List.of("compat.glfw.GlfwMixin");
 
         LOGGER.warn("[minecraft-cursor] Fabric-only compatibility features could not be applied due to one of these mods: {}", (Object) modsEarlyLoadingGLFW);
         return null;
