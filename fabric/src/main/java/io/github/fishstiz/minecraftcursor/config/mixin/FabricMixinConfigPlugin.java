@@ -8,20 +8,25 @@ import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
 public class FabricMixinConfigPlugin implements IMixinConfigPlugin {
-    private static final Logger LOGGER = LoggerFactory.getLogger("minecraft-cursor");
+    private static final Logger LOGGER = LoggerFactory.getLogger("minecraft-cursor | FabricMixinConfigPlugin");
     private final String[] modsEarlyLoadingGLFW = {"earlyloadingscreen"};
 
-    private boolean isGLFWModsLoaded() {
+    private record GlfwMod(String modId, boolean isLoaded) {
+    }
+
+    private GlfwMod isGLFWModLoaded() {
         for (String modId : modsEarlyLoadingGLFW) {
             if (FabricLoader.getInstance().isModLoaded(modId)) {
-                return true;
+                return new GlfwMod(modId, true);
             }
         }
-        return false;
+        return new GlfwMod(Arrays.toString(modsEarlyLoadingGLFW), false);
     }
 
     @Override
@@ -48,12 +53,25 @@ public class FabricMixinConfigPlugin implements IMixinConfigPlugin {
     public List<String> getMixins() {
         if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) return null;
 
-        MixinConfigProperties properties = new MixinConfigProperties(LOGGER);
+        final var props = new MixinConfigProperties(LOGGER, FabricLoader.getInstance().getConfigDir());
+        List<String> mixins = new ArrayList<>();
 
-        if (properties.ignoreModCheckGlfw() || !isGLFWModsLoaded()) return List.of("compat.glfw.GlfwMixin");
+        GlfwMod glfwMod = isGLFWModLoaded();
+        if (props.forceDisableGlfw.value()) {
+            LOGGER.warn("[minecraft-cursor] Property set: {}. Disabling cursor tracking for other mods...", props.forceDisableGlfw.key());
+        } else if (props.ignoreModCheckGlfw.value() || !glfwMod.isLoaded()) {
+            if (props.ignoreModCheckGlfw.value()) {
+                LOGGER.warn("[minecraft-cursor] Property set: {}. Enabling cursor tracking for other mods. May crash game due to: {}", props.ignoreModCheckGlfw.key(), glfwMod.modId);
+            } else {
+                LOGGER.info("[minecraft-cursor] Enabling cursor tracking for other mods... If game crashes, report issue and set '{}' to true in '{}' as workaround (disables cursor tracking).", props.forceDisableGlfw.key(), props.file);
+            }
 
-        LOGGER.warn("[minecraft-cursor] Fabric-only compatibility features could not be applied due to one of these mods: {}", (Object) modsEarlyLoadingGLFW);
-        return null;
+            mixins.add("compat.glfw.GlfwMixin");
+        } else {
+            LOGGER.warn("[minecraft-cursor] Cursor tracking could not be enabled due to: {}. Compatibility issues may occur. To ignore this check, set '{}' to true in '{}'.", glfwMod.modId, props.ignoreModCheckGlfw.key(), props.file);
+        }
+
+        return !mixins.isEmpty() ? mixins : null;
     }
 
     @Override
