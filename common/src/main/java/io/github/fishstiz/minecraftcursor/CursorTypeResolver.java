@@ -111,7 +111,7 @@ final class CursorTypeResolver implements ElementRegistrar {
                 CursorType parentCursorType = resolveChild(childParent, mouseX, mouseY);
                 cursorType = parentCursorType != CursorType.DEFAULT ? parentCursorType : cursorType;
             }
-            if (child.isMouseOver(mouseX, mouseY)) {
+            if (cursorType == CursorType.DEFAULT && child.isMouseOver(mouseX, mouseY)) {
                 CursorType childCursorType = resolve(child, mouseX, mouseY);
                 cursorType = childCursorType != CursorType.DEFAULT ? childCursorType : cursorType;
             }
