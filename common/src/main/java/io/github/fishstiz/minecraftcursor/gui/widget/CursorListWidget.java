@@ -13,6 +13,8 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -56,6 +58,22 @@ public class CursorListWidget extends ContainerObjectSelectionList<CursorListWid
     }
 
     @Override
+    protected int getRowTop(int index) {
+        return y0 + (this.itemHeight + ROW_GAP) * index - (int) this.getScrollAmount();
+    }
+
+    protected int getRowIndex(double y) {
+        int index = ((int) Math.floor(y - this.y0) + (int) this.getScrollAmount()) / (this.itemHeight + ROW_GAP);
+        return index >= 0 && index < this.getItemCount() ? index : -1;
+    }
+
+    @Override
+    protected @Nullable CursorEntry getEntryAtPosition(double mouseX, double mouseY) {
+        int index = this.getRowIndex(mouseY);
+        return index >= 0 && this.isMouseOver(mouseX, mouseY) ? this.getEntry(index) : null;
+    }
+
+    @Override
     public void setLeftPos(int leftPos) {
         this.x0 = leftPos;
         super.setLeftPos(leftPos);
@@ -66,7 +84,7 @@ public class CursorListWidget extends ContainerObjectSelectionList<CursorListWid
         this.height = height;
     }
 
-    class CursorEntry extends Entry<CursorEntry> {
+    public class CursorEntry extends Entry<CursorEntry> {
         public final CursorButtonWidget button;
 
         public CursorEntry(Cursor cursor, int x, int y, int width, int height) {
@@ -74,31 +92,33 @@ public class CursorListWidget extends ContainerObjectSelectionList<CursorListWid
         }
 
         @Override
-        public void render(GuiGraphics context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float delta) {
+        public void render(@NotNull GuiGraphics context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float delta) {
             button.setX(CursorListWidget.this.x0);
             button.setY(CursorListWidget.this.y0 + (itemHeight + ROW_GAP) * index - (int) Math.round(getScrollAmount()));
             button.renderWidget(context, mouseX, mouseY, delta);
         }
 
         @Override
-        public List<? extends NarratableEntry> narratables() {
+        public @NotNull List<? extends NarratableEntry> narratables() {
             return List.of(button);
         }
 
         @Override
-        public List<? extends GuiEventListener> children() {
+        public @NotNull List<? extends GuiEventListener> children() {
             return List.of(button);
         }
     }
 
-    class CursorButtonWidget extends AbstractButton implements CursorProvider {
+    public class CursorButtonWidget extends AbstractButton implements CursorProvider {
         private static final String PREFIX_TEXT_KEY = "minecraft-cursor.options.cursor-type.";
         private static final int TEXTURE_SIZE = 16;
         private static final int PADDING_LEFT = 8;
         private static final int BACKGROUND_COLOR = 0x7F000000; // black 50%
         private static final int TEXT_COLOR = 0xFFFFFFFF; // white
         private static final int TEXT_DISABLED_COLOR = 0xFF555555; // dark gray
-        private static final int BORDER_COLOR = 0xFFFFFFFF; // white
+        private static final int BORDER_COLOR = 0xFF000000;
+        private static final int SELECTED_BORDER_COLOR = 0xFFFFFFFF; // white
+        private static final int HOVERED_BORDER_COLOR = 0xFF555555; // dark gray
 
         private final Cursor cursor;
 
@@ -113,13 +133,23 @@ public class CursorListWidget extends ContainerObjectSelectionList<CursorListWid
         }
 
         @Override
-        public void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
+        public void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float delta) {
             renderBox(context);
             renderTexture(context);
             renderMessage(context);
+            renderBorder(context, mouseX, mouseY);
+        }
 
-            context.renderOutline(getX(), getY(), getWidth(), getHeight(),
-                    isMouseOver(mouseX, mouseY) || cursor == optionsScreen.getSelectedCursor() ? BORDER_COLOR : 0xFF000000);
+        private void renderBorder(GuiGraphics context, int mouseX, int mouseY) {
+            int borderColor = BORDER_COLOR;
+
+            if (cursor == optionsScreen.getSelectedCursor()) {
+                borderColor = SELECTED_BORDER_COLOR;
+            } else if (isMouseOver(mouseX, mouseY)) {
+                borderColor = HOVERED_BORDER_COLOR;
+            }
+
+            context.renderOutline(getX(), getY(), getWidth(), getHeight(), borderColor);
         }
 
         private void renderBox(GuiGraphics context) {
@@ -145,7 +175,7 @@ public class CursorListWidget extends ContainerObjectSelectionList<CursorListWid
         }
 
         @Override
-        protected void updateWidgetNarration(NarrationElementOutput builder) {
+        protected void updateWidgetNarration(@NotNull NarrationElementOutput builder) {
             // unsupported
         }
 
