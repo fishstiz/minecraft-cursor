@@ -1,6 +1,5 @@
 package io.github.fishstiz.minecraftcursor.mixin;
 
-import io.github.fishstiz.minecraftcursor.CursorManager;
 import io.github.fishstiz.minecraftcursor.gui.screen.CursorOptionsScreen;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.components.Button;
@@ -29,7 +28,7 @@ public abstract class MouseOptionsScreenMixin extends OptionsSubScreen {
                 Component.translatable("minecraft-cursor.options").append("..."),
                 btn -> {
                     if (this.minecraft != null) {
-                        this.minecraft.setScreen(new CursorOptionsScreen(this, CursorManager.INSTANCE));
+                        this.minecraft.setScreen(new CursorOptionsScreen(this));
                     }
                 }).build();
 

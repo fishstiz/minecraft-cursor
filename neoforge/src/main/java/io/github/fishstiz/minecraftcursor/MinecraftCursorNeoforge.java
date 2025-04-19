@@ -19,7 +19,7 @@ public class MinecraftCursorNeoforge {
 
     public MinecraftCursorNeoforge(ModContainer container, IEventBus modEventBus) {
         container.registerExtensionPoint(IConfigScreenFactory.class, (c, screen) ->
-                new CursorOptionsScreen(screen, CursorManager.INSTANCE));
+                new CursorOptionsScreen(screen));
 
         MinecraftCursor.init();
 

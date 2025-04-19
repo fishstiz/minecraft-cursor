@@ -1,4 +1,4 @@
-package io.github.fishstiz.minecraftcursor.gui.screen;
+package io.github.fishstiz.minecraftcursor.gui;
 
 import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
 import io.github.fishstiz.minecraftcursor.cursor.AnimationState;
