@@ -87,6 +87,7 @@ publishMods {
     modrinth("modrinthFabric") {
         from modrinthOptions, fabricOptions
         modLoaders.add("fabric")
+        modLoaders.add("quilt")
         requires("fabric-api")
         optional("modmenu")
     }
@@ -98,6 +99,7 @@ publishMods {
     curseforge("curseforgeFabric") {
         from curseforgeOptions, fabricOptions
         modLoaders.add("fabric")
+        modLoaders.add("quilt")
         clientRequired = true
         requires("fabric-api")
         optional("modmenu")
