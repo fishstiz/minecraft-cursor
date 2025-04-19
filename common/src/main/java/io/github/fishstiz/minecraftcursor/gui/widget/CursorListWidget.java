@@ -47,6 +47,10 @@ public class CursorListWidget extends ContainerObjectSelectionList<CursorListWid
         return Math.max(0, maxPosition - (this.getBottom() - this.getY()) + (ROW_GAP * getItemCount()) - ROW_GAP);
     }
 
+    public void clampScrollAmount() {
+        this.setScrollAmount(Math.clamp(this.scrollAmount(), 0.0, this.maxScrollAmount()));
+    }
+
     @Override
     protected int scrollBarX() {
         return getRight() - SCROLLBAR_OFFSET;
