@@ -74,14 +74,29 @@ public class CursorListWidget extends ContainerObjectSelectionList<CursorListWid
     }
 
     @Override
+    protected void renderList(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        int left = this.x0;
+        int width = this.width - SCROLLBAR_OFFSET;
+
+        for (int i = 0; i < this.getItemCount(); i++) {
+            int top = this.getRowTop(i);
+            int bottom = this.getRowBottom(i);
+            if (bottom >= this.y0 && top <= this.y1) {
+                this.renderItem(guiGraphics, mouseX, mouseY, partialTick, i, left, top, width, this.itemHeight);
+            }
+        }
+    }
+
+    @Override
     public void setLeftPos(int leftPos) {
         this.x0 = leftPos;
         super.setLeftPos(leftPos);
-        this.centerScrollOn(this.getFirstElement());
+        this.centerScrollOn(this.getFocused() != null ? this.getFocused() : this.getFirstElement());
     }
 
     public void setHeight(int height) {
         this.height = height;
+        this.y1 = this.y0 + this.height;
     }
 
     public class CursorEntry extends Entry<CursorEntry> {
@@ -93,8 +108,7 @@ public class CursorListWidget extends ContainerObjectSelectionList<CursorListWid
 
         @Override
         public void render(@NotNull GuiGraphics context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float delta) {
-            button.setX(CursorListWidget.this.x0);
-            button.setY(CursorListWidget.this.y0 + (itemHeight + ROW_GAP) * index - (int) Math.round(getScrollAmount()));
+            button.setPosition(x, y);
             button.renderWidget(context, mouseX, mouseY, delta);
         }
 

@@ -204,15 +204,6 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
             GLOBAL.setYHot(yhot);
             yhotEntry.sliderWidget.setTranslatedValue(yhot);
         }
-
-        if (applyX && applyY) {
-            cursorManager.getCurrentCursor().setHotspots(xhot, yhot);
-        } else if (applyX) {
-            cursorManager.getCurrentCursor().setXHot(xhot);
-        } else if (applyY) {
-            cursorManager.getCurrentCursor().setYHot(yhot);
-        }
-
         if (mouseEvent == MouseEvent.RELEASE) {
             applyHotspotsToAll();
         }
@@ -306,8 +297,8 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
         this.height = height;
         this.setLeftPos(0);
         this.y0 = y;
+        this.y1 = this.y0 + this.height;
     }
-
 
     @Override
     public void setX(int x) {

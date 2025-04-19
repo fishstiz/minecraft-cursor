@@ -4,6 +4,7 @@ import io.github.fishstiz.minecraftcursor.api.CursorController;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
+import io.github.fishstiz.minecraftcursor.util.MouseEvent;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -31,14 +32,18 @@ public class CursorOptionsHandler {
         }
     }
 
-    void handleChangeHotspotWidget(int xhot, int yhot) {
+    void handleChangeHotspotWidget(MouseEvent event, int xhot, int yhot) {
         if (!GLOBAL.isXHotActive()) {
             options.xhotSlider.setTranslatedValue(xhot);
-            handleChangeXHot(xhot);
+            if (event == MouseEvent.RELEASE) {
+                handleChangeXHot(xhot);
+            }
         }
         if (!GLOBAL.isYHotActive()) {
             options.yhotSlider.setTranslatedValue(yhot);
-            handleChangeYHot(yhot);
+            if (event == MouseEvent.RELEASE) {
+                handleChangeYHot(yhot);
+            }
         }
     }
 

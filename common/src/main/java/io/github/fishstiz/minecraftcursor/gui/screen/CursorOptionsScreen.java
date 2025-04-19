@@ -2,6 +2,7 @@ package io.github.fishstiz.minecraftcursor.gui.screen;
 
 import io.github.fishstiz.minecraftcursor.CursorManager;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
+import io.github.fishstiz.minecraftcursor.gui.CursorAnimationHelper;
 import io.github.fishstiz.minecraftcursor.gui.widget.ContainerWidget;
 import io.github.fishstiz.minecraftcursor.gui.widget.CursorListWidget;
 import io.github.fishstiz.minecraftcursor.gui.widget.CursorOptionsHandler;
@@ -15,7 +16,9 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
@@ -26,14 +29,10 @@ public class CursorOptionsScreen extends Screen {
     private static final int SELECTED_CURSOR_COLUMN_WIDTH = 200;
     private static final int COLUMN_GAP = 8;
 
-    private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
-    private final Button moreButton = Button.builder(
-            Component.translatable("minecraft-cursor.options.more").append("..."),
-            btn -> toMoreOptions()).build();
-    private final Button doneButton = Button.builder(
-            CommonComponents.GUI_DONE, btn -> this.onClose()).build();
-
     public final CursorAnimationHelper animationHelper = new CursorAnimationHelper();
+    private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
+    private final Button moreButton = Button.builder(Component.translatable("minecraft-cursor.options.more").append("..."), btn -> toMoreOptions()).build();
+    private final Button doneButton = Button.builder(CommonComponents.GUI_DONE, btn -> this.onClose()).build();
     private final CursorManager cursorManager;
     private final List<Cursor> cursors;
     final Screen previousScreen;
@@ -63,12 +62,12 @@ public class CursorOptionsScreen extends Screen {
         this.addRenderableWidget(body.cursorsColumn);
 
         if (this.body != null) {
-            this.refreshWidgetPositions();
+            this.repositionElements();
         }
     }
 
     @Override
-    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
+    public void render(@NotNull GuiGraphics context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
         this.renderDirtBackground(context);
         body.render(context, mouseX, mouseY, delta);
@@ -76,7 +75,8 @@ public class CursorOptionsScreen extends Screen {
         doneButton.render(context, mouseX, mouseY, delta);
     }
 
-    protected void refreshWidgetPositions() {
+    @Override
+    protected void repositionElements() {
         this.layout.arrangeElements();
 
         int bodyWidth = CURSORS_COLUMN_WIDTH + SELECTED_CURSOR_COLUMN_WIDTH + COLUMN_GAP;
@@ -86,7 +86,6 @@ public class CursorOptionsScreen extends Screen {
 
         moreButton.setWidth(buttonWidth);
         doneButton.setWidth(buttonWidth - 2);
-
         moreButton.setX(centerX - buttonWidth - gapHalf);
         doneButton.setX(centerX + gapHalf);
 
@@ -139,6 +138,7 @@ public class CursorOptionsScreen extends Screen {
     public class CursorOptionsBody extends ContainerWidget {
         public final CursorListWidget cursorsColumn;
         public final CursorOptionsWidget selectedCursorColumn;
+        private final List<GuiEventListener> children = new ArrayList<>();
 
         public CursorOptionsBody() {
             super(layout.getX(), layout.getHeaderHeight(), CursorOptionsScreen.this.width, getContentHeight(), Component.empty());
@@ -149,6 +149,8 @@ public class CursorOptionsScreen extends Screen {
 
             cursorsColumn = new CursorListWidget(minecraft, CURSORS_COLUMN_WIDTH, height, y, y + height, screen);
             selectedCursorColumn = new CursorOptionsWidget(computedX2(), SELECTED_CURSOR_COLUMN_WIDTH, height, y, screen);
+            this.children.add(cursorsColumn);
+            this.children.add(selectedCursorColumn);
 
             position();
         }
@@ -162,12 +164,13 @@ public class CursorOptionsScreen extends Screen {
         }
 
         @Override
-        public List<? extends GuiEventListener> children() {
-            return List.of(cursorsColumn, selectedCursorColumn);
+        public @NotNull List<? extends GuiEventListener> children() {
+            return this.children;
         }
 
         @Override
-        public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
+        public void render(@NotNull GuiGraphics context, int mouseX, int mouseY, float delta) {
+            cursorsColumn.setHeight(getInnerHeight());
             cursorsColumn.render(context, mouseX, mouseY, delta);
             selectedCursorColumn.render(context, mouseX, mouseY, delta);
         }
@@ -201,7 +204,7 @@ public class CursorOptionsScreen extends Screen {
         }
 
         @Override
-        protected void updateWidgetNarration(NarrationElementOutput builder) {
+        protected void updateWidgetNarration(@NotNull NarrationElementOutput builder) {
             // not supported
         }
 
@@ -216,7 +219,7 @@ public class CursorOptionsScreen extends Screen {
         }
 
         @Override
-        protected void renderContents(GuiGraphics context, int mouseX, int mouseY, float delta) {
+        protected void renderContents(@NotNull GuiGraphics context, int mouseX, int mouseY, float delta) {
             this.render(context, mouseX, mouseY, delta);
         }
     }
