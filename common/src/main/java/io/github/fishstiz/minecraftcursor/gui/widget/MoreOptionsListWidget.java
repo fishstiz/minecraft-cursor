@@ -2,11 +2,10 @@ package io.github.fishstiz.minecraftcursor.gui.widget;
 
 import io.github.fishstiz.minecraftcursor.CursorManager;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
+import io.github.fishstiz.minecraftcursor.compat.ExternalCursorTracker;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
-import io.github.fishstiz.minecraftcursor.platform.Platform;
-import io.github.fishstiz.minecraftcursor.platform.Services;
 import io.github.fishstiz.minecraftcursor.util.DrawUtil;
 import io.github.fishstiz.minecraftcursor.util.MouseEvent;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
@@ -131,8 +130,8 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
     private void addModCompatOptions() {
         addEntry(new TitleEntry(COMPAT_TEXT));
 
-        boolean active = PLATFORM.getPlatform() == Platform.FABRIC && !PLATFORM.isModLoaded("earlyloadingscreen");
-        addEntry(new ToggleEntry(REMAP_TEXT, active && CONFIG.isRemapCursorsEnabled(), active, REMAP_TOOLTIP, CONFIG::setRemapCursorsEnabled));
+        boolean isTracking = ExternalCursorTracker.isTracking();
+        addEntry(new ToggleEntry(REMAP_TEXT, isTracking && CONFIG.isRemapCursorsEnabled(), isTracking, REMAP_TOOLTIP, CONFIG::setRemapCursorsEnabled));
     }
 
     private void addResourcePackOptions() {

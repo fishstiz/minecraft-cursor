@@ -18,7 +18,6 @@ public class ExternalCursorTracker implements CursorTracker {
     private final LongOpenHashSet addresses = new LongOpenHashSet();
 
     private ExternalCursorTracker() {
-        MinecraftCursor.LOGGER.info("[minecraft-cursor] Tracking cursors from other mods...");
     }
 
     private static class CursorTimestamp {
@@ -55,7 +54,7 @@ public class ExternalCursorTracker implements CursorTracker {
         for (CursorTimestamp cursorTimestamp : currentCursors.values()) {
             // if latest custom cursor
             if ((cursorTimestamp.cursorType == ExternalCursor.PLACEHOLDER_CUSTOM)
-                    && (latestCursorTimestamp == null
+                && (latestCursorTimestamp == null
                     || latestCursorTimestamp.cursorType != ExternalCursor.PLACEHOLDER_CUSTOM
                     || cursorTimestamp.timestamp > latestCursorTimestamp.timestamp)) {
                 latestCursorTimestamp = cursorTimestamp;
@@ -63,11 +62,11 @@ public class ExternalCursorTracker implements CursorTracker {
             }
             // if latest non-default cursor
             if ((latestCursorTimestamp == null
-                    || latestCursorTimestamp.cursorType != ExternalCursor.PLACEHOLDER_CUSTOM)
-                    && (latestCursorTimestamp == null
+                 || latestCursorTimestamp.cursorType != ExternalCursor.PLACEHOLDER_CUSTOM)
+                && (latestCursorTimestamp == null
                     || latestCursorTimestamp.cursorType == CursorType.DEFAULT
                     || (cursorTimestamp.timestamp > latestCursorTimestamp.timestamp
-                    && cursorTimestamp.cursorType != CursorType.DEFAULT))) {
+                        && cursorTimestamp.cursorType != CursorType.DEFAULT))) {
                 latestCursorTimestamp = cursorTimestamp;
             }
         }
@@ -75,8 +74,45 @@ public class ExternalCursorTracker implements CursorTracker {
         return latestCursorTimestamp != null ? latestCursorTimestamp.cursorType : CursorType.DEFAULT;
     }
 
+    public @Nullable ExternalCursor getTrackedCursor(long cursor) {
+        return this.externalCursors.get(cursor);
+    }
+
+    public void untrackCursor(long cursor) {
+        this.externalCursors.remove(cursor);
+    }
+
+    public void updateCursor(int caller, CursorType cursorType) {
+        this.updateCursorTimestamp(caller, cursorType);
+    }
+
+    public boolean isTracking(long cursor) {
+        return this.externalCursors.containsKey(cursor);
+    }
+
+    public void storeAddress(long address) {
+        this.addresses.add(address);
+    }
+
+    public boolean consumeAddress(long address) {
+        return this.addresses.removeIf(a -> a == address);
+    }
+
+    public @NotNull CursorType getCursorOrDefault() {
+        return this.getLatestCursorOrDefault();
+    }
+
+    public boolean isCustom() {
+        return getCursorOrDefault() == ExternalCursor.PLACEHOLDER_CUSTOM;
+    }
+
     private static class Holder {
         private static final ExternalCursorTracker INSTANCE = new ExternalCursorTracker();
+
+        static {
+            tracking = true;
+            MinecraftCursor.LOGGER.info("[minecraft-cursor] Tracking cursors from other mods...");
+        }
     }
 
     public static boolean isTracking() {
@@ -91,51 +127,16 @@ public class ExternalCursorTracker implements CursorTracker {
     }
 
     public static StackWalker getWalker() {
-        tracking = true;
         return Holder.INSTANCE.walker;
     }
 
     public static void trackCursor(long cursor, int caller, CursorType cursorType) {
-        tracking = true;
         Holder.INSTANCE.externalCursors
                 .computeIfAbsent(cursor, c -> new ExternalCursor(caller, cursorType))
                 .update(cursorType);
     }
 
     public static void trackCursor(long cursor, int caller) {
-        tracking = true;
         Holder.INSTANCE.externalCursors.putIfAbsent(cursor, new ExternalCursor(caller));
-    }
-
-    public @Nullable ExternalCursor getTrackedCursor(long cursor) {
-        return Holder.INSTANCE.externalCursors.get(cursor);
-    }
-
-    public void untrackCursor(long cursor) {
-        Holder.INSTANCE.externalCursors.remove(cursor);
-    }
-
-    public void updateCursor(int caller, CursorType cursorType) {
-        Holder.INSTANCE.updateCursorTimestamp(caller, cursorType);
-    }
-
-    public boolean isTracking(long cursor) {
-        return Holder.INSTANCE.externalCursors.containsKey(cursor);
-    }
-
-    public void storeAddress(long address) {
-        Holder.INSTANCE.addresses.add(address);
-    }
-
-    public boolean consumeAddress(long address) {
-        return Holder.INSTANCE.addresses.removeIf(a -> a == address);
-    }
-
-    public @NotNull CursorType getCursorOrDefault() {
-        return Holder.INSTANCE.getLatestCursorOrDefault();
-    }
-
-    public boolean isCustom() {
-        return getCursorOrDefault() == ExternalCursor.PLACEHOLDER_CUSTOM;
     }
 }
