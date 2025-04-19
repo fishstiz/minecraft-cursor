@@ -10,6 +10,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +36,9 @@ public class CursorOptionsWidget extends AbstractContainerWidget {
     public static final Component XHOT_TEXT = Component.translatable("minecraft-cursor.options.xhot");
     public static final Component YHOT_TEXT = Component.translatable("minecraft-cursor.options.yhot");
 
-    private final CursorOptionsScreen parent;
     private final CursorOptionsHandler handler;
+    private final CursorOptionsScreen parent;
+    private final List<GuiEventListener> children = new ArrayList<>();
     SelectedCursorToggleWidget enableButton;
     SelectedCursorSliderWidget scaleSlider;
     SelectedCursorSliderWidget xhotSlider;
@@ -46,7 +48,7 @@ public class CursorOptionsWidget extends AbstractContainerWidget {
     SelectedCursorHotspotWidget cursorHotspot;
     SelectedCursorTestWidget cursorTest;
 
-    public CursorOptionsWidget(int x, int width, int height, int y,  CursorOptionsScreen optionsScreen) {
+    public CursorOptionsWidget(int x, int width, int height, int y, CursorOptionsScreen optionsScreen) {
         super(x, y, width, height, Component.empty());
 
         this.parent = optionsScreen;
@@ -64,17 +66,22 @@ public class CursorOptionsWidget extends AbstractContainerWidget {
                 SCALE_MIN, SCALE_MAX, SCALE_STEP,
                 handler::handleChangeScale, CursorOptionsHandler::removeScaleOverride);
         bindHelperButton(scaleSlider);
-
         xhotSlider = createHotspotSlider(XHOT_TEXT, settings.getXHot(), handler::handleChangeXHot);
         yhotSlider = createHotspotSlider(YHOT_TEXT, settings.getYHot(), handler::handleChangeYHot);
-
         animateButton = new SelectedCursorToggleWidget(ANIMATE_TEXT, handler.isAnimated(), handler::handlePressAnimate);
         resetAnimation = new SelectedCursorButtonWidget(RESET_ANIMATION_TEXT, handler::handleResetAnimation);
-
         cursorHotspot = new SelectedCursorHotspotWidget(BOX_WIDGET_TEXTURE_SIZE, this);
         cursorHotspot.setChangeEventListener(handler::handleChangeHotspotWidget);
-
         cursorTest = new SelectedCursorTestWidget(BOX_WIDGET_TEXTURE_SIZE, this);
+
+        this.children.add(enableButton);
+        this.children.add(scaleSlider);
+        this.children.add(xhotSlider);
+        this.children.add(yhotSlider);
+        this.children.add(animateButton);
+        this.children.add(resetAnimation);
+        this.children.add(cursorHotspot);
+        this.children.add(cursorTest);
 
         refreshWidgets();
     }
@@ -94,6 +101,7 @@ public class CursorOptionsWidget extends AbstractContainerWidget {
         var helperButton = new SelectedCursorButtonWidget(HELPER_ICON, HELPER_ICON_SIZE, HELPER_ICON_SIZE, parent::toMoreOptions);
         helperButton.setTooltip(Tooltip.create(Component.translatable(GLOBAL_TEXT_KEY, sliderWidget.getPrefix())));
         sliderWidget.setInactiveHelperButton(helperButton, HELPER_BUTTON_SIZE, HELPER_BUTTON_SIZE);
+        this.children.add(sliderWidget.getInactiveHelperButton());
     }
 
     private void refreshWidgets() {
@@ -117,7 +125,7 @@ public class CursorOptionsWidget extends AbstractContainerWidget {
     }
 
     @Override
-    public void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
+    public void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float delta) {
         placeWidgets();
 
         enableButton.render(context, mouseX, mouseY, delta);
@@ -179,36 +187,12 @@ public class CursorOptionsWidget extends AbstractContainerWidget {
     }
 
     @Override
-    public List<? extends GuiEventListener> children() {
-        List<GuiEventListener> children = new ArrayList<>(List.of(
-                enableButton,
-                scaleSlider,
-                xhotSlider,
-                yhotSlider,
-                animateButton,
-                resetAnimation,
-                cursorHotspot,
-                cursorTest
-        ));
-
-        addHelperButton(scaleSlider, children);
-        addHelperButton(xhotSlider, children);
-        addHelperButton(yhotSlider, children);
-
-        return children;
-    }
-
-    private void addHelperButton(SelectedCursorSliderWidget slider, List<GuiEventListener> children) {
-        if (slider != null) {
-            var helperButton = slider.getInactiveHelperButton();
-            if (helperButton != null) {
-                children.add(helperButton);
-            }
-        }
+    public @NotNull List<? extends GuiEventListener> children() {
+        return this.children;
     }
 
     @Override
-    protected void updateWidgetNarration(NarrationElementOutput builder) {
+    protected void updateWidgetNarration(@NotNull NarrationElementOutput builder) {
         // not supported
     }
 }
