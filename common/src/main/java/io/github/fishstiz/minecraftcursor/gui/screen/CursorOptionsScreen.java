@@ -29,6 +29,7 @@ public class CursorOptionsScreen extends Screen {
     private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
     private final List<Cursor> cursors;
     private Cursor selectedCursor;
+    private CursorListWidget list;
     @Nullable CursorOptionsWidget options;
 
     public CursorOptionsScreen(Screen previousScreen) {
@@ -51,7 +52,7 @@ public class CursorOptionsScreen extends Screen {
     }
 
     protected LinearLayout initContents(LinearLayout contents) {
-        contents.addChild(new CursorListWidget(
+        this.list = contents.addChild(new CursorListWidget(
                 minecraft,
                 CURSORS_COLUMN_WIDTH,
                 layout.getContentHeight(),
@@ -76,6 +77,13 @@ public class CursorOptionsScreen extends Screen {
     @Override
     protected void repositionElements() {
         this.layout.arrangeElements();
+        this.list.setHeight(layout.getContentHeight());
+        this.list.setY(layout.getHeaderHeight());
+
+        if (this.options != null) {
+            this.options.setHeight(layout.getContentHeight());
+            this.options.setY(layout.getHeaderHeight());
+        }
     }
 
     public void selectCursor(Cursor cursor) {
