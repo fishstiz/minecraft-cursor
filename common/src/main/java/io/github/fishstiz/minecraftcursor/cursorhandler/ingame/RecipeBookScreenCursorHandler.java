@@ -1,5 +1,6 @@
 package io.github.fishstiz.minecraftcursor.cursorhandler.ingame;
 
+import io.github.fishstiz.minecraftcursor.api.CursorHandler;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.mixin.access.*;
 import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
@@ -11,25 +12,18 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.recipebook.OverlayRecipeComponent;
 import net.minecraft.world.inventory.RecipeBookMenu;
 
-public class RecipeBookScreenCursorHandler<T extends AbstractContainerScreen<? extends RecipeBookMenu<?>>> extends HandledScreenCursorHandler<RecipeBookMenu<?>, T> {
+public class RecipeBookScreenCursorHandler<T extends AbstractContainerScreen<? extends RecipeBookMenu<?>>> implements CursorHandler<T> {
     public static final RecipeBookScreenCursorHandler<InventoryScreen> INVENTORY = new RecipeBookScreenCursorHandler<>();
     public static final RecipeBookScreenCursorHandler<CraftingScreen> CRAFTING = new RecipeBookScreenCursorHandler<>();
     public static final RecipeBookScreenCursorHandler<AbstractFurnaceScreen<?>> FURNACE = new RecipeBookScreenCursorHandler<>();
 
-    private OverlayRecipeComponent alternatesWidget;
-
     @Override
     public CursorType getCursorType(T recipeBookScreen, double mouseX, double mouseY) {
-        CursorType cursorType = super.getCursorType(recipeBookScreen, mouseX, mouseY);
-        if (cursorType != CursorType.DEFAULT && (alternatesWidget == null || !alternatesWidget.isVisible())) {
-            return cursorType;
-        }
-
         RecipeBookWidgetAccessor recipeBook = getRecipeBook(recipeBookScreen);
         if (recipeBook == null || !recipeBook.invokeIsOpen()) return CursorType.DEFAULT;
 
         RecipeBookResultsAccessor recipesArea = (RecipeBookResultsAccessor) recipeBook.getRecipesArea();
-        alternatesWidget = recipesArea.getAlternatesWidget();
+        OverlayRecipeComponent alternatesWidget = recipesArea.getAlternatesWidget();
 
         if (alternatesWidget.isVisible()) {
             return getAlternatesWidgetCursor((RecipeAlternativesWidgetAccessor) alternatesWidget);
