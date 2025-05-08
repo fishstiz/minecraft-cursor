@@ -1,5 +1,6 @@
 package io.github.fishstiz.minecraftcursor.cursorhandler.ingame;
 
+import io.github.fishstiz.minecraftcursor.api.CursorHandler;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.mixin.access.RecipeAlternativesWidgetAccessor;
 import io.github.fishstiz.minecraftcursor.mixin.access.RecipeBookResultsAccessor;
@@ -12,21 +13,14 @@ import net.minecraft.client.gui.screens.inventory.AbstractRecipeBookScreen;
 import net.minecraft.client.gui.screens.recipebook.OverlayRecipeComponent;
 import net.minecraft.world.inventory.RecipeBookMenu;
 
-public class RecipeBookScreenCursorHandler extends HandledScreenCursorHandler<RecipeBookMenu, AbstractRecipeBookScreen<? extends RecipeBookMenu>> {
-    private RecipeAlternativesWidgetAccessor alternatesWidget;
-
+public class RecipeBookScreenCursorHandler implements CursorHandler<AbstractRecipeBookScreen<?>> {
     @Override
     public CursorType getCursorType(AbstractRecipeBookScreen<? extends RecipeBookMenu> recipeBookScreen, double mouseX, double mouseY) {
-        CursorType cursorType = super.getCursorType(recipeBookScreen, mouseX, mouseY);
-        if (cursorType != CursorType.DEFAULT && (alternatesWidget == null || !(((OverlayRecipeComponent) alternatesWidget).isVisible()))) {
-            return cursorType;
-        }
-
         RecipeBookWidgetAccessor recipeBook = (RecipeBookWidgetAccessor) ((RecipeBookScreenAccessor<?>) recipeBookScreen).getRecipeBook();
         if (!recipeBook.invokeIsOpen()) return CursorType.DEFAULT;
 
         RecipeBookResultsAccessor recipesArea = (RecipeBookResultsAccessor) recipeBook.getRecipesArea();
-        alternatesWidget = (RecipeAlternativesWidgetAccessor) recipesArea.getAlternatesWidget();
+        RecipeAlternativesWidgetAccessor alternatesWidget = (RecipeAlternativesWidgetAccessor) recipesArea.getAlternatesWidget();
 
         if (((OverlayRecipeComponent) alternatesWidget).isVisible()) {
             return getAlternatesWidgetCursor(alternatesWidget);

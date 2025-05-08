@@ -15,7 +15,8 @@
     "access.RecipeBookResultsAccessor",
     "access.RecipeBookScreenAccessor",
     "access.RecipeBookWidgetAccessor",
-    "access.StonecutterScreenAccessor"
+    "access.StonecutterScreenAccessor",
+    "cursorprovider.AbstractContainerScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1

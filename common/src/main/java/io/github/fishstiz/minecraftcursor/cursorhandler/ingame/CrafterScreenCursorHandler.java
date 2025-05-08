@@ -1,5 +1,6 @@
 package io.github.fishstiz.minecraftcursor.cursorhandler.ingame;
 
+import io.github.fishstiz.minecraftcursor.api.CursorHandler;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.mixin.access.HandledScreenAccessor;
 import net.minecraft.client.Minecraft;
@@ -9,13 +10,10 @@ import net.minecraft.world.inventory.CrafterMenu;
 import net.minecraft.world.inventory.CrafterSlot;
 import net.minecraft.world.inventory.Slot;
 
-public class CrafterScreenCursorHandler extends HandledScreenCursorHandler<CrafterMenu, CrafterScreen> {
+public class CrafterScreenCursorHandler implements CursorHandler<CrafterScreen> {
     @Override
     @SuppressWarnings("unchecked")
     public CursorType getCursorType(CrafterScreen crafterScreen, double mouseX, double mouseY) {
-        CursorType cursorType = super.getCursorType(crafterScreen, mouseX, mouseY);
-        if (cursorType != CursorType.DEFAULT) return cursorType;
-
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return CursorType.DEFAULT;
 
