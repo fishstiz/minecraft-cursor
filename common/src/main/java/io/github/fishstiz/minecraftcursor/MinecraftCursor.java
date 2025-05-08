@@ -15,6 +15,8 @@ import net.minecraft.client.gui.screens.Screen;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
+
 public final class MinecraftCursor {
     public static final String MOD_ID = "minecraft-cursor";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
@@ -97,13 +99,10 @@ public final class MinecraftCursor {
             return cursorType;
         }
 
-        for (GuiEventListener child : screen.children()) {
-            if (child.isMouseOver(mouseX, mouseY)) {
-                cursorType = RESOLVER.resolve(child, mouseX, mouseY);
-                if (!cursorType.isDefault()) {
-                    return cursorType;
-                }
-            }
+        Optional<GuiEventListener> child = screen.getChildAt(mouseX, mouseY);
+
+        if (child.isPresent()) {
+            return RESOLVER.resolve(child.get(), mouseX, mouseY);
         }
 
         return CursorType.DEFAULT;
