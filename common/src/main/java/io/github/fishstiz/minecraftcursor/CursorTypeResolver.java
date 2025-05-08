@@ -16,9 +16,11 @@ import java.util.Optional;
 class CursorTypeResolver implements ElementRegistrar {
     private final List<ElementEntry<? extends GuiEventListener>> registry = new ArrayList<>();
     private final HashMap<String, CursorTypeFunction<? extends GuiEventListener>> cachedRegistry = new HashMap<>();
+    private final ElementInspector inspector;
     String lastFailedElement;
 
-    CursorTypeResolver() {
+    CursorTypeResolver(ElementInspector inspector) {
+        this.inspector = inspector;
     }
 
     @Override
@@ -57,6 +59,10 @@ class CursorTypeResolver implements ElementRegistrar {
         registry.add(new ElementEntry<>(elementClass, elementToCursorType));
     }
 
+    public void clearCache() {
+        cachedRegistry.clear();
+    }
+
     @SuppressWarnings("unchecked")
     public <T extends GuiEventListener> CursorType resolve(T element, double mouseX, double mouseY) {
         String elementName = element.getClass().getName();
@@ -72,7 +78,9 @@ class CursorTypeResolver implements ElementRegistrar {
 
             if (mapper == null) {
                 mapper = (CursorTypeFunction<T>) resolveMapper(element);
-                cachedRegistry.put(elementName, mapper);
+                if (!inspector.setHovered(element)) {
+                    cachedRegistry.put(elementName, mapper);
+                }
             }
 
             return mapper.getCursorType(element, mouseX, mouseY);
@@ -91,6 +99,7 @@ class CursorTypeResolver implements ElementRegistrar {
     private CursorTypeFunction<? extends GuiEventListener> resolveMapper(GuiEventListener element) {
         for (int i = registry.size() - 1; i >= 0; i--) {
             if (registry.get(i).element.isInstance(element)) {
+                inspector.setHovered(element);
                 return registry.get(i).mapper;
             }
         }
@@ -103,11 +112,13 @@ class CursorTypeResolver implements ElementRegistrar {
     private <T extends ContainerEventHandler> CursorType resolveChild(T parent, double mouseX, double mouseY) {
         Optional<GuiEventListener> child = parent.getChildAt(mouseX, mouseY);
         if (child.isPresent()) {
-            if (child.get() instanceof ContainerEventHandler nestedParent) {
+            GuiEventListener hoveredElement = child.get();
+            if (hoveredElement instanceof ContainerEventHandler nestedParent) {
                 CursorType cursorType = resolveChild(nestedParent, mouseX, mouseY);
                 if (!cursorType.isDefault()) return cursorType;
             }
-            return resolve(child.get(), mouseX, mouseY);
+            inspector.setHovered(hoveredElement);
+            return resolve(hoveredElement, mouseX, mouseY);
         }
         return CursorType.DEFAULT;
     }

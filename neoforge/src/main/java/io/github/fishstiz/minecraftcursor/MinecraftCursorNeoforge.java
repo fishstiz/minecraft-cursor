@@ -37,7 +37,7 @@ public class MinecraftCursorNeoforge {
 
     @SubscribeEvent
     public void onScreenRender(ScreenEvent.Render.Post event) {
-        MinecraftCursor.onScreenRender(event.getScreen().getMinecraft(), event.getMouseX(), event.getMouseY());
+        MinecraftCursor.onScreenRender(event.getScreen().getMinecraft(), event.getGuiGraphics(), event.getMouseX(), event.getMouseY());
     }
 
     @SubscribeEvent
