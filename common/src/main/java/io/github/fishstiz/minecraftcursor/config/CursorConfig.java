@@ -190,10 +190,10 @@ public class CursorConfig implements Serializable {
     }
 
     public static class Settings implements Serializable {
-        protected double scale = Default.SCALE;
-        protected int xhot = Default.X_HOT;
-        protected int yhot = Default.Y_HOT;
-        private boolean enabled = Default.ENABLED;
+        protected double scale = SettingsUtil.SCALE;
+        protected int xhot = SettingsUtil.X_HOT;
+        protected int yhot = SettingsUtil.Y_HOT;
+        private boolean enabled = SettingsUtil.ENABLED;
         private Boolean animated;
 
         public void update(double scale, int xhot, int yhot, boolean enabled) {
@@ -231,21 +231,6 @@ public class CursorConfig implements Serializable {
             Settings settings = new Settings();
             settings.update(this.scale, this.xhot, this.yhot, this.enabled);
             return settings;
-        }
-
-        public static class Default {
-            private Default() {
-            }
-
-            public static final double SCALE = 1.0;
-            public static final double SCALE_MIN = 0.5;
-            public static final double SCALE_MAX = 8.0;
-            public static final double SCALE_STEP = 0.05;
-            public static final int X_HOT = 0;
-            public static final int Y_HOT = 0;
-            public static final int HOT_MIN = 0;
-            public static final int HOT_MAX = 31;
-            public static final boolean ENABLED = true;
         }
     }
 
