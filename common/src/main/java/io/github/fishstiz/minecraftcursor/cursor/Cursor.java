@@ -101,8 +101,14 @@ public class Cursor {
         }
     }
 
+    public void applySettings(CursorConfig.Settings settings) {
+        this.enable(settings.isEnabled());
+        this.updateImage(settings.getScale(), settings.getXHot(), settings.getXHot());
+    }
+
     public void enable(boolean enabled) {
         this.enabled = enabled;
+        if (this.onLoad != null) this.onLoad.accept(this);
     }
 
     public ResourceLocation getSprite() {

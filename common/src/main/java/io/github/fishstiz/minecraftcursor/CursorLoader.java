@@ -5,6 +5,7 @@ import io.github.fishstiz.minecraftcursor.config.AnimatedCursorConfig;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.config.CursorConfigLoader;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
+import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -24,19 +25,37 @@ public class CursorLoader {
     private static final String ANIMATION_TYPE = IMG_TYPE + ".mcmeta";
     private static final String CONFIG_PATH = "atlases/cursors.json";
     private static final String CURSORS_DIR = "textures/cursors/";
+    private static CursorConfig resourceConfig;
 
     private CursorLoader() {
+    }
+
+    public static void resetConfig() {
+        if (resourceConfig != null) {
+            CONFIG.set_hash(resourceConfig.get_hash());
+            CONFIG.layerSettings(resourceConfig.getSettings());
+
+            for (Cursor cursor : CursorManager.INSTANCE.getCursors()) {
+                cursor.applySettings(CONFIG.getOrCreateCursorSettings(cursor.getType()).copy());
+            }
+        } else {
+            MinecraftCursor.LOGGER.error("Failed to apply resource config: Not Found.");
+        }
     }
 
     public static ResourceLocation getLocation() {
         return new ResourceLocation(MOD_ID, CURSORS_DIR);
     }
 
-    public static void reload(ResourceManager manager) {
+    public static void applyDefaultCursor() {
         CursorManager.INSTANCE.setCurrentCursor(CursorType.DEFAULT);
+    }
+
+    public static void reload(ResourceManager manager) {
+        applyDefaultCursor();
         loadConfig(manager);
         loadCursorTextures(manager);
-        CursorManager.INSTANCE.setCurrentCursor(CursorType.DEFAULT);
+        Minecraft.getInstance().execute(CursorLoader::applyDefaultCursor);
     }
 
     private static void loadConfig(ResourceManager manager) {
@@ -48,10 +67,11 @@ public class CursorLoader {
             if (!config.get_hash().equals(CONFIG.get_hash())) {
                 MinecraftCursor.LOGGER.info("[minecraft-cursor] New resource pack settings detected, updating config...");
                 CONFIG.set_hash(config.get_hash());
-                CONFIG.setSettings(config.getSettings());
+                CONFIG.mergeSettings(config.getSettings());
                 CONFIG.getGlobal().setActiveAll(false);
                 CONFIG.save();
             }
+            resourceConfig = config;
         });
     }
 
@@ -65,7 +85,7 @@ public class CursorLoader {
                 if (combinedConfig == null) {
                     combinedConfig = loadedConfig;
                 } else {
-                    combinedConfig.setSettings(loadedConfig.getSettings());
+                    combinedConfig.layerSettings(loadedConfig.getSettings());
                 }
             } catch (IOException e) {
                 MinecraftCursor.LOGGER.error("[minecraft-cursor] Failed to load settings of resource pack '{}'", configResource.sourcePackId());
@@ -77,12 +97,12 @@ public class CursorLoader {
 
     private static void loadCursorTextures(ResourceManager manager) {
         for (Cursor cursor : CursorManager.INSTANCE.getCursors()) {
-            String basePath = CURSORS_DIR + cursor.getType().getKey();
-            loadCursorTexture(manager, cursor, basePath);
+            loadCursorTexture(manager, cursor);
         }
     }
 
-    private static void loadCursorTexture(ResourceManager manager, Cursor cursor, String basePath) {
+    public static void loadCursorTexture(ResourceManager manager, Cursor cursor) {
+        String basePath = CURSORS_DIR + cursor.getType().getKey();
         ResourceLocation location = new ResourceLocation(MOD_ID, basePath + IMG_TYPE);
         Resource cursorResource = manager.getResource(location).orElse(null);
 
