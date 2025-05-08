@@ -1,7 +1,5 @@
 package io.github.fishstiz.minecraftcursor.gui.screen;
 
-import io.github.fishstiz.minecraftcursor.api.CursorProvider;
-import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.gui.widget.MoreOptionsListWidget;
 import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorHotspotWidget;
 import net.minecraft.client.gui.GuiGraphics;
@@ -13,7 +11,7 @@ import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class MoreOptionsScreen extends Screen implements CursorProvider {
+public class MoreOptionsScreen extends Screen {
     private static final int HOTSPOT_WIDGET_SIZE = 96;
     private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
     private final Screen previousScreen;
@@ -95,15 +93,5 @@ public class MoreOptionsScreen extends Screen implements CursorProvider {
                 this.minecraft.setScreen(previousScreen);
             }
         }
-    }
-
-    @Override
-    public CursorType getCursorType(double mouseX, double mouseY) {
-        int headerHeight = layout.getHeaderHeight();
-        if ((mouseY < headerHeight || mouseY > headerHeight + layout.getContentHeight())
-            && mouseX > doneButton.getX() + doneButton.getWidth()) {
-            return CursorType.DEFAULT_FORCE;
-        }
-        return CursorType.DEFAULT;
     }
 }

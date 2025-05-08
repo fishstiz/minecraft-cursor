@@ -11,6 +11,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 class CursorTypeResolver implements ElementRegistrar {
     private final List<ElementEntry<? extends GuiEventListener>> registry = new ArrayList<>();
@@ -99,16 +100,14 @@ class CursorTypeResolver implements ElementRegistrar {
         return ElementRegistrar::elementToDefault;
     }
 
-    private <T extends ContainerEventHandler> CursorType resolveChild(T parentElement, double mouseX, double mouseY) {
-        for (GuiEventListener child : parentElement.children()) {
-            if (child instanceof ContainerEventHandler parent) {
-                CursorType cursorType = resolveChild(parent, mouseX, mouseY);
+    private <T extends ContainerEventHandler> CursorType resolveChild(T parent, double mouseX, double mouseY) {
+        Optional<GuiEventListener> child = parent.getChildAt(mouseX, mouseY);
+        if (child.isPresent()) {
+            if (child.get() instanceof ContainerEventHandler nestedParent) {
+                CursorType cursorType = resolveChild(nestedParent, mouseX, mouseY);
                 if (!cursorType.isDefault()) return cursorType;
             }
-            if (child.isMouseOver(mouseX, mouseY)) {
-                CursorType cursorType = resolve(child, mouseX, mouseY);
-                if (!cursorType.isDefault()) return cursorType;
-            }
+            return resolve(child.get(), mouseX, mouseY);
         }
         return CursorType.DEFAULT;
     }
