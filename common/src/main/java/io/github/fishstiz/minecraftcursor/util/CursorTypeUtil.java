@@ -10,24 +10,21 @@ public class CursorTypeUtil {
     private CursorTypeUtil() {
     }
 
-    private static class Client {
-        private static final Minecraft MINECRAFT = Minecraft.getInstance();
-    }
+    public static final long WINDOW = Minecraft.getInstance().getWindow().getWindow();
 
     public static boolean canShift() {
-        long handle = Client.MINECRAFT.getWindow().getWindow();
-        return CursorManager.INSTANCE.getCursor(CursorType.SHIFT).getId() != 0
-                && (InputConstants.isKeyDown(handle, GLFW.GLFW_KEY_LEFT_SHIFT)
-                || InputConstants.isKeyDown(handle, GLFW.GLFW_KEY_RIGHT_SHIFT));
+        return CursorManager.INSTANCE.getId(CursorType.SHIFT) != 0 &&
+               InputConstants.isKeyDown(WINDOW, GLFW.GLFW_KEY_LEFT_SHIFT) ||
+               InputConstants.isKeyDown(WINDOW, GLFW.GLFW_KEY_RIGHT_SHIFT);
     }
 
     public static boolean isGrabbing() {
-        return CursorManager.INSTANCE.getCursor(CursorType.GRABBING).getId() != 0
-                && CursorManager.INSTANCE.getCurrentCursor().getType() == CursorType.GRABBING
-                && isLeftClickHeld();
+        return CursorManager.INSTANCE.getId(CursorType.GRABBING) != 0 &&
+               CursorManager.INSTANCE.getAppliedCursor().getType().isKey(CursorType.GRABBING) &&
+               isLeftClickHeld();
     }
 
     public static boolean isLeftClickHeld() {
-        return GLFW.glfwGetMouseButton(Client.MINECRAFT.getWindow().getWindow(), GLFW.GLFW_MOUSE_BUTTON_1) == GLFW.GLFW_PRESS;
+        return GLFW.glfwGetMouseButton(WINDOW, GLFW.GLFW_MOUSE_BUTTON_1) == GLFW.GLFW_PRESS;
     }
 }

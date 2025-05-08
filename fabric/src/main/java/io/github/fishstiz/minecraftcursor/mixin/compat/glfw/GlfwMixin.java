@@ -7,7 +7,7 @@ import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.compat.CursorTracker;
 import io.github.fishstiz.minecraftcursor.compat.ExternalCursor;
 import io.github.fishstiz.minecraftcursor.compat.ExternalCursorTracker;
-import net.minecraft.client.Minecraft;
+import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -87,7 +87,7 @@ public abstract class GlfwMixin {
 
     @WrapMethod(method = "glfwSetCursor")
     private static void setMinecraftCursor(long window, long cursor, Operation<Void> original) {
-        if (!isTracking() || window != Minecraft.getInstance().getWindow().getWindow() || !CONFIG.isRemapCursorsEnabled()) {
+        if (!isTracking() || window != CursorTypeUtil.WINDOW || !CONFIG.isRemapCursorsEnabled()) {
             original.call(window, cursor);
             return;
         }
@@ -104,20 +104,27 @@ public abstract class GlfwMixin {
                 original.call(window, cursor);
             } else {
                 tracker.updateCursor(packageName.hashCode(), CursorType.DEFAULT);
-                if (!tracker.isCustom()) original.call(window, CursorManager.INSTANCE.getCurrentCursor().getId());
+                if (!tracker.isCustom()) {
+                    original.call(window, CursorManager.INSTANCE.getCurrentId());
+                }
             }
             return;
         }
 
-        ExternalCursor externalCursor = tracker.getTrackedCursor(cursor);
-        if (externalCursor == null
-                || externalCursor.getCursorType() == ExternalCursor.PLACEHOLDER_CUSTOM
-                || CursorManager.INSTANCE.getCursor(externalCursor.getCursorType()).getId() == 0) {
+        ExternalCursor trackedCursor = tracker.getTrackedCursor(cursor);
+
+        if (trackedCursor == null
+            || trackedCursor.getCursorType().isKey(ExternalCursor.PLACEHOLDER_CUSTOM)
+            || CursorManager.INSTANCE.getId(trackedCursor.getCursorType()) == 0) {
             original.call(window, cursor);
-            tracker.updateCursor(externalCursor == null ? 0 : externalCursor.getCaller(), ExternalCursor.PLACEHOLDER_CUSTOM);
+            tracker.updateCursor(trackedCursor == null ? 0 : trackedCursor.getCaller(), ExternalCursor.PLACEHOLDER_CUSTOM);
             return;
         }
-        tracker.updateCursor(externalCursor.getCaller(), externalCursor.getCursorType());
-        if (!tracker.isCustom()) original.call(window, CursorManager.INSTANCE.getCurrentCursor().getId());
+
+        tracker.updateCursor(trackedCursor.getCaller(), trackedCursor.getCursorType());
+
+        if (!tracker.isCustom()) {
+            original.call(window, CursorManager.INSTANCE.getCurrentId());
+        }
     }
 }

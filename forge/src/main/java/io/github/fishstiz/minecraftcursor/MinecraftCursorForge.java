@@ -1,6 +1,7 @@
 package io.github.fishstiz.minecraftcursor;
 
 import io.github.fishstiz.minecraftcursor.gui.screen.CursorOptionsScreen;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
@@ -14,15 +15,15 @@ import net.minecraftforge.fml.common.Mod;
 public class MinecraftCursorForge {
     // Forge does not support dashes in mod id
     public static final String MOD_ID = "minecraft_cursor";
+    private static final MinecraftCursor MINECRAFT_CURSOR = new MinecraftCursor();
 
     @SuppressWarnings("removal")
     public MinecraftCursorForge() {
-        ModLoadingContext.get().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class, () ->
-                new ConfigScreenHandler.ConfigScreenFactory((mc, screen) ->
-                        new CursorOptionsScreen(screen, CursorManager.INSTANCE)
-                ));
+        MINECRAFT_CURSOR.init();
 
-        MinecraftCursor.init();
+        ModLoadingContext.get().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class, () ->
+                new ConfigScreenHandler.ConfigScreenFactory((mc, screen) -> new CursorOptionsScreen(screen))
+        );
     }
 
     @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
@@ -33,24 +34,27 @@ public class MinecraftCursorForge {
         }
     }
 
-
     @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
     public static class ClientForgeEvents {
         @SubscribeEvent
         public static void onScreenInit(ScreenEvent.Init.Pre event) {
-            MinecraftCursor.getInstance().beforeScreenInit(event.getScreen());
+            MINECRAFT_CURSOR.onScreenInit(MinecraftHolder.INSTANCE, event.getScreen());
         }
 
         @SubscribeEvent
         public static void onScreenRender(ScreenEvent.Render.Post event) {
-            MinecraftCursor.getInstance().afterRenderScreen(event.getMouseX(), event.getMouseY());
+            MINECRAFT_CURSOR.onScreenRender(MinecraftHolder.INSTANCE, event.getMouseX(), event.getMouseY());
         }
 
         @SubscribeEvent
         public static void onClientTick(TickEvent.ClientTickEvent event) {
             if (event.phase == TickEvent.Phase.END) {
-                MinecraftCursor.getInstance().tick();
+                MINECRAFT_CURSOR.onClientTick(MinecraftHolder.INSTANCE);
             }
         }
+    }
+
+    private static class MinecraftHolder {
+        private static final Minecraft INSTANCE = Minecraft.getInstance();
     }
 }

@@ -30,10 +30,6 @@ public class CursorConfigLoader {
     }
 
     public static CursorConfig fromFile(File file) {
-        if (!file.getPath().endsWith(".json")) {
-            throw new IllegalArgumentException("Unsupported file type.");
-        }
-
         CursorConfig config = new CursorConfig();
 
         try (FileReader reader = new FileReader(file)) {

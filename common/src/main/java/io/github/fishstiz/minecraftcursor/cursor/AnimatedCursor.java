@@ -157,6 +157,12 @@ public class AnimatedCursor extends Cursor {
         applyToFrames(cursor -> cursor.enable(enabled));
     }
 
+    @Override
+    public void destroy() {
+        super.destroy();
+        applyToFrames(Cursor::destroy);
+    }
+
     public Frame getFallbackFrame() {
         if (this.fallbackFrame == null) {
             this.fallbackFrame = new Frame(this, 1, 0);

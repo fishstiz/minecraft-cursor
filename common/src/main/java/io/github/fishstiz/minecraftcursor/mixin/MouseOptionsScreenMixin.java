@@ -39,7 +39,7 @@ public abstract class MouseOptionsScreenMixin extends OptionsSubScreen {
                 false,
                 value -> {
                     if (this.minecraft != null) {
-                        this.minecraft.setScreen(new CursorOptionsScreen(this, CursorManager.INSTANCE));
+                        this.minecraft.setScreen(new CursorOptionsScreen(this));
                     }
                 });
         list.addBig(button);

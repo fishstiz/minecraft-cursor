@@ -10,7 +10,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 public class SelectedCursorTestWidget extends SelectedCursorClickableWidget implements CursorProvider {
-    private static final ResourceLocation BACKGROUND = ResourceLocation.tryBuild(MinecraftCursor.MOD_ID, "textures/gui/test_background.png");
+    private static final ResourceLocation BACKGROUND = new ResourceLocation(MinecraftCursor.MOD_ID, "textures/gui/test_background.png");
     private static final int HOTSPOT_RULER_COLOR = 0xFF00FF00; // green
     private static final Button BUTTON = Button.builder(Component.empty(),
             b -> b.setFocused(false)).size(20, 20).build();

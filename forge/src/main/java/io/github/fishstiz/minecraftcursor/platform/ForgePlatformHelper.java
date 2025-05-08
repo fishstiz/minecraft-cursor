@@ -8,7 +8,9 @@ import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import org.jetbrains.annotations.NotNull;
+import org.spongepowered.tools.obfuscation.ObfuscationData;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.stream.StreamSupport;
@@ -25,8 +27,8 @@ public class ForgePlatformHelper implements PlatformHelper {
     }
 
     @Override
-    public String getConfigDir() {
-        return FMLPaths.CONFIGDIR.get().toString();
+    public Path getConfigDir() {
+        return FMLPaths.CONFIGDIR.get();
     }
 
     @Override

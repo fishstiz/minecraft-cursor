@@ -1,6 +1,5 @@
 package io.github.fishstiz.minecraftcursor.gui.screen;
 
-import io.github.fishstiz.minecraftcursor.CursorManager;
 import io.github.fishstiz.minecraftcursor.api.CursorProvider;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.gui.widget.MoreOptionsListWidget;
@@ -19,16 +18,14 @@ public class MoreOptionsScreen extends Screen implements CursorProvider {
     private static final int HOTSPOT_WIDGET_SIZE = 96;
     private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
     private final Screen previousScreen;
-    private final CursorManager cursorManager;
     private final Button doneButton = Button.builder(CommonComponents.GUI_DONE, btn -> this.onClose()).build();
     private @Nullable SelectedCursorHotspotWidget hotspotWidget;
     private MoreOptionsListWidget list;
 
-    protected MoreOptionsScreen(Screen previousScreen, CursorManager cursorManager) {
+    protected MoreOptionsScreen(Screen previousScreen) {
         super(Component.translatable("minecraft-cursor.options.more"));
 
         this.previousScreen = previousScreen;
-        this.cursorManager = cursorManager;
     }
 
     @Override
@@ -38,8 +35,7 @@ public class MoreOptionsScreen extends Screen implements CursorProvider {
                 width,
                 getContentHeight(),
                 layout.getHeaderHeight(),
-                layout.getHeaderHeight() + getContentHeight(),
-                cursorManager
+                layout.getHeaderHeight() + getContentHeight()
         );
 
         if (previousScreen instanceof CursorOptionsScreen optionsScreen && optionsScreen.body != null) {
@@ -47,6 +43,8 @@ public class MoreOptionsScreen extends Screen implements CursorProvider {
             this.hotspotWidget.visible = false;
             this.hotspotWidget.setChangeEventListener(this.list::handleChangeHotspotWidget);
             this.addWidget(this.hotspotWidget);
+        } else {
+            this.hotspotWidget = null;
         }
 
         this.layout.addToHeader(new StringWidget(this.title, this.font));
@@ -95,7 +93,7 @@ public class MoreOptionsScreen extends Screen implements CursorProvider {
 
         if (this.minecraft != null) {
             if (previousScreen instanceof CursorOptionsScreen options && options.body != null) {
-                CursorOptionsScreen optionsScreen = new CursorOptionsScreen(options.previousScreen, cursorManager);
+                CursorOptionsScreen optionsScreen = new CursorOptionsScreen(options.previousScreen);
                 this.minecraft.setScreen(optionsScreen);
                 optionsScreen.selectCursor(options.getSelectedCursor());
             } else {

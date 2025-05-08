@@ -33,24 +33,22 @@ public class CursorOptionsScreen extends Screen {
     private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
     private final Button moreButton = Button.builder(Component.translatable("minecraft-cursor.options.more").append("..."), btn -> toMoreOptions()).build();
     private final Button doneButton = Button.builder(CommonComponents.GUI_DONE, btn -> this.onClose()).build();
-    private final CursorManager cursorManager;
     private final List<Cursor> cursors;
     final Screen previousScreen;
     private Cursor selectedCursor;
     CursorOptionsBody body;
 
-    public CursorOptionsScreen(Screen previousScreen, CursorManager cursorManager) {
+    public CursorOptionsScreen(Screen previousScreen) {
         super(TITLE_TEXT);
 
         this.previousScreen = previousScreen;
-        this.cursorManager = cursorManager;
 
-        cursors = this.cursorManager.getLoadedCursors();
+        cursors = CursorManager.INSTANCE.getLoadedCursors();
     }
 
     @Override
     protected void init() {
-        selectedCursor = cursorManager.getLoadedCursors().get(0);
+        selectedCursor = cursors.get(0);
 
         this.layout.addToHeader(new StringWidget(this.title, this.font));
         this.body = this.layout.addToContents(new CursorOptionsBody());
@@ -117,7 +115,7 @@ public class CursorOptionsScreen extends Screen {
 
     public void toMoreOptions() {
         if (minecraft != null) {
-            minecraft.setScreen(new MoreOptionsScreen(this, cursorManager));
+            minecraft.setScreen(new MoreOptionsScreen(this));
         }
     }
 

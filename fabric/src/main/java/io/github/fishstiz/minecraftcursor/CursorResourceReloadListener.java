@@ -1,17 +1,29 @@
 package io.github.fishstiz.minecraftcursor;
 
-import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
+import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.profiling.ProfilerFiller;
+import org.jetbrains.annotations.NotNull;
 
-class CursorResourceReloadListener extends AbstractCursorResourceReloadListener implements SimpleSynchronousResourceReloadListener {
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+
+class CursorResourceReloadListener implements IdentifiableResourceReloadListener {
     @Override
     public ResourceLocation getFabricId() {
-        return getId();
+        return CursorLoader.getLocation();
     }
 
     @Override
-    public void onResourceManagerReload(ResourceManager manager) {
-        reloadMinecraftCursor(manager);
+    public @NotNull CompletableFuture<Void> reload(
+            PreparationBarrier barrier,
+            ResourceManager manager,
+            ProfilerFiller preparationsProfiler,
+            ProfilerFiller reloadProfiler,
+            Executor backgroundExecutor,
+            Executor gameExecutor
+    ) {
+        return CompletableFuture.runAsync(() -> CursorLoader.reload(manager)).thenCompose(barrier::wait);
     }
 }

@@ -4,24 +4,34 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.server.packs.PackType;
 
 public class MinecraftCursorFabric implements ClientModInitializer {
+    private final MinecraftCursor minecraftCursor = new MinecraftCursor();
+
     @Override
     public void onInitializeClient() {
-        MinecraftCursor.init();
+        minecraftCursor.init();
 
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new CursorResourceReloadListener());
+        ScreenEvents.BEFORE_INIT.register(this::onScreenInit);
+        ClientTickEvents.START_CLIENT_TICK.register(minecraftCursor::onClientTick);
+    }
 
-        ScreenEvents.BEFORE_INIT.register((client, screen, width, height) -> {
-            MinecraftCursor.getInstance().beforeScreenInit(screen);
+    private void onScreenInit(Minecraft minecraft, Screen screen, int width, int height) {
+        minecraftCursor.onScreenInit(minecraft, screen);
 
-            if (client.screen != null) {
-                ScreenEvents.afterRender(client.screen).register((currentScreen, context, mouseX, mouseY, delta) ->
-                        MinecraftCursor.getInstance().afterRenderScreen(mouseX, mouseY));
-            }
-        });
+        ScreenEvents.afterRender(screen).register(this::onScreenRender);
+    }
 
-        ClientTickEvents.START_CLIENT_TICK.register(client -> MinecraftCursor.getInstance().tick());
+    private void onScreenRender(Screen screen, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        minecraftCursor.onScreenRender(MinecraftHolder.INSTANCE, mouseX, mouseY);
+    }
+
+    private static class MinecraftHolder {
+        private static final Minecraft INSTANCE = Minecraft.getInstance();
     }
 }

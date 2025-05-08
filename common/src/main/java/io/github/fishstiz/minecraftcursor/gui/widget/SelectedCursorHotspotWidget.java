@@ -18,7 +18,7 @@ import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
 
 public class SelectedCursorHotspotWidget extends SelectedCursorClickableWidget implements CursorProvider {
     private static final CursorConfig.GlobalSettings global = CONFIG.getGlobal();
-    private static final ResourceLocation BACKGROUND = ResourceLocation.tryBuild(MinecraftCursor.MOD_ID, "textures/gui/hotspot_background.png");
+    private static final ResourceLocation BACKGROUND = new ResourceLocation(MinecraftCursor.MOD_ID, "textures/gui/hotspot_background.png");
     private static final int CURSOR_SIZE = 32;
     private static final int RULER_COLOR = 0xFFFF0000; // red
     private static final int OVERRIDE_RULER_COLOR = 0xFF00FF00; // green

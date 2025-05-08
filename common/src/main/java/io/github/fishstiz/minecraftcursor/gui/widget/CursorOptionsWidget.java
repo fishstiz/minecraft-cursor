@@ -24,7 +24,7 @@ public class CursorOptionsWidget extends ContainerWidget {
     private static final int BOX_WIDGET_TEXTURE_SIZE = 96;
     private static final int HELPER_BUTTON_SIZE = 16;
     private static final int HELPER_ICON_SIZE = 10;
-    private static final ResourceLocation HELPER_ICON = ResourceLocation.tryBuild("minecraft", "textures/gui/unseen_notification.png");
+    private static final ResourceLocation HELPER_ICON = new ResourceLocation("minecraft", "textures/gui/unseen_notification.png");
     private static final String GLOBAL_TEXT_KEY = "minecraft-cursor.options.global.tooltip";
     private static final Component ANIMATE_TEXT = Component.translatable("minecraft-cursor.options.animate");
     private static final Component RESET_ANIMATION_TEXT = Component.translatable("minecraft-cursor.options.animate-reset");
