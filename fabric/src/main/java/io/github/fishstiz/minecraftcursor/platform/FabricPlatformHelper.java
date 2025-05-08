@@ -5,6 +5,7 @@ import io.github.fishstiz.minecraftcursor.platform.services.PlatformHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.file.Path;
 import java.util.List;
 
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.MOD_ID;
@@ -21,8 +22,8 @@ public class FabricPlatformHelper implements PlatformHelper {
     }
 
     @Override
-    public String getConfigDir() {
-        return FabricLoader.getInstance().getConfigDir().toString();
+    public Path getConfigDir() {
+        return FabricLoader.getInstance().getConfigDir();
     }
 
     @Override

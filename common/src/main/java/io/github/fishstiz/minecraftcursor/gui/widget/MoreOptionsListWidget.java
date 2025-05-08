@@ -1,5 +1,6 @@
 package io.github.fishstiz.minecraftcursor.gui.widget;
 
+import io.github.fishstiz.minecraftcursor.CursorLoader;
 import io.github.fishstiz.minecraftcursor.CursorManager;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.compat.ExternalCursorTracker;
@@ -146,7 +147,8 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
 
     private void reloadConfiguration() {
         CONFIG.set_hash(String.valueOf(Math.random()));
-        minecraft.reloadResourcePacks().thenRun(this::reloadGlobalOptions);
+        CursorLoader.reload(minecraft.getResourceManager());
+        this.reloadGlobalOptions();
     }
 
     private void addAdaptiveEntry(Component label, boolean isEnabled, boolean active, Consumer<Boolean> onPress) {
@@ -173,7 +175,7 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
         });
         DoubleConsumer handleChange = value -> {
             valueSetter.accept(value);
-            cursorAction.accept(CursorManager.INSTANCE.getCurrentCursor(), value);
+            cursorAction.accept(CursorManager.INSTANCE.getAppliedCursor(), value);
         };
         BooleanConsumer handleToggle = active -> {
             activeSetter.accept(active);
@@ -198,12 +200,15 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
             yhotEntry.sliderWidget.setTranslatedValue(yhot);
         }
 
-        if (applyX && applyY) {
-            CursorManager.INSTANCE.getCurrentCursor().setHotspots(xhot, yhot);
-        } else if (applyX) {
-            CursorManager.INSTANCE.getCurrentCursor().setXHot(xhot);
-        } else if (applyY) {
-            CursorManager.INSTANCE.getCurrentCursor().setYHot(yhot);
+        Cursor currentCursor = CursorManager.INSTANCE.getAppliedCursor();
+        if (currentCursor.isLoaded()) {
+            if (applyX && applyY) {
+                currentCursor.setHotspots(xhot, yhot);
+            } else if (applyX) {
+                currentCursor.setXHot(xhot);
+            } else if (applyY) {
+                currentCursor.setYHot(yhot);
+            }
         }
 
         if (mouseEvent == MouseEvent.RELEASE) {
@@ -239,11 +244,13 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
     private void toggleAnimations(boolean isAnimated) {
         CursorManager.INSTANCE.setIsAnimated(isAnimated);
 
-        CONFIG.getSettings().forEach((key, settings) -> {
-            if (CursorManager.INSTANCE.getCursor(key) instanceof AnimatedCursor) {
+        for (Cursor cursor : CursorManager.INSTANCE.getCursors()) {
+            if (cursor instanceof AnimatedCursor animatedCursor) {
+                CursorConfig.Settings settings = CONFIG.getOrCreateCursorSettings(animatedCursor.getType());
+                animatedCursor.setAnimated(isAnimated);
                 settings.setAnimated(isAnimated);
             }
-        });
+        }
     }
 
     private void toggleAdaptive(boolean isEnabled) {

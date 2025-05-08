@@ -7,6 +7,7 @@ import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLPaths;
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.stream.StreamSupport;
@@ -23,8 +24,8 @@ public class NeoforgePlatformHelper implements PlatformHelper {
     }
 
     @Override
-    public String getConfigDir() {
-        return FMLPaths.CONFIGDIR.get().toString();
+    public Path getConfigDir() {
+        return FMLPaths.CONFIGDIR.get();
     }
 
     @Override
