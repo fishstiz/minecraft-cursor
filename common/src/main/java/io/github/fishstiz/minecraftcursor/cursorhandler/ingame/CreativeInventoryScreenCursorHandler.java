@@ -1,6 +1,7 @@
 package io.github.fishstiz.minecraftcursor.cursorhandler.ingame;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
+import io.github.fishstiz.minecraftcursor.api.CursorHandler;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.mixin.access.CreativeInventoryScreenAccessor;
 import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
@@ -9,7 +10,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 
-public class CreativeInventoryScreenCursorHandler extends HandledScreenCursorHandler<CreativeModeInventoryScreen.ItemPickerMenu, CreativeModeInventoryScreen> {
+public class CreativeInventoryScreenCursorHandler implements CursorHandler<CreativeModeInventoryScreen> {
     // Derived from CreativeInventoryScreen#renderTabTooltipIfHovered
     public static final int TAB_WIDTH = 21;
     public static final int TAB_HEIGHT = 27;
@@ -18,11 +19,6 @@ public class CreativeInventoryScreenCursorHandler extends HandledScreenCursorHan
 
     @Override
     public CursorType getCursorType(CreativeModeInventoryScreen creativeInventoryScreen, double mouseX, double mouseY) {
-        CursorType handledScreenCursor = super.getCursorType(creativeInventoryScreen, mouseX, mouseY);
-        if (handledScreenCursor != CursorType.DEFAULT) {
-            return handledScreenCursor;
-        }
-
         CreativeInventoryScreenAccessor accessor = (CreativeInventoryScreenAccessor) creativeInventoryScreen;
         CursorType cursorType = getCursorTypeTabs(accessor, mouseX, mouseY);
         cursorType = cursorType != CursorType.DEFAULT ? cursorType : getCursorTypeDelete(accessor);

@@ -40,7 +40,6 @@ public class MinecraftCursorInitializerImpl implements MinecraftCursorInitialize
         elementRegistrar.register(AbstractSliderButton.class, MinecraftCursorInitializerImpl::sliderWidgetCursor);
         elementRegistrar.register(EditBox.class, MinecraftCursorInitializerImpl::textFieldWidgetCursor);
         elementRegistrar.register(new WorldListWidgetCursorHandler());
-        elementRegistrar.register(new HandledScreenCursorHandler<>());
         elementRegistrar.register(new MultiplayerServerListWidgetCursorHandler());
         elementRegistrar.register(new RecipeBookScreenCursorHandler());
         elementRegistrar.register(new CreativeInventoryScreenCursorHandler());

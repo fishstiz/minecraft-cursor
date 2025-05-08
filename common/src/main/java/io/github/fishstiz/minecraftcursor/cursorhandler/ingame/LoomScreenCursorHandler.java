@@ -1,6 +1,7 @@
 package io.github.fishstiz.minecraftcursor.cursorhandler.ingame;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
+import io.github.fishstiz.minecraftcursor.api.CursorHandler;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.mixin.access.LoomScreenAccessor;
 import net.minecraft.client.gui.screens.inventory.LoomScreen;
@@ -10,7 +11,7 @@ import net.minecraft.world.level.block.entity.BannerPattern;
 
 import java.util.List;
 
-public class LoomScreenCursorHandler extends HandledScreenCursorHandler<LoomMenu, LoomScreen> {
+public class LoomScreenCursorHandler implements CursorHandler<LoomScreen> {
     // Derived from LoomScreen#drawBackground
     public static final int PATTERNS_OFFSET_X = 60;
     public static final int PATTERNS_OFFSET_Y = 13;
@@ -19,9 +20,6 @@ public class LoomScreenCursorHandler extends HandledScreenCursorHandler<LoomMenu
 
     @Override
     public CursorType getCursorType(LoomScreen loomScreen, double mouseX, double mouseY) {
-        CursorType cursorType = super.getCursorType(loomScreen, mouseX, mouseY);
-        if (cursorType != CursorType.DEFAULT) return cursorType;
-
         if (!MinecraftCursor.CONFIG.isLoomPatternsEnabled()) return CursorType.DEFAULT;
 
         LoomScreenAccessor loomScreenAccessor = (LoomScreenAccessor) loomScreen;
