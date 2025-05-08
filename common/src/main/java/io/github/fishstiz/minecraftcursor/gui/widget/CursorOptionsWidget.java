@@ -2,6 +2,7 @@ package io.github.fishstiz.minecraftcursor.gui.widget;
 
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.gui.screen.CursorOptionsScreen;
+import io.github.fishstiz.minecraftcursor.util.SettingsUtil;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
@@ -16,7 +17,7 @@ import java.util.List;
 import java.util.function.DoubleConsumer;
 
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
-import static io.github.fishstiz.minecraftcursor.config.CursorConfig.Settings.Default.*;
+import static io.github.fishstiz.minecraftcursor.util.SettingsUtil.*;
 
 public class CursorOptionsWidget extends ContainerWidget {
     private static final int OPTIONS_HEIGHT = 24;
@@ -74,6 +75,7 @@ public class CursorOptionsWidget extends ContainerWidget {
                 SCALE_TEXT, settings.getScale(),
                 SCALE_MIN, SCALE_MAX, SCALE_STEP,
                 handler::handleChangeScale, CursorOptionsHandler::removeScaleOverride));
+        scaleSlider.setTextMapper(SettingsUtil::getAutoText);
         bindHelperButton(scaleSlider);
         xhotSlider = this.addChild(createHotspotSlider(XHOT_TEXT, settings.getXHot(), handler::handleChangeXHot));
         yhotSlider = this.addChild(createHotspotSlider(YHOT_TEXT, settings.getYHot(), handler::handleChangeYHot));
