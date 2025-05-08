@@ -9,6 +9,7 @@ import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
 import io.github.fishstiz.minecraftcursor.util.DrawUtil;
 import io.github.fishstiz.minecraftcursor.util.MouseEvent;
+import io.github.fishstiz.minecraftcursor.util.SettingsUtil;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -28,6 +29,7 @@ import java.util.function.*;
 
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
 import static io.github.fishstiz.minecraftcursor.gui.widget.CursorOptionsWidget.*;
+import static io.github.fishstiz.minecraftcursor.util.SettingsUtil.*;
 
 public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOptionsListWidget.OptionEntry> {
     private static final CursorConfig.GlobalSettings GLOBAL = CONFIG.getGlobal();
@@ -68,20 +70,23 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
     private final ToggleEntry animationEntry = new ToggleEntry(
             ANIMATION_TEXT, false, false, ANIMATION_TOOLTIP, this::toggleAnimations
     );
-    private final SliderEntry scaleEntry = createSliderEntry(SCALE_TEXT, "",
-            CursorConfig.Settings.Default.SCALE_MIN, CursorConfig.Settings.Default.SCALE_MAX, CursorConfig.Settings.Default.SCALE_STEP,
+    private final SliderEntry scaleEntry = createSliderEntry(
+            SCALE_TEXT, "",
+            SCALE_MIN, SCALE_MAX, SCALE_STEP,
             GLOBAL::isScaleActive, GLOBAL::setScaleActive,
             GLOBAL::getScale, GLOBAL::setScale,
             CursorConfig.Settings::getScale, Cursor::setScale
     );
-    private final SliderEntry xhotEntry = createSliderEntry(XHOT_TEXT, "px",
-            CursorConfig.Settings.Default.HOT_MIN, CursorConfig.Settings.Default.HOT_MAX, 1,
+    private final SliderEntry xhotEntry = createSliderEntry(
+            XHOT_TEXT, "px",
+            HOT_MIN, HOT_MAX, 1,
             GLOBAL::isXHotActive, GLOBAL::setXhotActive,
             GLOBAL::getXHot, GLOBAL::setXHotDouble,
             CursorConfig.Settings::getXHot, Cursor::setXHot
     );
-    private final SliderEntry yhotEntry = createSliderEntry(YHOT_TEXT, "px",
-            CursorConfig.Settings.Default.HOT_MIN, CursorConfig.Settings.Default.HOT_MAX, 1,
+    private final SliderEntry yhotEntry = createSliderEntry(
+            YHOT_TEXT, "px",
+            HOT_MIN, HOT_MAX, 1,
             GLOBAL::isYHotActive, GLOBAL::setYhotActive,
             GLOBAL::getYHot, GLOBAL::setYHotDouble,
             CursorConfig.Settings::getYHot, Cursor::setYHot
@@ -106,6 +111,7 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
         animationEntry.button.setValue(CursorManager.INSTANCE.isAnimated());
         animationEntry.button.active = CursorManager.INSTANCE.hasAnimations();
         scaleEntry.button.setValue(GLOBAL.isScaleActive());
+        scaleEntry.sliderWidget.setTextMapper(SettingsUtil::getAutoText);
         xhotEntry.button.setValue(GLOBAL.isXHotActive());
         yhotEntry.button.setValue(GLOBAL.isYHotActive());
         addEntry(animationEntry);

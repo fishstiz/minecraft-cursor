@@ -160,6 +160,12 @@ public class AnimatedCursor extends Cursor {
         applyToFrames(Cursor::destroy);
     }
 
+    @Override
+    public void reload() {
+        super.reload();
+        applyToFrames(Cursor::reload);
+    }
+
     public Frame getFallbackFrame() {
         if (this.fallbackFrame == null) {
             this.fallbackFrame = new Frame(this, 1, 0);

@@ -5,7 +5,7 @@ import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.compat.ExternalCursorTracker;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.util.BufferedImageUtil;
-import io.github.fishstiz.minecraftcursor.util.SettingsUtil;
+import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWImage;
@@ -14,6 +14,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.function.Consumer;
+
+import static io.github.fishstiz.minecraftcursor.util.SettingsUtil.*;
 
 public class Cursor {
     protected static final int SIZE = 32;
@@ -59,7 +61,7 @@ public class Cursor {
 
         try {
             BufferedImage image = BufferedImageUtil.decompressBase64ToImage(cachedBufferedImage);
-            create(image, SettingsUtil.sanitizeScale(scale), SettingsUtil.sanitizeHotspot(xhot), SettingsUtil.sanitizeHotspot(yhot));
+            create(image, sanitizeScale(scale), sanitizeHotspot(xhot), sanitizeHotspot(yhot));
             image.flush();
         } catch (IOException e) {
             MinecraftCursor.LOGGER.error("Error updating image of {}: {}", type, e);
@@ -67,9 +69,11 @@ public class Cursor {
     }
 
     private void create(BufferedImage image, double scale, int xhot, int yhot) {
-        BufferedImage scaledImage = scale == 1 ? image : BufferedImageUtil.scaleImage(image, scale);
-        int scaledXHot = scale == 1 ? xhot : (int) Math.round(xhot * scale);
-        int scaledYHot = scale == 1 ? yhot : (int) Math.round(yhot * scale);
+        double correctedScale = isAutoScale(scale) ? Minecraft.getInstance().getWindow().getGuiScale() : scale;
+
+        BufferedImage scaledImage = scale == 1 ? image : BufferedImageUtil.scaleImage(image, correctedScale);
+        int scaledXHot = scale == 1 ? xhot : (int) Math.round(xhot * correctedScale);
+        int scaledYHot = scale == 1 ? yhot : (int) Math.round(yhot * correctedScale);
 
         GLFWImage glfwImage = GLFWImage.create();
         glfwImage.width(scaledImage.getWidth());
@@ -101,9 +105,13 @@ public class Cursor {
         }
     }
 
+    public void reload() {
+        this.updateImage(this.getScale(), this.getXHot(), this.getYHot());
+    }
+
     public void applySettings(CursorConfig.Settings settings) {
         this.enable(settings.isEnabled());
-        this.updateImage(settings.getScale(), settings.getXHot(), settings.getXHot());
+        this.updateImage(settings.getScale(), settings.getXHot(), settings.getYHot());
     }
 
     public void enable(boolean enabled) {
