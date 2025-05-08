@@ -17,11 +17,8 @@ import net.neoforged.neoforge.common.NeoForge;
 public class MinecraftCursorNeoforge {
     // Neoforge does not support dashes in mod id
     public static final String MOD_ID = "minecraft_cursor";
-    private final MinecraftCursor minecraftCursor = new MinecraftCursor();
 
     public MinecraftCursorNeoforge(ModContainer container, IEventBus modEventBus) {
-        minecraftCursor.init();
-
         container.registerExtensionPoint(IConfigScreenFactory.class, (c, screen) ->
                 new CursorOptionsScreen(screen)
         );
@@ -29,22 +26,23 @@ public class MinecraftCursorNeoforge {
         modEventBus.addListener(RegisterClientReloadListenersEvent.class, event ->
                 event.registerReloadListener(new CursorResourceReloadListener()));
 
+        MinecraftCursor.init();
         NeoForge.EVENT_BUS.register(this);
     }
 
     @SubscribeEvent
     public void onScreenInit(ScreenEvent.Init.Pre event) {
-        minecraftCursor.onScreenInit(event.getScreen().getMinecraft(), event.getScreen());
+        MinecraftCursor.onScreenInit(event.getScreen().getMinecraft(), event.getScreen());
     }
 
     @SubscribeEvent
     public void onScreenRender(ScreenEvent.Render.Post event) {
-        minecraftCursor.onScreenRender(event.getScreen().getMinecraft(), event.getMouseX(), event.getMouseY());
+        MinecraftCursor.onScreenRender(event.getScreen().getMinecraft(), event.getMouseX(), event.getMouseY());
     }
 
     @SubscribeEvent
     public void onClientTick(ClientTickEvent.Post event) {
-        minecraftCursor.onClientTick(MinecraftHolder.INSTANCE);
+        MinecraftCursor.onClientTick(MinecraftHolder.INSTANCE);
     }
 
     private static class MinecraftHolder {
