@@ -7,7 +7,7 @@ import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
 import io.github.fishstiz.minecraftcursor.cursor.AnimationState;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
-import net.minecraft.client.Minecraft;
+import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,13 +24,9 @@ public final class CursorManager implements CursorTypeRegistrar {
     private final LinkedHashMap<String, Cursor> cursors = new LinkedHashMap<>();
     private final TreeMap<Integer, String> overrides = new TreeMap<>();
     private final AnimationState animationState = new AnimationState();
-    private Cursor currentCursor = new Cursor(CursorType.of(""), null);
+    private @NotNull Cursor currentCursor = new Cursor(CursorType.of(""), null);
 
     private CursorManager() {
-    }
-
-    private static class Client {
-        private static final Minecraft MINECRAFT = Minecraft.getInstance();
     }
 
     @Override
@@ -57,40 +53,48 @@ public final class CursorManager implements CursorTypeRegistrar {
             return cursorType;
         }
 
-        cursors.put(key, new Cursor(cursorType, this::handleCursorLoad));
+        cursors.put(key, new Cursor(cursorType, this::onLoad));
 
         return cursorType;
     }
 
-    public void loadCursorImage(
-            CursorType type,
+    public void loadCursor(
+            Cursor cursor,
             ResourceLocation sprite,
             BufferedImage image,
-            CursorConfig.Settings settings,
             @Nullable AnimatedCursorConfig animation
     ) throws IOException {
         boolean animated = animation != null;
-        Cursor cursor = getCursor(type);
-        CursorConfig.Settings updatedSettings = getUpdatedSettings(settings);
 
         if (animated != (cursor instanceof AnimatedCursor)) {
             cursor.destroy();
-            cursor = createAppropiateCursor(type, animated);
-            cursors.put(type.getKey(), cursor);
+            cursor = animated
+                    ? new AnimatedCursor(cursor.getType(), this::onLoad)
+                    : new Cursor(cursor.getType(), this::onLoad);
+
+            cursors.put(cursor.getType().getKey(), cursor);
         }
 
+        CursorConfig.Settings settings = getCursorSettings(cursor);
         if (cursor instanceof AnimatedCursor animatedCursor) {
-            animatedCursor.loadImage(sprite, image, updatedSettings, animation);
+            animatedCursor.loadImage(sprite, image, settings, animation);
         } else {
-            cursor.loadImage(sprite, image, updatedSettings);
+            cursor.loadImage(sprite, image, settings);
         }
     }
 
-    private CursorConfig.Settings getUpdatedSettings(CursorConfig.Settings settings) {
-        CursorConfig.GlobalSettings global = CONFIG.getGlobal();
-        CursorConfig.Settings updatedSettings = new CursorConfig.Settings();
+    private void onLoad(Cursor cursor) {
+        Cursor appliedCursor = getAppliedCursor();
+        if (appliedCursor.isLoaded() && appliedCursor.getId() == cursor.getId()) {
+            reloadCursor();
+        }
+    }
 
-        updatedSettings.update(
+    private CursorConfig.Settings getCursorSettings(Cursor cursor) {
+        CursorConfig.Settings settings = CONFIG.getOrCreateCursorSettings(cursor.getType());
+        CursorConfig.GlobalSettings global = CONFIG.getGlobal();
+
+        settings.update(
                 global.isScaleActive() ? global.getScale() : settings.getScale(),
                 global.isXHotActive() ? global.getXHot() : settings.getXHot(),
                 global.isYHotActive() ? global.getYHot() : settings.getYHot(),
@@ -98,34 +102,22 @@ public final class CursorManager implements CursorTypeRegistrar {
         );
 
         if (settings.isAnimated() != null) {
-            updatedSettings.setAnimated(settings.isAnimated());
+            settings.setAnimated(settings.isAnimated());
         }
 
-        return updatedSettings;
+        return settings;
     }
 
-    private Cursor createAppropiateCursor(CursorType type, boolean animated) {
-        return animated
-                ? new AnimatedCursor(type, this::handleCursorLoad)
-                : new Cursor(type, this::handleCursorLoad);
-    }
-
-    private void handleCursorLoad(Cursor cursor) {
-        if (getCurrentCursor().getId() == cursor.getId()) {
-            reloadCursor();
-        }
-    }
-
-    void setCurrentCursor(CursorType type) {
+    void setCurrentCursor(@NotNull CursorType type) {
         Cursor override = getOverride().orElse(null);
-        Cursor cursor = override != null ? override : getCursor(type.getKey());
+        Cursor cursor = override != null ? override : this.cursors.get(type.getKey());
 
         if (cursor instanceof AnimatedCursor animatedCursor && cursor.getId() != 0) {
             handleCursorAnimation(animatedCursor);
             return;
         }
 
-        if (type != CursorType.DEFAULT && cursor.getId() == 0 || !cursor.isEnabled()) {
+        if (cursor == null || !type.isDefault() && cursor.getId() == 0 || !cursor.isEnabled()) {
             cursor = getCursor(CursorType.DEFAULT);
         }
 
@@ -133,12 +125,7 @@ public final class CursorManager implements CursorTypeRegistrar {
     }
 
     private void handleCursorAnimation(AnimatedCursor cursor) {
-        if (cursor == null) {
-            updateCursor(getCursor(CursorType.DEFAULT));
-            return;
-        }
-
-        if (!getCurrentCursor().getType().getKey().equals(cursor.getType().getKey())) {
+        if (!getAppliedCursor().getType().isKey(cursor.getType())) {
             animationState.reset();
         } else {
             animationState.nextFrame(cursor);
@@ -149,20 +136,21 @@ public final class CursorManager implements CursorTypeRegistrar {
     }
 
     private void updateCursor(Cursor cursor) {
-        if (currentCursor != null && cursor.getId() == currentCursor.getId()) {
+        if (cursor == null || cursor.getId() == currentCursor.getId()) {
             return;
         }
 
         currentCursor = cursor;
-        GLFW.glfwSetCursor(Client.MINECRAFT.getWindow().getWindow(), currentCursor.getId());
+        GLFW.glfwSetCursor(CursorTypeUtil.WINDOW, currentCursor.getId());
     }
 
     public void reloadCursor() {
-        GLFW.glfwSetCursor(Client.MINECRAFT.getWindow().getWindow(), getCurrentCursor().getId());
+        GLFW.glfwSetCursor(CursorTypeUtil.WINDOW, getAppliedCursor().getId());
     }
 
     public void overrideCurrentCursor(CursorType type, int index) {
-        if (getCursor(type).isEnabled()) {
+        Cursor cursor = getCursor(type);
+        if (cursor != null && cursor.isEnabled()) {
             overrides.put(index, type.getKey());
         } else {
             overrides.remove(index);
@@ -176,9 +164,9 @@ public final class CursorManager implements CursorTypeRegistrar {
     public Optional<Cursor> getOverride() {
         while (!overrides.isEmpty()) {
             Map.Entry<Integer, String> lastEntry = overrides.lastEntry();
-            Cursor cursor = getCursor(lastEntry.getValue());
+            Cursor cursor = this.cursors.get(lastEntry.getValue());
 
-            if (cursor.getId() == 0) {
+            if (cursor == null || cursor.getId() == 0) {
                 overrides.remove(lastEntry.getKey());
             } else {
                 return Optional.of(cursor);
@@ -188,7 +176,7 @@ public final class CursorManager implements CursorTypeRegistrar {
         return Optional.empty();
     }
 
-    public @NotNull Cursor getCurrentCursor() {
+    public @NotNull Cursor getAppliedCursor() {
         Cursor override = getOverride().orElse(null);
         Cursor cursor = override != null ? override : currentCursor;
 
@@ -199,37 +187,45 @@ public final class CursorManager implements CursorTypeRegistrar {
         return cursor;
     }
 
-    public @NotNull Cursor getCursor(String key) {
-        return cursors.computeIfAbsent(key, k -> new Cursor(CursorType.of(k), this::handleCursorLoad));
+    public @Nullable Cursor getCursor(CursorType type) {
+        return cursors.get(type.getKey());
     }
 
-    public @NotNull Cursor getCursor(CursorType type) {
-        return cursors.computeIfAbsent(type.getKey(), k -> new Cursor(type, this::handleCursorLoad));
+    public long getId(CursorType type) {
+        Cursor cursor = cursors.get(type.getKey());
+        return cursor != null ? cursor.getId() : 0;
     }
 
-    public List<CursorType> getCursorTypes() {
-        return cursors.keySet().stream().filter(type -> !type.isEmpty()).map(CursorType::of).toList();
+    public long getCurrentId() {
+        return getAppliedCursor().getId();
+    }
+
+    public Collection<Cursor> getCursors() {
+        return cursors.values();
     }
 
     public List<Cursor> getLoadedCursors() {
-        List<Cursor> activeCursors = new ArrayList<>();
+        List<Cursor> loadedCursors = new ArrayList<>();
         for (Cursor cursor : cursors.values()) {
             if (cursor.isLoaded()) {
-                activeCursors.add(cursor);
+                loadedCursors.add(cursor);
             }
         }
-        return activeCursors;
+        return loadedCursors;
     }
 
     public boolean isAdaptive() {
-        return cursors.values().stream().anyMatch(cursor ->
-                cursor.isEnabled() && CursorType.DEFAULT != cursor.getType()
-        );
+        for (Cursor cursor : cursors.values()) {
+            if (cursor.isEnabled() && !cursor.getType().isDefault()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void setIsAdaptive(boolean isAdaptive) {
         cursors.values().forEach(cursor -> {
-            if (cursor.getType() != CursorType.DEFAULT) {
+            if (!cursor.getType().isDefault()) {
                 cursor.enable(isAdaptive);
             }
         });

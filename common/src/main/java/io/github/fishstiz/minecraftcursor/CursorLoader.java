@@ -4,6 +4,7 @@ import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.config.AnimatedCursorConfig;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.config.CursorConfigLoader;
+import io.github.fishstiz.minecraftcursor.cursor.Cursor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -18,26 +19,27 @@ import java.util.Optional;
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.MOD_ID;
 
-abstract class AbstractCursorResourceReloadListener {
+public class CursorLoader {
     private static final String IMG_TYPE = ".png";
     private static final String ANIMATION_TYPE = IMG_TYPE + ".mcmeta";
     private static final String CONFIG_PATH = "atlases/cursors.json";
     private static final String CURSORS_DIR = "textures/cursors/";
 
-    protected AbstractCursorResourceReloadListener() {
+    private CursorLoader() {
     }
 
-    public ResourceLocation getId() {
+    public static ResourceLocation getLocation() {
         return ResourceLocation.fromNamespaceAndPath(MOD_ID, CURSORS_DIR);
     }
 
-    public void reloadMinecraftCursor(ResourceManager manager) {
+    public static void reload(ResourceManager manager) {
+        CursorManager.INSTANCE.setCurrentCursor(CursorType.DEFAULT);
         loadConfig(manager);
         loadCursorTextures(manager);
         CursorManager.INSTANCE.setCurrentCursor(CursorType.DEFAULT);
     }
 
-    private void loadConfig(ResourceManager manager) {
+    private static void loadConfig(ResourceManager manager) {
         List<Resource> configResources = manager.getResourceStack(ResourceLocation.fromNamespaceAndPath(MOD_ID, CONFIG_PATH));
 
         if (configResources.isEmpty()) return;
@@ -53,7 +55,7 @@ abstract class AbstractCursorResourceReloadListener {
         });
     }
 
-    private Optional<CursorConfig> getConfigFromResources(List<Resource> configResources) {
+    private static Optional<CursorConfig> getConfigFromResources(List<Resource> configResources) {
         CursorConfig combinedConfig = null;
 
         for (Resource configResource : configResources) {
@@ -73,20 +75,19 @@ abstract class AbstractCursorResourceReloadListener {
         return Optional.ofNullable(combinedConfig);
     }
 
-    private void loadCursorTextures(ResourceManager manager) {
-        for (CursorType cursorType : CursorManager.INSTANCE.getCursorTypes()) {
-            String basePath = CURSORS_DIR + cursorType.getKey();
-            loadCursorTexture(manager, cursorType, basePath);
+    private static void loadCursorTextures(ResourceManager manager) {
+        for (Cursor cursor : CursorManager.INSTANCE.getCursors()) {
+            String basePath = CURSORS_DIR + cursor.getType().getKey();
+            loadCursorTexture(manager, cursor, basePath);
         }
     }
 
-    private void loadCursorTexture(ResourceManager manager, CursorType cursorType, String basePath) {
-        ResourceLocation cursorId = ResourceLocation.fromNamespaceAndPath(MOD_ID, basePath + IMG_TYPE);
-        Resource cursorResource = manager.getResource(cursorId).orElse(null);
-
+    private static void loadCursorTexture(ResourceManager manager, Cursor cursor, String basePath) {
+        ResourceLocation location = ResourceLocation.fromNamespaceAndPath(MOD_ID, basePath + IMG_TYPE);
+        Resource cursorResource = manager.getResource(location).orElse(null);
 
         if (cursorResource == null) {
-            MinecraftCursor.LOGGER.error("[minecraft-cursor] Cursor Type: '{}' not found", cursorType.getKey());
+            MinecraftCursor.LOGGER.error("[minecraft-cursor] Cursor Type: '{}' not found", cursor.getType().getKey());
             return;
         }
 
@@ -94,12 +95,12 @@ abstract class AbstractCursorResourceReloadListener {
         try (InputStream cursorStream = cursorResource.open()) {
             image = ImageIO.read(cursorStream);
             if (image == null) {
-                MinecraftCursor.LOGGER.error("[minecraft-cursor] Invalid file for cursor type '{}'", cursorType);
+                MinecraftCursor.LOGGER.error("[minecraft-cursor] Invalid file for cursor type '{}'", cursor.getType().getKey());
                 return;
             }
 
-            AnimatedCursorConfig animation = loadAnimationConfig(manager, basePath, cursorResource);
-            CursorManager.INSTANCE.loadCursorImage(cursorType, cursorId, image, CONFIG.getOrCreateCursorSettings(cursorType), animation);
+            AnimatedCursorConfig animation = loadAnimation(manager, basePath, cursorResource);
+            CursorManager.INSTANCE.loadCursor(cursor, location, image, animation);
         } catch (IOException e) {
             MinecraftCursor.LOGGER.error("[minecraft-cursor] Failed to load cursor image for '{}'", basePath);
         } finally {
@@ -107,7 +108,7 @@ abstract class AbstractCursorResourceReloadListener {
         }
     }
 
-    private AnimatedCursorConfig loadAnimationConfig(ResourceManager manager, String basePath, Resource cursorResource) {
+    private static AnimatedCursorConfig loadAnimation(ResourceManager manager, String basePath, Resource cursorResource) {
         Resource animationResource = manager
                 .getResource(ResourceLocation.fromNamespaceAndPath(MOD_ID, basePath + ANIMATION_TYPE))
                 .orElse(null);

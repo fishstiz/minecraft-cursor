@@ -81,8 +81,8 @@ public class Cursor {
         ExternalCursorTracker.get().storeAddress(glfwImage.address());
         this.id = GLFW.glfwCreateCursor(glfwImage, scaledXHot, scaledYHot);
 
-        if (onLoad != null) {
-            onLoad.accept(this);
+        if (this.onLoad != null) {
+            this.onLoad.accept(this);
         }
 
         if (previousId != 0 && this.id != previousId) {
@@ -103,7 +103,6 @@ public class Cursor {
 
     public void enable(boolean enabled) {
         this.enabled = enabled;
-        if (this.onLoad != null) this.onLoad.accept(this);
     }
 
     public ResourceLocation getSprite() {

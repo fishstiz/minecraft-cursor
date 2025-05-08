@@ -1,5 +1,7 @@
 package io.github.fishstiz.minecraftcursor.api;
 
+import java.util.Objects;
+
 /**
  * Represents a cursor type identified by a unique key.
  * <p>
@@ -28,6 +30,14 @@ public interface CursorType {
      */
     static CursorType of(String key) {
         return () -> key;
+    }
+
+    default boolean isKey(CursorType cursorType) {
+        return Objects.equals(this.getKey(), cursorType.getKey());
+    }
+
+    default boolean isDefault() {
+        return this == CursorType.DEFAULT;
     }
 
     /**
