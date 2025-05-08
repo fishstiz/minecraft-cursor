@@ -1,8 +1,10 @@
 package io.github.fishstiz.minecraftcursor.gui.widget;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
@@ -17,6 +19,7 @@ public class SelectedCursorSliderWidget extends AbstractSliderButton {
     private final @Nullable Runnable onRelease;
     private double translatedValue;
     private SelectedCursorButtonWidget inactiveHelperButton;
+    private TextMapper textMapper;
 
     public SelectedCursorSliderWidget(
             Component text,
@@ -73,6 +76,11 @@ public class SelectedCursorSliderWidget extends AbstractSliderButton {
         return (clampedValue - min) / (max - min);
     }
 
+    public void setTextMapper(TextMapper mapper) {
+        this.textMapper = mapper;
+        this.updateMessage();
+    }
+
     public void update(double translatedValue, boolean active) {
         setTranslatedValue(translatedValue);
         this.active = active;
@@ -92,47 +100,24 @@ public class SelectedCursorSliderWidget extends AbstractSliderButton {
 
     @Override
     public void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
+        super.renderWidget(context, mouseX, mouseY, delta);
+
         SelectedCursorButtonWidget helperButton = getInactiveHelperButton();
         boolean isHelperButtonPresent = helperButton != null;
 
         if (isHelperButtonPresent) {
             helperButton.active = !active;
-        }
 
-        if (isHelperButtonPresent && isMouseOverInactive(mouseX, mouseY)) {
-            renderAroundHelperButton(context, mouseX, mouseY, delta, helperButton);
-            helperButton.render(context, mouseX, mouseY, delta);
-        } else {
-            super.renderWidget(context, mouseX, mouseY, delta);
+            if (isMouseOverInactive(mouseX, mouseY)) {
+                PoseStack poseStack = context.pose();
+                poseStack.pushPose();
+                poseStack.translate(0, 0, 1f);
+                helperButton.render(context, mouseX, mouseY, delta);
+                poseStack.popPose();
+            }
         }
 
         isHovered = isMouseOver(mouseX, mouseY);
-    }
-
-    private void renderAroundHelperButton(
-            GuiGraphics context,
-            int mouseX,
-            int mouseY,
-            float delta,
-            SelectedCursorButtonWidget helperButton
-    ) {
-        int x = getX();
-        int y = getY();
-        int right = getRight();
-        int bottom = getBottom();
-        int helperY = helperButton.getY();
-        int helperBottom = helperButton.getBottom();
-
-        renderSection(context, mouseX, mouseY, delta, x, y, right, helperY); // top
-        renderSection(context, mouseX, mouseY, delta, x, helperBottom, right, bottom); // bottom
-        renderSection(context, mouseX, mouseY, delta, x, helperY, helperButton.getX(), helperBottom); // left
-        renderSection(context, mouseX, mouseY, delta, helperButton.getRight(), helperY, right, helperBottom); // right
-    }
-
-    private void renderSection(GuiGraphics context, int mouseX, int mouseY, float delta, int x1, int y1, int x2, int y2) {
-        context.enableScissor(x1, y1, x2, y2);
-        super.renderWidget(context, mouseX, mouseY, delta);
-        context.disableScissor();
     }
 
     @Override
@@ -148,8 +133,22 @@ public class SelectedCursorSliderWidget extends AbstractSliderButton {
 
     @Override
     protected void updateMessage() {
-        String formattedValue = String.format(step % 1 == 0 ? "%.0f" : "%.2f", translatedValue);
-        setMessage(Component.empty().append(prefix).append(Component.nullToEmpty(": " + formattedValue + suffix)));
+        MutableComponent label = prefix.copy().append(": ");
+        Component message = null;
+
+        if (textMapper != null) {
+            Component mappedText = textMapper.getText(translatedValue);
+            if (mappedText != null) {
+                message = label.append(mappedText);
+            }
+        }
+
+        if (message == null) {
+            String formattedValue = String.format(step % 1 == 0 ? "%.0f" : "%.2f", translatedValue);
+            message = label.append(formattedValue + suffix);
+        }
+
+        setMessage(message);
     }
 
     public double getTranslatedValue() {
@@ -188,9 +187,14 @@ public class SelectedCursorSliderWidget extends AbstractSliderButton {
 
     public boolean isMouseOverInactive(int mouseX, int mouseY) {
         return !active
-                && mouseX >= getX()
-                && mouseY >= getY()
-                && mouseX < getRight()
-                && mouseY < getBottom();
+               && mouseX >= getX()
+               && mouseY >= getY()
+               && mouseX < getRight()
+               && mouseY < getBottom();
+    }
+
+    @FunctionalInterface
+    public interface TextMapper {
+        @Nullable Component getText(double translatedValue);
     }
 }
