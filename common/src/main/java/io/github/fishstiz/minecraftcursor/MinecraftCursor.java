@@ -10,6 +10,7 @@ import io.github.fishstiz.minecraftcursor.provider.CursorControllerProvider;
 import io.github.fishstiz.minecraftcursor.platform.Services;
 import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import org.slf4j.Logger;
@@ -21,7 +22,8 @@ public final class MinecraftCursor {
     public static final String MOD_ID = "minecraft-cursor";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     public static final CursorConfig CONFIG = CursorConfigLoader.fromFile(Services.PLATFORM.getConfigDir().resolve(MOD_ID + ".json").toFile());
-    private static final CursorTypeResolver RESOLVER = new CursorTypeResolver();
+    private static final ElementInspector INSPECTOR = new ElementInspector();
+    private static final CursorTypeResolver RESOLVER = new CursorTypeResolver(INSPECTOR);
     private static final CursorControllerImpl CONTROLLER = new CursorControllerImpl();
     private static Screen visibleScreen;
 
@@ -54,7 +56,10 @@ public final class MinecraftCursor {
         visibleScreen = null;
     }
 
-    static void onScreenRender(Minecraft minecraft, int mouseX, int mouseY) {
+    static void onScreenRender(Minecraft minecraft, GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        INSPECTOR.renderDeepest(minecraft, guiGraphics, minecraft.screen, mouseX, mouseY);
+        INSPECTOR.renderHovered(minecraft, guiGraphics);
+
         if (ExternalCursorTracker.get().isCustom()) return;
 
         if (minecraft.screen != null) {
@@ -106,5 +111,11 @@ public final class MinecraftCursor {
         }
 
         return CursorType.DEFAULT;
+    }
+
+    public static void toggleInspect() {
+        if (INSPECTOR.setEnabled(!INSPECTOR.isEnabled())) {
+            RESOLVER.clearCache();
+        }
     }
 }
