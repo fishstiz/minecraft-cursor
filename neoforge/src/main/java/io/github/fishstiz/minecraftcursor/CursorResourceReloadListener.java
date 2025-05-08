@@ -1,5 +1,6 @@
 package io.github.fishstiz.minecraftcursor;
 
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -8,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
-class CursorResourceReloadListener extends AbstractCursorResourceReloadListener implements PreparableReloadListener {
+class CursorResourceReloadListener implements PreparableReloadListener {
     @Override
     public @NotNull CompletableFuture<Void> reload(
             PreparationBarrier barrier,
@@ -18,6 +19,10 @@ class CursorResourceReloadListener extends AbstractCursorResourceReloadListener 
             @NotNull Executor backgroundExecutor,
             @NotNull Executor gameExecutor
     ) {
-        return CompletableFuture.runAsync(() -> reloadMinecraftCursor(manager), gameExecutor).thenCompose(barrier::wait);
+        return CompletableFuture.runAsync(() -> CursorLoader.reload(manager), gameExecutor).thenCompose(barrier::wait);
+    }
+
+    public ResourceLocation getId() {
+        return CursorLoader.getLocation();
     }
 }

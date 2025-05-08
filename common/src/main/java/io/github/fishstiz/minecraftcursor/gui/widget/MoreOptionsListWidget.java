@@ -1,5 +1,6 @@
 package io.github.fishstiz.minecraftcursor.gui.widget;
 
+import io.github.fishstiz.minecraftcursor.CursorLoader;
 import io.github.fishstiz.minecraftcursor.CursorManager;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.compat.ExternalCursorTracker;
@@ -63,6 +64,16 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
     private static final int ROW_GAP = 6;
 
     private final List<ToggleEntry> adaptiveOptions = new ArrayList<>();
+
+    private final ToggleEntry animationEntry = new ToggleEntry(
+            ANIMATION_TEXT, false, false, ANIMATION_TOOLTIP, this::toggleAnimations
+    );
+    private final SliderEntry scaleEntry = createSliderEntry(SCALE_TEXT, "",
+            CursorConfig.Settings.Default.SCALE_MIN, CursorConfig.Settings.Default.SCALE_MAX, CursorConfig.Settings.Default.SCALE_STEP,
+            GLOBAL::isScaleActive, GLOBAL::setScaleActive,
+            GLOBAL::getScale, GLOBAL::setScale,
+            CursorConfig.Settings::getScale, Cursor::setScale
+    );
     private final SliderEntry xhotEntry = createSliderEntry(XHOT_TEXT, "px",
             CursorConfig.Settings.Default.HOT_MIN, CursorConfig.Settings.Default.HOT_MAX, 1,
             GLOBAL::isXHotActive, GLOBAL::setXhotActive,
@@ -75,7 +86,6 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
             GLOBAL::getYHot, GLOBAL::setYHotDouble,
             CursorConfig.Settings::getYHot, Cursor::setYHot
     );
-    private boolean reloaded = false;
 
     public MoreOptionsListWidget(Minecraft client, int width, int height, int y) {
         super(client, width, height, y, ITEM_HEIGHT + ROW_GAP);
@@ -88,23 +98,23 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
 
     private void addGlobalOptions() {
         addEntry(new TitleEntry(GLOBAL_SETTINGS_TEXT));
-        addEntry(new ToggleEntry(
-                ANIMATION_TEXT,
-                CursorManager.INSTANCE.isAnimated(),
-                CursorManager.INSTANCE.hasAnimations(),
-                ANIMATION_TOOLTIP,
-                this::toggleAnimations)
-        );
 
-        addEntry(createSliderEntry(SCALE_TEXT, "",
-                CursorConfig.Settings.Default.SCALE_MIN, CursorConfig.Settings.Default.SCALE_MAX, CursorConfig.Settings.Default.SCALE_STEP,
-                GLOBAL::isScaleActive, GLOBAL::setScaleActive,
-                GLOBAL::getScale, GLOBAL::setScale,
-                CursorConfig.Settings::getScale, Cursor::setScale
-        ));
-
+        reloadGlobalOptions();
+        addEntry(animationEntry);
+        addEntry(scaleEntry);
         addEntry(xhotEntry);
         addEntry(yhotEntry);
+    }
+
+    private void reloadGlobalOptions() {
+        try {
+            animationEntry.button.setValue(CursorManager.INSTANCE.isAnimated());
+            animationEntry.button.active = CursorManager.INSTANCE.hasAnimations();
+            scaleEntry.button.setValue(GLOBAL.isScaleActive());
+            xhotEntry.button.setValue(GLOBAL.isXHotActive());
+            yhotEntry.button.setValue(GLOBAL.isYHotActive());
+        } catch (NullPointerException ignore) { // when exiting the screen while reloading
+        }
     }
 
     private void addAdaptiveOptions() {
@@ -137,11 +147,8 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
 
     private void reloadConfiguration() {
         CONFIG.set_hash(String.valueOf(Math.random()));
-        minecraft.reloadResourcePacks().thenRun(() -> this.reloaded = true);
-    }
-
-    public boolean isReloaded() {
-        return this.reloaded;
+        CursorLoader.reload(minecraft.getResourceManager());
+        this.reloadGlobalOptions();
     }
 
     private void addAdaptiveEntry(Component label, boolean isEnabled, boolean active, Consumer<Boolean> onPress) {
@@ -168,7 +175,7 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
         });
         DoubleConsumer handleChange = value -> {
             valueSetter.accept(value);
-            cursorAction.accept(CursorManager.INSTANCE.getCurrentCursor(), value);
+            cursorAction.accept(CursorManager.INSTANCE.getAppliedCursor(), value);
         };
         BooleanConsumer handleToggle = active -> {
             activeSetter.accept(active);
@@ -193,12 +200,15 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
             yhotEntry.sliderWidget.setTranslatedValue(yhot);
         }
 
-        if (applyX && applyY) {
-            CursorManager.INSTANCE.getCurrentCursor().setHotspots(xhot, yhot);
-        } else if (applyX) {
-            CursorManager.INSTANCE.getCurrentCursor().setXHot(xhot);
-        } else if (applyY) {
-            CursorManager.INSTANCE.getCurrentCursor().setYHot(yhot);
+        Cursor currentCursor = CursorManager.INSTANCE.getAppliedCursor();
+        if (currentCursor.isLoaded()) {
+            if (applyX && applyY) {
+                currentCursor.setHotspots(xhot, yhot);
+            } else if (applyX) {
+                currentCursor.setXHot(xhot);
+            } else if (applyY) {
+                currentCursor.setYHot(yhot);
+            }
         }
 
         if (mouseEvent == MouseEvent.RELEASE) {
@@ -234,11 +244,13 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
     private void toggleAnimations(boolean isAnimated) {
         CursorManager.INSTANCE.setIsAnimated(isAnimated);
 
-        CONFIG.getSettings().forEach((key, settings) -> {
-            if (CursorManager.INSTANCE.getCursor(key) instanceof AnimatedCursor) {
+        for (Cursor cursor : CursorManager.INSTANCE.getCursors()) {
+            if (cursor instanceof AnimatedCursor animatedCursor) {
+                CursorConfig.Settings settings = CONFIG.getOrCreateCursorSettings(animatedCursor.getType());
+                animatedCursor.setAnimated(isAnimated);
                 settings.setAnimated(isAnimated);
             }
-        });
+        }
     }
 
     private void toggleAdaptive(boolean isEnabled) {

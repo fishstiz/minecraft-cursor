@@ -8,19 +8,16 @@ import io.github.fishstiz.minecraftcursor.platform.Services;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-final class CursorTypeResolver implements ElementRegistrar {
-    static final CursorTypeResolver INSTANCE = new CursorTypeResolver();
-    private final List<AbstractMap.SimpleImmutableEntry<Class<? extends GuiEventListener>, CursorTypeFunction<? extends GuiEventListener>>>
-            registry = new ArrayList<>();
+class CursorTypeResolver implements ElementRegistrar {
+    private final List<ElementEntry<? extends GuiEventListener>> registry = new ArrayList<>();
     private final HashMap<String, CursorTypeFunction<? extends GuiEventListener>> cachedRegistry = new HashMap<>();
     String lastFailedElement;
 
-    private CursorTypeResolver() {
+    CursorTypeResolver() {
     }
 
     @Override
@@ -33,22 +30,22 @@ final class CursorTypeResolver implements ElementRegistrar {
             register(targetElement.fullyQualifiedClassName().get(), cursorHandler::getCursorType);
         } else {
             throw new NullPointerException("Could not register cursor handler: "
-                    + cursorHandler.getClass().getName()
-                    + " - Target Element Class and FQCN not present");
+                                           + cursorHandler.getClass().getName()
+                                           + " - Target Element Class and FQCN not present");
         }
     }
 
     @Override
-    public <T extends GuiEventListener> void register(String fullyQualifiedClassName, CursorTypeFunction<T> elementToCursorType) {
+    public <T extends GuiEventListener> void register(String binaryName, CursorTypeFunction<T> elementToCursorType) {
         try {
             @SuppressWarnings("unchecked")
-            Class<T> elementClass = (Class<T>) Class.forName(Services.PLATFORM.mapClassName("intermediary", fullyQualifiedClassName));
+            Class<T> elementClass = (Class<T>) Class.forName(Services.PLATFORM.mapClassName("intermediary", binaryName));
             if (!GuiEventListener.class.isAssignableFrom(elementClass)) {
-                throw new ClassCastException(fullyQualifiedClassName + " is not a subclass of Element");
+                throw new ClassCastException(binaryName + " is not a subclass of Element");
             }
             register(elementClass, elementToCursorType);
         } catch (ClassNotFoundException e) {
-            MinecraftCursor.LOGGER.error("[minecraft-cursor] Error registering element. Class not found: {}", fullyQualifiedClassName);
+            MinecraftCursor.LOGGER.error("[minecraft-cursor] Error registering element. Class not found: {}", binaryName);
         } catch (ClassCastException e) {
             MinecraftCursor.LOGGER.error("[minecraft-cursor] Error registering element. Invalid class: {}", e.getMessage());
         }
@@ -56,7 +53,7 @@ final class CursorTypeResolver implements ElementRegistrar {
 
     @Override
     public <T extends GuiEventListener> void register(Class<T> elementClass, CursorTypeFunction<T> elementToCursorType) {
-        registry.add(new AbstractMap.SimpleImmutableEntry<>(elementClass, elementToCursorType));
+        registry.add(new ElementEntry<>(elementClass, elementToCursorType));
     }
 
     @SuppressWarnings("unchecked")
@@ -66,20 +63,18 @@ final class CursorTypeResolver implements ElementRegistrar {
         try {
             if (element instanceof CursorProvider cursorProvider) {
                 CursorType providedCursorType = cursorProvider.getCursorType(mouseX, mouseY);
-                if (providedCursorType != null && providedCursorType != CursorType.DEFAULT) {
+                if (providedCursorType != null && !providedCursorType.isDefault()) {
                     return providedCursorType;
                 }
             }
+            CursorTypeFunction<T> mapper = (CursorTypeFunction<T>) cachedRegistry.get(elementName);
 
-            CursorTypeFunction<T> cursorTypeFunction = (CursorTypeFunction<T>) cachedRegistry.get(elementName);
-
-            if (cursorTypeFunction == null) {
-                cursorTypeFunction = (CursorTypeFunction<T>) resolveFunction(element);
-                cachedRegistry.put(elementName, cursorTypeFunction);
+            if (mapper == null) {
+                mapper = (CursorTypeFunction<T>) resolveMapper(element);
+                cachedRegistry.put(elementName, mapper);
             }
 
-            CursorType cursorType = cursorTypeFunction.getCursorType(element, mouseX, mouseY);
-            return cursorType != null ? cursorType : CursorType.DEFAULT;
+            return mapper.getCursorType(element, mouseX, mouseY);
         } catch (LinkageError | Exception e) {
             if (!elementName.equals(lastFailedElement)) {
                 lastFailedElement = elementName;
@@ -92,10 +87,10 @@ final class CursorTypeResolver implements ElementRegistrar {
         return CursorType.DEFAULT;
     }
 
-    private CursorTypeFunction<? extends GuiEventListener> resolveFunction(GuiEventListener element) {
+    private CursorTypeFunction<? extends GuiEventListener> resolveMapper(GuiEventListener element) {
         for (int i = registry.size() - 1; i >= 0; i--) {
-            if (registry.get(i).getKey().isInstance(element)) {
-                return registry.get(i).getValue();
+            if (registry.get(i).element.isInstance(element)) {
+                return registry.get(i).mapper;
             }
         }
         if (element instanceof ContainerEventHandler) {
@@ -105,17 +100,19 @@ final class CursorTypeResolver implements ElementRegistrar {
     }
 
     private <T extends ContainerEventHandler> CursorType resolveChild(T parentElement, double mouseX, double mouseY) {
-        CursorType cursorType = CursorType.DEFAULT;
         for (GuiEventListener child : parentElement.children()) {
-            if (child instanceof ContainerEventHandler childParent) {
-                CursorType parentCursorType = resolveChild(childParent, mouseX, mouseY);
-                cursorType = parentCursorType != CursorType.DEFAULT ? parentCursorType : cursorType;
+            if (child instanceof ContainerEventHandler parent) {
+                CursorType cursorType = resolveChild(parent, mouseX, mouseY);
+                if (!cursorType.isDefault()) return cursorType;
             }
-            if (cursorType == CursorType.DEFAULT && child.isMouseOver(mouseX, mouseY)) {
-                CursorType childCursorType = resolve(child, mouseX, mouseY);
-                cursorType = childCursorType != CursorType.DEFAULT ? childCursorType : cursorType;
+            if (child.isMouseOver(mouseX, mouseY)) {
+                CursorType cursorType = resolve(child, mouseX, mouseY);
+                if (!cursorType.isDefault()) return cursorType;
             }
         }
-        return cursorType;
+        return CursorType.DEFAULT;
+    }
+
+    record ElementEntry<T extends GuiEventListener>(Class<T> element, CursorTypeFunction<T> mapper) {
     }
 }

@@ -4,6 +4,7 @@ import io.github.fishstiz.minecraftcursor.api.MinecraftCursorInitializer;
 import io.github.fishstiz.minecraftcursor.platform.Platform;
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.file.Path;
 import java.util.List;
 
 public interface PlatformHelper {
@@ -11,7 +12,7 @@ public interface PlatformHelper {
 
     @NotNull Platform getPlatform();
 
-    String getConfigDir();
+    Path getConfigDir();
 
     List<MinecraftCursorInitializer> getEntrypoints();
 

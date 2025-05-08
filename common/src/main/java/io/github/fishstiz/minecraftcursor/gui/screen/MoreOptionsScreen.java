@@ -29,14 +29,7 @@ public class MoreOptionsScreen extends Screen implements CursorProvider {
 
     @Override
     protected void init() {
-        if (this.list != null && this.list.isReloaded()) {
-            onClose();
-        }
-
-        this.layout.addTitleHeader(this.title, this.font);
-        this.list = this.layout.addToContents(new MoreOptionsListWidget(this.minecraft, width, layout.getContentHeight(), layout.getHeaderHeight()));
-        this.layout.addToFooter(doneButton);
-        this.layout.visitWidgets(this::addRenderableWidget);
+        this.list = new MoreOptionsListWidget(this.minecraft, width, layout.getContentHeight(), layout.getHeaderHeight());
 
         if (previousScreen instanceof CursorOptionsScreen optionsScreen && optionsScreen.options != null) {
             this.hotspotWidget = new SelectedCursorHotspotWidget(
@@ -47,9 +40,12 @@ public class MoreOptionsScreen extends Screen implements CursorProvider {
             this.hotspotWidget.visible = false;
             this.hotspotWidget.setChangeEventListener(this.list::handleChangeHotspotWidget);
             this.addWidget(this.hotspotWidget);
-        } else {
-            this.hotspotWidget = null;
         }
+
+        this.layout.addTitleHeader(this.title, this.font);
+        this.layout.addToContents(this.list);
+        this.layout.addToFooter(doneButton);
+        this.layout.visitWidgets(this::addRenderableWidget);
 
         this.repositionElements();
     }

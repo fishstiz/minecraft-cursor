@@ -5,15 +5,10 @@ import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.api.CursorController;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 
-public final class CursorControllerImpl implements CursorController {
-    public static final CursorController INSTANCE = new CursorControllerImpl();
-
-    private CursorControllerImpl() {
-    }
-
+public record CursorControllerImpl(MinecraftCursor minecraftCursor) implements CursorController {
     @Override
     public void setSingleCycleCursor(CursorType cursorType) {
-        MinecraftCursor.getInstance().setSingleCycleCursor(cursorType);
+        this.minecraftCursor.setSingleCycleCursor(cursorType);
     }
 
     @Override
