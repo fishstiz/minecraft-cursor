@@ -15,15 +15,14 @@ import net.minecraftforge.fml.common.Mod;
 public class MinecraftCursorForge {
     // Forge does not support dashes in mod id
     public static final String MOD_ID = "minecraft_cursor";
-    private static final MinecraftCursor MINECRAFT_CURSOR = new MinecraftCursor();
 
     @SuppressWarnings("removal")
     public MinecraftCursorForge() {
-        MINECRAFT_CURSOR.init();
-
         ModLoadingContext.get().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class, () ->
                 new ConfigScreenHandler.ConfigScreenFactory((mc, screen) -> new CursorOptionsScreen(screen))
         );
+
+        MinecraftCursor.init();
     }
 
     @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
@@ -38,18 +37,18 @@ public class MinecraftCursorForge {
     public static class ClientForgeEvents {
         @SubscribeEvent
         public static void onScreenInit(ScreenEvent.Init.Pre event) {
-            MINECRAFT_CURSOR.onScreenInit(MinecraftHolder.INSTANCE, event.getScreen());
+            MinecraftCursor.onScreenInit(MinecraftHolder.INSTANCE, event.getScreen());
         }
 
         @SubscribeEvent
         public static void onScreenRender(ScreenEvent.Render.Post event) {
-            MINECRAFT_CURSOR.onScreenRender(MinecraftHolder.INSTANCE, event.getMouseX(), event.getMouseY());
+            MinecraftCursor.onScreenRender(MinecraftHolder.INSTANCE, event.getMouseX(), event.getMouseY());
         }
 
         @SubscribeEvent
         public static void onClientTick(TickEvent.ClientTickEvent event) {
             if (event.phase == TickEvent.Phase.END) {
-                MINECRAFT_CURSOR.onClientTick(MinecraftHolder.INSTANCE);
+                MinecraftCursor.onClientTick(MinecraftHolder.INSTANCE);
             }
         }
     }
