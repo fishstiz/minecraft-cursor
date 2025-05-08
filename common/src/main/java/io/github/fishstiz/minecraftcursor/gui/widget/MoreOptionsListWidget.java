@@ -90,6 +90,10 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
     public MoreOptionsListWidget(Minecraft client, int width, int height, int y) {
         super(client, width, height, y, ITEM_HEIGHT + ROW_GAP);
 
+        this.init();
+    }
+
+    private void init() {
         addGlobalOptions();
         addAdaptiveOptions();
         addModCompatOptions();
@@ -99,22 +103,15 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
     private void addGlobalOptions() {
         addEntry(new TitleEntry(GLOBAL_SETTINGS_TEXT));
 
-        reloadGlobalOptions();
+        animationEntry.button.setValue(CursorManager.INSTANCE.isAnimated());
+        animationEntry.button.active = CursorManager.INSTANCE.hasAnimations();
+        scaleEntry.button.setValue(GLOBAL.isScaleActive());
+        xhotEntry.button.setValue(GLOBAL.isXHotActive());
+        yhotEntry.button.setValue(GLOBAL.isYHotActive());
         addEntry(animationEntry);
         addEntry(scaleEntry);
         addEntry(xhotEntry);
         addEntry(yhotEntry);
-    }
-
-    private void reloadGlobalOptions() {
-        try {
-            animationEntry.button.setValue(CursorManager.INSTANCE.isAnimated());
-            animationEntry.button.active = CursorManager.INSTANCE.hasAnimations();
-            scaleEntry.button.setValue(GLOBAL.isScaleActive());
-            xhotEntry.button.setValue(GLOBAL.isXHotActive());
-            yhotEntry.button.setValue(GLOBAL.isYHotActive());
-        } catch (NullPointerException ignore) { // when exiting the screen while reloading
-        }
     }
 
     private void addAdaptiveOptions() {
@@ -146,9 +143,9 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
     }
 
     private void reloadConfiguration() {
-        CONFIG.set_hash(String.valueOf(Math.random()));
-        CursorLoader.reload(minecraft.getResourceManager());
-        this.reloadGlobalOptions();
+        CursorLoader.resetConfig();
+        this.clearEntries();
+        this.init();
     }
 
     private void addAdaptiveEntry(Component label, boolean isEnabled, boolean active, Consumer<Boolean> onPress) {

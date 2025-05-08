@@ -80,8 +80,25 @@ public class CursorConfig implements Serializable {
         return settings;
     }
 
-    public void setSettings(Map<String, Settings> settings) {
-        this.settings.putAll(settings);
+    public void mergeSettings(Map<String, Settings> settings) {
+        for (Map.Entry<String, Settings> entry : settings.entrySet()) {
+            Settings oldSettings = this.settings.computeIfAbsent(entry.getKey(), k -> new Settings());
+            Settings validated = entry.getValue().copy();
+
+            // preserve 'disabled' state of cursors
+            // only allow external settings to disable
+            if (!oldSettings.enabled) {
+                validated.enabled = false;
+            }
+
+            this.settings.put(entry.getKey(), validated);
+        }
+    }
+
+    public void layerSettings(Map<String, Settings> settings) {
+        for (Map.Entry<String, Settings> entry : settings.entrySet()) {
+            this.settings.put(entry.getKey(), entry.getValue().copy());
+        }
     }
 
     public boolean isCreativeTabsEnabled() {
@@ -208,6 +225,12 @@ public class CursorConfig implements Serializable {
 
         public void setAnimated(boolean animated) {
             this.animated = animated;
+        }
+
+        public Settings copy() {
+            Settings settings = new Settings();
+            settings.update(this.scale, this.xhot, this.yhot, this.enabled);
+            return settings;
         }
 
         public static class Default {

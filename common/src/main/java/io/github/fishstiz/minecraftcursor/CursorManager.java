@@ -86,23 +86,24 @@ public final class CursorManager implements CursorTypeRegistrar {
     private void onLoad(Cursor cursor) {
         Cursor appliedCursor = getAppliedCursor();
         if (appliedCursor.isLoaded() && appliedCursor.getId() == cursor.getId()) {
-            reloadCursor();
+            reapplyCursor();
         }
     }
 
     private CursorConfig.Settings getCursorSettings(Cursor cursor) {
-        CursorConfig.Settings settings = CONFIG.getOrCreateCursorSettings(cursor.getType());
+        CursorConfig.Settings settings = new CursorConfig.Settings();
+        CursorConfig.Settings base = CONFIG.getOrCreateCursorSettings(cursor.getType());
         CursorConfig.GlobalSettings global = CONFIG.getGlobal();
 
         settings.update(
-                global.isScaleActive() ? global.getScale() : settings.getScale(),
-                global.isXHotActive() ? global.getXHot() : settings.getXHot(),
-                global.isYHotActive() ? global.getYHot() : settings.getYHot(),
-                settings.isEnabled()
+                global.isScaleActive() ? global.getScale() : base.getScale(),
+                global.isXHotActive() ? global.getXHot() : base.getXHot(),
+                global.isYHotActive() ? global.getYHot() : base.getYHot(),
+                base.isEnabled()
         );
 
-        if (settings.isAnimated() != null) {
-            settings.setAnimated(settings.isAnimated());
+        if (base.isAnimated() != null) {
+            settings.setAnimated(base.isAnimated());
         }
 
         return settings;
@@ -144,7 +145,7 @@ public final class CursorManager implements CursorTypeRegistrar {
         GLFW.glfwSetCursor(CursorTypeUtil.WINDOW, currentCursor.getId());
     }
 
-    public void reloadCursor() {
+    public void reapplyCursor() {
         GLFW.glfwSetCursor(CursorTypeUtil.WINDOW, getAppliedCursor().getId());
     }
 
