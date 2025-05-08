@@ -1,11 +1,13 @@
 package io.github.fishstiz.minecraftcursor.gui.screen;
 
+import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.gui.widget.MoreOptionsListWidget;
 import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorHotspotWidget;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
+import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -16,7 +18,6 @@ public class MoreOptionsScreen extends Screen {
     private static final int HOTSPOT_WIDGET_SIZE = 96;
     private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
     private final Screen previousScreen;
-    private final Button doneButton = Button.builder(CommonComponents.GUI_DONE, btn -> this.onClose()).build();
     private @Nullable SelectedCursorHotspotWidget hotspotWidget;
     private MoreOptionsListWidget list;
 
@@ -41,13 +42,18 @@ public class MoreOptionsScreen extends Screen {
             this.hotspotWidget.visible = false;
             this.hotspotWidget.setChangeEventListener(this.list::handleChangeHotspotWidget);
             this.addWidget(this.hotspotWidget);
-        } else {
-            this.hotspotWidget = null;
         }
 
         this.layout.addToHeader(new StringWidget(this.title, this.font));
         this.layout.addToContents(this.addRenderableWidget(this.list));
-        this.layout.addToFooter(this.doneButton);
+
+        LinearLayout footer = this.layout.addToFooter(new LinearLayout(0, 0, LinearLayout.Orientation.HORIZONTAL));
+        footer.addChild(Button.builder(Component.literal("🔎"), btn -> MinecraftCursor.toggleInspect())
+                .size(20, 20)
+                .build()
+        );
+        footer.addChild(Button.builder(CommonComponents.GUI_DONE, btn -> this.onClose()).build());
+
         this.layout.visitWidgets(this::addRenderableWidget);
         this.repositionElements();
     }
