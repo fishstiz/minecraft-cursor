@@ -21,6 +21,8 @@ class CursorResourceReloadListener implements IdentifiableResourceReloadListener
             Executor backgroundExecutor,
             Executor gameExecutor
     ) {
-        return CompletableFuture.runAsync(() -> CursorLoader.reload(manager)).thenCompose(barrier::wait);
+        return CompletableFuture.runAsync(() -> CursorLoader.reload(manager))
+                .thenCompose(barrier::wait)
+                .thenRunAsync(CursorLoader::applyDefaultCursor, gameExecutor);
     }
 }
