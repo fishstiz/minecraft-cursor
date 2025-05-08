@@ -1,6 +1,7 @@
 package io.github.fishstiz.minecraftcursor.cursorhandler.ingame;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
+import io.github.fishstiz.minecraftcursor.api.CursorHandler;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.mixin.access.HandledScreenAccessor;
 import net.minecraft.client.Minecraft;
@@ -8,7 +9,7 @@ import net.minecraft.client.gui.screens.inventory.EnchantmentScreen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.inventory.EnchantmentMenu;
 
-public class EnchantmentScreenCursorHandler extends HandledScreenCursorHandler<EnchantmentMenu, EnchantmentScreen> {
+public class EnchantmentScreenCursorHandler implements CursorHandler<EnchantmentScreen> {
     // Derived from EnchantmentScreen#drawBackground
     public static final int ENCHANTMENT_BTN_WIDTH = 108;
     public static final int ENCHANTMENT_BTN_HEIGHT = 19;
@@ -18,9 +19,6 @@ public class EnchantmentScreenCursorHandler extends HandledScreenCursorHandler<E
     @Override
     @SuppressWarnings("unchecked")
     public CursorType getCursorType(EnchantmentScreen enchantmentScreen, double mouseX, double mouseY) {
-        CursorType cursorType = super.getCursorType(enchantmentScreen, mouseX, mouseY);
-        if (cursorType != CursorType.DEFAULT) return cursorType;
-
         if (!MinecraftCursor.CONFIG.isEnchantmentsEnabled()) return CursorType.DEFAULT;
 
         LocalPlayer player = Minecraft.getInstance().player;

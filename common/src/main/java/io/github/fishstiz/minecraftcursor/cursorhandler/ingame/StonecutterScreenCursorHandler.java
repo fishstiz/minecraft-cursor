@@ -1,12 +1,13 @@
 package io.github.fishstiz.minecraftcursor.cursorhandler.ingame;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
+import io.github.fishstiz.minecraftcursor.api.CursorHandler;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.mixin.access.StonecutterScreenAccessor;
 import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
 import net.minecraft.world.inventory.StonecutterMenu;
 
-public class StonecutterScreenCursorHandler extends HandledScreenCursorHandler<StonecutterMenu, StonecutterScreen> {
+public class StonecutterScreenCursorHandler implements CursorHandler<StonecutterScreen> {
     // Derived from StonecutterScreen#drawBackground
     public static final int RECIPES_OFFSET_X = 52;
     public static final int RECIPES_OFFSET_Y = 14;
@@ -19,9 +20,6 @@ public class StonecutterScreenCursorHandler extends HandledScreenCursorHandler<S
 
     @Override
     public CursorType getCursorType(StonecutterScreen stonecutterScreen, double mouseX, double mouseY) {
-        CursorType cursorType = super.getCursorType(stonecutterScreen, mouseX, mouseY);
-        if (cursorType != CursorType.DEFAULT) return cursorType;
-
         if (!MinecraftCursor.CONFIG.isStonecutterRecipesEnabled()) return CursorType.DEFAULT;
 
         StonecutterScreenAccessor accessor = (StonecutterScreenAccessor) stonecutterScreen;
