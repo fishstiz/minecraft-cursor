@@ -5,17 +5,10 @@ package io.github.fishstiz.minecraftcursor.api;
  * <p>
  * Implement this directly to your element if Minecraft Cursor is a required dependency.
  * </p>
- * For optional dependencies, you can create a wrapper element that implements {@code CursorProvider} and use that if the mod is loaded.
  *
  * <p>
  * <b>Note:</b> The {@link net.minecraft.client.gui.components.events.GuiEventListener} must either be the current screen or be accessible from the current screen or
  * from its parent element through {@link net.minecraft.client.gui.components.events.ContainerEventHandler#children()}.
- * </p>
- * Any container or nested container must be an instance of {@link net.minecraft.client.gui.components.events.ContainerEventHandler}
- * and be accessible via the {@link net.minecraft.client.gui.components.events.ContainerEventHandler#children()} method.
- * <p>
- * This accessibility must be maintained throughout the entire element hierarchy, starting from
- * the current screen down to the deepest nested parent element.
  * </p>
  */
 public interface CursorProvider {

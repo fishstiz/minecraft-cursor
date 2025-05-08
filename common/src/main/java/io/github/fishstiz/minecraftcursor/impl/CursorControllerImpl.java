@@ -1,14 +1,26 @@
 package io.github.fishstiz.minecraftcursor.impl;
 
 import io.github.fishstiz.minecraftcursor.CursorManager;
-import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.api.CursorController;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
+import org.jetbrains.annotations.Nullable;
 
-public record CursorControllerImpl(MinecraftCursor minecraftCursor) implements CursorController {
+public class CursorControllerImpl implements CursorController {
+    private CursorType singleCycleCursor;
+
+    public boolean hasTransientCursor() {
+        return singleCycleCursor != null;
+    }
+
+    public @Nullable CursorType consumeTransientCursor() {
+        CursorType cursorType = singleCycleCursor;
+        singleCycleCursor = null;
+        return cursorType;
+    }
+
     @Override
     public void setSingleCycleCursor(CursorType cursorType) {
-        this.minecraftCursor.setSingleCycleCursor(cursorType);
+        this.singleCycleCursor = cursorType;
     }
 
     @Override

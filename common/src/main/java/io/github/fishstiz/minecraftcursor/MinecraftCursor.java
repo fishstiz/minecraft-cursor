@@ -5,8 +5,8 @@ import io.github.fishstiz.minecraftcursor.compat.ExternalCursorTracker;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.config.CursorConfigLoader;
 import io.github.fishstiz.minecraftcursor.impl.CursorControllerImpl;
-import io.github.fishstiz.minecraftcursor.provider.CursorControllerProvider;
 import io.github.fishstiz.minecraftcursor.impl.MinecraftCursorInitializerImpl;
+import io.github.fishstiz.minecraftcursor.provider.CursorControllerProvider;
 import io.github.fishstiz.minecraftcursor.platform.Services;
 import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
 import net.minecraft.client.Minecraft;
@@ -15,18 +15,18 @@ import net.minecraft.client.gui.screens.Screen;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MinecraftCursor {
+public final class MinecraftCursor {
     public static final String MOD_ID = "minecraft-cursor";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     public static final CursorConfig CONFIG = CursorConfigLoader.fromFile(Services.PLATFORM.getConfigDir().resolve(MOD_ID + ".json").toFile());
     private static final CursorTypeResolver RESOLVER = new CursorTypeResolver();
-    private CursorType singleCycleCursor;
-    private Screen visibleNonCurrentScreen;
+    private static final CursorControllerImpl CONTROLLER = new CursorControllerImpl();
+    private static Screen visibleScreen;
 
-    MinecraftCursor() {
+    private MinecraftCursor() {
     }
 
-    public void init() {
+    static void init() {
         new MinecraftCursorInitializerImpl().init(CursorManager.INSTANCE, RESOLVER);
 
         Services.PLATFORM.getEntrypoints().forEach(entrypoint -> {
@@ -37,22 +37,22 @@ public class MinecraftCursor {
             }
         });
 
-        CursorControllerProvider.init(new CursorControllerImpl(this));
+        CursorControllerProvider.init(CONTROLLER);
     }
 
-    public void onScreenInit(Minecraft minecraft, Screen screen) {
+    static void onScreenInit(Minecraft minecraft, Screen screen) {
         RESOLVER.lastFailedElement = "";
 
         if (minecraft.screen == null) {
             CursorManager.INSTANCE.setCurrentCursor(CursorType.DEFAULT);
-            visibleNonCurrentScreen = screen;
+            visibleScreen = screen;
             return;
         }
 
-        visibleNonCurrentScreen = null;
+        visibleScreen = null;
     }
 
-    public void onScreenRender(Minecraft minecraft, int mouseX, int mouseY) {
+    static void onScreenRender(Minecraft minecraft, int mouseX, int mouseY) {
         if (ExternalCursorTracker.get().isCustom()) return;
 
         if (minecraft.screen != null) {
@@ -60,28 +60,26 @@ public class MinecraftCursor {
         }
     }
 
-    public void onClientTick(Minecraft minecraft) {
+    static void onClientTick(Minecraft minecraft) {
         if (ExternalCursorTracker.get().isCustom()) return;
 
-        if (minecraft.screen == null && visibleNonCurrentScreen != null && !minecraft.mouseHandler.isMouseGrabbed()) {
+        if (minecraft.screen == null && visibleScreen != null && !minecraft.mouseHandler.isMouseGrabbed()) {
             double scale = minecraft.getWindow().getGuiScale();
             double mouseX = minecraft.mouseHandler.xpos() / scale;
             double mouseY = minecraft.mouseHandler.ypos() / scale;
-            CursorManager.INSTANCE.setCurrentCursor(resolveCursorType(visibleNonCurrentScreen, mouseX, mouseY));
-        } else if (minecraft.screen == null && visibleNonCurrentScreen == null) {
+            CursorManager.INSTANCE.setCurrentCursor(resolveCursorType(visibleScreen, mouseX, mouseY));
+        } else if (minecraft.screen == null && visibleScreen == null) {
             CursorManager.INSTANCE.setCurrentCursor(ExternalCursorTracker.get().getCursorOrDefault());
         }
     }
 
-    private CursorType resolveCursorType(Screen screen, double mouseX, double mouseY) {
+    private static CursorType resolveCursorType(Screen screen, double mouseX, double mouseY) {
         if (!CursorManager.INSTANCE.isAdaptive()) {
             return CursorType.DEFAULT;
         }
 
-        if (singleCycleCursor != null) {
-            CursorType cursorType = singleCycleCursor;
-            singleCycleCursor = null;
-            return cursorType;
+        if (CONTROLLER.hasTransientCursor()) {
+            return CONTROLLER.consumeTransientCursor();
         }
 
         CursorType externalCursor = ExternalCursorTracker.get().getCursorOrDefault();
@@ -109,9 +107,5 @@ public class MinecraftCursor {
         }
 
         return CursorType.DEFAULT;
-    }
-
-    public void setSingleCycleCursor(CursorType cursorType) {
-        singleCycleCursor = cursorType;
     }
 }
