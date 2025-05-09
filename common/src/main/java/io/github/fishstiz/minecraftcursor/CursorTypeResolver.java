@@ -4,6 +4,7 @@ import io.github.fishstiz.minecraftcursor.api.CursorHandler;
 import io.github.fishstiz.minecraftcursor.api.CursorProvider;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.api.ElementRegistrar;
+import io.github.fishstiz.minecraftcursor.inspect.ElementInspector;
 import io.github.fishstiz.minecraftcursor.platform.Services;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -16,11 +17,11 @@ import java.util.Optional;
 class CursorTypeResolver implements ElementRegistrar {
     private final List<ElementEntry<? extends GuiEventListener>> registry = new ArrayList<>();
     private final HashMap<String, CursorTypeFunction<? extends GuiEventListener>> cachedRegistry = new HashMap<>();
-    private final ElementInspector inspector;
+    private ElementInspector inspector;
     String lastFailedElement;
 
-    CursorTypeResolver(ElementInspector inspector) {
-        this.inspector = inspector;
+    CursorTypeResolver() {
+        inspector = new ElementInspector() {};
     }
 
     @Override
@@ -59,9 +60,6 @@ class CursorTypeResolver implements ElementRegistrar {
         registry.add(new ElementEntry<>(elementClass, elementToCursorType));
     }
 
-    public void clearCache() {
-        cachedRegistry.clear();
-    }
 
     @SuppressWarnings("unchecked")
     public <T extends GuiEventListener> CursorType resolve(T element, double mouseX, double mouseY) {
@@ -78,7 +76,7 @@ class CursorTypeResolver implements ElementRegistrar {
 
             if (mapper == null) {
                 mapper = (CursorTypeFunction<T>) resolveMapper(element);
-                if (!inspector.setHovered(element)) {
+                if (!inspector.setHovered(element, true)) {
                     cachedRegistry.put(elementName, mapper);
                 }
             }
@@ -89,7 +87,7 @@ class CursorTypeResolver implements ElementRegistrar {
                 lastFailedElement = elementName;
                 MinecraftCursor.LOGGER.error(
                         "Could not get cursor type for element: {}",
-                        Services.PLATFORM.unmapClassName("named", elementName)
+                        Services.PLATFORM.unmapClassName("intermediary", elementName)
                 );
             }
         }
@@ -99,7 +97,7 @@ class CursorTypeResolver implements ElementRegistrar {
     private CursorTypeFunction<? extends GuiEventListener> resolveMapper(GuiEventListener element) {
         for (int i = registry.size() - 1; i >= 0; i--) {
             if (registry.get(i).element.isInstance(element)) {
-                inspector.setHovered(element);
+                inspector.setHovered(element, true);
                 return registry.get(i).mapper;
             }
         }
@@ -117,10 +115,19 @@ class CursorTypeResolver implements ElementRegistrar {
                 CursorType cursorType = resolveChild(nestedParent, mouseX, mouseY);
                 if (!cursorType.isDefault()) return cursorType;
             }
-            inspector.setHovered(hoveredElement);
+            inspector.setHovered(hoveredElement, false);
             return resolve(hoveredElement, mouseX, mouseY);
         }
         return CursorType.DEFAULT;
+    }
+
+    public ElementInspector getInspector() {
+        return inspector;
+    }
+
+    public void toggleInspector() {
+        inspector = ElementInspector.toggle(inspector);
+        cachedRegistry.clear();
     }
 
     record ElementEntry<T extends GuiEventListener>(Class<T> element, CursorTypeFunction<T> mapper) {

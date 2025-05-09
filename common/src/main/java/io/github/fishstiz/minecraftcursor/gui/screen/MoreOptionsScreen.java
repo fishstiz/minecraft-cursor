@@ -2,6 +2,7 @@ package io.github.fishstiz.minecraftcursor.gui.screen;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.gui.widget.MoreOptionsListWidget;
+import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorButtonWidget;
 import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorHotspotWidget;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -10,10 +11,12 @@ import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class MoreOptionsScreen extends Screen {
+    private static final int FOOTER_SPACING = 8;
     private static final int HOTSPOT_WIDGET_SIZE = 96;
     private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
     private final Screen previousScreen;
@@ -43,17 +46,26 @@ public class MoreOptionsScreen extends Screen {
 
         this.layout.addTitleHeader(this.title, this.font);
         this.layout.addToContents(this.list);
-
-        LinearLayout footer = this.layout.addToFooter(LinearLayout.horizontal());
-        footer.addChild(Button.builder(Component.literal("🔎"), btn -> MinecraftCursor.toggleInspect())
-                .size(20, 20)
-                .build()
-        );
-        footer.addChild(Button.builder(CommonComponents.GUI_DONE, btn -> this.onClose()).build());
-
+        this.layout.addToFooter(this.createFooter());
         this.layout.visitWidgets(this::addRenderableWidget);
 
         this.repositionElements();
+    }
+
+    private LinearLayout createFooter() {
+        LinearLayout footer = LinearLayout.horizontal().spacing(FOOTER_SPACING);
+
+        ResourceLocation inspectIcon = ResourceLocation.withDefaultNamespace("textures/gui/sprites/icon/search.png");
+        int iconSize = 12;
+        int inspectSize = 20;
+
+        Button inspect = new SelectedCursorButtonWidget(inspectIcon, iconSize, iconSize, MinecraftCursor::toggleInspect);
+        inspect.setSize(inspectSize, inspectSize);
+
+        footer.addChild(inspect);
+        footer.addChild(Button.builder(CommonComponents.GUI_DONE, btn -> this.onClose()).build());
+
+        return footer;
     }
 
     @Override

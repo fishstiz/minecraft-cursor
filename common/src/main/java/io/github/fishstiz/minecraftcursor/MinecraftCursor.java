@@ -4,6 +4,7 @@ import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.compat.ExternalCursorTracker;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.config.CursorConfigLoader;
+import io.github.fishstiz.minecraftcursor.inspect.ElementInspector;
 import io.github.fishstiz.minecraftcursor.impl.CursorControllerImpl;
 import io.github.fishstiz.minecraftcursor.impl.MinecraftCursorInitializerImpl;
 import io.github.fishstiz.minecraftcursor.provider.CursorControllerProvider;
@@ -22,8 +23,7 @@ public final class MinecraftCursor {
     public static final String MOD_ID = "minecraft-cursor";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     public static final CursorConfig CONFIG = CursorConfigLoader.fromFile(Services.PLATFORM.getConfigDir().resolve(MOD_ID + ".json").toFile());
-    private static final ElementInspector INSPECTOR = new ElementInspector();
-    private static final CursorTypeResolver RESOLVER = new CursorTypeResolver(INSPECTOR);
+    private static final CursorTypeResolver RESOLVER = new CursorTypeResolver();
     private static final CursorControllerImpl CONTROLLER = new CursorControllerImpl();
     private static Screen visibleScreen;
 
@@ -57,8 +57,12 @@ public final class MinecraftCursor {
     }
 
     static void onScreenRender(Minecraft minecraft, GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        INSPECTOR.renderDeepest(minecraft, guiGraphics, minecraft.screen, mouseX, mouseY);
-        INSPECTOR.renderHovered(minecraft, guiGraphics);
+        ElementInspector inspector = RESOLVER.getInspector();
+        if (inspector.isEnabled()) {
+            inspector.renderDeepest(minecraft, guiGraphics, minecraft.screen, mouseX, mouseY);
+            inspector.renderHovered(minecraft, guiGraphics);
+            inspector.renderCacheSize(minecraft, guiGraphics);
+        }
 
         if (ExternalCursorTracker.get().isCustom()) return;
 
@@ -114,8 +118,6 @@ public final class MinecraftCursor {
     }
 
     public static void toggleInspect() {
-        if (INSPECTOR.setEnabled(!INSPECTOR.isEnabled())) {
-            RESOLVER.clearCache();
-        }
+        RESOLVER.toggleInspector();
     }
 }
