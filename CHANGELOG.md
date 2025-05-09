@@ -1,9 +1,10 @@
-- Respect precedence of children when multiple registered elements overlap.
-- Optimized cursor (and more) options screen.
-- Fixed elements duplicating when resizing screen in 1.20.1 and 1.21.1 (#17)
-- Fixed cursor list scroll overflowing when resizing screen.
-
-Fabric:
-- Add compatibility with Quilt for 1.21.2 and above (#27)
-- `GlfwMixin` (cursor tracking) is now applied dynamically to prevent crashes with mods that load GLFW early other than early loading screen.
-- Removed `minecraft-cursor.properties` (it's no longer needed due to above change).
+- Added auto-scale. Set scale to < 0.50 to scale cursor with the GUI.
+- Changed the element detection logic to reduce false positives.
+- Resetting cursor settings no longer reloads all resource packs.
+- Resource packs can no longer forcibly enable cursors that were disabled in user config ([#29](https://github.com/fishstiz/minecraft-cursor/issues/29)).
+- Removed `AbstractHandledScreenCursorHandler`.
+- Removed busy cursor on `GenericMessageScreen`.
+- Fixed animated cursor frames not being destroyed properly on resource reload.
+- Fixed animation of current cursor not being toggled by the toggle animation option.
+- Added inspect mode to check detected elements. Intended for personal use but you can try it yourself and see the inner workings of the mod from More Cursor Options.
+- Minor optimizations.
