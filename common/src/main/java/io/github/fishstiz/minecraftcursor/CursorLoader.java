@@ -1,5 +1,6 @@
 package io.github.fishstiz.minecraftcursor;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.config.AnimatedCursorConfig;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
@@ -10,8 +11,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -111,20 +110,11 @@ public class CursorLoader {
             return;
         }
 
-        BufferedImage image = null;
-        try (InputStream cursorStream = cursorResource.open()) {
-            image = ImageIO.read(cursorStream);
-            if (image == null) {
-                MinecraftCursor.LOGGER.error("[minecraft-cursor] Invalid file for cursor type '{}'", cursor.getType().getKey());
-                return;
-            }
-
+        try (InputStream cursorStream = cursorResource.open(); NativeImage image = NativeImage.read(cursorStream)) {
             AnimatedCursorConfig animation = loadAnimation(manager, basePath, cursorResource);
             CursorManager.INSTANCE.loadCursor(cursor, location, image, animation);
         } catch (IOException e) {
             MinecraftCursor.LOGGER.error("[minecraft-cursor] Failed to load cursor image for '{}'", basePath);
-        } finally {
-            if (image != null) image.flush();
         }
     }
 
