@@ -1,14 +1,13 @@
 package io.github.fishstiz.minecraftcursor.cursor;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.config.AnimatedCursorConfig;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
-import io.github.fishstiz.minecraftcursor.util.BufferedImageUtil;
+import io.github.fishstiz.minecraftcursor.util.NativeImageUtil;
 import net.minecraft.resources.ResourceLocation;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,7 +28,7 @@ public class AnimatedCursor extends Cursor {
 
     public void loadImage(
             ResourceLocation sprite,
-            BufferedImage image,
+            NativeImage image,
             CursorConfig.Settings settings,
             AnimatedCursorConfig animation
     ) throws IOException {
@@ -45,7 +44,7 @@ public class AnimatedCursor extends Cursor {
 
     private HashMap<Integer, Cursor> createCursors(
             ResourceLocation sprite,
-            BufferedImage image,
+            NativeImage image,
             CursorConfig.Settings settings,
             int availableFrames
     ) throws IOException {
@@ -80,14 +79,14 @@ public class AnimatedCursor extends Cursor {
 
     private Cursor createCursor(
             ResourceLocation sprite,
-            BufferedImage image,
+            NativeImage image,
             CursorConfig.Settings settings,
             int index
     ) throws IOException {
         Cursor cursor = new Cursor(this.getType(), this.onLoad);
-        BufferedImage cropped = BufferedImageUtil.cropImage(image, new Rectangle(0, index * SIZE, SIZE, SIZE));
-        cursor.loadImage(sprite, cropped, settings);
-        cropped.flush();
+        try (NativeImage cropped = NativeImageUtil.cropImage(image, 0, index * SIZE, SIZE, SIZE)) {
+            cursor.loadImage(sprite, cropped, settings);
+        }
         return cursor;
     }
 
