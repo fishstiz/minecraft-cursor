@@ -1,5 +1,6 @@
 package io.github.fishstiz.minecraftcursor;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.api.CursorTypeRegistrar;
 import io.github.fishstiz.minecraftcursor.config.AnimatedCursorConfig;
@@ -13,7 +14,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.*;
 
@@ -61,7 +61,7 @@ public final class CursorManager implements CursorTypeRegistrar {
     public void loadCursor(
             Cursor cursor,
             ResourceLocation sprite,
-            BufferedImage image,
+            NativeImage image,
             @Nullable AnimatedCursorConfig animation
     ) throws IOException {
         boolean animated = animation != null;
