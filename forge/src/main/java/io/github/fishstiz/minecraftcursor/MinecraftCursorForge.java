@@ -42,7 +42,7 @@ public class MinecraftCursorForge {
 
         @SubscribeEvent
         public static void onScreenRender(ScreenEvent.Render.Post event) {
-            MinecraftCursor.onScreenRender(MinecraftHolder.INSTANCE, event.getGuiGraphics(), event.getMouseX(), event.getMouseY());
+            MinecraftCursor.onScreenRender(MinecraftHolder.INSTANCE, event.getScreen(), event.getGuiGraphics(), event.getMouseX(), event.getMouseY());
         }
 
         @SubscribeEvent

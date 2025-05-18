@@ -25,7 +25,7 @@ public class MinecraftCursorFabric implements ClientModInitializer {
     }
 
     private void onScreenRender(Screen screen, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        MinecraftCursor.onScreenRender(MinecraftHolder.INSTANCE, guiGraphics, mouseX, mouseY);
+        MinecraftCursor.onScreenRender(MinecraftHolder.INSTANCE, screen, guiGraphics, mouseX, mouseY);
     }
 
     private static class MinecraftHolder {
