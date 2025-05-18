@@ -90,12 +90,12 @@ public class ExternalCursorTracker implements CursorTracker {
         return this.externalCursors.containsKey(cursor);
     }
 
-    public void storeAddress(long address) {
+    public void claimAddress(long address) {
         this.addresses.add(address);
     }
 
-    public boolean consumeAddress(long address) {
-        return this.addresses.removeIf(a -> a == address);
+    public boolean unclaimAddress(long address) {
+        return this.addresses.remove(address);
     }
 
     public @NotNull CursorType getCursorOrDefault() {
