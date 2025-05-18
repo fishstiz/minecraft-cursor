@@ -76,7 +76,7 @@ class CursorTypeResolver implements ElementRegistrar {
 
             if (mapper == null) {
                 mapper = (CursorTypeFunction<T>) resolveMapper(element);
-                if (!inspector.setHovered(element, true)) {
+                if (!inspector.setFocused(element, true)) {
                     cachedRegistry.put(elementName, mapper);
                 }
             }
@@ -97,7 +97,7 @@ class CursorTypeResolver implements ElementRegistrar {
     private CursorTypeFunction<? extends GuiEventListener> resolveMapper(GuiEventListener element) {
         for (int i = registry.size() - 1; i >= 0; i--) {
             if (registry.get(i).element.isInstance(element)) {
-                inspector.setHovered(element, true);
+                inspector.setFocused(element, true);
                 return registry.get(i).mapper;
             }
         }
@@ -115,7 +115,7 @@ class CursorTypeResolver implements ElementRegistrar {
                 CursorType cursorType = resolveChild(nestedParent, mouseX, mouseY);
                 if (!cursorType.isDefault()) return cursorType;
             }
-            inspector.setHovered(hoveredElement, false);
+            inspector.setFocused(hoveredElement, false);
             return resolve(hoveredElement, mouseX, mouseY);
         }
         return CursorType.DEFAULT;
