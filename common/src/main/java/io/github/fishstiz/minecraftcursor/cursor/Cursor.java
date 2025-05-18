@@ -73,6 +73,10 @@ public class Cursor {
     private void create(NativeImage image, double scale, int xhot, int yhot) {
         double correctedScale = isAutoScale(scale) ? Minecraft.getInstance().getWindow().getGuiScale() : scale;
 
+        long glfwImageAddress = 0;
+        long previousId = this.id;
+        ByteBuffer pixels = null;
+
         try (NativeImage scaledImage = scale == 1 ? image : NativeImageUtil.scaleImage(image, correctedScale)) {
             int scaledXHot = scale == 1 ? xhot : (int) Math.round(xhot * correctedScale);
             int scaledYHot = scale == 1 ? yhot : (int) Math.round(yhot * correctedScale);
@@ -80,30 +84,37 @@ public class Cursor {
             int scaledHeight = scaledImage.getHeight();
 
             GLFWImage glfwImage = GLFWImage.create();
-            glfwImage.width(scaledWidth);
-            glfwImage.height(scaledHeight);
-
-            ByteBuffer pixels = MemoryUtil.memAlloc(scaledWidth * scaledHeight * 4);
+            pixels = MemoryUtil.memAlloc(scaledWidth * scaledHeight * 4);
             NativeImageUtil.writePixelsRGBA(scaledImage, pixels);
-            glfwImage.pixels(pixels);
-            MemoryUtil.memFree(pixels);
+            glfwImage.set(scaledWidth, scaledHeight, pixels);
 
-            long previousId = this.id;
-            ExternalCursorTracker.get().storeAddress(glfwImage.address());
+            glfwImageAddress = glfwImage.address();
+            ExternalCursorTracker.get().claimAddress(glfwImageAddress);
             this.id = GLFW.glfwCreateCursor(glfwImage, scaledXHot, scaledYHot);
+
+            if (this.id == 0) {
+                MinecraftCursor.LOGGER.error("[minecraft-cursor] Error creating cursor '{}'. ", this.type.getKey());
+                return;
+            }
 
             if (this.onLoad != null) {
                 this.onLoad.accept(this);
-            }
-
-            if (previousId != 0 && this.id != previousId) {
-                GLFW.glfwDestroyCursor(previousId);
             }
 
             loaded = true;
             this.scale = scale;
             this.xhot = xhot;
             this.yhot = yhot;
+        } finally {
+            if (glfwImageAddress != 0) {
+                ExternalCursorTracker.get().unclaimAddress(glfwImageAddress);
+            }
+            if (pixels != null) {
+                MemoryUtil.memFree(pixels);
+            }
+            if (previousId != 0 && this.id != previousId) {
+                GLFW.glfwDestroyCursor(previousId);
+            }
         }
     }
 

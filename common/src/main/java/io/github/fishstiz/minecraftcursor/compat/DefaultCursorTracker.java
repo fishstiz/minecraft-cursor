@@ -35,12 +35,12 @@ public class DefaultCursorTracker implements CursorTracker {
     }
 
     @Override
-    public void storeAddress(long address) {
+    public void claimAddress(long address) {
         // unsupported
     }
 
     @Override
-    public boolean consumeAddress(long address) {
+    public boolean unclaimAddress(long address) {
         return true; // consume address if null
     }
 
