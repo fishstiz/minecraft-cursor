@@ -1,10 +1,2 @@
-- Added auto-scale. Set scale to < 0.50 to scale cursor with the GUI.
-- Changed the element detection logic to reduce false positives.
-- Resetting cursor settings no longer reloads all resource packs.
-- Resource packs can no longer forcibly enable cursors that were disabled in user config ([#29](https://github.com/fishstiz/minecraft-cursor/issues/29)).
-- Removed `AbstractHandledScreenCursorHandler`.
-- Removed busy cursor on `GenericMessageScreen`.
-- Fixed animated cursor frames not being destroyed properly on resource reload.
-- Fixed animation of current cursor not being toggled by the toggle animation option.
-- Added inspect mode to check detected elements. Intended for personal use but you can try it yourself and see the inner workings of the mod from More Cursor Options.
-- Minor optimizations.
+- Migrated to Minecraft's Native Image API which may fix some issues on certain platforms.
+- Minor optimizations on some hud screens.
