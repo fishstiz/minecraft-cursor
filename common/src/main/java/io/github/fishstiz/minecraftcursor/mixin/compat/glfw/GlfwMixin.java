@@ -35,7 +35,7 @@ public abstract class GlfwMixin {
 
     @WrapMethod(method = "nglfwCreateCursor")
     private static long ntrackCustomCursor(long image, int xhot, int yhot, Operation<Long> original) {
-        if (ExternalCursorTracker.get().consumeAddress(image)) {
+        if (ExternalCursorTracker.get().unclaimAddress(image)) {
             return original.call(image, xhot, yhot);
         }
 
