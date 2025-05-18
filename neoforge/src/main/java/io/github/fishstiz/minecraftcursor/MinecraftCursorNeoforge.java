@@ -2,6 +2,7 @@ package io.github.fishstiz.minecraftcursor;
 
 import io.github.fishstiz.minecraftcursor.gui.screen.CursorOptionsScreen;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -32,12 +33,14 @@ public class MinecraftCursorNeoforge {
 
     @SubscribeEvent
     public void onScreenInit(ScreenEvent.Init.Pre event) {
-        MinecraftCursor.onScreenInit(event.getScreen().getMinecraft(), event.getScreen());
+        Screen screen = event.getScreen();
+        MinecraftCursor.onScreenInit(screen.getMinecraft(), screen);
     }
 
     @SubscribeEvent
     public void onScreenRender(ScreenEvent.Render.Post event) {
-        MinecraftCursor.onScreenRender(event.getScreen().getMinecraft(), event.getGuiGraphics(), event.getMouseX(), event.getMouseY());
+        Screen screen = event.getScreen();
+        MinecraftCursor.onScreenRender(screen.getMinecraft(), screen, event.getGuiGraphics(), event.getMouseX(), event.getMouseY());
     }
 
     @SubscribeEvent
