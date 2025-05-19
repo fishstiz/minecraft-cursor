@@ -114,10 +114,10 @@ public class CursorOptionsWidget extends AbstractContainerWidget implements Cont
         xhotSlider.update(settings.getXHot(), !global.isXHotActive());
         yhotSlider.update(settings.getYHot(), !global.isYHotActive());
 
-        boolean isAnimated = handler.isAnimated();
+        boolean animationEnabled = handler.isAnimated();
         animateButton.active = handler.getCursorAsAnimatedCursor().isPresent();
-        resetAnimation.active = isAnimated && enableButton.value;
-        animateButton.setValue(isAnimated);
+        resetAnimation.active = animationEnabled;
+        animateButton.setValue(animationEnabled);
 
         cursorHotspot.setRulerRendered(true, true);
         cursorHotspot.active = !(global.isXHotActive() && global.isYHotActive());
