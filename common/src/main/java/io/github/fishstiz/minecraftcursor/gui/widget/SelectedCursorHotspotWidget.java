@@ -4,7 +4,6 @@ import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.api.CursorProvider;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
-import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
 import io.github.fishstiz.minecraftcursor.util.MouseEvent;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -26,6 +25,7 @@ public class SelectedCursorHotspotWidget extends AbstractWidget implements Curso
     private final CursorOptionsWidget options;
     private boolean rulerRendered = true;
     private float rulerAlpha = 1f;
+    private boolean dragging = false;
     private MouseEventListener changeEventListener;
 
     public SelectedCursorHotspotWidget(int size, CursorOptionsWidget options) {
@@ -86,6 +86,7 @@ public class SelectedCursorHotspotWidget extends AbstractWidget implements Curso
 
     @Override
     public void onClick(double mouseX, double mouseY) {
+        this.dragging = true;
         setHotspots(MouseEvent.CLICK, mouseX, mouseY);
     }
 
@@ -120,7 +121,7 @@ public class SelectedCursorHotspotWidget extends AbstractWidget implements Curso
         if (!active) {
             return CursorType.DEFAULT;
         }
-        if (isFocused() && (CursorTypeUtil.isLeftClickHeld() || CursorTypeUtil.isGrabbing())) {
+        if (this.dragging) {
             return CursorType.GRABBING;
         }
         return CursorType.POINTER;
@@ -135,21 +136,11 @@ public class SelectedCursorHotspotWidget extends AbstractWidget implements Curso
     }
 
     @Override
-    public boolean isMouseOver(double mouseX, double mouseY) {
-        return this.visible
-                && mouseX >= this.getX()
-                && mouseY >= this.getY()
-                && mouseX < this.getRight()
-                && mouseY < this.getBottom();
-    }
-
-    @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        if (isFocused()) {
+    public void onRelease(double mouseX, double mouseY) {
+        if (this.dragging) {
             setHotspots(MouseEvent.RELEASE, mouseX, mouseY);
+            this.dragging = false;
         }
-
-        return super.mouseReleased(mouseX, mouseY, button);
     }
 
     @Override
