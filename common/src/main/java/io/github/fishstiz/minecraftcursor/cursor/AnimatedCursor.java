@@ -6,7 +6,6 @@ import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.config.AnimatedCursorConfig;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.util.NativeImageUtil;
-import net.minecraft.resources.ResourceLocation;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,30 +25,28 @@ public class AnimatedCursor extends Cursor {
     }
 
     public void loadImage(
-            ResourceLocation sprite,
             NativeImage image,
             CursorConfig.Settings settings,
             AnimatedCursorConfig animation
     ) throws IOException {
-        super.loadImage(sprite, image, settings);
+        super.loadImage(image, settings);
 
         int availableFrames = image.getHeight() / SIZE;
 
-        HashMap<Integer, Cursor> newCursors = createCursors(sprite, image, settings, availableFrames);
+        HashMap<Integer, Cursor> newCursors = createCursors(image, settings, availableFrames);
         List<Frame> newFrames = createFrames(animation, newCursors, availableFrames);
 
         updateState(settings, animation, newCursors, newFrames);
     }
 
     private HashMap<Integer, Cursor> createCursors(
-            ResourceLocation sprite,
             NativeImage image,
             CursorConfig.Settings settings,
             int availableFrames
     ) throws IOException {
         HashMap<Integer, Cursor> newCursors = new HashMap<>();
         for (int i = 1; i < availableFrames; i++) {
-            newCursors.put(i, createCursor(sprite, image, settings, i));
+            newCursors.put(i, createCursor(image, settings, i));
         }
         return newCursors;
     }
@@ -77,14 +74,13 @@ public class AnimatedCursor extends Cursor {
     }
 
     private Cursor createCursor(
-            ResourceLocation sprite,
             NativeImage image,
             CursorConfig.Settings settings,
             int index
     ) throws IOException {
         Cursor cursor = new Cursor(this.getType(), this.onLoad);
         try (NativeImage cropped = NativeImageUtil.cropImage(image, 0, index * SIZE, SIZE, SIZE)) {
-            cursor.loadImage(sprite, cropped, settings);
+            cursor.loadImage(cropped, settings);
         }
         return cursor;
     }
@@ -148,9 +144,12 @@ public class AnimatedCursor extends Cursor {
     }
 
     @Override
-    public void enable(boolean enabled) {
-        super.enable(enabled);
-        applyToFrames(cursor -> cursor.enable(enabled));
+    public boolean enable(boolean enabled) {
+        if (super.enable(enabled)) {
+            applyToFrames(cursor -> cursor.enableWithoutLoading(enabled));
+            return true;
+        }
+        return false;
     }
 
     @Override

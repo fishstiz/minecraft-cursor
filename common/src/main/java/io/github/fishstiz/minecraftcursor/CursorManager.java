@@ -9,15 +9,12 @@ import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
 import io.github.fishstiz.minecraftcursor.cursor.AnimationState;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
 import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
-import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import java.io.IOException;
 import java.util.*;
-
-import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
 
 public final class CursorManager implements CursorTypeRegistrar {
     public static final CursorManager INSTANCE = new CursorManager();
@@ -60,26 +57,27 @@ public final class CursorManager implements CursorTypeRegistrar {
 
     public void loadCursor(
             Cursor cursor,
-            ResourceLocation sprite,
             NativeImage image,
+            CursorConfig.Settings settings,
             @Nullable AnimatedCursorConfig animation
     ) throws IOException {
-        boolean animated = animation != null;
+        if (!cursors.containsKey(cursor.getTypeKey())) {
+            throw new IllegalStateException("Attempting to load an unregistered cursor: " + cursor.getTypeKey());
+        }
 
+        boolean animated = animation != null;
         if (animated != (cursor instanceof AnimatedCursor)) {
             cursor.destroy();
             cursor = animated
                     ? new AnimatedCursor(cursor.getType(), this::onLoad)
                     : new Cursor(cursor.getType(), this::onLoad);
-
-            cursors.put(cursor.getType().getKey(), cursor);
+            cursors.put(cursor.getTypeKey(), cursor);
         }
 
-        CursorConfig.Settings settings = getCursorSettings(cursor);
         if (cursor instanceof AnimatedCursor animatedCursor) {
-            animatedCursor.loadImage(sprite, image, settings, animation);
+            animatedCursor.loadImage(image, settings, animation);
         } else {
-            cursor.loadImage(sprite, image, settings);
+            cursor.loadImage(image, settings);
         }
     }
 
@@ -88,25 +86,6 @@ public final class CursorManager implements CursorTypeRegistrar {
         if (appliedCursor.isLoaded() && appliedCursor.getId() == cursor.getId()) {
             reapplyCursor();
         }
-    }
-
-    private CursorConfig.Settings getCursorSettings(Cursor cursor) {
-        CursorConfig.Settings settings = new CursorConfig.Settings();
-        CursorConfig.Settings base = CONFIG.getOrCreateCursorSettings(cursor.getType());
-        CursorConfig.GlobalSettings global = CONFIG.getGlobal();
-
-        settings.update(
-                global.isScaleActive() ? global.getScale() : base.getScale(),
-                global.isXHotActive() ? global.getXHot() : base.getXHot(),
-                global.isYHotActive() ? global.getYHot() : base.getYHot(),
-                base.isEnabled()
-        );
-
-        if (base.isAnimated() != null) {
-            settings.setAnimated(base.isAnimated());
-        }
-
-        return settings;
     }
 
     void setCurrentCursor(@NotNull CursorType type) {
@@ -203,16 +182,6 @@ public final class CursorManager implements CursorTypeRegistrar {
 
     public Collection<Cursor> getCursors() {
         return cursors.values();
-    }
-
-    public List<Cursor> getLoadedCursors() {
-        List<Cursor> loadedCursors = new ArrayList<>();
-        for (Cursor cursor : cursors.values()) {
-            if (cursor.isLoaded()) {
-                loadedCursors.add(cursor);
-            }
-        }
-        return loadedCursors;
     }
 
     public boolean isAdaptive() {

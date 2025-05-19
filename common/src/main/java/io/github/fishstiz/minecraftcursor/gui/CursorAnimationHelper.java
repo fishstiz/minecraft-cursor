@@ -28,12 +28,12 @@ public class CursorAnimationHelper {
 
         context.blit(
                 RenderType::guiTextured,
-                cursor.getSprite(),
+                cursor.getLocation(),
                 x, y,
-                0, vOffset, // starting point
-                size, size, // width/height to stretch/shrink
-                CURSOR_SIZE, CURSOR_SIZE, // cropped width/height from actual image
-                cursor.getTrueWidth(), cursor.getTrueHeight() // actual width/height
+                0, vOffset,
+                size, size,
+                CURSOR_SIZE, CURSOR_SIZE,
+                cursor.getTextureWidth(), cursor.getTextureHeight()
         );
     }
 
