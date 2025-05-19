@@ -12,7 +12,7 @@ import java.util.concurrent.Executor;
 class CursorResourceReloadListener implements IdentifiableResourceReloadListener {
     @Override
     public ResourceLocation getFabricId() {
-        return CursorLoader.getLocation();
+        return CursorLoader.getDirectory();
     }
 
     @Override
@@ -26,6 +26,6 @@ class CursorResourceReloadListener implements IdentifiableResourceReloadListener
     ) {
         return CompletableFuture.runAsync(() -> CursorLoader.reload(manager))
                 .thenCompose(barrier::wait)
-                .thenRunAsync(CursorLoader::applyDefaultCursor, gameExecutor);
+                .thenRunAsync(CursorLoader::onReload, gameExecutor);
     }
 }

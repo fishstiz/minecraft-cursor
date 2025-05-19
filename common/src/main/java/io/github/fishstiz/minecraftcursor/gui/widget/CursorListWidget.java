@@ -31,10 +31,13 @@ public class CursorListWidget extends ContainerObjectSelectionList<CursorListWid
         setRenderBackground(false);
         setRenderHeader(false, 0);
         setRenderTopAndBottom(false);
-        populateEntries();
+
+        refreshEntries();
     }
 
-    public void populateEntries() {
+    public void refreshEntries() {
+        this.clearEntries();
+
         for (Cursor cursor : optionsScreen.getCursors()) {
             CursorEntry entry = new CursorEntry(
                     cursor,
@@ -124,15 +127,15 @@ public class CursorListWidget extends ContainerObjectSelectionList<CursorListWid
     }
 
     public class CursorButtonWidget extends AbstractButton implements CursorProvider {
-        private static final String PREFIX_TEXT_KEY = "minecraft-cursor.options.cursor-type.";
         private static final int TEXTURE_SIZE = 16;
         private static final int PADDING_LEFT = 8;
         private static final int BACKGROUND_COLOR = 0x7F000000; // black 50%
         private static final int TEXT_COLOR = 0xFFFFFFFF; // white
         private static final int TEXT_DISABLED_COLOR = 0xFF555555; // dark gray
+        private static final int TEXT_UNLOADED_COLOR = 0xFFAA5555; // red
         private static final int BORDER_COLOR = 0xFF000000;
         private static final int SELECTED_BORDER_COLOR = 0xFFFFFFFF; // white
-        private static final int HOVERED_BORDER_COLOR = 0xFF555555; // dark gray
+        private static final int HOVERED_BORDER_COLOR = 0xFFCCCCCC; // dark gray
 
         private final Cursor cursor;
 
@@ -159,7 +162,7 @@ public class CursorListWidget extends ContainerObjectSelectionList<CursorListWid
 
             if (cursor == optionsScreen.getSelectedCursor()) {
                 borderColor = SELECTED_BORDER_COLOR;
-            } else if (isMouseOver(mouseX, mouseY)) {
+            } else if (isFocused() || isMouseOver(mouseX, mouseY)) {
                 borderColor = HOVERED_BORDER_COLOR;
             }
 
@@ -179,18 +182,26 @@ public class CursorListWidget extends ContainerObjectSelectionList<CursorListWid
         }
 
         private void renderMessage(GuiGraphics context) {
-            Component message = Component.translatable(PREFIX_TEXT_KEY + this.cursor.getType().getKey());
-            int color = cursor.isEnabled() ? TEXT_COLOR : TEXT_DISABLED_COLOR;
+            int color;
+
+            if (cursor.isEnabled()) {
+                color = TEXT_COLOR;
+            } else if (cursor.isLoaded()) {
+                color = TEXT_DISABLED_COLOR;
+            } else {
+                color = TEXT_UNLOADED_COLOR;
+            }
+
             int x = getX() + TEXTURE_SIZE + PADDING_LEFT * 2;
             int endX = (getX() + getWidth()) - SCROLLBAR_OFFSET;
             int endY = getY() + getHeight();
 
-            DrawUtil.drawScrollableTextLeftAlign(context, minecraft.font, message, x, getY(), endX, endY, color);
+            DrawUtil.drawScrollableTextLeftAlign(context, minecraft.font, cursor.getText(), x, getY(), endX, endY, color);
         }
 
         @Override
         protected void updateWidgetNarration(@NotNull NarrationElementOutput builder) {
-            // unsupported
+            this.defaultButtonNarrationText(builder);
         }
 
         @Override

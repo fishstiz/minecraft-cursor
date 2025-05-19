@@ -25,6 +25,7 @@ import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.*;
 
@@ -153,7 +154,7 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
     }
 
     private void reloadConfiguration() {
-        CursorLoader.resetConfig();
+        CursorLoader.resetSettings();
         this.clearEntries();
         this.init();
     }
@@ -174,7 +175,7 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
             ToDoubleFunction<CursorConfig.Settings> settingsValueGetter,
             ObjDoubleConsumer<Cursor> cursorAction
     ) {
-        Runnable updateCursors = () -> CursorManager.INSTANCE.getLoadedCursors().forEach(cursor -> {
+        Runnable updateCursors = () -> CursorManager.INSTANCE.getCursors().forEach(cursor -> {
             double value = activeGetter.getAsBoolean()
                     ? valueGetter.getAsDouble()
                     : settingsValueGetter.applyAsDouble(CONFIG.getOrCreateCursorSettings(cursor.getType()));
@@ -227,18 +228,19 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
         boolean applyX = GLOBAL.isXHotActive();
         boolean applyY = GLOBAL.isYHotActive();
 
+        Collection<Cursor> cursors = CursorManager.INSTANCE.getCursors();
         if (applyX && applyY) {
-            CursorManager.INSTANCE.getLoadedCursors().forEach(cursor -> cursor.setHotspots(GLOBAL.getXHot(), GLOBAL.getYHot()));
+            cursors.forEach(cursor -> cursor.setHotspots(GLOBAL.getXHot(), GLOBAL.getYHot()));
         } else if (applyX) {
-            CursorManager.INSTANCE.getLoadedCursors().forEach(cursor -> cursor.setXHot(GLOBAL.getXHot()));
+            cursors.forEach(cursor -> cursor.setXHot(GLOBAL.getXHot()));
         } else if (applyY) {
-            CursorManager.INSTANCE.getLoadedCursors().forEach(cursor -> cursor.setYHot(GLOBAL.getYHot()));
+            cursors.forEach(cursor -> cursor.setYHot(GLOBAL.getYHot()));
         }
     }
 
     private void applyScaleToAll() {
         if (GLOBAL.isScaleActive()) {
-            CursorManager.INSTANCE.getLoadedCursors().forEach(cursor -> cursor.setScale(GLOBAL.getScale()));
+            CursorManager.INSTANCE.getCursors().forEach(cursor -> cursor.setScale(GLOBAL.getScale()));
         }
     }
 

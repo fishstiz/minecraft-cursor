@@ -19,6 +19,7 @@ import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
@@ -33,7 +34,7 @@ public class CursorOptionsScreen extends Screen {
     private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
     private final Button moreButton = Button.builder(Component.translatable("minecraft-cursor.options.more").append("..."), btn -> toMoreOptions()).build();
     private final Button doneButton = Button.builder(CommonComponents.GUI_DONE, btn -> this.onClose()).build();
-    private final List<Cursor> cursors;
+    private final Collection<Cursor> cursors;
     final Screen previousScreen;
     private Cursor selectedCursor;
     CursorOptionsBody body;
@@ -43,12 +44,12 @@ public class CursorOptionsScreen extends Screen {
 
         this.previousScreen = previousScreen;
 
-        cursors = CursorManager.INSTANCE.getLoadedCursors();
+        cursors = CursorManager.INSTANCE.getCursors();
     }
 
     @Override
     protected void init() {
-        selectedCursor = cursors.get(0);
+        selectedCursor = this.cursors.iterator().next();
 
         this.layout.addToHeader(new StringWidget(this.title, this.font));
         this.body = this.layout.addToContents(new CursorOptionsBody());
@@ -109,7 +110,7 @@ public class CursorOptionsScreen extends Screen {
         return selectedCursor;
     }
 
-    public List<Cursor> getCursors() {
+    public Collection<Cursor> getCursors() {
         return cursors;
     }
 

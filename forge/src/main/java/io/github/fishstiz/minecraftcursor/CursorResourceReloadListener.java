@@ -21,6 +21,6 @@ class CursorResourceReloadListener implements PreparableReloadListener {
     ) {
         return CompletableFuture.runAsync(() -> CursorLoader.reload(manager))
                 .thenCompose(barrier::wait)
-                .thenRunAsync(CursorLoader::applyDefaultCursor, gameExecutor);
+                .thenRunAsync(CursorLoader::onReload, gameExecutor);
     }
 }
