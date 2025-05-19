@@ -39,6 +39,7 @@ public class MinecraftCursorInitializerImpl implements MinecraftCursorInitialize
         elementRegistrar.register(TabButton.class, MinecraftCursorInitializerImpl::tabButtonWidgetCursor);
         elementRegistrar.register(AbstractSliderButton.class, MinecraftCursorInitializerImpl::sliderWidgetCursor);
         elementRegistrar.register(EditBox.class, MinecraftCursorInitializerImpl::textFieldWidgetCursor);
+        elementRegistrar.register(MultiLineEditBox.class, MinecraftCursorInitializerImpl::textFieldWidgetCursor);
         elementRegistrar.register(new WorldListWidgetCursorHandler());
         elementRegistrar.register(new MultiplayerServerListWidgetCursorHandler());
         elementRegistrar.register(RecipeBookScreenCursorHandler.INVENTORY);
@@ -74,6 +75,10 @@ public class MinecraftCursorInitializerImpl implements MinecraftCursorInitialize
     }
 
     private static <T extends EditBox> CursorType textFieldWidgetCursor(T textField, double mouseX, double mouseY) {
-        return textField.visible && textField.isHovered() ? CursorType.TEXT : CursorType.DEFAULT;
+        return textField.visible && textField.active && textField.isHovered() ? CursorType.TEXT : CursorType.DEFAULT;
+    }
+
+    private static <T extends MultiLineEditBox> CursorType textFieldWidgetCursor(T textField, double mouseX, double mouseY) {
+        return textField.visible && textField.active && textField.isHovered() ? CursorType.TEXT : CursorType.DEFAULT;
     }
 }
