@@ -11,6 +11,7 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.StateSwitchingButton;
 import net.minecraft.client.gui.screens.inventory.AbstractRecipeBookScreen;
 import net.minecraft.client.gui.screens.recipebook.OverlayRecipeComponent;
+import net.minecraft.client.gui.screens.recipebook.RecipeBookTabButton;
 import net.minecraft.world.inventory.RecipeBookMenu;
 
 public class RecipeBookScreenCursorHandler implements CursorHandler<AbstractRecipeBookScreen<?>> {
@@ -38,8 +39,10 @@ public class RecipeBookScreenCursorHandler implements CursorHandler<AbstractReci
     }
 
     private CursorType getAlternatesWidgetCursor(RecipeAlternativesWidgetAccessor alternatesWidget) {
-        if (alternatesWidget.getAlternativeButtons().stream().anyMatch(AbstractWidget::isHovered)) {
-            return CursorTypeUtil.canShift() ? CursorType.SHIFT : CursorType.POINTER;
+        for (AbstractWidget alternativeButton : alternatesWidget.getAlternativeButtons()) {
+            if (alternativeButton.isActive() && alternativeButton.isHovered()) {
+                return CursorTypeUtil.canShift() ? CursorType.SHIFT : CursorType.POINTER;
+            }
         }
         return CursorType.DEFAULT_FORCE;
     }
@@ -51,7 +54,11 @@ public class RecipeBookScreenCursorHandler implements CursorHandler<AbstractReci
     }
 
     private CursorType getTabCursor(RecipeBookWidgetAccessor recipeBook) {
-        boolean isUnselectedTabHovered = recipeBook.getTabButtons().stream().anyMatch(btn -> btn.isHovered() && btn != recipeBook.getCurrentTab());
-        return isUnselectedTabHovered ? CursorType.POINTER : CursorType.DEFAULT;
+        for (RecipeBookTabButton tabButton : recipeBook.getTabButtons()) {
+            if (tabButton.isHovered() && tabButton.isActive() && tabButton != recipeBook.getCurrentTab()) {
+                return CursorType.POINTER;
+            }
+        }
+        return CursorType.DEFAULT;
     }
 }
