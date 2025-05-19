@@ -40,7 +40,7 @@ public class CursorAnimationHelper {
     private int getCurrentSpriteIndex(AnimatedCursor cursor) {
         AnimationState state = cursorStates.computeIfAbsent(cursor.getType().getKey(), t -> new AnimationState());
 
-        if (!cursor.isAnimated()) {
+        if (!cursor.isAnimated() || !cursor.isEnabled()) {
             state.reset();
             return 0;
         }
