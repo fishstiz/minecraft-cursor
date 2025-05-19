@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashSet;
 import java.util.Optional;
 
-public class ElementInspectorImpl implements ElementInspector {
+public final class ElementInspectorImpl implements ElementInspector {
     private static final Component SCREEN_LABEL = Component.literal("S: ").withColor(0xFF339BFF); // blue
     private static final Component CACHE_LABEL = Component.literal("Cache: ").withColor(0xFFFFFFFF); // white
     private static final Component DEEPEST_LABEL = Component.literal("D: ").withColor(0xFF00FF00); // green
