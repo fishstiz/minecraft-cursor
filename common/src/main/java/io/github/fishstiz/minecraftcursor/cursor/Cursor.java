@@ -1,13 +1,16 @@
 package io.github.fishstiz.minecraftcursor.cursor;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import io.github.fishstiz.minecraftcursor.CursorLoader;
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.compat.ExternalCursorTracker;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.util.NativeImageUtil;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.system.MemoryUtil;
@@ -19,28 +22,31 @@ import java.util.function.Consumer;
 import static io.github.fishstiz.minecraftcursor.util.SettingsUtil.*;
 
 public class Cursor {
+    private static final String IMG_TYPE = ".png";
     protected static final int SIZE = 32;
     protected final Consumer<Cursor> onLoad;
     private final CursorType type;
-    private ResourceLocation sprite;
+    private final ResourceLocation location;
+    private Component text;
     private String base64Image;
     private double scale;
     private int xhot;
     private int yhot;
     private boolean enabled;
     private boolean loaded;
-    private int trueWidth;
-    private int trueHeight;
+    private int textureWidth;
+    private int textureHeight;
     private long id = 0;
 
     public Cursor(CursorType type, Consumer<Cursor> onLoad) {
         this.type = type;
         this.onLoad = onLoad;
+        this.location = CursorLoader.getDirectory().withSuffix(type.getKey() + IMG_TYPE);
     }
 
-    public void loadImage(ResourceLocation sprite, NativeImage image, CursorConfig.Settings settings) throws IOException {
-        this.trueWidth = image.getWidth();
-        this.trueHeight = image.getHeight();
+    public void loadImage(NativeImage image, CursorConfig.Settings settings) throws IOException {
+        this.textureWidth = image.getWidth();
+        this.textureHeight = image.getHeight();
 
         NativeImage croppedImage = image;
         try {
@@ -48,7 +54,6 @@ public class Cursor {
                 croppedImage = NativeImageUtil.cropImage(croppedImage, 0, 0, SIZE, SIZE);
             }
 
-            this.sprite = sprite;
             this.base64Image = NativeImageUtil.toBase64String(croppedImage);
             this.enabled = settings.isEnabled();
 
@@ -59,7 +64,7 @@ public class Cursor {
     }
 
     protected void updateImage(double scale, int xhot, int yhot) {
-        if (id == 0 || base64Image == null) {
+        if (!this.isLoaded()) {
             return;
         }
 
@@ -92,21 +97,21 @@ public class Cursor {
             ExternalCursorTracker.get().claimAddress(glfwImageAddress);
             this.id = GLFW.glfwCreateCursor(glfwImage, scaledXHot, scaledYHot);
 
-            if (this.id == 0) {
+            if (this.id == MemoryUtil.NULL) {
                 MinecraftCursor.LOGGER.error("[minecraft-cursor] Error creating cursor '{}'. ", this.type.getKey());
                 return;
-            }
-
-            if (this.onLoad != null) {
-                this.onLoad.accept(this);
             }
 
             loaded = true;
             this.scale = scale;
             this.xhot = xhot;
             this.yhot = yhot;
+
+            if (this.onLoad != null) {
+                this.onLoad.accept(this);
+            }
         } finally {
-            if (glfwImageAddress != 0) {
+            if (glfwImageAddress != MemoryUtil.NULL) {
                 ExternalCursorTracker.get().unclaimAddress(glfwImageAddress);
             }
             if (pixels != null) {
@@ -125,7 +130,9 @@ public class Cursor {
     }
 
     public void reload() {
-        this.updateImage(this.getScale(), this.getXHot(), this.getYHot());
+        if (this.isLoaded()) {
+            this.updateImage(this.getScale(), this.getXHot(), this.getYHot());
+        }
     }
 
     public void applySettings(CursorConfig.Settings settings) {
@@ -133,21 +140,43 @@ public class Cursor {
         this.updateImage(settings.getScale(), settings.getXHot(), settings.getYHot());
     }
 
-    public void enable(boolean enabled) {
+    protected void enableWithoutLoading(boolean enabled) {
         this.enabled = enabled;
         if (this.onLoad != null) this.onLoad.accept(this);
     }
 
-    public ResourceLocation getSprite() {
-        return sprite;
+    public boolean enable(boolean enabled) {
+        if (!this.isLoaded() && !this.enabled && enabled && !CursorLoader.loadCursorTexture(this)) {
+            return false;
+        }
+        this.enabled = enabled;
+        if (this.onLoad != null) {
+            this.onLoad.accept(this);
+        }
+        return true;
+    }
+
+    public ResourceLocation getLocation() {
+        return this.location;
     }
 
     public long getId() {
         return enabled ? id : 0;
     }
 
-    public CursorType getType() {
+    public @NotNull CursorType getType() {
         return type;
+    }
+
+    public @NotNull String getTypeKey() {
+        return type.getKey();
+    }
+
+    public @NotNull Component getText() {
+        if (this.text == null) {
+            this.text = Component.translatable("minecraft-cursor.options.cursor-type." + type.getKey());
+        }
+        return this.text;
     }
 
     public double getScale() {
@@ -187,18 +216,18 @@ public class Cursor {
     }
 
     public boolean isEnabled() {
-        return enabled;
+        return isLoaded() && enabled;
     }
 
     public boolean isLoaded() {
         return loaded;
     }
 
-    public int getTrueWidth() {
-        return trueWidth;
+    public int getTextureWidth() {
+        return textureWidth > 0 ? textureWidth : SIZE;
     }
 
-    public int getTrueHeight() {
-        return trueHeight;
+    public int getTextureHeight() {
+        return textureHeight > 0 ? textureHeight : SIZE;
     }
 }

@@ -245,6 +245,16 @@ public class CursorConfig implements Serializable {
             setYhotActive(active);
         }
 
+        @Override
+        public void update(double scale, int xhot, int yhot, boolean enabled) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean isEnabled() {
+            throw new UnsupportedOperationException();
+        }
+
         public boolean isScaleActive() {
             return scaleActive;
         }
