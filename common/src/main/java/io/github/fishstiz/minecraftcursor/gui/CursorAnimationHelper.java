@@ -26,12 +26,12 @@ public class CursorAnimationHelper {
         int vOffset = CURSOR_SIZE * frameIndex;
 
         context.blit(
-                cursor.getSprite(),
+                cursor.getLocation(),
                 x, y,
-                size, size, // width/height to stretch/shrink
-                0, vOffset, // starting point
-                CURSOR_SIZE, CURSOR_SIZE, // cropped width/height from actual image
-                cursor.getTrueWidth(), cursor.getTrueHeight() // actual width/height
+                size, size,
+                0, vOffset,
+                CURSOR_SIZE, CURSOR_SIZE,
+                cursor.getTextureWidth(), cursor.getTextureHeight()
         );
     }
 

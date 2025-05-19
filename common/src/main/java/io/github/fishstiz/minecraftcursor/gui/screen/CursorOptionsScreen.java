@@ -14,7 +14,7 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
+import java.util.Collection;
 
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
 
@@ -27,7 +27,7 @@ public class CursorOptionsScreen extends Screen {
     final Screen previousScreen;
     public final CursorAnimationHelper animationHelper = new CursorAnimationHelper();
     private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
-    private final List<Cursor> cursors;
+    private final Collection<Cursor> cursors;
     private Cursor selectedCursor;
     private CursorListWidget list;
     @Nullable CursorOptionsWidget options;
@@ -37,12 +37,12 @@ public class CursorOptionsScreen extends Screen {
 
         this.previousScreen = previousScreen;
 
-        cursors = CursorManager.INSTANCE.getLoadedCursors();
+        cursors = CursorManager.INSTANCE.getCursors();
     }
 
     @Override
     protected void init() {
-        selectedCursor = this.cursors.getFirst();
+        selectedCursor = this.cursors.iterator().next();
 
         this.layout.addTitleHeader(this.title, this.font);
         this.layout.addToContents(initContents(LinearLayout.horizontal().spacing(COLUMN_GAP)));
@@ -105,7 +105,7 @@ public class CursorOptionsScreen extends Screen {
         return selectedCursor;
     }
 
-    public List<Cursor> getCursors() {
+    public Collection<Cursor> getCursors() {
         return cursors;
     }
 
