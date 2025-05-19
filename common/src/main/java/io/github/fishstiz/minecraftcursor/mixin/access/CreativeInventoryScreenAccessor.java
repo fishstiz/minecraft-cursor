@@ -17,6 +17,9 @@ public interface CreativeInventoryScreenAccessor extends HandledScreenAccessor<C
     @Accessor("destroyItemSlot")
     Slot getDeleteItemSlot();
 
+    @Accessor("scrolling")
+    boolean isScrolling();
+
     @Invoker("getTabX")
     int invokeGetTabX(CreativeModeTab group);
 
