@@ -3,7 +3,7 @@ package io.github.fishstiz.minecraftcursor.gui.screen;
 import io.github.fishstiz.minecraftcursor.CursorManager;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
 import io.github.fishstiz.minecraftcursor.gui.CursorAnimationHelper;
-import io.github.fishstiz.minecraftcursor.gui.widget.ContainerWidget;
+import io.github.fishstiz.minecraftcursor.gui.widget.AbstractContainerWidget;
 import io.github.fishstiz.minecraftcursor.gui.widget.CursorListWidget;
 import io.github.fishstiz.minecraftcursor.gui.widget.CursorOptionsHandler;
 import io.github.fishstiz.minecraftcursor.gui.widget.CursorOptionsWidget;
@@ -133,7 +133,7 @@ public class CursorOptionsScreen extends Screen {
         return height - layout.getHeaderHeight() - layout.getFooterHeight();
     }
 
-    public class CursorOptionsBody extends ContainerWidget {
+    public class CursorOptionsBody extends AbstractContainerWidget {
         public final CursorListWidget cursorsColumn;
         public final CursorOptionsWidget selectedCursorColumn;
         private final List<GuiEventListener> children = new ArrayList<>();

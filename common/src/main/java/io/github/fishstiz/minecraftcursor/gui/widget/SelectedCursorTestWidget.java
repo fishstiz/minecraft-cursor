@@ -4,16 +4,17 @@ import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.api.CursorProvider;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 
-public class SelectedCursorTestWidget extends SelectedCursorClickableWidget implements CursorProvider {
+public class SelectedCursorTestWidget extends AbstractWidget implements LayoutElementPatch, CursorProvider {
     private static final ResourceLocation BACKGROUND = new ResourceLocation(MinecraftCursor.MOD_ID, "textures/gui/test_background.png");
     private static final int HOTSPOT_RULER_COLOR = 0xFF00FF00; // green
-    private static final Button BUTTON = Button.builder(Component.empty(),
-            b -> b.setFocused(false)).size(20, 20).build();
+    private final Button testButton = Button.builder(Component.empty(), b -> b.setFocused(false)).size(20, 20).build();
     private final CursorOptionsWidget options;
 
     public SelectedCursorTestWidget(int size, CursorOptionsWidget optionsWidget) {
@@ -24,17 +25,17 @@ public class SelectedCursorTestWidget extends SelectedCursorClickableWidget impl
     }
 
     private void placeButton() {
-        int x = getX() + (getWidth() / 2 - BUTTON.getWidth() / 2);
-        int y = getY() + (getHeight() / 2 - BUTTON.getHeight() / 2);
-        BUTTON.setPosition(x, y);
+        int x = getX() + (getWidth() / 2 - testButton.getWidth() / 2);
+        int y = getY() + (getHeight() / 2 - testButton.getHeight() / 2);
+        testButton.setPosition(x, y);
     }
 
     @Override
     protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
         context.blit(BACKGROUND, getX(), getY(), 0, 0, width, height, width, height);
 
-        if (options.parent().getSelectedCursor().isEnabled()) {
-            BUTTON.render(context, mouseX, mouseY, delta);
+        if (this.isEnabled()) {
+            testButton.render(context, mouseX, mouseY, delta);
             renderRuler(context, mouseX, mouseY);
         } else {
             context.fill(getX(), getY(), getRight(), getBottom(), 0x7F000000); // 50% black overlay
@@ -51,6 +52,10 @@ public class SelectedCursorTestWidget extends SelectedCursorClickableWidget impl
         }
     }
 
+    public boolean isEnabled() {
+        return options.parent().getSelectedCursor().isEnabled();
+    }
+
     @Override
     public CursorType getCursorType(double mouseX, double mouseY) {
         return options.parent().getSelectedCursor().getType();
@@ -59,13 +64,21 @@ public class SelectedCursorTestWidget extends SelectedCursorClickableWidget impl
     @Override
     public boolean isMouseOver(double mouseX, double mouseY) {
         return mouseX >= this.getX()
-                && mouseY >= this.getY()
-                && mouseX < this.getRight()
-                && mouseY < this.getBottom();
+               && mouseY >= this.getY()
+               && mouseX < this.getRight()
+               && mouseY < this.getBottom();
     }
 
     @Override
-    protected void updateWidgetNarration(NarrationElementOutput builder) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (this.isEnabled() && this.isValidClickButton(button)) {
+            testButton.mouseClicked(mouseX, mouseY, button);
+        }
+        return false;
+    }
+
+    @Override
+    protected void updateWidgetNarration(@NotNull NarrationElementOutput builder) {
         // not supported
     }
 }

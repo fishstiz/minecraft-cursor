@@ -19,7 +19,7 @@ import java.util.function.DoubleConsumer;
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
 import static io.github.fishstiz.minecraftcursor.util.SettingsUtil.*;
 
-public class CursorOptionsWidget extends ContainerWidget {
+public class CursorOptionsWidget extends AbstractContainerWidget implements ContainerEventHandlerPatch {
     private static final int OPTIONS_HEIGHT = 24;
     private static final int GRID_PADDING = 4;
     private static final int BOX_WIDGET_TEXTURE_SIZE = 96;

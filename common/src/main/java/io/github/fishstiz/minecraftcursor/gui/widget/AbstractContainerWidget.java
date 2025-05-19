@@ -2,19 +2,18 @@ package io.github.fishstiz.minecraftcursor.gui.widget;
 
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.components.AbstractScrollWidget;
-import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class ContainerWidget extends AbstractScrollWidget implements ContainerEventHandler {
+public abstract class AbstractContainerWidget extends AbstractScrollWidget implements ContainerEventHandlerPatch {
     @Nullable
     private GuiEventListener focusedElement;
     private boolean dragging;
 
-    public ContainerWidget(int i, int j, int k, int l, Component text) {
-        super(i, j, k, l, text);
+    protected AbstractContainerWidget(int x, int y, int width, int height, Component message) {
+        super(x, y, width, height, message);
     }
 
     @Override
@@ -49,35 +48,34 @@ public abstract class ContainerWidget extends AbstractScrollWidget implements Co
     @Nullable
     @Override
     public ComponentPath nextFocusPath(FocusNavigationEvent navigation) {
-        return ContainerEventHandler.super.nextFocusPath(navigation);
+        return ContainerEventHandlerPatch.super.nextFocusPath(navigation);
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-//        boolean bl = this.checkScrollbarDragged(mouseX, mouseY, button);
-//        return ParentElement.super.mouseClicked(mouseX, mouseY, button) || bl;
-        return ContainerEventHandler.super.mouseClicked(mouseX, mouseY, button);
+        super.mouseClicked(mouseX, mouseY, button);
+        return ContainerEventHandlerPatch.super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         super.mouseReleased(mouseX, mouseY, button);
-        return ContainerEventHandler.super.mouseReleased(mouseX, mouseY, button);
+        return ContainerEventHandlerPatch.super.mouseReleased(mouseX, mouseY, button);
     }
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
-        return ContainerEventHandler.super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+        return ContainerEventHandlerPatch.super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
 
     @Override
     public boolean isFocused() {
-        return ContainerEventHandler.super.isFocused();
+        return ContainerEventHandlerPatch.super.isFocused();
     }
 
     @Override
     public void setFocused(boolean focused) {
-        ContainerEventHandler.super.setFocused(focused);
+        ContainerEventHandlerPatch.super.setFocused(focused);
     }
 }

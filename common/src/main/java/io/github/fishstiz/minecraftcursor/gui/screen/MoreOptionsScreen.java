@@ -1,6 +1,7 @@
 package io.github.fishstiz.minecraftcursor.gui.screen;
 
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
+import io.github.fishstiz.minecraftcursor.gui.widget.ContainerEventHandlerPatch;
 import io.github.fishstiz.minecraftcursor.gui.widget.MoreOptionsListWidget;
 import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorButtonWidget;
 import io.github.fishstiz.minecraftcursor.gui.widget.SelectedCursorHotspotWidget;
@@ -17,7 +18,7 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class MoreOptionsScreen extends Screen {
+public class MoreOptionsScreen extends Screen implements ContainerEventHandlerPatch {
     private static final int FOOTER_SPACING = 8;
     private static final int HOTSPOT_WIDGET_SIZE = 96;
     private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
@@ -80,7 +81,7 @@ public class MoreOptionsScreen extends Screen {
             this.layout.arrangeElements();
             this.list.position(width, getContentHeight(), layout.getHeaderHeight());
 
-            if (this.inspectButton != null & this.doneButton != null) {
+            if (this.inspectButton != null && this.doneButton != null) {
                 int footerWidth = this.inspectButton.getWidth() + this.doneButton.getWidth() + FOOTER_SPACING;
                 int footerX = this.width / 2 - footerWidth / 2;
 

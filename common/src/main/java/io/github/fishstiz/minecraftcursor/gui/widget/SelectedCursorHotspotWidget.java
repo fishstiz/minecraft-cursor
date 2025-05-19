@@ -4,19 +4,20 @@ import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.api.CursorProvider;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
-import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
 import io.github.fishstiz.minecraftcursor.util.MouseEvent;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.BiConsumer;
 
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
 
-public class SelectedCursorHotspotWidget extends SelectedCursorClickableWidget implements CursorProvider {
+public class SelectedCursorHotspotWidget extends AbstractWidget implements LayoutElementPatch, CursorProvider {
     private static final CursorConfig.GlobalSettings global = CONFIG.getGlobal();
     private static final ResourceLocation BACKGROUND = new ResourceLocation(MinecraftCursor.MOD_ID, "textures/gui/hotspot_background.png");
     private static final int CURSOR_SIZE = 32;
@@ -25,6 +26,7 @@ public class SelectedCursorHotspotWidget extends SelectedCursorClickableWidget i
     private final CursorOptionsWidget options;
     private boolean rulerRendered = true;
     private float rulerAlpha = 1f;
+    private boolean dragging = false;
     private MouseEventListener changeEventListener;
 
     public SelectedCursorHotspotWidget(int size, CursorOptionsWidget options) {
@@ -85,6 +87,7 @@ public class SelectedCursorHotspotWidget extends SelectedCursorClickableWidget i
 
     @Override
     public void onClick(double mouseX, double mouseY) {
+        this.dragging = true;
         setHotspots(MouseEvent.CLICK, mouseX, mouseY);
     }
 
@@ -119,7 +122,7 @@ public class SelectedCursorHotspotWidget extends SelectedCursorClickableWidget i
         if (!active) {
             return CursorType.DEFAULT;
         }
-        if (isFocused() && (CursorTypeUtil.isLeftClickHeld() || CursorTypeUtil.isGrabbing())) {
+        if (this.dragging) {
             return CursorType.GRABBING;
         }
         return CursorType.POINTER;
@@ -134,25 +137,15 @@ public class SelectedCursorHotspotWidget extends SelectedCursorClickableWidget i
     }
 
     @Override
-    public boolean isMouseOver(double mouseX, double mouseY) {
-        return this.visible
-                && mouseX >= this.getX()
-                && mouseY >= this.getY()
-                && mouseX < this.getRight()
-                && mouseY < this.getBottom();
-    }
-
-    @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        if (isFocused()) {
+    public void onRelease(double mouseX, double mouseY) {
+        if (this.dragging) {
             setHotspots(MouseEvent.RELEASE, mouseX, mouseY);
+            this.dragging = false;
         }
-
-        return super.mouseReleased(mouseX, mouseY, button);
     }
 
     @Override
-    protected void updateWidgetNarration(NarrationElementOutput builder) {
+    protected void updateWidgetNarration(@NotNull NarrationElementOutput builder) {
         // not supported
     }
 
