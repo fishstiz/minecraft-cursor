@@ -10,6 +10,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractFurnaceScreen;
 import net.minecraft.client.gui.screens.inventory.CraftingScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.recipebook.OverlayRecipeComponent;
+import net.minecraft.client.gui.screens.recipebook.RecipeBookTabButton;
 import net.minecraft.world.inventory.RecipeBookMenu;
 
 public class RecipeBookScreenCursorHandler<T extends AbstractContainerScreen<? extends RecipeBookMenu<?, ?>>> implements CursorHandler<T> {
@@ -52,9 +53,12 @@ public class RecipeBookScreenCursorHandler<T extends AbstractContainerScreen<? e
     }
 
     private CursorType getAlternatesWidgetCursor(RecipeAlternativesWidgetAccessor alternatesWidget) {
-        return alternatesWidget.getAlternativeButtons().stream().anyMatch(AbstractWidget::isHovered)
-                ? (CursorTypeUtil.canShift() ? CursorType.SHIFT : CursorType.POINTER)
-                : CursorType.DEFAULT_FORCE;
+        for (AbstractWidget alternativeButton : alternatesWidget.getAlternativeButtons()) {
+            if (alternativeButton.isActive() && alternativeButton.isHovered()) {
+                return CursorTypeUtil.canShift() ? CursorType.SHIFT : CursorType.POINTER;
+            }
+        }
+        return CursorType.DEFAULT_FORCE;
     }
 
     private boolean isButtonHovered(RecipeBookWidgetAccessor recipeBook, RecipeBookResultsAccessor recipesArea) {
@@ -64,8 +68,11 @@ public class RecipeBookScreenCursorHandler<T extends AbstractContainerScreen<? e
     }
 
     private CursorType getTabCursor(RecipeBookWidgetAccessor recipeBook) {
-        return recipeBook.getTabButtons().stream().anyMatch(btn -> btn.isHovered() && btn != recipeBook.getCurrentTab())
-                ? CursorType.POINTER
-                : CursorType.DEFAULT;
+        for (RecipeBookTabButton tabButton : recipeBook.getTabButtons()) {
+            if (tabButton.isHovered() && tabButton.isActive() && tabButton != recipeBook.getCurrentTab()) {
+                return CursorType.POINTER;
+            }
+        }
+        return CursorType.DEFAULT;
     }
 }

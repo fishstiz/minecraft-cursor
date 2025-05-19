@@ -110,7 +110,7 @@ public final class CursorManager implements CursorTypeRegistrar {
     }
 
     void setCurrentCursor(@NotNull CursorType type) {
-        Cursor override = getOverride().orElse(null);
+        Cursor override = getOverride();
         Cursor cursor = override != null ? override : this.cursors.get(type.getKey());
 
         if (cursor instanceof AnimatedCursor animatedCursor && cursor.getId() != 0) {
@@ -162,7 +162,7 @@ public final class CursorManager implements CursorTypeRegistrar {
         overrides.remove(index);
     }
 
-    public Optional<Cursor> getOverride() {
+    public @Nullable Cursor getOverride() {
         while (!overrides.isEmpty()) {
             Map.Entry<Integer, String> lastEntry = overrides.lastEntry();
             Cursor cursor = this.cursors.get(lastEntry.getValue());
@@ -170,15 +170,15 @@ public final class CursorManager implements CursorTypeRegistrar {
             if (cursor == null || cursor.getId() == 0) {
                 overrides.remove(lastEntry.getKey());
             } else {
-                return Optional.of(cursor);
+                return cursor;
             }
         }
 
-        return Optional.empty();
+        return null;
     }
 
     public @NotNull Cursor getAppliedCursor() {
-        Cursor override = getOverride().orElse(null);
+        Cursor override = getOverride();
         Cursor cursor = override != null ? override : currentCursor;
 
         if (cursor instanceof AnimatedCursor animatedCursor) {
