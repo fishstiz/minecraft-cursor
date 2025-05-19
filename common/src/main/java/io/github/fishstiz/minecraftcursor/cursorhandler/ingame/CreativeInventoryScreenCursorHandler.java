@@ -20,9 +20,14 @@ public class CreativeInventoryScreenCursorHandler implements CursorHandler<Creat
     @Override
     public CursorType getCursorType(CreativeModeInventoryScreen creativeInventoryScreen, double mouseX, double mouseY) {
         CreativeInventoryScreenAccessor accessor = (CreativeInventoryScreenAccessor) creativeInventoryScreen;
-        CursorType cursorType = getCursorTypeTabs(accessor, mouseX, mouseY);
-        cursorType = cursorType != CursorType.DEFAULT ? cursorType : getCursorTypeDelete(accessor);
-        return cursorType;
+        CursorType tabCursor = getCursorTypeTabs(accessor, mouseX, mouseY);
+        if (!tabCursor.isDefault()) {
+            return tabCursor;
+        }
+        if (accessor.isScrolling()) {
+            return CursorType.DEFAULT_FORCE;
+        }
+        return getCursorTypeDelete(accessor);
     }
 
     private CursorType getCursorTypeTabs(CreativeInventoryScreenAccessor creativeInventoryScreen, double mouseX, double mouseY) {
@@ -38,7 +43,7 @@ public class CreativeInventoryScreenCursorHandler implements CursorHandler<Creat
                     TAB_HEIGHT,
                     mouseX,
                     mouseY)
-                    && itemGroup != CreativeInventoryScreenAccessor.getSelectedTab()) {
+                && itemGroup != CreativeInventoryScreenAccessor.getSelectedTab()) {
                 isHovered = true;
                 break;
             }
@@ -50,8 +55,8 @@ public class CreativeInventoryScreenCursorHandler implements CursorHandler<Creat
     private CursorType getCursorTypeDelete(CreativeInventoryScreenAccessor creativeInventoryScreen) {
         Slot focusedSlot = creativeInventoryScreen.getFocusedSlot();
         if (CursorTypeUtil.canShift()
-                && focusedSlot != null
-                && focusedSlot == creativeInventoryScreen.getDeleteItemSlot()) {
+            && focusedSlot != null
+            && focusedSlot == creativeInventoryScreen.getDeleteItemSlot()) {
             return CursorType.SHIFT;
         }
         return CursorType.DEFAULT;
