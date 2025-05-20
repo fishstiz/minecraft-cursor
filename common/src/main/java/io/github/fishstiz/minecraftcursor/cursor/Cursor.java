@@ -7,7 +7,6 @@ import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.compat.ExternalCursorTracker;
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
 import io.github.fishstiz.minecraftcursor.util.NativeImageUtil;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +22,6 @@ import static io.github.fishstiz.minecraftcursor.util.SettingsUtil.*;
 
 public class Cursor {
     private static final String IMG_TYPE = ".png";
-    protected static final int SIZE = 32;
     protected final Consumer<Cursor> onLoad;
     private final CursorType type;
     private final ResourceLocation location;
@@ -44,14 +42,22 @@ public class Cursor {
         this.location = CursorLoader.getDirectory().withSuffix(type.getKey() + IMG_TYPE);
     }
 
-    public void loadImage(NativeImage image, CursorConfig.Settings settings) throws IOException {
+    public void loadImage(@NotNull NativeImage image, CursorConfig.Settings settings) throws IOException {
         this.textureWidth = image.getWidth();
         this.textureHeight = image.getHeight();
 
+        if (!SUPPORTED_SIZES.contains(textureWidth) || textureHeight % textureWidth != 0) {
+            throw new IOException("Invalid cursor size. Width must be one of " + SUPPORTED_SIZES + ", and height must be a multiple of width.");
+        }
+
+        boolean cropped = false;
         NativeImage croppedImage = image;
+
         try {
-            if (image.getWidth() > SIZE || image.getHeight() > SIZE) {
-                croppedImage = NativeImageUtil.cropImage(croppedImage, 0, 0, SIZE, SIZE);
+            int size = this.textureWidth;
+            if (image.getHeight() > size) {
+                croppedImage = NativeImageUtil.cropImage(image, 0, 0, size, size);
+                cropped = true;
             }
 
             this.base64Image = NativeImageUtil.toBase64String(croppedImage);
@@ -59,7 +65,9 @@ public class Cursor {
 
             create(croppedImage, settings.getScale(), settings.getXHot(), settings.getYHot());
         } finally {
-            croppedImage.close();
+            if (cropped) {
+                croppedImage.close();
+            }
         }
     }
 
@@ -69,22 +77,25 @@ public class Cursor {
         }
 
         try (NativeImage image = NativeImageUtil.fromBase64String(base64Image)) {
-            create(image, sanitizeScale(scale), sanitizeHotspot(xhot), sanitizeHotspot(yhot));
+            create(image, scale, xhot, yhot);
         } catch (IOException e) {
             MinecraftCursor.LOGGER.error("Error updating image of {}: {}", type, e);
         }
     }
 
     private void create(NativeImage image, double scale, int xhot, int yhot) {
-        double correctedScale = isAutoScale(scale) ? Minecraft.getInstance().getWindow().getGuiScale() : scale;
+        scale = sanitizeScale(scale);
+        xhot = sanitizeHotspot(xhot, this);
+        yhot = sanitizeHotspot(yhot, this);
 
         long glfwImageAddress = 0;
         long previousId = this.id;
         ByteBuffer pixels = null;
 
-        try (NativeImage scaledImage = scale == 1 ? image : NativeImageUtil.scaleImage(image, correctedScale)) {
-            int scaledXHot = scale == 1 ? xhot : (int) Math.round(xhot * correctedScale);
-            int scaledYHot = scale == 1 ? yhot : (int) Math.round(yhot * correctedScale);
+        double autoScaled = getAutoScale(scale);
+        try (NativeImage scaledImage = scale == 1 ? image : NativeImageUtil.scaleImage(image, autoScaled)) {
+            int scaledXHot = scale == 1 ? xhot : (int) Math.round(xhot * autoScaled);
+            int scaledYHot = scale == 1 ? yhot : (int) Math.round(yhot * autoScaled);
             int scaledWidth = scaledImage.getWidth();
             int scaledHeight = scaledImage.getHeight();
 
@@ -216,7 +227,7 @@ public class Cursor {
     }
 
     public boolean isEnabled() {
-        return isLoaded() && enabled;
+        return enabled;
     }
 
     public boolean isLoaded() {
@@ -224,10 +235,10 @@ public class Cursor {
     }
 
     public int getTextureWidth() {
-        return textureWidth > 0 ? textureWidth : SIZE;
+        return textureWidth;
     }
 
     public int getTextureHeight() {
-        return textureHeight > 0 ? textureHeight : SIZE;
+        return textureHeight;
     }
 }

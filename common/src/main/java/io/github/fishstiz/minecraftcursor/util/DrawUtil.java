@@ -4,7 +4,10 @@ import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+
+import static io.github.fishstiz.minecraftcursor.MinecraftCursor.MOD_ID;
 
 public class DrawUtil {
     private DrawUtil() {
@@ -37,5 +40,37 @@ public class DrawUtil {
         } else {
             context.drawString(textRenderer, text, startX, textY, color);
         }
+    }
+
+    public static void drawCheckerboard(
+            GuiGraphics guiGraphics,
+            int x,
+            int y,
+            int width,
+            int height,
+            float cellSize,
+            ResourceLocation checkerboard,
+            int textureSize
+    ) {
+        float drawWidth = textureSize * cellSize;
+        float drawHeight = textureSize * cellSize;
+
+        float clippedWidth = Math.min(drawWidth, width);
+        float clippedHeight = Math.min(drawHeight, height);
+
+        float uRatio = clippedWidth / drawWidth;
+        float vRatio = clippedHeight / drawHeight;
+
+        int uvWidth = Math.round(textureSize * uRatio);
+        int uvHeight = Math.round(textureSize * vRatio);
+
+        guiGraphics.blit(
+                checkerboard,
+                x, y,
+                (int) clippedWidth, (int) clippedHeight,
+                0, 0,
+                uvWidth, uvHeight,
+                textureSize, textureSize
+        );
     }
 }

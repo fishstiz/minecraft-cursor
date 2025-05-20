@@ -55,7 +55,7 @@ public final class CursorManager implements CursorTypeRegistrar {
         return cursorType;
     }
 
-    public void loadCursor(
+    public Cursor loadCursor(
             Cursor cursor,
             NativeImage image,
             CursorConfig.Settings settings,
@@ -79,6 +79,8 @@ public final class CursorManager implements CursorTypeRegistrar {
         } else {
             cursor.loadImage(image, settings);
         }
+
+        return cursor;
     }
 
     private void onLoad(Cursor cursor) {
@@ -169,6 +171,10 @@ public final class CursorManager implements CursorTypeRegistrar {
 
     public @Nullable Cursor getCursor(CursorType type) {
         return cursors.get(type.getKey());
+    }
+
+    public @Nullable Cursor getCursor(String type) {
+        return cursors.get(type);
     }
 
     public long getId(CursorType type) {

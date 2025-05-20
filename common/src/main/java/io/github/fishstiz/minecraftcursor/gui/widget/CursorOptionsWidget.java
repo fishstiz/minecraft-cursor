@@ -1,6 +1,8 @@
 package io.github.fishstiz.minecraftcursor.gui.widget;
 
 import io.github.fishstiz.minecraftcursor.config.CursorConfig;
+import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
+import io.github.fishstiz.minecraftcursor.cursor.Cursor;
 import io.github.fishstiz.minecraftcursor.gui.screen.CursorOptionsScreen;
 import io.github.fishstiz.minecraftcursor.util.SettingsUtil;
 import net.minecraft.client.gui.GuiGraphics;
@@ -91,7 +93,7 @@ public class CursorOptionsWidget extends AbstractContainerWidget implements Cont
     private SelectedCursorSliderWidget createHotspotSlider(Component prefix, int value, DoubleConsumer onApply) {
         var slider = new SelectedCursorSliderWidget(
                 prefix, value,
-                HOT_MIN, HOT_MAX, 1, HOT_UNIT,
+                HOT_MIN, GLOBAL_HOT_MAX, 1, HOT_UNIT,
                 handler.handleChangeHotspots(onApply)
         );
         bindHelperButton(slider);
@@ -106,16 +108,19 @@ public class CursorOptionsWidget extends AbstractContainerWidget implements Cont
     }
 
     private void refreshWidgets() {
+        Cursor cursor = handler.getCursor();
         CursorConfig.GlobalSettings global = CONFIG.getGlobal();
         CursorConfig.Settings settings = handler.getSettings();
 
         enableButton.setValue(settings.isEnabled());
-        scaleSlider.update(settings.getScale(), !global.isScaleActive());
-        xhotSlider.update(settings.getXHot(), !global.isXHotActive());
-        yhotSlider.update(settings.getYHot(), !global.isYHotActive());
+        scaleSlider.update(SCALE_MIN, SCALE_MAX, settings.getScale(), !global.isScaleActive());
 
-        boolean animationEnabled = handler.isAnimated();
-        animateButton.active = handler.getCursorAsAnimatedCursor().isPresent();
+        int maxHotspot = cursor.getTextureWidth() - 1;
+        xhotSlider.update(0, maxHotspot, settings.getXHot(), !global.isXHotActive());
+        yhotSlider.update(0, maxHotspot, settings.getYHot(), !global.isYHotActive());
+
+        animateButton.active = cursor instanceof AnimatedCursor;
+        boolean animationEnabled = animateButton.active && ((AnimatedCursor) cursor).isAnimated();
         resetAnimation.active = animationEnabled;
         animateButton.setValue(animationEnabled);
 

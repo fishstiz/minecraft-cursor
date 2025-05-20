@@ -79,16 +79,17 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
             GLOBAL::getScale, GLOBAL::setScale,
             CursorConfig.Settings::getScale, Cursor::setScale
     );
+    private final int maxHotspot = SettingsUtil.getMaxHotspot(CursorManager.INSTANCE.getCursors()) - 1;
     private final SliderEntry xhotEntry = createSliderEntry(
             XHOT_TEXT, "px",
-            HOT_MIN, HOT_MAX, 1,
+            HOT_MIN, maxHotspot, 1,
             GLOBAL::isXHotActive, GLOBAL::setXhotActive,
             GLOBAL::getXHot, GLOBAL::setXHotDouble,
             CursorConfig.Settings::getXHot, Cursor::setXHot
     );
     private final SliderEntry yhotEntry = createSliderEntry(
             YHOT_TEXT, "px",
-            HOT_MIN, HOT_MAX, 1,
+            HOT_MIN, maxHotspot, 1,
             GLOBAL::isYHotActive, GLOBAL::setYhotActive,
             GLOBAL::getYHot, GLOBAL::setYHotDouble,
             CursorConfig.Settings::getYHot, Cursor::setYHot
@@ -154,7 +155,7 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
     }
 
     private void reloadConfiguration() {
-        CursorLoader.resetSettings();
+        CursorLoader.applyResourceSettings();
         this.clearEntries();
         this.init();
     }
@@ -178,7 +179,7 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
         Runnable updateCursors = () -> CursorManager.INSTANCE.getCursors().forEach(cursor -> {
             double value = activeGetter.getAsBoolean()
                     ? valueGetter.getAsDouble()
-                    : settingsValueGetter.applyAsDouble(CONFIG.getOrCreateCursorSettings(cursor.getType()));
+                    : settingsValueGetter.applyAsDouble(CONFIG.getOrCreateCursorSettings(cursor));
             cursorAction.accept(cursor, value);
         });
         DoubleConsumer handleChange = value -> {
@@ -255,7 +256,7 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
 
         for (Cursor cursor : CursorManager.INSTANCE.getCursors()) {
             if (cursor instanceof AnimatedCursor animatedCursor) {
-                CursorConfig.Settings settings = CONFIG.getOrCreateCursorSettings(animatedCursor.getType());
+                CursorConfig.Settings settings = CONFIG.getOrCreateCursorSettings(animatedCursor);
                 animatedCursor.setAnimated(isAnimated);
                 settings.setAnimated(isAnimated);
             }
@@ -274,6 +275,7 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
             if (key.equals(CursorType.DEFAULT.getKey())) return;
 
             settings.update(
+                    CursorManager.INSTANCE.getCursor(key),
                     settings.getScale(),
                     settings.getXHot(),
                     settings.getYHot(),

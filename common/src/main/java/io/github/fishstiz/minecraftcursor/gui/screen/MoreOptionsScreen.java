@@ -108,7 +108,7 @@ public class MoreOptionsScreen extends Screen implements ContainerEventHandlerPa
             hotspotWidget.active = true;
 
             context.enableScissor(x, layout.getHeaderHeight(), list.getRowLeft(), layout.getHeaderHeight() + getContentHeight());
-            hotspotWidget.renderWidget(context, mouseX, mouseY, delta);
+            hotspotWidget.render(context, mouseX, mouseY, delta);
             context.disableScissor();
         } else {
             hotspotWidget.visible = false;

@@ -106,7 +106,7 @@ public class CursorOptionsHandler {
     }
 
     CursorConfig.Settings getSettings() {
-        return CONFIG.getOrCreateCursorSettings(getCursor().getType());
+        return CONFIG.getOrCreateCursorSettings(getCursor());
     }
 
     public void updateSettings() {
@@ -114,6 +114,7 @@ public class CursorOptionsHandler {
         Cursor cursor = getCursor();
 
         getSettings().update(
+                cursor,
                 GLOBAL.isScaleActive() ? settings.getScale() : cursor.getScale(),
                 GLOBAL.isXHotActive() ? settings.getXHot() : cursor.getXHot(),
                 GLOBAL.isYHotActive() ? settings.getYHot() : cursor.getYHot(),

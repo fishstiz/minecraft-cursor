@@ -32,7 +32,7 @@ public class AnimatedCursor extends Cursor {
     ) throws IOException {
         super.loadImage(image, settings);
 
-        int availableFrames = image.getHeight() / SIZE;
+        int availableFrames = image.getHeight() / this.getTextureWidth();
 
         HashMap<Integer, Cursor> newCursors = createCursors(image, settings, availableFrames);
         List<Frame> newFrames = createFrames(animation, newCursors, availableFrames);
@@ -80,7 +80,8 @@ public class AnimatedCursor extends Cursor {
             int index
     ) throws IOException {
         Cursor cursor = new Cursor(this.getType(), this.onLoad);
-        try (NativeImage cropped = NativeImageUtil.cropImage(image, 0, index * SIZE, SIZE, SIZE)) {
+        int size = this.getTextureWidth();
+        try (NativeImage cropped = NativeImageUtil.cropImage(image, 0, index * size, size, size)) {
             cursor.loadImage(cropped, settings);
         }
         return cursor;
