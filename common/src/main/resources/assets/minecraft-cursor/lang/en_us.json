@@ -30,6 +30,9 @@
 
   "minecraft-cursor.options.more.animation": "Cursor Animations",
   "minecraft-cursor.options.more.animation.tooltip": "Simply updates the animated setting on all animated cursors.",
+  "minecraft-cursor.options.more.deferred_loading": "Defer loading when disabled",
+  "minecraft-cursor.options.more.deferred_loading.tooltip": "Defers loading of disabled cursors on the next launch until they’re enabled.",
+  "minecraft-cursor.options.deferred_loading.fail": "Failed to load cursor '%1$s'",
 
   "minecraft-cursor.options.more.adapt": "Adaptive Cursor",
   "minecraft-cursor.options.more.adapt.tooltip": "Simply updates the enabled setting on all cursors except for the Default cursor.",

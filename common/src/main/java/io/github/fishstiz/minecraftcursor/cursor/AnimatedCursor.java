@@ -145,6 +145,12 @@ public class AnimatedCursor extends Cursor {
     }
 
     @Override
+    protected void enableWithoutLoading(boolean enabled) {
+        super.enableWithoutLoading(enabled);
+        applyToFrames(cursor -> cursor.enableWithoutLoading(enabled));
+    }
+
+    @Override
     public boolean enable(boolean enabled) {
         if (super.enable(enabled)) {
             applyToFrames(cursor -> cursor.enableWithoutLoading(enabled));
