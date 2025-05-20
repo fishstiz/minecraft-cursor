@@ -63,29 +63,21 @@ public class CursorOptionsWidget extends AbstractContainerWidget {
     private void initWidgets() {
         Config.Settings settings = handler.getSettings();
 
-        enableButton = new SelectedCursorToggleWidget(ENABLED_TEXT, settings.isEnabled(), handler::handleEnable);
-        scaleSlider = new SelectedCursorSliderWidget(
+        enableButton = this.addChild(new SelectedCursorToggleWidget(ENABLED_TEXT, settings.isEnabled(), handler::handleEnable));
+        scaleSlider = this.addChild(new SelectedCursorSliderWidget(
                 SCALE_TEXT, settings.getScale(),
                 SCALE_MIN, SCALE_MAX, SCALE_STEP,
-                handler::handleChangeScale, CursorOptionsHandler::removeScaleOverride);
+                handler::handleChangeScale, CursorOptionsHandler::removeScaleOverride
+        ));
         scaleSlider.setTextMapper(SettingsUtil::getAutoText);
         bindHelperButton(scaleSlider);
-        xhotSlider = createHotspotSlider(XHOT_TEXT, settings.getXHot(), handler::handleChangeXHot);
-        yhotSlider = createHotspotSlider(YHOT_TEXT, settings.getYHot(), handler::handleChangeYHot);
-        animateButton = new SelectedCursorToggleWidget(ANIMATE_TEXT, handler.isAnimated(), handler::handlePressAnimate);
-        resetAnimation = new SelectedCursorButtonWidget(RESET_ANIMATION_TEXT, handler::handleResetAnimation);
-        cursorHotspot = new SelectedCursorHotspotWidget(BOX_WIDGET_TEXTURE_SIZE, this);
+        xhotSlider = this.addChild(createHotspotSlider(XHOT_TEXT, settings.getXHot(), handler::handleChangeXHot));
+        yhotSlider = this.addChild(createHotspotSlider(YHOT_TEXT, settings.getYHot(), handler::handleChangeYHot));
+        animateButton = this.addChild(new SelectedCursorToggleWidget(ANIMATE_TEXT, handler.isAnimated(), handler::handlePressAnimate));
+        resetAnimation = this.addChild(new SelectedCursorButtonWidget(RESET_ANIMATION_TEXT, handler::handleResetAnimation));
+        cursorHotspot = this.addChild(new SelectedCursorHotspotWidget(BOX_WIDGET_TEXTURE_SIZE, this));
         cursorHotspot.setChangeEventListener(handler::handleChangeHotspotWidget);
-        cursorTest = new SelectedCursorTestWidget(BOX_WIDGET_TEXTURE_SIZE, this);
-
-        this.children.add(enableButton);
-        this.children.add(scaleSlider);
-        this.children.add(xhotSlider);
-        this.children.add(yhotSlider);
-        this.children.add(animateButton);
-        this.children.add(resetAnimation);
-        this.children.add(cursorHotspot);
-        this.children.add(cursorTest);
+        cursorTest = this.addChild(new SelectedCursorTestWidget(BOX_WIDGET_TEXTURE_SIZE, this));
 
         refreshWidgets();
     }
@@ -102,31 +94,33 @@ public class CursorOptionsWidget extends AbstractContainerWidget {
     }
 
     private void bindHelperButton(SelectedCursorSliderWidget sliderWidget) {
-        var helperButton = new SelectedCursorButtonWidget(HELPER_ICON, HELPER_ICON_SIZE, HELPER_ICON_SIZE, parent::toMoreOptions);
+        var helperButton = this.addChild(new SelectedCursorButtonWidget(HELPER_ICON, HELPER_ICON_SIZE, HELPER_ICON_SIZE, parent::toMoreOptions));
         helperButton.setTooltip(Tooltip.create(Component.translatable(GLOBAL_TEXT_KEY, sliderWidget.getPrefix())));
         sliderWidget.setInactiveHelperButton(helperButton, HELPER_BUTTON_SIZE, HELPER_BUTTON_SIZE);
-        this.children.add(sliderWidget.getInactiveHelperButton());
     }
 
     private void refreshWidgets() {
         Cursor cursor = handler.getCursor();
         Config.GlobalSettings global = CONFIG.getGlobal();
-        Config.Settings settings = handler.getSettings();
+        Config.Settings settings = CONFIG.getOrCreateCursorSettings(cursor);
 
         enableButton.setValue(settings.isEnabled());
-        scaleSlider.update(SCALE_MIN, SCALE_MAX, settings.getScale(), !global.isScaleActive());
 
-        int maxHotspot = cursor.getTextureWidth() - 1;
-        xhotSlider.update(0, maxHotspot, settings.getXHot(), !global.isXHotActive());
-        yhotSlider.update(0, maxHotspot, settings.getYHot(), !global.isYHotActive());
+        if (cursor.isLoaded()) {
+            scaleSlider.update(SCALE_MIN, SCALE_MAX, settings.getScale(), !global.isScaleActive());
 
-        animateButton.active = cursor instanceof AnimatedCursor;
-        boolean animationEnabled = animateButton.active && ((AnimatedCursor) cursor).isAnimated();
-        resetAnimation.active = animationEnabled;
-        animateButton.setValue(animationEnabled);
+            int maxHotspot = cursor.getTextureWidth() - 1;
+            xhotSlider.update(0, maxHotspot, settings.getXHot(), !global.isXHotActive());
+            yhotSlider.update(0, maxHotspot, settings.getYHot(), !global.isYHotActive());
 
-        cursorHotspot.setRulerRendered(true, true);
-        cursorHotspot.active = !(global.isXHotActive() && global.isYHotActive());
+            animateButton.active = cursor instanceof AnimatedCursor;
+            boolean animationEnabled = animateButton.active && ((AnimatedCursor) cursor).isAnimated();
+            resetAnimation.active = animationEnabled;
+            animateButton.setValue(animationEnabled);
+
+            cursorHotspot.setRulerRendered(true, true);
+            cursorHotspot.active = !(global.isXHotActive() && global.isYHotActive());
+        }
 
         children().forEach(widget -> widget.setFocused(false));
     }
@@ -135,18 +129,23 @@ public class CursorOptionsWidget extends AbstractContainerWidget {
     public void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float delta) {
         placeWidgets();
 
+        Cursor cursor = handler.getCursor();
+
         enableButton.render(context, mouseX, mouseY, delta);
-        scaleSlider.renderWidget(context, mouseX, mouseY, delta);
-        xhotSlider.renderWidget(context, mouseX, mouseY, delta);
-        yhotSlider.renderWidget(context, mouseX, mouseY, delta);
 
-        if (handler.getCursorAsAnimatedCursor().isPresent()) {
-            animateButton.render(context, mouseX, mouseY, delta);
-            resetAnimation.render(context, mouseX, mouseY, delta);
+        if (cursor.isLoaded()) {
+            scaleSlider.renderWidget(context, mouseX, mouseY, delta);
+            xhotSlider.renderWidget(context, mouseX, mouseY, delta);
+            yhotSlider.renderWidget(context, mouseX, mouseY, delta);
+
+            if (cursor instanceof AnimatedCursor) {
+                animateButton.render(context, mouseX, mouseY, delta);
+                resetAnimation.render(context, mouseX, mouseY, delta);
+            }
+
+            cursorHotspot.renderWidget(context, mouseX, mouseY, delta);
+            cursorTest.renderWidget(context, mouseX, mouseY, delta);
         }
-
-        cursorHotspot.renderWidget(context, mouseX, mouseY, delta);
-        cursorTest.renderWidget(context, mouseX, mouseY, delta);
     }
 
     private void placeWidgets() {
@@ -193,9 +192,14 @@ public class CursorOptionsWidget extends AbstractContainerWidget {
         return parent;
     }
 
+    private <T extends GuiEventListener> T addChild(T child) {
+        this.children.add(child);
+        return child;
+    }
+
     @Override
     public @NotNull List<? extends GuiEventListener> children() {
-        return this.children;
+        return this.handler.getCursor().isLoaded() ? this.children : List.of(enableButton);
     }
 
     @Override

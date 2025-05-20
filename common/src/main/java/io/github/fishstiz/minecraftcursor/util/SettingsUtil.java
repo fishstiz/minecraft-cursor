@@ -49,7 +49,7 @@ public class SettingsUtil {
     }
 
     public static int sanitizeHotspot(int hotspot, Cursor cursor) {
-        return clamp(hotspot, HOT_MIN, Objects.requireNonNull(cursor).getTextureWidth() - 1);
+        return clamp(hotspot, HOT_MIN, cursor.isLoaded() ? Objects.requireNonNull(cursor).getTextureWidth() - 1 : GLOBAL_HOT_MAX);
     }
 
     public static int sanitizeGlobalHotspot(int hotspot) {
@@ -67,9 +67,11 @@ public class SettingsUtil {
     public static int getMaxHotspot(Collection<Cursor> cursors) {
         int max = SUPPORTED_SIZES.iterator().next();
         for (Cursor cursor : cursors) {
-            int textureWidth = cursor.getTextureWidth();
-            if (textureWidth > max) {
-                max = textureWidth;
+            if (cursor.isLoaded()) {
+                int textureWidth = cursor.getTextureWidth();
+                if (textureWidth > max) {
+                    max = textureWidth;
+                }
             }
         }
         return max;

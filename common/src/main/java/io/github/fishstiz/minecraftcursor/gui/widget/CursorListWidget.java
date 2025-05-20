@@ -154,23 +154,26 @@ public class CursorListWidget extends ContainerObjectSelectionList<CursorListWid
         }
 
         private void renderTexture(GuiGraphics context) {
-            int x = getX() + PADDING_LEFT;
-            int y = getY() + (getHeight() / 2) - (TEXTURE_SIZE / 2);
-            optionsScreen.animationHelper.drawSprite(context, cursor, x, y, TEXTURE_SIZE);
+            if (cursor.isLoaded()) {
+                int x = getX() + PADDING_LEFT;
+                int y = getY() + (getHeight() / 2) - (TEXTURE_SIZE / 2);
+                optionsScreen.animationHelper.drawSprite(context, cursor, x, y, TEXTURE_SIZE);
+            }
         }
 
         private void renderMessage(GuiGraphics context) {
             int color;
 
-            if (cursor.isEnabled()) {
+            boolean loaded = cursor.isLoaded();
+            if (loaded && cursor.isEnabled()) {
                 color = TEXT_COLOR;
-            } else if (cursor.isLoaded()) {
+            } else if (loaded) {
                 color = TEXT_DISABLED_COLOR;
             } else {
                 color = TEXT_UNLOADED_COLOR;
             }
 
-            int x = getX() + TEXTURE_SIZE + PADDING_LEFT * 2;
+            int x = getX() + (loaded ? TEXTURE_SIZE : 0) + PADDING_LEFT * 2;
             int endX = (getX() + getWidth()) - SCROLLBAR_OFFSET;
             int endY = getY() + getHeight();
 

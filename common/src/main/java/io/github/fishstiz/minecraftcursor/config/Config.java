@@ -24,6 +24,7 @@ public class Config extends AbstractConfig<Config.Settings> {
     private boolean worldIconEnabled = true;
     private boolean serverIconEnabled = true;
     private boolean remapCursorsEnabled = true;
+    private boolean deferredLoading = false;
     private final GlobalSettings global = new GlobalSettings();
     transient File file;
 
@@ -66,12 +67,6 @@ public class Config extends AbstractConfig<Config.Settings> {
             }
 
             this.settings.put(entry.getKey(), validated);
-        }
-    }
-
-    public void layerResources(Resource resources) {
-        for (Map.Entry<String, Config.Settings> entry : resources.getSettings().entrySet()) {
-            this.settings.put(entry.getKey(), entry.getValue().copy());
         }
     }
 
@@ -161,6 +156,14 @@ public class Config extends AbstractConfig<Config.Settings> {
 
     public void setRemapCursorsEnabled(boolean remapCursorsEnabled) {
         this.remapCursorsEnabled = remapCursorsEnabled;
+    }
+
+    public boolean isDeferredLoading() {
+        return deferredLoading;
+    }
+
+    public void setDeferredLoading(boolean deferredLoading) {
+        this.deferredLoading = deferredLoading;
     }
 
     private static String generateHash(Map<String, Settings> settings) {

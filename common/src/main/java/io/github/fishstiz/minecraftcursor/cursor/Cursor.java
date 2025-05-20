@@ -148,7 +148,7 @@ public class Cursor {
     }
 
     public void applySettings(Config.Settings settings) {
-        this.enable(settings.isEnabled());
+        this.enableWithoutLoading(settings.isEnabled());
         this.updateImage(settings.getScale(), settings.getXHot(), settings.getYHot());
     }
 
@@ -161,8 +161,11 @@ public class Cursor {
         if (!this.isLoaded() && !this.enabled && enabled && !CursorLoader.loadCursorTexture(this)) {
             return false;
         }
+
+        boolean previous = this.enabled;
         this.enabled = enabled;
-        if (this.onLoad != null) {
+
+        if (previous != this.enabled && this.onLoad != null) {
             this.onLoad.accept(this);
         }
         return true;
@@ -235,11 +238,19 @@ public class Cursor {
         return loaded;
     }
 
-    public int getTextureWidth() {
+    public int getTextureWidth() throws IllegalStateException {
+        assertLoaded();
         return textureWidth;
     }
 
-    public int getTextureHeight() {
+    public int getTextureHeight() throws IllegalStateException {
+        assertLoaded();
         return textureHeight;
+    }
+
+    private void assertLoaded() {
+        if (!this.isLoaded()) {
+            throw new IllegalStateException("Cursor has not been loaded");
+        }
     }
 }

@@ -1,6 +1,7 @@
 package io.github.fishstiz.minecraftcursor.gui.screen;
 
 import io.github.fishstiz.minecraftcursor.CursorManager;
+import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
 import io.github.fishstiz.minecraftcursor.gui.CursorAnimationHelper;
 import io.github.fishstiz.minecraftcursor.gui.widget.CursorListWidget;
@@ -12,6 +13,7 @@ import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -27,10 +29,11 @@ public class CursorOptionsScreen extends Screen {
     final Screen previousScreen;
     public final CursorAnimationHelper animationHelper = new CursorAnimationHelper();
     private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
-    private final Collection<Cursor> cursors;
+    private @NotNull Collection<Cursor> cursors;
     private Cursor selectedCursor;
     private CursorListWidget list;
     @Nullable CursorOptionsWidget options;
+    private boolean initialized;
 
     public CursorOptionsScreen(Screen previousScreen) {
         super(TITLE_TEXT);
@@ -38,6 +41,13 @@ public class CursorOptionsScreen extends Screen {
         this.previousScreen = previousScreen;
 
         cursors = CursorManager.INSTANCE.getCursors();
+    }
+
+    @Override
+    public void added() {
+        if (this.initialized) {
+            this.refresh();
+        }
     }
 
     @Override
@@ -49,6 +59,8 @@ public class CursorOptionsScreen extends Screen {
         this.layout.addToFooter(initFooter(LinearLayout.horizontal().spacing(COLUMN_GAP)));
         this.layout.visitWidgets(this::addRenderableWidget);
         this.repositionElements();
+
+        this.initialized = true;
     }
 
     protected LinearLayout initContents(LinearLayout contents) {
@@ -105,13 +117,23 @@ public class CursorOptionsScreen extends Screen {
         return selectedCursor;
     }
 
-    public Collection<Cursor> getCursors() {
+    public @NotNull Collection<Cursor> getCursors() {
         return cursors;
     }
 
     public void toMoreOptions() {
         if (minecraft != null) {
             minecraft.setScreen(new MoreOptionsScreen(this));
+        }
+    }
+
+    public void refresh() {
+        CursorType previous = this.getSelectedCursor().getType();
+        cursors = CursorManager.INSTANCE.getCursors();
+        this.selectCursor(CursorManager.INSTANCE.getCursor(previous));
+        this.list.refreshEntries();
+        if (this.options != null) {
+            options.refresh();
         }
     }
 
