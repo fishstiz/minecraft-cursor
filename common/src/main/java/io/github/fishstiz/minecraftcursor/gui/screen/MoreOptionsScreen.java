@@ -33,7 +33,9 @@ public class MoreOptionsScreen extends Screen {
     protected void init() {
         this.list = new MoreOptionsListWidget(this.minecraft, width, layout.getContentHeight(), layout.getHeaderHeight());
 
-        if (previousScreen instanceof CursorOptionsScreen previous && previous.options != null) {
+        if (previousScreen instanceof CursorOptionsScreen previous
+            && previous.options != null
+            && previous.getSelectedCursor().isLoaded()) {
             this.hotspotWidget = new SelectedCursorHotspotWidget(
                     HOTSPOT_WIDGET_SIZE,
                     previous.options
@@ -105,9 +107,6 @@ public class MoreOptionsScreen extends Screen {
         list.applyConfig();
 
         if (this.minecraft != null) {
-            if (previousScreen instanceof CursorOptionsScreen screen && screen.options != null) {
-                screen.options.refresh();
-            }
             this.minecraft.setScreen(previousScreen);
         }
     }

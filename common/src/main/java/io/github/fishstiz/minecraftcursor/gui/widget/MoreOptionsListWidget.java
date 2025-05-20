@@ -40,6 +40,8 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
 
     private static final Tooltip ANIMATION_TOOLTIP = Tooltip.create(Component.translatable("minecraft-cursor.options.more.animation.tooltip"));
     private static final Component ANIMATION_TEXT = Component.translatable("minecraft-cursor.options.more.animation");
+    private static final Component DEFERRED_TEXT = Component.translatable("minecraft-cursor.options.more.deferred_loading");
+    private static final Tooltip DEFERRED_TOOLTIP = Tooltip.create(Component.translatable("minecraft-cursor.options.more.deferred_loading.tooltip"));
 
     private static final Tooltip ADAPTIVE_CURSOR_TOOLTIP = Tooltip.create(Component.translatable("minecraft-cursor.options.more.adapt.tooltip"));
     private static final Component ADAPTIVE_CURSOR_TEXT = Component.translatable("minecraft-cursor.options.more.adapt");
@@ -116,6 +118,13 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
         scaleEntry.sliderWidget.setTextMapper(SettingsUtil::getAutoText);
         xhotEntry.button.setValue(GLOBAL.isXHotActive());
         yhotEntry.button.setValue(GLOBAL.isYHotActive());
+        addEntry(new ToggleEntry(
+                DEFERRED_TEXT,
+                CONFIG.isDeferredLoading(),
+                true,
+                DEFERRED_TOOLTIP,
+                CONFIG::setDeferredLoading
+        ));
         addEntry(animationEntry);
         addEntry(scaleEntry);
         addEntry(xhotEntry);
@@ -265,8 +274,6 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
             option.button.setValue(isEnabled);
         });
 
-        CursorManager.INSTANCE.setIsAdaptive(isEnabled);
-
         CONFIG.getSettings().forEach((key, settings) -> {
             if (key.equals(CursorType.DEFAULT.getKey())) return;
 
@@ -278,6 +285,11 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
                     isEnabled
             );
         });
+
+        CursorManager.INSTANCE.setIsAdaptive(isEnabled);
+
+        this.clearEntries();
+        this.init();
     }
 
     public int getYEntry(int index) {
