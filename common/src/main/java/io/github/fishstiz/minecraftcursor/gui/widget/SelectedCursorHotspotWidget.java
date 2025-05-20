@@ -2,7 +2,7 @@ package io.github.fishstiz.minecraftcursor.gui.widget;
 
 import io.github.fishstiz.minecraftcursor.api.CursorProvider;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
-import io.github.fishstiz.minecraftcursor.config.CursorConfig;
+import io.github.fishstiz.minecraftcursor.config.Config;
 import io.github.fishstiz.minecraftcursor.util.DrawUtil;
 import io.github.fishstiz.minecraftcursor.util.MouseEvent;
 import io.github.fishstiz.minecraftcursor.util.SettingsUtil;
@@ -25,7 +25,7 @@ public class SelectedCursorHotspotWidget extends AbstractWidget implements Curso
     private static final int BORDER_COLOR = 0xFF000000; // black
     private static final int RULER_COLOR = 0xFFFF0000; // red
     private static final int OVERRIDE_RULER_COLOR = 0xFF00FF00; // green
-    private final CursorConfig.GlobalSettings global = CONFIG.getGlobal();
+    private final Config.GlobalSettings global = CONFIG.getGlobal();
     private final CursorOptionsWidget options;
     private boolean rulerRendered = true;
     private float rulerAlpha = 1f;

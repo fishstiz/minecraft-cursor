@@ -2,9 +2,9 @@ package io.github.fishstiz.minecraftcursor;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
-import io.github.fishstiz.minecraftcursor.config.AnimatedCursorConfig;
-import io.github.fishstiz.minecraftcursor.config.CursorConfig;
-import io.github.fishstiz.minecraftcursor.config.CursorConfigLoader;
+import io.github.fishstiz.minecraftcursor.config.AnimationData;
+import io.github.fishstiz.minecraftcursor.config.Config;
+import io.github.fishstiz.minecraftcursor.config.ConfigLoader;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.toasts.SystemToast;
@@ -26,7 +26,7 @@ public class CursorLoader {
     private static final String ANIMATION_TYPE = ".mcmeta";
     private static final ResourceLocation SETTINGS_LOCATION = ResourceLocation.fromNamespaceAndPath(MOD_ID, "atlases/cursors.json");
     private static final ResourceLocation DIR = ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/cursors/");
-    private static CursorConfig.Resource resourceConfig;
+    private static Config.Resource resourceConfig;
 
     private CursorLoader() {
     }
@@ -59,11 +59,11 @@ public class CursorLoader {
         });
     }
 
-    private static Optional<CursorConfig.Resource> getLayeredSettings(List<Resource> configResources) {
-        CursorConfig.Resource layeredResources = null;
+    private static Optional<Config.Resource> getLayeredSettings(List<Resource> configResources) {
+        Config.Resource layeredResources = null;
         for (Resource configResource : configResources) {
             try (InputStream stream = configResource.open()) {
-                CursorConfig.Resource resourceConfig = CursorConfigLoader.loadResource(stream);
+                Config.Resource resourceConfig = ConfigLoader.loadResource(stream);
                 if (layeredResources == null) {
                     layeredResources = resourceConfig;
                 } else {
@@ -90,7 +90,7 @@ public class CursorLoader {
 
     private static void loadCursorTextures(ResourceManager manager) {
         for (Cursor cursor : CursorManager.INSTANCE.getCursors()) {
-            CursorConfig.Settings settings = CONFIG.getOrCreateCursorSettings(cursor);
+            Config.Settings settings = CONFIG.getOrCreateCursorSettings(cursor);
             loadCursorTexture(manager, cursor, settings);
         }
     }
@@ -109,7 +109,7 @@ public class CursorLoader {
         return true;
     }
 
-    private static boolean loadCursorTexture(ResourceManager manager, Cursor cursor, CursorConfig.Settings settings) {
+    private static boolean loadCursorTexture(ResourceManager manager, Cursor cursor, Config.Settings settings) {
         LOGGER.info("[minecraft-cursor] Loading cursor '{}'...", cursor.getTypeKey());
 
         ResourceLocation location = cursor.getLocation();
@@ -121,10 +121,8 @@ public class CursorLoader {
         }
 
         try (InputStream cursorStream = cursorResource.get().open(); NativeImage image = NativeImage.read(cursorStream)) {
-            AnimatedCursorConfig animation = loadAnimation(manager, location, cursorResource.get());
-            Cursor loaded = CursorManager.INSTANCE.loadCursor(cursor, image, CONFIG.getGlobal().apply(settings), animation);
-            settings.update(loaded, loaded.getScale(), loaded.getXHot(), loaded.getYHot(), loaded.isEnabled());
-
+            AnimationData animation = loadAnimation(manager, location, cursorResource.get());
+            CursorManager.INSTANCE.loadCursor(cursor, image, CONFIG.getGlobal().apply(settings), animation);
             return true;
         } catch (IOException e) {
             LOGGER.error("[minecraft-cursor] Failed to load cursor at '{}'", location);
@@ -132,11 +130,11 @@ public class CursorLoader {
         }
     }
 
-    private static AnimatedCursorConfig loadAnimation(ResourceManager manager, ResourceLocation location, Resource cursorResource) {
+    private static AnimationData loadAnimation(ResourceManager manager, ResourceLocation location, Resource cursorResource) {
         Optional<Resource> animationResource = manager.getResource(location.withSuffix(ANIMATION_TYPE));
         if (animationResource.isPresent() && animationResource.get().sourcePackId().equals(cursorResource.sourcePackId())) {
             try (InputStream stream = animationResource.get().open()) {
-                return CursorConfigLoader.getAnimationConfig(stream);
+                return ConfigLoader.getAnimationConfig(stream);
             } catch (IOException e) {
                 LOGGER.error("[minecraft-cursor] Failed to load animation config for '{}'", location);
             }

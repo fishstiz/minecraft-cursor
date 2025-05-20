@@ -3,8 +3,8 @@ package io.github.fishstiz.minecraftcursor;
 import com.mojang.blaze3d.platform.NativeImage;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.api.CursorTypeRegistrar;
-import io.github.fishstiz.minecraftcursor.config.AnimatedCursorConfig;
-import io.github.fishstiz.minecraftcursor.config.CursorConfig;
+import io.github.fishstiz.minecraftcursor.config.AnimationData;
+import io.github.fishstiz.minecraftcursor.config.Config;
 import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
 import io.github.fishstiz.minecraftcursor.cursor.AnimationState;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
@@ -55,11 +55,11 @@ public final class CursorManager implements CursorTypeRegistrar {
         return cursorType;
     }
 
-    public Cursor loadCursor(
+    public void loadCursor(
             Cursor cursor,
             NativeImage image,
-            CursorConfig.Settings settings,
-            @Nullable AnimatedCursorConfig animation
+            Config.Settings settings,
+            @Nullable AnimationData animation
     ) throws IOException {
         if (!cursors.containsKey(cursor.getTypeKey())) {
             throw new IllegalStateException("Attempting to load an unregistered cursor: " + cursor.getTypeKey());
@@ -79,8 +79,6 @@ public final class CursorManager implements CursorTypeRegistrar {
         } else {
             cursor.loadImage(image, settings);
         }
-
-        return cursor;
     }
 
     private void onLoad(Cursor cursor) {
