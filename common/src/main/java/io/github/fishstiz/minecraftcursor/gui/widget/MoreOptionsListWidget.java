@@ -4,7 +4,7 @@ import io.github.fishstiz.minecraftcursor.CursorLoader;
 import io.github.fishstiz.minecraftcursor.CursorManager;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.compat.ExternalCursorTracker;
-import io.github.fishstiz.minecraftcursor.config.CursorConfig;
+import io.github.fishstiz.minecraftcursor.config.Config;
 import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
 import io.github.fishstiz.minecraftcursor.util.DrawUtil;
@@ -33,7 +33,7 @@ import static io.github.fishstiz.minecraftcursor.gui.widget.CursorOptionsWidget.
 import static io.github.fishstiz.minecraftcursor.util.SettingsUtil.*;
 
 public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOptionsListWidget.OptionEntry> {
-    private static final CursorConfig.GlobalSettings GLOBAL = CONFIG.getGlobal();
+    private static final Config.GlobalSettings GLOBAL = CONFIG.getGlobal();
 
     private static final String GLOBAL_TOOLTIP_KEY = "minecraft-cursor.options.more.global.tooltip";
     private static final Component GLOBAL_SETTINGS_TEXT = Component.translatable("minecraft-cursor.options.more.global");
@@ -76,7 +76,7 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
             SCALE_MIN, SCALE_MAX, SCALE_STEP,
             GLOBAL::isScaleActive, GLOBAL::setScaleActive,
             GLOBAL::getScale, GLOBAL::setScale,
-            CursorConfig.Settings::getScale, Cursor::setScale
+            Config.Settings::getScale, Cursor::setScale
     );
     private final int maxHotspot = SettingsUtil.getMaxHotspot(CursorManager.INSTANCE.getCursors()) - 1;
     private final SliderEntry xhotEntry = createSliderEntry(
@@ -84,14 +84,14 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
             HOT_MIN, maxHotspot, 1,
             GLOBAL::isXHotActive, GLOBAL::setXhotActive,
             GLOBAL::getXHot, GLOBAL::setXHotDouble,
-            CursorConfig.Settings::getXHot, Cursor::setXHot
+            Config.Settings::getXHot, Cursor::setXHot
     );
     private final SliderEntry yhotEntry = createSliderEntry(
             YHOT_TEXT, "px",
             HOT_MIN, maxHotspot, 1,
             GLOBAL::isYHotActive, GLOBAL::setYhotActive,
             GLOBAL::getYHot, GLOBAL::setYHotDouble,
-            CursorConfig.Settings::getYHot, Cursor::setYHot
+            Config.Settings::getYHot, Cursor::setYHot
     );
 
     public MoreOptionsListWidget(Minecraft client, int width, int height, int y) {
@@ -169,7 +169,7 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
             BooleanConsumer activeSetter,
             DoubleSupplier valueGetter,
             DoubleConsumer valueSetter,
-            ToDoubleFunction<CursorConfig.Settings> settingsValueGetter,
+            ToDoubleFunction<Config.Settings> settingsValueGetter,
             ObjDoubleConsumer<Cursor> cursorAction
     ) {
         Runnable updateCursors = () -> CursorManager.INSTANCE.getCursors().forEach(cursor -> {
@@ -252,7 +252,7 @@ public class MoreOptionsListWidget extends ContainerObjectSelectionList<MoreOpti
 
         for (Cursor cursor : CursorManager.INSTANCE.getCursors()) {
             if (cursor instanceof AnimatedCursor animatedCursor) {
-                CursorConfig.Settings settings = CONFIG.getOrCreateCursorSettings(animatedCursor);
+                Config.Settings settings = CONFIG.getOrCreateCursorSettings(animatedCursor);
                 animatedCursor.setAnimated(isAnimated);
                 settings.setAnimated(isAnimated);
             }

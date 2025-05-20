@@ -1,6 +1,6 @@
 package io.github.fishstiz.minecraftcursor.gui.widget;
 
-import io.github.fishstiz.minecraftcursor.config.CursorConfig;
+import io.github.fishstiz.minecraftcursor.config.Config;
 import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
 import io.github.fishstiz.minecraftcursor.gui.screen.CursorOptionsScreen;
@@ -61,7 +61,7 @@ public class CursorOptionsWidget extends AbstractContainerWidget {
     }
 
     private void initWidgets() {
-        CursorConfig.Settings settings = handler.getSettings();
+        Config.Settings settings = handler.getSettings();
 
         enableButton = new SelectedCursorToggleWidget(ENABLED_TEXT, settings.isEnabled(), handler::handleEnable);
         scaleSlider = new SelectedCursorSliderWidget(
@@ -110,8 +110,8 @@ public class CursorOptionsWidget extends AbstractContainerWidget {
 
     private void refreshWidgets() {
         Cursor cursor = handler.getCursor();
-        CursorConfig.GlobalSettings global = CONFIG.getGlobal();
-        CursorConfig.Settings settings = handler.getSettings();
+        Config.GlobalSettings global = CONFIG.getGlobal();
+        Config.Settings settings = handler.getSettings();
 
         enableButton.setValue(settings.isEnabled());
         scaleSlider.update(SCALE_MIN, SCALE_MAX, settings.getScale(), !global.isScaleActive());

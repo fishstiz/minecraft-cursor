@@ -7,13 +7,13 @@ import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.List;
 
-public class AnimatedCursorConfig implements Serializable {
+public class AnimationData implements Serializable {
     private static final int MIN_TIME = 1;
     public final AnimationMode mode;
     private final int frametime;
     private final List<Frame> frames = List.of();
 
-    public AnimatedCursorConfig() {
+    public AnimationData() {
         this.mode = AnimationMode.LOOP;
         this.frametime = MIN_TIME;
     }
@@ -39,7 +39,7 @@ public class AnimatedCursorConfig implements Serializable {
             return this.index;
         }
 
-        public int getTime(AnimatedCursorConfig config) {
+        public int getTime(AnimationData config) {
             this.time = this.time > 0 ? this.time : Math.max(config.getFrametime(), MIN_TIME);
             return this.time;
         }
