@@ -10,13 +10,10 @@ import io.github.fishstiz.minecraftcursor.compat.ExternalCursorTracker;
 import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 
-import java.util.stream.Stream;
 
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.LOGGER;
-import static io.github.fishstiz.minecraftcursor.MinecraftCursor.MOD_ID;
 import static io.github.fishstiz.minecraftcursor.compat.ExternalCursorTracker.*;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -24,26 +21,22 @@ import static org.lwjgl.glfw.GLFW.*;
 // only works on Fabric, NeoForge doesn't allow mixin of library
 @Mixin(value = GLFW.class, remap = false)
 public abstract class GlfwMixin {
-    @Unique
-    private static String minecraft_cursor$getCaller(Stream<StackWalker.StackFrame> frames) {
-        return frames.skip(2)
-                .dropWhile(frame -> frame.getDeclaringClass() == GLFW.class)
-                .findFirst()
-                .map(frame -> frame.getDeclaringClass().getPackageName())
-                .orElse("placeholder");
-    }
-
     @WrapMethod(method = "nglfwCreateCursor")
     private static long ntrackCustomCursor(long image, int xhot, int yhot, Operation<Long> original) {
         if (ExternalCursorTracker.get().unclaimAddress(image)) {
             return original.call(image, xhot, yhot);
         }
 
+        String packageName = getWalker().walk(ExternalCursorTracker::getCallerPackage);
         long id = original.call(image, xhot, yhot);
-        String caller = getWalker().walk(GlfwMixin::minecraft_cursor$getCaller);
-        trackCursor(id, caller.hashCode());
 
-        LOGGER.warn("[minecraft-cursor] Detected custom cursor from '{}'. Expect compatibility issues.", caller);
+        if (isInternalPackage(packageName)) {
+            return id;
+        }
+
+        trackCursor(id, packageName.hashCode());
+
+        LOGGER.warn("[minecraft-cursor] Detected custom cursor from '{}'. Expect compatibility issues.", packageName);
         return id;
     }
 
@@ -68,9 +61,9 @@ public abstract class GlfwMixin {
         if (cursorType != null) {
             ExternalCursor externalCursor = ExternalCursorTracker.get().getTrackedCursor(id);
             if (externalCursor == null) {
-                String caller = getWalker().walk(GlfwMixin::minecraft_cursor$getCaller);
-                LOGGER.info("[minecraft-cursor] Remapping cursor to '{}' from '{}'", cursorType.getKey(), caller);
-                trackCursor(id, caller.hashCode(), cursorType);
+                String packageName = getWalker().walk(ExternalCursorTracker::getCallerPackage);
+                LOGGER.info("[minecraft-cursor] Remapping cursor to '{}' from '{}'", cursorType.getKey(), packageName);
+                trackCursor(id, packageName.hashCode(), cursorType);
             } else {
                 externalCursor.update(cursorType);
             }
@@ -99,8 +92,8 @@ public abstract class GlfwMixin {
         }
 
         if (cursor == 0) {
-            String packageName = getWalker().walk(GlfwMixin::minecraft_cursor$getCaller);
-            if (packageName.contains(MOD_ID.replaceAll("[-_]", ""))) {
+            String packageName = getWalker().walk(ExternalCursorTracker::getCallerPackage);
+            if (isInternalPackage(packageName)) {
                 original.call(window, cursor);
             } else {
                 tracker.updateCursor(packageName.hashCode(), CursorType.DEFAULT);
