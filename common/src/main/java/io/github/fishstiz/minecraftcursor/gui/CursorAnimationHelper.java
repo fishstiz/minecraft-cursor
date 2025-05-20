@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CursorAnimationHelper {
-    private static final int CURSOR_SIZE = 32;
     private final Map<String, AnimationState> cursorStates = new HashMap<>();
 
     public void reset(AnimatedCursor cursor) {
@@ -24,7 +23,8 @@ public class CursorAnimationHelper {
             frameIndex = getCurrentSpriteIndex(animatedCursor);
         }
 
-        int vOffset = CURSOR_SIZE * frameIndex;
+        int cursorSize = cursor.getTextureWidth();
+        int vOffset = cursorSize * frameIndex;
 
         context.blit(
                 RenderType::guiTextured,
@@ -32,7 +32,7 @@ public class CursorAnimationHelper {
                 x, y,
                 0, vOffset,
                 size, size,
-                CURSOR_SIZE, CURSOR_SIZE,
+                cursorSize, cursorSize,
                 cursor.getTextureWidth(), cursor.getTextureHeight()
         );
     }

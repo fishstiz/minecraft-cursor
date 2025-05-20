@@ -1,19 +1,22 @@
 package io.github.fishstiz.minecraftcursor.gui.widget;
 
-import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.api.CursorProvider;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
+import io.github.fishstiz.minecraftcursor.util.DrawUtil;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
+import static io.github.fishstiz.minecraftcursor.MinecraftCursor.MOD_ID;
+
 public class SelectedCursorTestWidget extends AbstractWidget implements CursorProvider {
-    private static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(MinecraftCursor.MOD_ID, "textures/gui/test_background.png");
+    private static final ResourceLocation BACKGROUND_64 = ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/gui/background_dark_64.png");
+    private static final int BACKGROUND_DISABLED = 0x7F000000; // 50% black
+    private static final int BORDER_COLOR = 0xFF000000; // black
     private static final int HOTSPOT_RULER_COLOR = 0xFF00FF00; // green
     private final Button testButton = Button.builder(Component.empty(), b -> b.setFocused(false)).size(20, 20).build();
     private final CursorOptionsWidget options;
@@ -25,25 +28,22 @@ public class SelectedCursorTestWidget extends AbstractWidget implements CursorPr
         this.active = false;
     }
 
-    private void placeButton() {
-        int x = getX() + (getWidth() / 2 - testButton.getWidth() / 2);
-        int y = getY() + (getHeight() / 2 - testButton.getHeight() / 2);
-        testButton.setPosition(x, y);
-    }
-
     @Override
-    protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
-        context.blit(RenderType::guiTextured, BACKGROUND, getX(), getY(), 0, 0, width, height, width, height);
+    protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float delta) {
+        float cellSize = (float) getWidth() / this.options.parent().getSelectedCursor().getTextureWidth();
+        DrawUtil.drawCheckerboard(context, getX(), getY(), getWidth(), getHeight(), cellSize, BACKGROUND_64, 64);
 
         if (this.isEnabled()) {
+            int x = getX() + (getWidth() / 2 - testButton.getWidth() / 2);
+            int y = getY() + (getHeight() / 2 - testButton.getHeight() / 2);
+            testButton.setPosition(x, y);
             testButton.render(context, mouseX, mouseY, delta);
             renderRuler(context, mouseX, mouseY);
         } else {
-            context.fill(getX(), getY(), getRight(), getBottom(), 0x7F000000); // 50% black overlay
+            context.fill(getX(), getY(), getRight(), getBottom(), BACKGROUND_DISABLED);
         }
 
-        context.renderOutline(getX(), getY(), getWidth(), getHeight(), 0xFF000000);
-        placeButton();
+        context.renderOutline(getX(), getY(), getWidth(), getHeight(), BORDER_COLOR);
     }
 
     private void renderRuler(GuiGraphics context, int mouseX, int mouseY) {
@@ -80,6 +80,6 @@ public class SelectedCursorTestWidget extends AbstractWidget implements CursorPr
 
     @Override
     protected void updateWidgetNarration(@NotNull NarrationElementOutput builder) {
-        // not supported
+        this.defaultButtonNarrationText(builder);
     }
 }
