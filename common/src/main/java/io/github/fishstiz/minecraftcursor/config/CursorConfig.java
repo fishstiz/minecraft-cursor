@@ -1,14 +1,17 @@
 package io.github.fishstiz.minecraftcursor.config;
 
-import io.github.fishstiz.minecraftcursor.api.CursorType;
+import io.github.fishstiz.minecraftcursor.cursor.Cursor;
 import io.github.fishstiz.minecraftcursor.util.SettingsUtil;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
-public class CursorConfig implements Serializable {
+import static io.github.fishstiz.minecraftcursor.util.SettingsUtil.sanitizeHotspot;
+import static io.github.fishstiz.minecraftcursor.util.SettingsUtil.sanitizeScale;
+
+public class CursorConfig extends Config<CursorConfig.Settings> {
     private String _hash;
     private boolean itemSlotEnabled = true;
     private boolean itemGrabbingEnabled = true;
@@ -22,72 +25,43 @@ public class CursorConfig implements Serializable {
     private boolean serverIconEnabled = true;
     private boolean remapCursorsEnabled = true;
     private final GlobalSettings global = new GlobalSettings();
-    private final Map<String, Settings> settings = new HashMap<>();
     transient File file;
 
     CursorConfig() {
     }
 
-    public Settings getOrCreateCursorSettings(CursorType type) {
-        return settings.computeIfAbsent(type.getKey(), k -> new Settings());
+    public Settings getOrCreateCursorSettings(Cursor cursor) {
+        return settings.computeIfAbsent(cursor.getTypeKey(), k -> new Settings());
     }
 
-    public String get_hash() {
+    @Override
+    public @NotNull String getHash() {
         if (this._hash == null) {
-            generateHash();
+            this._hash = generateHash(this.settings);
         }
-
         return _hash;
     }
 
-    private void generateHash() {
-        long hash = 0;
-        long prime = 31;
-
-        for (Map.Entry<String, Settings> entry : this.settings.entrySet()) {
-            String key = entry.getKey();
-            Settings value = entry.getValue();
-
-            for (char c : key.toCharArray()) {
-                hash = hash * prime + c;
-            }
-
-            hash = hash * prime + (long) value.getScale();
-            hash = hash * prime + value.getXHot();
-            hash = hash * prime + value.getYHot();
-            hash = hash * prime + (value.isEnabled() ? 1 : 0);
-        }
-
-        this.set_hash(Long.toHexString(hash));
-    }
-
-    public void set_hash(String hash) {
+    public void setHash(String hash) {
         _hash = hash;
     }
 
     public void save() {
-        if (file == null) {
-            throw new NullPointerException("Cannot save config when initialized without file.");
-        }
-        CursorConfigLoader.saveConfig(file, this);
+        CursorConfigLoader.saveConfig(Objects.requireNonNull(file), this);
     }
 
     public GlobalSettings getGlobal() {
         return global;
     }
 
-    public Map<String, Settings> getSettings() {
-        return settings;
-    }
-
-    public void mergeSettings(Map<String, Settings> settings) {
-        for (Map.Entry<String, Settings> entry : settings.entrySet()) {
-            Settings oldSettings = this.settings.computeIfAbsent(entry.getKey(), k -> new Settings());
+    public void mergeResources(Resource resources) {
+        for (Map.Entry<String, CursorConfig.Settings> entry : resources.getSettings().entrySet()) {
+            Settings old = this.settings.computeIfAbsent(entry.getKey(), k -> new Settings());
             Settings validated = entry.getValue().copy();
 
             // preserve 'disabled' state of cursors
             // only allow external settings to disable
-            if (!oldSettings.enabled) {
+            if (!old.enabled) {
                 validated.enabled = false;
             }
 
@@ -95,8 +69,8 @@ public class CursorConfig implements Serializable {
         }
     }
 
-    public void layerSettings(Map<String, Settings> settings) {
-        for (Map.Entry<String, Settings> entry : settings.entrySet()) {
+    public void layerResources(Resource resources) {
+        for (Map.Entry<String, CursorConfig.Settings> entry : resources.getSettings().entrySet()) {
             this.settings.put(entry.getKey(), entry.getValue().copy());
         }
     }
@@ -189,30 +163,38 @@ public class CursorConfig implements Serializable {
         this.remapCursorsEnabled = remapCursorsEnabled;
     }
 
-    public static class Settings implements Serializable {
-        protected double scale = SettingsUtil.SCALE;
-        protected int xhot = SettingsUtil.X_HOT;
-        protected int yhot = SettingsUtil.Y_HOT;
-        private boolean enabled = SettingsUtil.ENABLED;
-        private Boolean animated;
+    private static String generateHash(Map<String, Settings> settings) {
+        long hash = 0;
+        long prime = 31;
 
-        public void update(double scale, int xhot, int yhot, boolean enabled) {
-            this.scale = SettingsUtil.sanitizeScale(scale);
-            this.xhot = SettingsUtil.sanitizeHotspot(xhot);
-            this.yhot = SettingsUtil.sanitizeHotspot(yhot);
+        for (Map.Entry<String, Settings> entry : settings.entrySet()) {
+            String key = entry.getKey();
+            Settings value = entry.getValue();
+            for (char c : key.toCharArray()) {
+                hash = hash * prime + c;
+            }
+            hash = hash * prime + (long) value.scale;
+            hash = hash * prime + value.xhot;
+            hash = hash * prime + value.yhot;
+            hash = hash * prime + (value.enabled ? 1 : 0);
+        }
+
+        return Long.toHexString(hash);
+    }
+
+    public static class Settings extends Config.Settings<Settings> {
+        protected boolean enabled = SettingsUtil.ENABLED;
+        protected Boolean animated;
+
+        Settings() {
+        }
+
+        public void update(Cursor cursor, double scale, int xhot, int yhot, boolean enabled) {
+            Objects.requireNonNull(cursor);
+            this.scale = sanitizeScale(scale);
+            this.xhot = sanitizeHotspot(xhot, cursor);
+            this.yhot = sanitizeHotspot(yhot, cursor);
             this.enabled = enabled;
-        }
-
-        public double getScale() {
-            return SettingsUtil.sanitizeScale(this.scale);
-        }
-
-        public int getXHot() {
-            return SettingsUtil.sanitizeHotspot(this.xhot);
-        }
-
-        public int getYHot() {
-            return SettingsUtil.sanitizeHotspot(this.yhot);
         }
 
         public boolean isEnabled() {
@@ -227,14 +209,19 @@ public class CursorConfig implements Serializable {
             this.animated = animated;
         }
 
+        @Override
         public Settings copy() {
             Settings settings = new Settings();
-            settings.update(this.scale, this.xhot, this.yhot, this.enabled);
+            settings.scale = this.scale;
+            settings.xhot = this.xhot;
+            settings.yhot = this.yhot;
+            settings.enabled = this.enabled;
+            settings.animated = this.animated;
             return settings;
         }
     }
 
-    public static class GlobalSettings extends Settings {
+    public static class GlobalSettings extends Config.Settings<GlobalSettings> {
         private boolean scaleActive = false;
         private boolean xhotActive = false;
         private boolean yhotActive = false;
@@ -243,16 +230,6 @@ public class CursorConfig implements Serializable {
             setScaleActive(active);
             setXhotActive(active);
             setYhotActive(active);
-        }
-
-        @Override
-        public void update(double scale, int xhot, int yhot, boolean enabled) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public boolean isEnabled() {
-            throw new UnsupportedOperationException();
         }
 
         public boolean isScaleActive() {
@@ -280,7 +257,7 @@ public class CursorConfig implements Serializable {
         }
 
         public void setScale(double scale) {
-            this.scale = SettingsUtil.sanitizeScale(scale);
+            this.scale = sanitizeScale(scale);
         }
 
         public void setXHotDouble(double xhot) {
@@ -288,7 +265,12 @@ public class CursorConfig implements Serializable {
         }
 
         public void setXHot(int xhot) {
-            this.xhot = SettingsUtil.sanitizeHotspot(xhot);
+            this.xhot = SettingsUtil.sanitizeGlobalHotspot(xhot);
+        }
+
+        @Override
+        public int getXHot() {
+            return SettingsUtil.sanitizeGlobalHotspot(this.xhot);
         }
 
         public void setYHotDouble(double yhot) {
@@ -296,7 +278,43 @@ public class CursorConfig implements Serializable {
         }
 
         public void setYHot(int yhot) {
-            this.yhot = SettingsUtil.sanitizeHotspot(yhot);
+            this.yhot = SettingsUtil.sanitizeGlobalHotspot(yhot);
+        }
+
+        @Override
+        public int getYHot() {
+            return SettingsUtil.sanitizeGlobalHotspot(this.yhot);
+        }
+
+        @Override
+        GlobalSettings copy() {
+            GlobalSettings globalSettings = new GlobalSettings();
+            globalSettings.scale = this.scale;
+            globalSettings.xhot = this.xhot;
+            globalSettings.yhot = this.yhot;
+            globalSettings.scaleActive = this.scaleActive;
+            globalSettings.xhotActive = this.xhotActive;
+            globalSettings.yhotActive = this.yhotActive;
+            return globalSettings;
+        }
+
+        public <T extends Config.Settings<T>> T apply(T settings) {
+            T copied = settings.copy();
+            copied.scale = this.isScaleActive() ? this.getScale() : copied.getScale();
+            copied.xhot = this.isXHotActive() ? this.getXHot() : copied.getXHot();
+            copied.yhot = this.isYHotActive() ? this.getYHot() : copied.getYHot();
+            return copied;
+        }
+    }
+
+    public static class Resource extends Config<CursorConfig.Settings> {
+        @Override
+        public @NotNull String getHash() {
+            return CursorConfig.generateHash(this.settings);
+        }
+
+        public void layer(Map<String, CursorConfig.Settings> settings) {
+            this.settings.putAll(settings);
         }
     }
 }

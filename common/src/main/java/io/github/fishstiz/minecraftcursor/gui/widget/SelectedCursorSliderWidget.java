@@ -1,22 +1,24 @@
 package io.github.fishstiz.minecraftcursor.gui.widget;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.github.fishstiz.minecraftcursor.util.SettingsUtil;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
 public class SelectedCursorSliderWidget extends AbstractSliderButton {
     private final Component prefix;
-    private final double min;
-    private final double max;
     private final double step;
     private final String suffix;
     private final Consumer<Double> onApply;
     private final @Nullable Runnable onRelease;
+    private double min;
+    private double max;
     private double translatedValue;
     private SelectedCursorButtonWidget inactiveHelperButton;
     private TextMapper textMapper;
@@ -81,13 +83,15 @@ public class SelectedCursorSliderWidget extends AbstractSliderButton {
         this.updateMessage();
     }
 
-    public void update(double translatedValue, boolean active) {
-        setTranslatedValue(translatedValue);
+    public void update(double min, double max, double translatedValue, boolean active) {
+        this.min = min;
+        this.max = max;
+        setTranslatedValue(SettingsUtil.clamp(translatedValue, this.min, this.max));
         this.active = active;
     }
 
     public void setTranslatedValue(double translatedValue) {
-        value = translatedValueToValue(translatedValue);
+        this.value = translatedValueToValue(translatedValue);
 
         applyValue();
         updateMessage();
@@ -95,11 +99,11 @@ public class SelectedCursorSliderWidget extends AbstractSliderButton {
 
     private void translateValue() {
         double scaledValue = min + (value * (max - min));
-        translatedValue = Math.round(scaledValue / step) * step;
+        this.translatedValue = Math.round(scaledValue / step) * step;
     }
 
     @Override
-    public void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
+    public void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float delta) {
         super.renderWidget(context, mouseX, mouseY, delta);
 
         SelectedCursorButtonWidget helperButton = getInactiveHelperButton();

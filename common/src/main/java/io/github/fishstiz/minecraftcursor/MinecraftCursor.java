@@ -21,7 +21,7 @@ import java.util.Optional;
 public final class MinecraftCursor {
     public static final String MOD_ID = "minecraft-cursor";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-    public static final CursorConfig CONFIG = CursorConfigLoader.fromFile(Services.PLATFORM.getConfigDir().resolve(MOD_ID + ".json").toFile());
+    public static final CursorConfig CONFIG = CursorConfigLoader.load(Services.PLATFORM.getConfigDir().resolve(MOD_ID + ".json").toFile());
     private static final CursorTypeResolver RESOLVER = new CursorTypeResolver();
     private static final CursorControllerImpl CONTROLLER = new CursorControllerImpl();
     private static Screen visibleHudScreen;
