@@ -44,7 +44,9 @@ public class MoreOptionsScreen extends Screen implements ContainerEventHandlerPa
                 layout.getHeaderHeight() + getContentHeight()
         );
 
-        if (previousScreen instanceof CursorOptionsScreen optionsScreen && optionsScreen.body != null) {
+        if (previousScreen instanceof CursorOptionsScreen optionsScreen
+            && optionsScreen.body != null
+            && optionsScreen.getSelectedCursor().isLoaded()) {
             this.hotspotWidget = new SelectedCursorHotspotWidget(HOTSPOT_WIDGET_SIZE, optionsScreen.body.selectedCursorColumn);
             this.hotspotWidget.visible = false;
             this.hotspotWidget.setChangeEventListener(this.list::handleChangeHotspotWidget);
@@ -121,13 +123,7 @@ public class MoreOptionsScreen extends Screen implements ContainerEventHandlerPa
         list.applyConfig();
 
         if (this.minecraft != null) {
-            if (previousScreen instanceof CursorOptionsScreen options && options.body != null) {
-                CursorOptionsScreen optionsScreen = new CursorOptionsScreen(options.previousScreen);
-                this.minecraft.setScreen(optionsScreen);
-                optionsScreen.selectCursor(options.getSelectedCursor());
-            } else {
-                this.minecraft.setScreen(previousScreen);
-            }
+            this.minecraft.setScreen(previousScreen);
         }
     }
 

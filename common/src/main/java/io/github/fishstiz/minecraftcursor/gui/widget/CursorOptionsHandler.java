@@ -24,8 +24,17 @@ public class CursorOptionsHandler {
     void handleEnable(boolean enabled) {
         Cursor cursor = getCursor();
 
-        cursor.enable(enabled);
-        updateSettings();
+        boolean loaded = cursor.isLoaded();
+        if (cursor.enable(enabled)) {
+            if (enabled && !loaded) {
+                options.parent().refresh();
+                options.parent().getSelectedCursor().enable(true);
+            }
+            updateSettings();
+            options.enableButton.setValue(enabled);
+        } else {
+            options.enableButton.setValue(false);
+        }
 
         if (cursor instanceof AnimatedCursor) {
             options.resetAnimation.active = options.animateButton.value && enabled;
@@ -113,13 +122,15 @@ public class CursorOptionsHandler {
         Config.Settings settings = getSettings();
         Cursor cursor = getCursor();
 
-        settings.update(
-                cursor,
-                GLOBAL.isScaleActive() ? settings.getScale() : cursor.getScale(),
-                GLOBAL.isXHotActive() ? settings.getXHot() : cursor.getXHot(),
-                GLOBAL.isYHotActive() ? settings.getYHot() : cursor.getYHot(),
-                cursor.isEnabled()
-        );
+        if (cursor.isLoaded()) {
+            settings.update(
+                    cursor,
+                    GLOBAL.isScaleActive() ? settings.getScale() : cursor.getScale(),
+                    GLOBAL.isXHotActive() ? settings.getXHot() : cursor.getXHot(),
+                    GLOBAL.isYHotActive() ? settings.getYHot() : cursor.getYHot(),
+                    cursor.isEnabled()
+            );
+        }
     }
 
     public static void removeScaleOverride() {

@@ -79,7 +79,7 @@ public class CursorLoader {
     public static void applyResourceSettings() {
         if (resourceConfig != null) {
             CONFIG.setHash(resourceConfig.getHash());
-            CONFIG.layerResources(resourceConfig);
+            CONFIG.mergeResources(resourceConfig);
             for (Cursor cursor : CursorManager.INSTANCE.getCursors()) {
                 cursor.applySettings(CONFIG.getOrCreateCursorSettings(cursor));
             }
@@ -91,7 +91,12 @@ public class CursorLoader {
     private static void loadCursorTextures(ResourceManager manager) {
         for (Cursor cursor : CursorManager.INSTANCE.getCursors()) {
             Config.Settings settings = CONFIG.getOrCreateCursorSettings(cursor);
-            loadCursorTexture(manager, cursor, settings);
+
+            if (!CONFIG.isDeferredLoading() || settings.isEnabled()) {
+                loadCursorTexture(manager, cursor, settings);
+            } else {
+                LOGGER.info("[minecraft-cursor] Skipped loading of disabled cursor '{}'.", cursor.getTypeKey());
+            }
         }
     }
 
@@ -102,7 +107,7 @@ public class CursorLoader {
                     minecraft,
                     SystemToast.SystemToastIds.PACK_LOAD_FAILURE,
                     Component.translatable("resourcePack.load_fail"),
-                    cursor.getText()
+                    Component.translatable("minecraft-cursor.options.deferred_loading.fail", cursor.getText())
             ));
             return false;
         }

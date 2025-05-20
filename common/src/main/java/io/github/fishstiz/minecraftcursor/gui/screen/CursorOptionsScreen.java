@@ -1,6 +1,7 @@
 package io.github.fishstiz.minecraftcursor.gui.screen;
 
 import io.github.fishstiz.minecraftcursor.CursorManager;
+import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
 import io.github.fishstiz.minecraftcursor.gui.CursorAnimationHelper;
 import io.github.fishstiz.minecraftcursor.gui.widget.AbstractContainerWidget;
@@ -34,8 +35,9 @@ public class CursorOptionsScreen extends Screen {
     private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
     private final Button moreButton = Button.builder(Component.translatable("minecraft-cursor.options.more").append("..."), btn -> toMoreOptions()).build();
     private final Button doneButton = Button.builder(CommonComponents.GUI_DONE, btn -> this.onClose()).build();
-    private final Collection<Cursor> cursors;
-    final Screen previousScreen;
+    private @NotNull Collection<Cursor> cursors;
+    private final Screen previousScreen;
+    private boolean initialized;
     private Cursor selectedCursor;
     CursorOptionsBody body;
 
@@ -45,6 +47,13 @@ public class CursorOptionsScreen extends Screen {
         this.previousScreen = previousScreen;
 
         cursors = CursorManager.INSTANCE.getCursors();
+    }
+
+    @Override
+    public void added() {
+        if (this.initialized) {
+            this.refresh();
+        }
     }
 
     @Override
@@ -63,6 +72,8 @@ public class CursorOptionsScreen extends Screen {
         if (this.body != null) {
             this.repositionElements();
         }
+
+        this.initialized = true;
     }
 
     @Override
@@ -110,13 +121,23 @@ public class CursorOptionsScreen extends Screen {
         return selectedCursor;
     }
 
-    public Collection<Cursor> getCursors() {
+    public @NotNull Collection<Cursor> getCursors() {
         return cursors;
     }
 
     public void toMoreOptions() {
         if (minecraft != null) {
             minecraft.setScreen(new MoreOptionsScreen(this));
+        }
+    }
+
+    public void refresh() {
+        CursorType previous = this.getSelectedCursor().getType();
+        cursors = CursorManager.INSTANCE.getCursors();
+        this.selectCursor(CursorManager.INSTANCE.getCursor(previous));
+        if (this.body != null) {
+            this.body.cursorsColumn.refreshEntries();
+            this.body.selectedCursorColumn.refresh();
         }
     }
 
