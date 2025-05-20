@@ -34,7 +34,7 @@ public class Cursor {
     private boolean loaded;
     private int textureWidth;
     private int textureHeight;
-    private long id = 0;
+    private long id = MemoryUtil.NULL;
 
     public Cursor(CursorType type, Consumer<Cursor> onLoad) {
         this.type = type;
@@ -88,7 +88,7 @@ public class Cursor {
         xhot = sanitizeHotspot(xhot, this);
         yhot = sanitizeHotspot(yhot, this);
 
-        long glfwImageAddress = 0;
+        long glfwImageAddress = MemoryUtil.NULL;
         long previousId = this.id;
         ByteBuffer pixels = null;
 
@@ -122,21 +122,22 @@ public class Cursor {
                 this.onLoad.accept(this);
             }
         } finally {
-            if (glfwImageAddress != MemoryUtil.NULL) {
-                ExternalCursorTracker.get().unclaimAddress(glfwImageAddress);
-            }
             if (pixels != null) {
                 MemoryUtil.memFree(pixels);
             }
-            if (previousId != 0 && this.id != previousId) {
+            if (previousId != MemoryUtil.NULL && this.id != previousId) {
                 GLFW.glfwDestroyCursor(previousId);
+            }
+            if (glfwImageAddress != MemoryUtil.NULL) {
+                ExternalCursorTracker.get().unclaimAddress(glfwImageAddress);
             }
         }
     }
 
     public void destroy() {
-        if (this.id != 0) {
+        if (this.id != MemoryUtil.NULL) {
             GLFW.glfwDestroyCursor(this.id);
+            this.id = MemoryUtil.NULL;
         }
     }
 
@@ -172,7 +173,7 @@ public class Cursor {
     }
 
     public long getId() {
-        return enabled ? id : 0;
+        return enabled ? id : MemoryUtil.NULL;
     }
 
     public @NotNull CursorType getType() {
