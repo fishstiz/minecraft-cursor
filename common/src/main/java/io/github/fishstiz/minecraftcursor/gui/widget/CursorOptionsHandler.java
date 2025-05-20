@@ -1,7 +1,7 @@
 package io.github.fishstiz.minecraftcursor.gui.widget;
 
 import io.github.fishstiz.minecraftcursor.api.CursorController;
-import io.github.fishstiz.minecraftcursor.config.CursorConfig;
+import io.github.fishstiz.minecraftcursor.config.Config;
 import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
 
@@ -12,7 +12,7 @@ import java.util.function.DoubleConsumer;
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
 
 public class CursorOptionsHandler {
-    private static final CursorConfig.GlobalSettings GLOBAL = CONFIG.getGlobal();
+    private static final Config.GlobalSettings GLOBAL = CONFIG.getGlobal();
     private static final int SCALE_OVERRIDE = -1;
     private final CursorOptionsWidget options;
 
@@ -100,15 +100,15 @@ public class CursorOptionsHandler {
         return getCursorAsAnimatedCursor().map(AnimatedCursor::isAnimated).orElse(false);
     }
 
-    CursorConfig.Settings getSettings() {
+    Config.Settings getSettings() {
         return CONFIG.getOrCreateCursorSettings(getCursor());
     }
 
     public void updateSettings() {
-        CursorConfig.Settings settings = getSettings();
+        Config.Settings settings = getSettings();
         Cursor cursor = getCursor();
 
-        getSettings().update(
+        settings.update(
                 cursor,
                 GLOBAL.isScaleActive() ? settings.getScale() : cursor.getScale(),
                 GLOBAL.isXHotActive() ? settings.getXHot() : cursor.getXHot(),
