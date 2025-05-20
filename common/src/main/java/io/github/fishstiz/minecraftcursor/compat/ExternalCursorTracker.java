@@ -6,9 +6,11 @@ import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.minecraft.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 public class ExternalCursorTracker implements CursorTracker {
     private static boolean tracking = false;
@@ -126,10 +128,6 @@ public class ExternalCursorTracker implements CursorTracker {
         return Holder.INSTANCE;
     }
 
-    public static StackWalker getWalker() {
-        return Holder.INSTANCE.walker;
-    }
-
     public static void trackCursor(long cursor, int caller, CursorType cursorType) {
         Holder.INSTANCE.externalCursors
                 .computeIfAbsent(cursor, c -> new ExternalCursor(caller, cursorType))
@@ -138,5 +136,21 @@ public class ExternalCursorTracker implements CursorTracker {
 
     public static void trackCursor(long cursor, int caller) {
         Holder.INSTANCE.externalCursors.putIfAbsent(cursor, new ExternalCursor(caller));
+    }
+
+    public static StackWalker getWalker() {
+        return Holder.INSTANCE.walker;
+    }
+
+    public static String getCallerPackage(Stream<StackWalker.StackFrame> frames) {
+        return frames.skip(2)
+                .dropWhile(frame -> frame.getDeclaringClass() == GLFW.class)
+                .findFirst()
+                .map(frame -> frame.getDeclaringClass().getPackageName())
+                .orElse("placeholder");
+    }
+
+    public static boolean isInternalPackage(String packageName) {
+        return packageName.startsWith("io.github.fishstiz.minecraftcursor");
     }
 }

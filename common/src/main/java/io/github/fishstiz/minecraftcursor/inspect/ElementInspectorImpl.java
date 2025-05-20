@@ -22,7 +22,7 @@ public class ElementInspectorImpl implements ElementInspector {
     private static final Component CACHE_LABEL = Component.literal("Cache: ").withStyle(style -> style.withColor(0xFFFFFFFF)); // white
     private static final Component DEEPEST_LABEL = Component.literal("D: ").withStyle(style -> style.withColor(0xFF00FF00)); // green
     private static final Component FOCUSED_LABEL = Component.literal("F: ").withStyle(style -> style.withColor(0xFFFF0000)); // red
-    private static final float Z = 900f;
+    private static final float Z = 2000f;
     private static final float TEXT_SCALE = 0.75f;
     private HashSet<String> cache = new HashSet<>();
     private GuiEventListener focused;
