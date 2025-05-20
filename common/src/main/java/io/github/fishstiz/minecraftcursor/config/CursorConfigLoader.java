@@ -23,22 +23,22 @@ public class CursorConfigLoader {
         }
     }
 
-    public static CursorConfig fromStream(InputStream stream) throws IOException {
+    public static CursorConfig.Resource loadResource(InputStream stream) throws IOException {
         try (InputStreamReader reader = new InputStreamReader(stream)) {
-            return GSON.fromJson(reader, CursorConfig.class);
+            return GSON.fromJson(reader, CursorConfig.Resource.class);
         }
     }
 
-    public static CursorConfig fromFile(File file) {
+    public static CursorConfig load(File file) {
         CursorConfig config = new CursorConfig();
 
         try (FileReader reader = new FileReader(file)) {
             config = GSON.fromJson(reader, CursorConfig.class);
         } catch (FileNotFoundException e) {
-            MinecraftCursor.LOGGER.info("[minecraft-cursor] Creating cursor config file at '{}'...", file.getPath());
+            MinecraftCursor.LOGGER.info("[minecraft-cursor] Creating config file at '{}'...", file.getPath());
             saveConfig(file, config);
         } catch (IOException e) {
-            MinecraftCursor.LOGGER.warn("[minecraft-cursor] Failed to load cursor config at '{}'", file.getPath());
+            MinecraftCursor.LOGGER.error("[minecraft-cursor] Failed to load config at '{}'", file.getPath());
         }
 
         config.file = file;
