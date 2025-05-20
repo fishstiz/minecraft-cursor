@@ -3,8 +3,8 @@ package io.github.fishstiz.minecraftcursor.cursor;
 import com.mojang.blaze3d.platform.NativeImage;
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
-import io.github.fishstiz.minecraftcursor.config.AnimatedCursorConfig;
-import io.github.fishstiz.minecraftcursor.config.CursorConfig;
+import io.github.fishstiz.minecraftcursor.config.AnimationData;
+import io.github.fishstiz.minecraftcursor.config.Config;
 import io.github.fishstiz.minecraftcursor.util.NativeImageUtil;
 
 import java.io.IOException;
@@ -27,8 +27,8 @@ public class AnimatedCursor extends Cursor {
 
     public void loadImage(
             NativeImage image,
-            CursorConfig.Settings settings,
-            AnimatedCursorConfig animation
+            Config.Settings settings,
+            AnimationData animation
     ) throws IOException {
         super.loadImage(image, settings);
 
@@ -42,7 +42,7 @@ public class AnimatedCursor extends Cursor {
 
     private HashMap<Integer, Cursor> createCursors(
             NativeImage image,
-            CursorConfig.Settings settings,
+            Config.Settings settings,
             int availableFrames
     ) throws IOException {
         HashMap<Integer, Cursor> newCursors = new HashMap<>();
@@ -52,7 +52,7 @@ public class AnimatedCursor extends Cursor {
         return newCursors;
     }
 
-    private List<Frame> createFrames(AnimatedCursorConfig animation, HashMap<Integer, Cursor> cursors, int availableFrames) {
+    private List<Frame> createFrames(AnimationData animation, HashMap<Integer, Cursor> cursors, int availableFrames) {
         List<Frame> newFrames = new ArrayList<>();
 
         if (animation.getFrames().isEmpty()) {
@@ -63,7 +63,7 @@ public class AnimatedCursor extends Cursor {
             return newFrames;
         }
 
-        for (AnimatedCursorConfig.Frame frame : animation.getFrames()) {
+        for (AnimationData.Frame frame : animation.getFrames()) {
             int index = frame.getIndex();
             if (index < 0 || index >= availableFrames) {
                 MinecraftCursor.LOGGER.warn("[minecraft-cursor] Sprite does not exist on index {} for cursor type '{}', skipping frame.", index, getType());
@@ -76,7 +76,7 @@ public class AnimatedCursor extends Cursor {
 
     private Cursor createCursor(
             NativeImage image,
-            CursorConfig.Settings settings,
+            Config.Settings settings,
             int index
     ) throws IOException {
         Cursor cursor = new Cursor(this.getType(), this.onLoad);
@@ -88,8 +88,8 @@ public class AnimatedCursor extends Cursor {
     }
 
     private void updateState(
-            CursorConfig.Settings settings,
-            AnimatedCursorConfig animation,
+            Config.Settings settings,
+            AnimationData animation,
             HashMap<Integer, Cursor> newCursors,
             List<Frame> newFrames
     ) {

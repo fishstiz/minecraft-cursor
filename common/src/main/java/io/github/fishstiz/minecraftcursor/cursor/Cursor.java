@@ -5,7 +5,7 @@ import io.github.fishstiz.minecraftcursor.CursorLoader;
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.compat.ExternalCursorTracker;
-import io.github.fishstiz.minecraftcursor.config.CursorConfig;
+import io.github.fishstiz.minecraftcursor.config.Config;
 import io.github.fishstiz.minecraftcursor.util.NativeImageUtil;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -42,7 +42,7 @@ public class Cursor {
         this.location = CursorLoader.getDirectory().withSuffix(type.getKey() + IMG_TYPE);
     }
 
-    public void loadImage(@NotNull NativeImage image, CursorConfig.Settings settings) throws IOException {
+    public void loadImage(@NotNull NativeImage image, Config.Settings settings) throws IOException {
         this.textureWidth = image.getWidth();
         this.textureHeight = image.getHeight();
 
@@ -146,7 +146,7 @@ public class Cursor {
         }
     }
 
-    public void applySettings(CursorConfig.Settings settings) {
+    public void applySettings(Config.Settings settings) {
         this.enable(settings.isEnabled());
         this.updateImage(settings.getScale(), settings.getXHot(), settings.getYHot());
     }

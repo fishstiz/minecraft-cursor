@@ -2,8 +2,8 @@ package io.github.fishstiz.minecraftcursor;
 
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.compat.ExternalCursorTracker;
-import io.github.fishstiz.minecraftcursor.config.CursorConfig;
-import io.github.fishstiz.minecraftcursor.config.CursorConfigLoader;
+import io.github.fishstiz.minecraftcursor.config.Config;
+import io.github.fishstiz.minecraftcursor.config.ConfigLoader;
 import io.github.fishstiz.minecraftcursor.impl.CursorControllerImpl;
 import io.github.fishstiz.minecraftcursor.impl.MinecraftCursorInitializerImpl;
 import io.github.fishstiz.minecraftcursor.provider.CursorControllerProvider;
@@ -21,7 +21,7 @@ import java.util.Optional;
 public final class MinecraftCursor {
     public static final String MOD_ID = "minecraft-cursor";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-    public static final CursorConfig CONFIG = CursorConfigLoader.load(Services.PLATFORM.getConfigDir().resolve(MOD_ID + ".json").toFile());
+    public static final Config CONFIG = ConfigLoader.load(Services.PLATFORM.getConfigDir().resolve(MOD_ID + ".json").toFile());
     private static final CursorTypeResolver RESOLVER = new CursorTypeResolver();
     private static final CursorControllerImpl CONTROLLER = new CursorControllerImpl();
     private static Screen visibleHudScreen;
