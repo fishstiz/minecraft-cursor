@@ -10,7 +10,7 @@ import java.util.Objects;
 import java.util.Set;
 
 public class SettingsUtil {
-    public static final Set<Integer> SUPPORTED_SIZES = Set.of(16, 32, 48, 64);
+    public static final Set<Integer> SUPPORTED_SIZES = Set.of(8, 16, 32, 48, 64);
     public static final double SCALE_AUTO_THRESHOLD_MAX = 0.49;
     public static final double SCALE = 1.0;
     public static final double SCALE_MIN = 0;
