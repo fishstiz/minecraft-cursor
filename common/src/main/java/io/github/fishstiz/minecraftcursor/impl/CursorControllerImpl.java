@@ -7,20 +7,21 @@ import net.minecraft.Util;
 import org.jetbrains.annotations.Nullable;
 
 public class CursorControllerImpl implements CursorController {
-    private static final long TRANSIENT_EXPIRE_MS = 40; // 2 ticks
+    private static final long TRANSIENT_EXPIRE_MS = 100; // 5 ticks
     private CursorType singleCycleCursor;
     private long timestamp = 0;
 
     public boolean hasTransientCursor() {
-        return singleCycleCursor != null && Util.getMillis() - timestamp < TRANSIENT_EXPIRE_MS;
+        if (singleCycleCursor != null) {
+            if (Util.getMillis() - timestamp < TRANSIENT_EXPIRE_MS) {
+                return true;
+            }
+            singleCycleCursor = null;
+        }
+        return false;
     }
 
     public @Nullable CursorType consumeTransientCursor() {
-        if (!hasTransientCursor()) {
-            singleCycleCursor = null;
-            return null;
-        }
-
         CursorType cursorType = singleCycleCursor;
         singleCycleCursor = null;
         return cursorType;
