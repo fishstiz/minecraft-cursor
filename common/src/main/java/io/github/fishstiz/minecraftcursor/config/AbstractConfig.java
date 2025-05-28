@@ -15,7 +15,7 @@ public abstract class AbstractConfig<T extends AbstractConfig.Settings<T>> imple
         return !this.getHash().equals(config.getHash());
     }
 
-    public Map<String, T> getSettings() {
+    public Map<String, T> getAllSettings() {
         return settings;
     }
 

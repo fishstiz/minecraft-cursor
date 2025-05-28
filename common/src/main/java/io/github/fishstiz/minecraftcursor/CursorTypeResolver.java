@@ -35,7 +35,7 @@ class CursorTypeResolver implements ElementRegistrar {
         } else {
             throw new NullPointerException("Could not register cursor handler: "
                                            + cursorHandler.getClass().getName()
-                                           + " - Target Element Class and FQCN not present");
+                                           + " - Target ElementView Class and FQCN not present");
         }
     }
 
@@ -45,7 +45,7 @@ class CursorTypeResolver implements ElementRegistrar {
             @SuppressWarnings("unchecked")
             Class<T> elementClass = (Class<T>) Class.forName(Services.PLATFORM.mapClassName("intermediary", binaryName));
             if (!GuiEventListener.class.isAssignableFrom(elementClass)) {
-                throw new ClassCastException(binaryName + " is not a subclass of Element");
+                throw new ClassCastException(binaryName + " is not a subclass of ElementView");
             }
             register(elementClass, elementToCursorType);
         } catch (ClassNotFoundException e) {

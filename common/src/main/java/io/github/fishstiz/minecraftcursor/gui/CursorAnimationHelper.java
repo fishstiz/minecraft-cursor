@@ -16,6 +16,8 @@ public class CursorAnimationHelper {
     }
 
     public void drawSprite(GuiGraphics context, Cursor cursor, int x, int y, int size) {
+        if (!cursor.isLoaded()) return;
+
         int frameIndex = 0;
 
         if (cursor instanceof AnimatedCursor animatedCursor) {
@@ -40,10 +42,9 @@ public class CursorAnimationHelper {
 
         if (!cursor.isAnimated() || !cursor.isEnabled()) {
             state.reset();
-            return 0;
+            return cursor.getFallbackFrame().spriteIndex();
         }
 
-        state.nextFrame(cursor);
-        return cursor.getFrame(state.getCurrentFrame()).spriteIndex();
+        return cursor.getFrame(state.next(cursor)).spriteIndex();
     }
 }

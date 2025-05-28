@@ -12,6 +12,10 @@ public interface PlatformHelper {
 
     List<MinecraftCursorInitializer> getEntrypoints();
 
+    default boolean isFabric() {
+        return false;
+    }
+    
     default String mapClassName(String namespace, String className) {
         return className;
     }
