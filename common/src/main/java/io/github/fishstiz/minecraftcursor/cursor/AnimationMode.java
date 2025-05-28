@@ -17,6 +17,10 @@ public enum AnimationMode {
     RANDOM,
     RANDOM_CYCLE;
 
+    public boolean isReversed() {
+        return this == LOOP_REVERSE || this == REVERSE;
+    }
+
     @Override
     public String toString() {
         return name().toLowerCase();

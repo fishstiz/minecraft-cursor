@@ -147,28 +147,18 @@ public class Cursor {
         }
     }
 
-    public void applySettings(Config.Settings settings) {
-        this.enableWithoutLoading(settings.isEnabled());
+    public void apply(Config.Settings settings) {
+        this.enable(settings.isEnabled());
         this.updateImage(settings.getScale(), settings.getXHot(), settings.getYHot());
     }
 
-    protected void enableWithoutLoading(boolean enabled) {
-        this.enabled = enabled;
-        if (this.onLoad != null) this.onLoad.accept(this);
-    }
-
-    public boolean enable(boolean enabled) {
-        if (!this.isLoaded() && !this.enabled && enabled && !CursorLoader.loadCursorTexture(this)) {
-            return false;
-        }
-
+    public void enable(boolean enabled) {
         boolean previous = this.enabled;
         this.enabled = enabled;
 
-        if (previous != this.enabled && this.onLoad != null) {
+        if (previous != this.enabled && this.isLoaded() && this.onLoad != null) {
             this.onLoad.accept(this);
         }
-        return true;
     }
 
     public ResourceLocation getLocation() {
@@ -231,7 +221,7 @@ public class Cursor {
     }
 
     public boolean isEnabled() {
-        return enabled;
+        return enabled && isLoaded();
     }
 
     public boolean isLoaded() {
