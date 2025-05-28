@@ -107,11 +107,9 @@ public final class CursorManager implements CursorTypeRegistrar {
     private void handleCursorAnimation(AnimatedCursor cursor) {
         if (!getAppliedCursor().getType().isKey(cursor.getType())) {
             animationState.reset();
-        } else {
-            animationState.nextFrame(cursor);
         }
 
-        Cursor currentFrameCursor = cursor.getFrame(animationState.getCurrentFrame()).cursor();
+        Cursor currentFrameCursor = cursor.getFrame(animationState.next(cursor)).cursor();
         updateCursor(currentFrameCursor.getId() != 0 ? currentFrameCursor : cursor);
     }
 
@@ -167,17 +165,24 @@ public final class CursorManager implements CursorTypeRegistrar {
         return cursor;
     }
 
+    public boolean isEnabled(@NotNull CursorType type) {
+        Cursor cursor = cursors.get(type.getKey());
+        if (cursor == null) {
+            return false;
+        }
+        return cursor.isEnabled();
+    }
+
+    public boolean isEnabled(@Nullable Cursor cursor) {
+        return cursor != null && this.isEnabled(cursor.getType());
+    }
+
     public @Nullable Cursor getCursor(CursorType type) {
         return cursors.get(type.getKey());
     }
 
     public @Nullable Cursor getCursor(String type) {
         return cursors.get(type);
-    }
-
-    public long getId(CursorType type) {
-        Cursor cursor = cursors.get(type.getKey());
-        return cursor != null ? cursor.getId() : 0;
     }
 
     public long getCurrentId() {
@@ -197,14 +202,6 @@ public final class CursorManager implements CursorTypeRegistrar {
         return false;
     }
 
-    public void setIsAdaptive(boolean isAdaptive) {
-        cursors.values().forEach(cursor -> {
-            if (!cursor.getType().isDefault()) {
-                cursor.enable(isAdaptive);
-            }
-        });
-    }
-
     public boolean hasAnimations() {
         for (Cursor cursor : cursors.values()) {
             if (cursor instanceof AnimatedCursor) {
@@ -221,14 +218,6 @@ public final class CursorManager implements CursorTypeRegistrar {
             }
         }
         return false;
-    }
-
-    public void setIsAnimated(boolean isAnimated) {
-        cursors.values().forEach(cursor -> {
-            if (cursor instanceof AnimatedCursor animatedCursor) {
-                animatedCursor.setAnimated(isAnimated);
-            }
-        });
     }
 
     public void reloadCursors() {

@@ -1,5 +1,6 @@
 package io.github.fishstiz.minecraftcursor;
 
+import io.github.fishstiz.minecraftcursor.config.Flag;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.impl.launch.FabricLauncherBase;
@@ -43,6 +44,7 @@ public class FabricMixinConfigPlugin implements IMixinConfigPlugin {
 
         if (FabricLauncherBase.getLauncher().isClassLoaded("org.lwjgl.glfw.GLFW")) {
             LOGGER.warn("[minecraft-cursor] Could not enable cursor tracking as GLFW has been loaded early (possibly by another mod). May break functionality.");
+            Flag.REMAP.disable();
             return null;
         }
 

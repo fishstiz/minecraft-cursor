@@ -6,12 +6,13 @@ import io.github.fishstiz.minecraftcursor.config.AnimationData;
 import io.github.fishstiz.minecraftcursor.config.Config;
 import io.github.fishstiz.minecraftcursor.config.ConfigLoader;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
+import io.github.fishstiz.minecraftcursor.util.SettingsUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.toasts.SystemToast;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,12 +21,11 @@ import java.util.Optional;
 
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.LOGGER;
-import static io.github.fishstiz.minecraftcursor.MinecraftCursor.MOD_ID;
 
 public class CursorLoader {
     private static final String ANIMATION_TYPE = ".mcmeta";
-    private static final ResourceLocation SETTINGS_LOCATION = new ResourceLocation(MOD_ID, "atlases/cursors.json");
-    private static final ResourceLocation DIR = new ResourceLocation(MOD_ID, "textures/cursors/");
+    private static final ResourceLocation SETTINGS_LOCATION = MinecraftCursor.loc("atlases/cursors.json");
+    private static final ResourceLocation DIR = MinecraftCursor.loc("textures/cursors/");
     private static Config.Resource resourceConfig;
 
     private CursorLoader() {
@@ -51,7 +51,7 @@ public class CursorLoader {
             if (config.isDifferent(CONFIG)) {
                 LOGGER.info("[minecraft-cursor] New resource pack settings detected, updating config...");
                 CONFIG.setHash(config.getHash());
-                CONFIG.mergeResources(config);
+                CONFIG.merge(config);
                 CONFIG.getGlobal().setActiveAll(false);
                 CONFIG.save();
             }
@@ -67,7 +67,7 @@ public class CursorLoader {
                 if (layeredResources == null) {
                     layeredResources = resourceConfig;
                 } else {
-                    layeredResources.layer(resourceConfig.getSettings());
+                    layeredResources.layer(resourceConfig.getAllSettings());
                 }
             } catch (IOException e) {
                 LOGGER.error("[minecraft-cursor] Failed to load settings of resource pack '{}'", configResource.sourcePackId());
@@ -76,12 +76,27 @@ public class CursorLoader {
         return Optional.ofNullable(layeredResources);
     }
 
-    public static void applyResourceSettings() {
+    public static boolean isResourceSetting(@NotNull Cursor cursor, @Nullable Config.Settings settings) {
+        return SettingsUtil.equalSettings(resourceConfig.getOrCreateSettings(cursor), settings, true);
+    }
+
+    public static boolean retoreActiveResourceSettings(@NotNull Cursor cursor) {
+        if (resourceConfig != null) {
+            CONFIG.replaceActiveSettings(resourceConfig, cursor);
+            cursor.apply(CONFIG.getGlobal().apply(CONFIG.getOrCreateSettings(cursor)));
+            return true;
+        } else {
+            LOGGER.error("Failed to apply resource settings: Not Found");
+        }
+        return false;
+    }
+
+    public static void restoreResourceSettings() {
         if (resourceConfig != null) {
             CONFIG.setHash(resourceConfig.getHash());
-            CONFIG.mergeResources(resourceConfig);
+            CONFIG.merge(resourceConfig);
             for (Cursor cursor : CursorManager.INSTANCE.getCursors()) {
-                cursor.applySettings(CONFIG.getOrCreateCursorSettings(cursor));
+                cursor.apply(CONFIG.getGlobal().apply(CONFIG.getOrCreateSettings(cursor)));
             }
         } else {
             LOGGER.error("Failed to apply resource config: Not Found.");
@@ -90,7 +105,7 @@ public class CursorLoader {
 
     private static void loadCursorTextures(ResourceManager manager) {
         for (Cursor cursor : CursorManager.INSTANCE.getCursors()) {
-            Config.Settings settings = CONFIG.getOrCreateCursorSettings(cursor);
+            Config.Settings settings = CONFIG.getOrCreateSettings(cursor);
 
             if (!CONFIG.isDeferredLoading() || settings.isEnabled()) {
                 loadCursorTexture(manager, cursor, settings);
@@ -100,18 +115,8 @@ public class CursorLoader {
         }
     }
 
-    public static boolean loadCursorTexture(Cursor cursor) {
-        Minecraft minecraft = Minecraft.getInstance();
-        if (!loadCursorTexture(minecraft.getResourceManager(), cursor, CONFIG.getOrCreateCursorSettings(cursor))) {
-            minecraft.getToasts().addToast(SystemToast.multiline(
-                    minecraft,
-                    SystemToast.SystemToastIds.PACK_LOAD_FAILURE,
-                    Component.translatable("resourcePack.load_fail"),
-                    Component.translatable("minecraft-cursor.options.deferred_loading.fail", cursor.getText())
-            ));
-            return false;
-        }
-        return true;
+    public static boolean loadCursorTexture(ResourceManager manager, Cursor cursor) {
+        return loadCursorTexture(manager, cursor, CONFIG.getOrCreateSettings(cursor));
     }
 
     private static boolean loadCursorTexture(ResourceManager manager, Cursor cursor, Config.Settings settings) {

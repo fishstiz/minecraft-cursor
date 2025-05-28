@@ -9,10 +9,12 @@ import io.github.fishstiz.minecraftcursor.impl.MinecraftCursorInitializerImpl;
 import io.github.fishstiz.minecraftcursor.provider.CursorControllerProvider;
 import io.github.fishstiz.minecraftcursor.platform.Services;
 import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
+import io.github.fishstiz.minecraftcursor.config.Flag;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +43,10 @@ public final class MinecraftCursor {
         });
 
         CursorControllerProvider.init(CONTROLLER);
+
+        if (!Services.PLATFORM.isFabric()) {
+            Flag.REMAP.disable(); // Unsupported in Forge/NeoForge
+        }
     }
 
     static void onScreenInit(Minecraft minecraft, Screen screen) {
@@ -113,5 +119,13 @@ public final class MinecraftCursor {
 
     public static void toggleInspect() {
         RESOLVER.toggleInspector();
+    }
+
+    public static boolean isInspecting() {
+        return RESOLVER.getInspector().isInspecting();
+    }
+
+    public static ResourceLocation loc(String path) {
+        return new ResourceLocation(MOD_ID, path);
     }
 }

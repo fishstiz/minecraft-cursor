@@ -13,13 +13,13 @@ public class CursorTypeUtil {
     public static final long WINDOW = Minecraft.getInstance().getWindow().getWindow();
 
     public static boolean canShift() {
-        return CursorManager.INSTANCE.getId(CursorType.SHIFT) != 0 &&
+        return CursorManager.INSTANCE.isEnabled(CursorType.SHIFT) &&
                InputConstants.isKeyDown(WINDOW, GLFW.GLFW_KEY_LEFT_SHIFT) ||
                InputConstants.isKeyDown(WINDOW, GLFW.GLFW_KEY_RIGHT_SHIFT);
     }
 
     public static boolean isGrabbing() {
-        return CursorManager.INSTANCE.getId(CursorType.GRABBING) != 0 &&
+        return CursorManager.INSTANCE.isEnabled(CursorType.GRABBING) &&
                CursorManager.INSTANCE.getAppliedCursor().getType().isKey(CursorType.GRABBING) &&
                isLeftClickHeld();
     }

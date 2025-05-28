@@ -108,7 +108,7 @@ public abstract class GlfwMixin {
 
         if (trackedCursor == null
             || trackedCursor.getCursorType().isKey(ExternalCursor.PLACEHOLDER_CUSTOM)
-            || CursorManager.INSTANCE.getId(trackedCursor.getCursorType()) == 0) {
+            || !CursorManager.INSTANCE.isEnabled(trackedCursor.getCursorType())) {
             original.call(window, cursor);
             tracker.updateCursor(trackedCursor == null ? 0 : trackedCursor.getCaller(), ExternalCursor.PLACEHOLDER_CUSTOM);
             return;

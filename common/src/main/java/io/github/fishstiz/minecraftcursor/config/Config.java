@@ -31,7 +31,7 @@ public class Config extends AbstractConfig<Config.Settings> {
     Config() {
     }
 
-    public Settings getOrCreateCursorSettings(Cursor cursor) {
+    public Settings getOrCreateSettings(Cursor cursor) {
         return settings.computeIfAbsent(cursor.getTypeKey(), k -> new Settings());
     }
 
@@ -55,18 +55,43 @@ public class Config extends AbstractConfig<Config.Settings> {
         return global;
     }
 
-    public void mergeResources(Resource resources) {
-        for (Map.Entry<String, Config.Settings> entry : resources.getSettings().entrySet()) {
-            Settings old = this.settings.computeIfAbsent(entry.getKey(), k -> new Settings());
-            Settings validated = entry.getValue().copy();
 
-            // preserve 'disabled' state of cursors
-            // only allow external settings to disable
-            if (!old.enabled) {
-                validated.enabled = false;
-            }
+    private Settings validateSettings(String key, Settings settings) {
+        Settings old = this.settings.computeIfAbsent(key, k -> new Settings());
+        Settings validated = settings.copy();
 
-            this.settings.put(entry.getKey(), validated);
+        // resource packs can only disable
+        if (!old.enabled) {
+            validated.enabled = false;
+        }
+
+        return validated;
+    }
+
+    private Config.Settings filterInactive(@NotNull Cursor cursor, @NotNull Config.Settings settingsToApply) {
+        Config.Settings currentSettings = this.settings.computeIfAbsent(cursor.getTypeKey(), k -> new Config.Settings());
+        Config.Settings validated = settingsToApply.copy();
+
+        if (this.global.isScaleActive()) {
+            validated.setScale(currentSettings.getScale());
+        }
+        if (this.global.isXHotActive()) {
+            validated.setXHot(cursor, currentSettings.getXHot());
+        }
+        if (this.global.isYHotActive()) {
+            validated.setYHot(cursor, currentSettings.getYHot());
+        }
+        return validated;
+    }
+
+    public void replaceActiveSettings(Resource resource, Cursor cursor) {
+        this.settings.put(cursor.getTypeKey(), this.filterInactive(cursor, resource.getOrCreateSettings(cursor)));
+    }
+
+    public void merge(Resource resources) {
+        for (Map.Entry<String, Config.Settings> resourceEntry : resources.getAllSettings().entrySet()) {
+            String key = resourceEntry.getKey();
+            this.settings.put(key, this.validateSettings(key, resourceEntry.getValue()));
         }
     }
 
@@ -200,6 +225,22 @@ public class Config extends AbstractConfig<Config.Settings> {
             this.enabled = enabled;
         }
 
+        public void setScale(double scale) {
+            this.scale = sanitizeScale(scale);
+        }
+
+        public void setXHot(@NotNull Cursor cursor, int xhot) {
+            this.xhot = sanitizeHotspot(xhot, cursor);
+        }
+
+        public void setYHot(@NotNull Cursor cursor, int yhot) {
+            this.yhot = sanitizeHotspot(yhot, cursor);
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
         public boolean isEnabled() {
             return enabled;
         }
@@ -231,8 +272,8 @@ public class Config extends AbstractConfig<Config.Settings> {
 
         public void setActiveAll(boolean active) {
             setScaleActive(active);
-            setXhotActive(active);
-            setYhotActive(active);
+            setXHotActive(active);
+            setYHotActive(active);
         }
 
         public boolean isScaleActive() {
@@ -247,7 +288,7 @@ public class Config extends AbstractConfig<Config.Settings> {
             return xhotActive;
         }
 
-        public void setXhotActive(boolean xhotActive) {
+        public void setXHotActive(boolean xhotActive) {
             this.xhotActive = xhotActive;
         }
 
@@ -255,7 +296,7 @@ public class Config extends AbstractConfig<Config.Settings> {
             return yhotActive;
         }
 
-        public void setYhotActive(boolean yhotActive) {
+        public void setYHotActive(boolean yhotActive) {
             this.yhotActive = yhotActive;
         }
 
@@ -263,7 +304,7 @@ public class Config extends AbstractConfig<Config.Settings> {
             this.scale = sanitizeScale(scale);
         }
 
-        public void setXHotDouble(double xhot) {
+        public void setXHot(double xhot) {
             setXHot((int) xhot);
         }
 
@@ -276,7 +317,7 @@ public class Config extends AbstractConfig<Config.Settings> {
             return SettingsUtil.sanitizeGlobalHotspot(this.xhot);
         }
 
-        public void setYHotDouble(double yhot) {
+        public void setYHot(double yhot) {
             setYHot((int) yhot);
         }
 
@@ -311,6 +352,10 @@ public class Config extends AbstractConfig<Config.Settings> {
     }
 
     public static class Resource extends AbstractConfig<Settings> {
+        public Config.Settings getOrCreateSettings(Cursor cursor) {
+            return settings.computeIfAbsent(cursor.getTypeKey(), k -> new Config.Settings());
+        }
+
         @Override
         public @NotNull String getHash() {
             return Config.generateHash(this.settings);

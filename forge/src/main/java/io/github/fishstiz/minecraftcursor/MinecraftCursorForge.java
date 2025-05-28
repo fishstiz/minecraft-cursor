@@ -1,6 +1,6 @@
 package io.github.fishstiz.minecraftcursor;
 
-import io.github.fishstiz.minecraftcursor.gui.screen.CursorOptionsScreen;
+import io.github.fishstiz.minecraftcursor.gui.screen.ConfigurationScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.ConfigScreenHandler;
@@ -19,7 +19,7 @@ public class MinecraftCursorForge {
     @SuppressWarnings("removal")
     public MinecraftCursorForge() {
         ModLoadingContext.get().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class, () ->
-                new ConfigScreenHandler.ConfigScreenFactory((mc, screen) -> new CursorOptionsScreen(screen))
+                new ConfigScreenHandler.ConfigScreenFactory((mc, screen) -> new ConfigurationScreen(screen))
         );
 
         MinecraftCursor.init();

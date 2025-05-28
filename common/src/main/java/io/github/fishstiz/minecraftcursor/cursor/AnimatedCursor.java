@@ -37,7 +37,7 @@ public class AnimatedCursor extends Cursor {
         HashMap<Integer, Cursor> newCursors = createCursors(image, settings, availableFrames);
         List<Frame> newFrames = createFrames(animation, newCursors, availableFrames);
 
-        updateState(settings, animation, newCursors, newFrames);
+        updateState(settings.isAnimated(), animation, newCursors, newFrames);
     }
 
     private HashMap<Integer, Cursor> createCursors(
@@ -88,17 +88,16 @@ public class AnimatedCursor extends Cursor {
     }
 
     private void updateState(
-            Config.Settings settings,
+            Boolean animated,
             AnimationData animation,
             HashMap<Integer, Cursor> newCursors,
             List<Frame> newFrames
     ) {
+        this.setAnimated(animated);
         this.fallbackFrame = new Frame(this, 1, 0);
-        this.animated = settings.isAnimated() == null || settings.isAnimated();
         this.mode = animation.mode;
 
-        boolean isReversed = this.mode == AnimationMode.LOOP_REVERSE || this.mode == AnimationMode.REVERSE;
-        if (isReversed) Collections.reverse(newFrames);
+        if (this.mode.isReversed()) Collections.reverse(newFrames);
         this.frames = newFrames;
 
 
@@ -139,8 +138,8 @@ public class AnimatedCursor extends Cursor {
         return this.animated;
     }
 
-    public void setAnimated(boolean animated) {
-        this.animated = animated;
+    public void setAnimated(Boolean animated) {
+        this.animated = animated == null || animated;
     }
 
     public AnimationMode getMode() {
@@ -148,18 +147,15 @@ public class AnimatedCursor extends Cursor {
     }
 
     @Override
-    protected void enableWithoutLoading(boolean enabled) {
-        super.enableWithoutLoading(enabled);
-        applyToFrames(cursor -> cursor.enableWithoutLoading(enabled));
+    public void apply(Config.Settings settings) {
+        this.setAnimated(settings.isAnimated());
+        super.apply(settings);
     }
 
     @Override
-    public boolean enable(boolean enabled) {
-        if (super.enable(enabled)) {
-            applyToFrames(cursor -> cursor.enableWithoutLoading(enabled));
-            return true;
-        }
-        return false;
+    public void enable(boolean enabled) {
+        super.enable(enabled);
+        applyToFrames(cursor -> cursor.enable(enabled));
     }
 
     @Override

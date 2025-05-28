@@ -7,8 +7,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 
-import static io.github.fishstiz.minecraftcursor.MinecraftCursor.MOD_ID;
-
 public class DrawUtil {
     private DrawUtil() {
     }
@@ -21,7 +19,8 @@ public class DrawUtil {
             int startY,
             int endX,
             int endY,
-            int color
+            int color,
+            boolean shadow
     ) {
         int textWidth = textRenderer.width(text);
         int textY = (startY + endY - 9) / 2 + 1;
@@ -35,11 +34,24 @@ public class DrawUtil {
             double scrollOffset = Mth.lerp(scrollFactor, 0.0, overflowWidth);
 
             context.enableScissor(startX, startY, endX, endY);
-            context.drawString(textRenderer, text, startX - (int) scrollOffset, textY, color);
+            context.drawString(textRenderer, text, startX - (int) scrollOffset, textY, color, shadow);
             context.disableScissor();
         } else {
-            context.drawString(textRenderer, text, startX, textY, color);
+            context.drawString(textRenderer, text, startX, textY, color, shadow);
         }
+    }
+
+    public static void drawScrollableTextLeftAlign(
+            GuiGraphics context,
+            Font textRenderer,
+            Component text,
+            int startX,
+            int startY,
+            int endX,
+            int endY,
+            int color
+    ) {
+        drawScrollableTextLeftAlign(context, textRenderer, text, startX, startY, endX, endY, color, true);
     }
 
     public static void drawCheckerboard(
