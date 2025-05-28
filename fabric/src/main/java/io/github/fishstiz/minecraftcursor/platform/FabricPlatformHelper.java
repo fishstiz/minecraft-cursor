@@ -26,6 +26,11 @@ public class FabricPlatformHelper implements PlatformHelper {
     }
 
     @Override
+    public boolean isFabric() {
+        return true;
+    }
+
+    @Override
     public String mapClassName(String namespace, String className) {
         return FabricLoader.getInstance().getMappingResolver().mapClassName(namespace, className);
     }

@@ -22,6 +22,10 @@ public interface ElementInspector {
         // no-op
     }
 
+    default boolean isInspecting() {
+        return this != NO_OP;
+    }
+
     static ElementInspector toggle(ElementInspector elementInspector) {
         elementInspector.destroy();
         return elementInspector instanceof ElementInspectorImpl ? NO_OP : new ElementInspectorImpl();

@@ -7,23 +7,25 @@ import java.util.List;
 import java.util.Random;
 
 public class AnimationState {
+    private static final long MS_PER_TICK = 50;
     private static final Random RANDOM = new Random();
-    private long lastFrameTime = Util.getMillis();
+    private long lastFrameTime = 0;
     private int currentFrame = 0;
     private boolean oscillateReversed = false;
     private List<Integer> remainingFrames;
 
-    public boolean nextFrame(AnimatedCursor cursor) {
-        long currentTime = Util.getMillis();
-        boolean isNextFrame = currentTime - lastFrameTime >= cursor.getFrame(currentFrame).time() * 50L; // 50ms = 1 tick
-        if (isNextFrame) next(cursor, currentTime);
-        return isNextFrame;
+    private boolean isNext(AnimatedCursor cursor, long currentTime) {
+        return currentTime - this.lastFrameTime >= cursor.getFrame(this.currentFrame).time() * MS_PER_TICK;
     }
 
-    public int next(AnimatedCursor cursor, long currentTime) {
-        lastFrameTime = currentTime;
+    public int next(AnimatedCursor cursor) {
+        long currentTime = Util.getMillis();
+        if (!this.isNext(cursor, currentTime)) {
+            return this.currentFrame;
+        }
 
-        currentFrame = switch (cursor.getMode()) {
+        this.lastFrameTime = currentTime;
+        this.currentFrame = switch (cursor.getMode()) {
             case LOOP, LOOP_REVERSE -> (currentFrame + 1) % cursor.getFrameCount();
             case FORWARDS, REVERSE -> Math.min(currentFrame + 1, cursor.getFrameCount() - 1);
             case OSCILLATE -> {
@@ -46,7 +48,6 @@ public class AnimationState {
                 yield remainingFrames.remove(RANDOM.nextInt(remainingFrames.size()));
             }
         };
-
         return currentFrame;
     }
 

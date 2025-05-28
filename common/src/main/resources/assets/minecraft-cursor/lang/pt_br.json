@@ -9,17 +9,18 @@
   "minecraft-cursor.options.cursor-type.grabbing": "Agarro",
   "minecraft-cursor.options.cursor-type.text": "Texto",
   "minecraft-cursor.options.cursor-type.shift": "Deslocamento",
-  "minecraft-cursor.options.more": "Mais Opções de Cursor",
-  "minecraft-cursor.options.more.adapt": "Cursor Adaptável",
-  "minecraft-cursor.options.more.adapt.tooltip": "Atualiza a configuração ativada para todos os cursores, exceto o cursor Padrão.",
-  "minecraft-cursor.options.item_slot": "Espaço de Item do Inventário",
-  "minecraft-cursor.options.item_grab": "Pegar Item no Inventário",
-  "minecraft-cursor.options.creative_tabs": "Aba do Inventário Criativo",
-  "minecraft-cursor.options.enchantments": "Botões de Encantamento",
-  "minecraft-cursor.options.stonecutter": "Botões de Receita da Cortadora de Pedra",
-  "minecraft-cursor.options.book_edit": "Livro e Pena",
-  "minecraft-cursor.options.loom": "Botões do Tear",
-  "minecraft-cursor.options.advancements": "Aba de Progressos",
-  "minecraft-cursor.options.world": "Botão de Jogar no Mundo",
-  "minecraft-cursor.options.server": "Botão de Jogar no Servidor"
+
+  "minecraft-cursor.options.adapt.item_slot": "Espaço de Item do Inventário",
+  "minecraft-cursor.options.adapt.item_grab": "Pegar Item no Inventário",
+  "minecraft-cursor.options.adapt.creative_tabs": "Aba do Inventário Criativo",
+  "minecraft-cursor.options.adapt.enchantments": "Botões de Encantamento",
+  "minecraft-cursor.options.adapt.stonecutter": "Botões de Receita da Cortadora de Pedra",
+  "minecraft-cursor.options.adapt.book_edit": "Livro e Pena",
+  "minecraft-cursor.options.adapt.loom": "Botões do Tear",
+  "minecraft-cursor.options.adapt.advancements": "Aba de Progressos",
+  "minecraft-cursor.options.adapt.world": "Botão de Jogar no Mundo",
+  "minecraft-cursor.options.adapt.server": "Botão de Jogar no Servidor",
+
+  "minecraft-cursor.options.adapt": "Cursor Adaptável",
+  "minecraft-cursor.options.adapt.tooltip": "Atualiza a configuração ativada para todos os cursores, exceto o cursor Padrão."
 }
