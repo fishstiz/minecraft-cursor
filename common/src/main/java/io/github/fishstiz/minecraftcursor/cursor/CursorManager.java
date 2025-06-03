@@ -113,7 +113,9 @@ public final class CursorManager implements CursorTypeRegistrar {
     }
 
     private void updateCursor(Cursor cursor) {
-        if (cursor == null || cursor.getId() == currentCursor.getId() || ExternalCursorTracker.get().isCustom()) {
+        if (cursor == null
+            || (!MinecraftCursor.CONFIG.isAggressiveCursor() && cursor.getId() == currentCursor.getId())
+            || ExternalCursorTracker.get().isCustom()) {
             return;
         }
 
