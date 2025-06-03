@@ -4,6 +4,8 @@ import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.compat.ExternalCursorTracker;
 import io.github.fishstiz.minecraftcursor.config.Config;
 import io.github.fishstiz.minecraftcursor.config.ConfigLoader;
+import io.github.fishstiz.minecraftcursor.cursor.CursorManager;
+import io.github.fishstiz.minecraftcursor.cursor.resolver.CursorTypeResolver;
 import io.github.fishstiz.minecraftcursor.impl.CursorControllerImpl;
 import io.github.fishstiz.minecraftcursor.impl.MinecraftCursorInitializerImpl;
 import io.github.fishstiz.minecraftcursor.provider.CursorControllerProvider;
@@ -24,7 +26,6 @@ public final class MinecraftCursor {
     public static final String MOD_ID = "minecraft-cursor";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     public static final Config CONFIG = ConfigLoader.load(Services.PLATFORM.getConfigDir().resolve(MOD_ID + ".json").toFile());
-    private static final CursorTypeResolver RESOLVER = new CursorTypeResolver();
     private static final CursorControllerImpl CONTROLLER = new CursorControllerImpl();
     private static Screen visibleHudScreen;
 
@@ -32,11 +33,11 @@ public final class MinecraftCursor {
     }
 
     static void init() {
-        new MinecraftCursorInitializerImpl().init(CursorManager.INSTANCE, RESOLVER);
+        new MinecraftCursorInitializerImpl().init(CursorManager.INSTANCE, CursorTypeResolver.INSTANCE);
 
         Services.PLATFORM.getEntrypoints().forEach(entrypoint -> {
             try {
-                entrypoint.init(CursorManager.INSTANCE, RESOLVER);
+                entrypoint.init(CursorManager.INSTANCE, CursorTypeResolver.INSTANCE);
             } catch (LinkageError | Exception e) {
                 LOGGER.error("[minecraft-cursor] Skipping invalid implementation of MinecraftCursorInitializer");
             }
@@ -50,21 +51,18 @@ public final class MinecraftCursor {
     }
 
     static void onScreenInit(Minecraft minecraft, Screen screen) {
-        RESOLVER.lastFailedElement = "";
-
         if (minecraft.screen == null) {
             CursorManager.INSTANCE.setCurrentCursor(CursorType.DEFAULT);
             visibleHudScreen = screen;
             return;
         }
-
         visibleHudScreen = null;
     }
 
     static void onScreenRender(Minecraft minecraft, Screen screen, GuiGraphics guiGraphics, int mouseX, int mouseY) {
         visibleHudScreen = null;
 
-        RESOLVER.getInspector().render(minecraft, screen, guiGraphics, mouseX, mouseY);
+        CursorTypeResolver.INSTANCE.getInspector().render(minecraft, screen, guiGraphics, mouseX, mouseY);
 
         if (ExternalCursorTracker.get().isCustom()) return;
 
@@ -102,8 +100,7 @@ public final class MinecraftCursor {
             return CursorType.GRABBING;
         }
 
-        CursorType cursorType = RESOLVER.resolve(screen, mouseX, mouseY);
-
+        CursorType cursorType = CursorTypeResolver.INSTANCE.resolve(screen, mouseX, mouseY);
         if (!cursorType.isDefault()) {
             return cursorType;
         }
@@ -111,18 +108,10 @@ public final class MinecraftCursor {
         Optional<GuiEventListener> child = screen.getChildAt(mouseX, mouseY);
 
         if (child.isPresent()) {
-            return RESOLVER.resolve(child.get(), mouseX, mouseY);
+            return CursorTypeResolver.INSTANCE.resolve(child.get(), mouseX, mouseY);
         }
 
         return CursorType.DEFAULT;
-    }
-
-    public static void toggleInspect() {
-        RESOLVER.toggleInspector();
-    }
-
-    public static boolean isInspecting() {
-        return RESOLVER.getInspector().isInspecting();
     }
 
     public static ResourceLocation loc(String path) {

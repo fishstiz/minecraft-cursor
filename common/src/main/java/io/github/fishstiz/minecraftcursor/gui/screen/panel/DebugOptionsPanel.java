@@ -1,6 +1,6 @@
 package io.github.fishstiz.minecraftcursor.gui.screen.panel;
 
-import io.github.fishstiz.minecraftcursor.MinecraftCursor;
+import io.github.fishstiz.minecraftcursor.cursor.resolver.CursorTypeResolver;
 import io.github.fishstiz.minecraftcursor.gui.widget.OptionsListWidget;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
@@ -19,8 +19,8 @@ public class DebugOptionsPanel extends AbstractOptionsPanel {
         this.optionsList = new OptionsListWidget(this.getMinecraft(), this.getFont(), this.getSpacing());
 
         this.optionsList.addToggle(
-                MinecraftCursor.isInspecting(),
-                v -> MinecraftCursor.toggleInspect(),
+                CursorTypeResolver.INSTANCE.getInspector().isInspecting(),
+                v -> CursorTypeResolver.INSTANCE.toggleInspector(),
                 this.index(INSPECT_TEXT),
                 null,
                 true

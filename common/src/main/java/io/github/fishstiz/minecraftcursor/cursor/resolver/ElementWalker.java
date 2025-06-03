@@ -6,7 +6,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 
 import java.util.function.Predicate;
 
-public class ElementWalker {
+final class ElementWalker {
     private ElementWalker() {
     }
 
@@ -27,7 +27,7 @@ public class ElementWalker {
                     }
                 }
                 if (containsPoint(child, mouseX, mouseY)) {
-                    T result = processor.process(child, mouseX, mouseY);
+                    T result = processor.processNode(child, mouseX, mouseY);
                     if (shouldReturn.test(result)) {
                         return result;
                     }
@@ -53,6 +53,6 @@ public class ElementWalker {
 
     @FunctionalInterface
     public interface Processor<T> {
-        T process(GuiEventListener child, double mouseX, double mouseY);
+        T processNode(GuiEventListener node, double mouseX, double mouseY);
     }
 }

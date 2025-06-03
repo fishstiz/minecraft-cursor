@@ -1,7 +1,7 @@
 package io.github.fishstiz.minecraftcursor.gui.screen.panel;
 
-import io.github.fishstiz.minecraftcursor.CursorLoader;
-import io.github.fishstiz.minecraftcursor.CursorManager;
+import io.github.fishstiz.minecraftcursor.CursorResourceLoader;
+import io.github.fishstiz.minecraftcursor.cursor.CursorManager;
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.api.CursorController;
 import io.github.fishstiz.minecraftcursor.config.Config;
@@ -300,12 +300,12 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
 
     private void refreshDefaultsButton() {
         if (this.resetToDefaultsButton != null) {
-            this.resetToDefaultsButton.active = !CursorLoader.isResourceSetting(this.cursor, this.settings);
+            this.resetToDefaultsButton.active = !CursorResourceLoader.isResourceSetting(this.cursor, this.settings);
         }
     }
 
     private void resetToDefaults() {
-        if (CursorLoader.retoreActiveResourceSettings(Objects.requireNonNull(this.cursor))) {
+        if (CursorResourceLoader.retoreActiveResourceSettings(Objects.requireNonNull(this.cursor))) {
             this.refreshCursors.run();
             if (this.enableToggler != null) {
                 this.setFocused(this.enableToggler);

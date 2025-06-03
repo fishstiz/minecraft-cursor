@@ -2,7 +2,6 @@ package io.github.fishstiz.minecraftcursor.platform;
 
 import cpw.mods.modlauncher.api.INameMappingService;
 import io.github.fishstiz.minecraftcursor.api.MinecraftCursorInitializer;
-import io.github.fishstiz.minecraftcursor.impl.MinecraftCursorInitializerImpl;
 import io.github.fishstiz.minecraftcursor.platform.services.PlatformHelper;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.FMLPaths;
@@ -25,11 +24,7 @@ public class ForgePlatformHelper implements PlatformHelper {
 
     @Override
     public List<MinecraftCursorInitializer> getEntrypoints() {
-        ServiceLoader<MinecraftCursorInitializer> loader = ServiceLoader.load(MinecraftCursorInitializer.class);
-
-        return StreamSupport.stream(loader.spliterator(), false)
-                .filter(service -> !(service instanceof MinecraftCursorInitializerImpl))
-                .toList();
+        return StreamSupport.stream(ServiceLoader.load(MinecraftCursorInitializer.class).spliterator(), false).toList();
     }
 
     @Override

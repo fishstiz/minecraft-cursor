@@ -1,7 +1,7 @@
 package io.github.fishstiz.minecraftcursor.gui.screen.panel;
 
-import io.github.fishstiz.minecraftcursor.CursorLoader;
-import io.github.fishstiz.minecraftcursor.CursorManager;
+import io.github.fishstiz.minecraftcursor.CursorResourceLoader;
+import io.github.fishstiz.minecraftcursor.cursor.CursorManager;
 import io.github.fishstiz.minecraftcursor.api.CursorController;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
@@ -212,7 +212,7 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
     }
 
     private void resetCursorSettings() {
-        CursorLoader.restoreResourceSettings();
+        CursorResourceLoader.restoreResourceSettings();
         this.refreshWidgets();
         this.repositionElements();
     }

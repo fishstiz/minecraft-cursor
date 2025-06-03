@@ -3,6 +3,7 @@ package io.github.fishstiz.minecraftcursor.cursor;
 import net.minecraft.Util;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -12,7 +13,8 @@ public class AnimationState {
     private long lastFrameTime = 0;
     private int currentFrame = 0;
     private boolean oscillateReversed = false;
-    private List<Integer> remainingFrames;
+    private List<Integer> shuffledFrames;
+    private int shuffledIndex = 0;
 
     private boolean isNext(AnimatedCursor cursor, long currentTime) {
         return currentTime - this.lastFrameTime >= cursor.getFrame(this.currentFrame).time() * MS_PER_TICK;
@@ -39,13 +41,15 @@ public class AnimationState {
                 yield newFrame;
             }
             case RANDOM_CYCLE -> {
-                if (remainingFrames == null || remainingFrames.isEmpty()) {
-                    remainingFrames = new ArrayList<>(cursor.getFrameCount());
+                if (shuffledFrames == null || shuffledIndex >= shuffledFrames.size()) {
+                    shuffledFrames = new ArrayList<>(cursor.getFrameCount());
                     for (int i = 0; i < cursor.getFrameCount(); i++) {
-                        remainingFrames.add(i);
+                        shuffledFrames.add(i);
                     }
+                    Collections.shuffle(shuffledFrames, RANDOM);
+                    shuffledIndex = 0;
                 }
-                yield remainingFrames.remove(RANDOM.nextInt(remainingFrames.size()));
+                yield shuffledFrames.get(shuffledIndex++);
             }
         };
         return currentFrame;
@@ -55,7 +59,8 @@ public class AnimationState {
         lastFrameTime = Util.getMillis();
         currentFrame = 0;
         oscillateReversed = false;
-        remainingFrames = null;
+        shuffledFrames = null;
+        shuffledIndex = 0;
     }
 
     public int getCurrentFrame() {
