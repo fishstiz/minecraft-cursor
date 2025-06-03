@@ -767,6 +767,10 @@ public abstract class CatalogBrowserScreen extends Screen {
             this.catalog.selectItem(item);
         }
 
+        protected CatalogBrowserScreen getScreen() {
+            return this.catalog;
+        }
+
         protected Minecraft getMinecraft() {
             return this.minecraft;
         }
