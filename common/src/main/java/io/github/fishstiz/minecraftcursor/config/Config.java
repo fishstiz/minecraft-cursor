@@ -26,6 +26,7 @@ public class Config extends AbstractConfig<Config.Settings> {
     private boolean remapCursorsEnabled = true;
     private boolean deferredLoading = false;
     private boolean inactiveWidgetsEnabled = true;
+    private boolean aggressiveCursor = false;
     private final GlobalSettings global = new GlobalSettings();
     transient File file;
 
@@ -198,6 +199,14 @@ public class Config extends AbstractConfig<Config.Settings> {
 
     public void setInactiveWidgetsEnabled(boolean inactiveWidgetsEnabled) {
         this.inactiveWidgetsEnabled = inactiveWidgetsEnabled;
+    }
+
+    public boolean isAggressiveCursor() {
+        return aggressiveCursor;
+    }
+
+    public void setAggressiveCursor(boolean aggressiveCursor) {
+        this.aggressiveCursor = aggressiveCursor;
     }
 
     private static String generateHash(Map<String, Settings> settings) {
