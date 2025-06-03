@@ -3,10 +3,12 @@ package io.github.fishstiz.minecraftcursor.cursor.resolver;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.function.Predicate;
 
-final class ElementWalker {
+public final class ElementWalker {
     private ElementWalker() {
     }
 
@@ -35,6 +37,10 @@ final class ElementWalker {
             }
         }
         return defaultValue;
+    }
+
+    public static @Nullable GuiEventListener findDeepest(ContainerEventHandler parent, double mouseX, double mouseY) {
+        return ElementWalker.walk(parent, mouseX, mouseY, (child, x, y) -> child, Objects::nonNull, null);
     }
 
     /**
