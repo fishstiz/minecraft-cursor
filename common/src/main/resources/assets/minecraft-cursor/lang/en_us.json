@@ -65,6 +65,8 @@
   "minecraft-cursor.options.compat.remap_cursors.info": "Remaps system cursors to the equivalent Minecraft Cursor.\n\nWARNING: Disabling may cause compatibility issues with certain mods.",
   "minecraft-cursor.options.compat.remap_cursors.info_unavailable": "Remapping system cursors is unsupported if GLFW is loaded early.",
   "minecraft-cursor.options.compat.remap_cursors.empty": "No detected cursors to remap.",
+  "minecraft-cursor.options.compat.aggressive_cursor": "Aggressive cursor updates",
+  "minecraft-cursor.options.compat.aggressive_cursor.info": "Aggressively updates the cursor instead of only when it changes.\n\nDisabled by default.",
 
   "minecraft-cursor.options.debug": "Debug",
   "minecraft-cursor.options.debug.inspect": "Inspect Element"
