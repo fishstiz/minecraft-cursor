@@ -11,6 +11,8 @@ import org.jetbrains.annotations.Nullable;
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
 
 public class CompatibilityOptionsPanel extends AbstractOptionsPanel {
+    private static final Component AGGRESSIVE_TEXT = Component.translatable("minecraft-cursor.options.compat.aggressive_cursor");
+    private static final Tooltip AGGRESSIVE_INFO = Tooltip.create(Component.translatable("minecraft-cursor.options.compat.aggressive_cursor.info"));
     private static final Component REMAP_TEXT = Component.translatable("minecraft-cursor.options.compat.remap_cursors");
     private static final Tooltip REMAP_INFO = Tooltip.create(Component.translatable(Flag.REMAP.getInfoKey()));
     private static final Tooltip REMAP_EMPTY_INFO = Tooltip.create(Component.translatable("minecraft-cursor.options.compat.remap_cursors.empty"));
@@ -24,7 +26,13 @@ public class CompatibilityOptionsPanel extends AbstractOptionsPanel {
     protected void initContents() {
         this.optionsList = new OptionsListWidget(this.getMinecraft(), this.getFont(), this.getSpacing());
 
-
+        this.optionsList.addToggle(
+                CONFIG.isAggressiveCursor(),
+                CONFIG::setAggressiveCursor,
+                this.index(AGGRESSIVE_TEXT),
+                AGGRESSIVE_INFO,
+                true
+        );
         this.optionsList.addToggle(
                 Flag.REMAP.isEnabled() && CONFIG.isRemapCursorsEnabled(),
                 CONFIG::setRemapCursorsEnabled,
