@@ -1,14 +1,21 @@
-**For all versions:**
-- Cursors can now use **8x8**, **16x16**, **48x48**, or **64x64** textures in addition to **32x32**.
-- Added option to defer loading of disabled cursors on the next launch of Minecraft until they’re enabled.  
-  Mostly negligible impact; mainly intended for users who disable adaptive cursor.
-- Registered vanilla **Multiline Edit Box** with **Text** cursor.
-- Applied default cursor when dragging the scrollbar on some scrollable areas.
-- Fixed hotspot widget applying when it was the last focused widget and the mouse was dragged from outside to inside its bounds.
-- Fixed animation also getting disabled when the cursor is disabled.
+- Increased maximum texture size to **128x128** in steps of **8**. Minimum size remains **8x8**.
+  <br>
+  Recommended texture size is 2<sup>n</sup> with custom scale or 16x16 with auto-scale enabled.
+- Changed element detection logic (again). Inactive vanilla widgets are now detected.
+- Registered disabled vanilla buttons and sliders with the **Not Allowed** cursor. Can be disabled. ([#31](https://github.com/fishstiz/minecraft-cursor/issues/31))
+- Overhauled the **Cursor Settings** screen.
+  - Added sidebar with sections: **Global**, **Adaptive Cursor**, **Cursors**, **Mod Compatibility**, and **Debug**.
+  - Added search functionality.
+  - **Adaptive Cursor**: Added option to toggle **Not Allowed** cursor on disabled widgets.
+  - **Cursors**: Added **Reset to Defaults** option.
+  - **Mod Compatibility**: Added option to aggressively update the cursor.
+  - Removed More Cursor Options screen (consolidated to Cursor Settings screen)
+- Improved performance of `random_cycle` animation mode.
+- Fixed cursor not being destroyed when switching to resource packs with an invalid cursor image.
+- Fixed the cursor reverting to **Default** when holding **right shift** on inventory items if the **Shift** cursor was disabled.
 
-**For Minecraft version 1.20.1:**
-- Fixed hotspot widget not applying when releasing the mouse outside the widget's bounds.
-
-**For Fabric versions:**
-- Fixed rare concurrency issue where the adaptive cursor does not work until restarting if other mods are also creating cursors.
+For Fabric versions:
+- Fixed custom cursors from other mods not being detected unless a standard cursor was also created.
+- Fixed cursor reload (via resource reload or changing cursor settings) bypassing the custom cursor check.
+  <br>
+  The expected behavior is that the Adaptive Cursor is disabled when a custom cursor is present to improve compatibility with mods that use custom cursors like FancyMenu.
