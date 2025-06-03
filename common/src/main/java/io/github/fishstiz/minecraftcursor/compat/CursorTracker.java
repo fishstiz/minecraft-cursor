@@ -13,10 +13,6 @@ public interface CursorTracker {
 
     boolean isTracking(long cursor);
 
-    void claimAddress(long address);
-
-    boolean unclaimAddress(long address);
-
     @NotNull CursorType getCursorOrDefault();
 
     boolean isCustom();
