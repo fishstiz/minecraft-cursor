@@ -1,5 +1,8 @@
 package io.github.fishstiz.minecraftcursor.api;
 
+import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.components.AbstractSliderButton;
+
 import java.util.Objects;
 
 /**
@@ -131,6 +134,10 @@ public interface CursorType {
     CursorType RESIZE_NESW = CursorType.of("resize_nesw");
 
     /**
+     * The cursor type that is applied when the mouse is over disabled
+     * {@link AbstractButton} and {@link AbstractSliderButton} widgets.
+     *
+     * <p>
      * Replaces {@code GLFW_NOT_ALLOWED_CURSOR} standard cursor.
      */
     CursorType NOT_ALLOWED = CursorType.of("not_allowed");

@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.fishstiz.minecraftcursor.platform.Services;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
@@ -15,7 +14,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
-import java.util.Objects;
 
 public class ElementInspectorImpl implements ElementInspector {
     private static final Component SCREEN_LABEL = Component.literal("S: ").withStyle(style -> style.withColor(0xFF339BFF)); // blue
@@ -59,7 +57,7 @@ public class ElementInspectorImpl implements ElementInspector {
     }
 
     private ScreenRectangle renderDeepest(Minecraft minecraft, Screen screen, GuiGraphics guiGraphics, double mouseX, double mouseY) {
-        GuiEventListener child = findDeepestChild(screen, mouseX, mouseY);
+        GuiEventListener child = ElementWalker.findDeepest(screen, mouseX, mouseY);
         GuiEventListener inspect = child != null ? child : screen;
         ScreenRectangle bounds = getBounds(inspect);
         Component label = DEEPEST_LABEL.copy().append(getClassName(inspect));
@@ -127,10 +125,6 @@ public class ElementInspectorImpl implements ElementInspector {
     private String getClassName(GuiEventListener element) {
         String namespace = Services.PLATFORM.isDevelopmentEnvironment() ? "named" : "intermediary";
         return Services.PLATFORM.unmapClassName(namespace, element.getClass().getName());
-    }
-
-    private @Nullable GuiEventListener findDeepestChild(ContainerEventHandler parent, double mouseX, double mouseY) {
-        return ElementWalker.walk(parent, mouseX, mouseY, (child, x, y) -> child, Objects::nonNull, null);
     }
 
     public enum Position {

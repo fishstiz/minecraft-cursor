@@ -28,6 +28,7 @@ public class AdaptiveOptionsPanel extends AbstractOptionsPanel {
     private static final Component ADVANCEMENTS = Component.translatable("minecraft-cursor.options.adapt.advancements");
     private static final Component WORLD = Component.translatable("minecraft-cursor.options.adapt.world");
     private static final Component SERVER = Component.translatable("minecraft-cursor.options.adapt.server");
+    private static final Component INACTIVE_WIDGETS = Component.translatable("minecraft-cursor.options.adapt.inactive_widgets");
     private static final int CURSOR_SIZE_STEP = 8;
     private final CursorAnimationHelper animationHelper;
     private final Runnable refreshCursors;
@@ -48,10 +49,11 @@ public class AdaptiveOptionsPanel extends AbstractOptionsPanel {
         this.optionsList.addToggle(adaptive, this::toggleAdaptive, ENABLE_TEXT, ADAPTIVE_INFO, true);
         this.addOption(CONFIG.isItemSlotEnabled(), CONFIG::setItemSlotEnabled, ITEM_SLOT, CursorType.POINTER, adaptive);
         this.addOption(CONFIG.isItemGrabbingEnabled(), CONFIG::setItemGrabbingEnabled, ITEM_GRAB, CursorType.GRABBING, adaptive);
+        this.addOption(CONFIG.isBookEditEnabled(), CONFIG::setBookEditEnabled, BOOK_EDIT, CursorType.TEXT, adaptive);
+        this.addOption(CONFIG.isInactiveWidgetsEnabled(), CONFIG::setInactiveWidgetsEnabled, INACTIVE_WIDGETS, CursorType.NOT_ALLOWED, adaptive);
         this.addOption(CONFIG.isCreativeTabsEnabled(), CONFIG::setCreativeTabsEnabled, CREATIVE_TABS, CursorType.POINTER, adaptive);
         this.addOption(CONFIG.isEnchantmentsEnabled(), CONFIG::setEnchantmentsEnabled, ENCHANTMENTS, CursorType.POINTER, adaptive);
         this.addOption(CONFIG.isStonecutterRecipesEnabled(), CONFIG::setStonecutterRecipesEnabled, STONECUTTER, CursorType.POINTER, adaptive);
-        this.addOption(CONFIG.isBookEditEnabled(), CONFIG::setBookEditEnabled, BOOK_EDIT, CursorType.TEXT, adaptive);
         this.addOption(CONFIG.isLoomPatternsEnabled(), CONFIG::setLoomPatternsEnabled, LOOM, CursorType.POINTER, adaptive);
         this.addOption(CONFIG.isAdvancementTabsEnabled(), CONFIG::setAdvancementTabsEnabled, ADVANCEMENTS, CursorType.POINTER, adaptive);
         this.addOption(CONFIG.isWorldIconEnabled(), CONFIG::setWorldIconEnabled, WORLD, CursorType.POINTER, adaptive);

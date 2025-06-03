@@ -408,24 +408,27 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
         }
 
         private class Entry extends AbstractListWidget<Entry>.Entry implements Layout {
-            private final AbstractWidget optionWidget;
             private final List<AbstractWidget> children = new ArrayList<>();
+            private final AbstractWidget optionWidget;
+            private final AbstractWidget decoration;
 
             private Entry(@NotNull AbstractWidget optionWidget, @Nullable AbstractWidget decoration) {
                 this.optionWidget = optionWidget;
+                this.decoration = decoration;
 
-                this.children.add(this.optionWidget);
-                if (decoration != null) {
-                    this.children.add(decoration);
+                if (this.decoration != null) {
+                    this.children.add(this.decoration);
                 }
+                this.children.add(this.optionWidget);
             }
 
             @Override
             public void render(@NotNull GuiGraphics guiGraphics, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean hovering, float partialTick) {
                 this.optionWidget.setPosition(left, top);
+                this.optionWidget.render(guiGraphics, mouseX, mouseY, partialTick);
 
-                for (AbstractWidget widget : this.children) {
-                    widget.render(guiGraphics, mouseX, mouseY, partialTick);
+                if (this.decoration != null) {
+                    this.decoration.render(guiGraphics, mouseX, mouseY, partialTick);
                 }
             }
 
