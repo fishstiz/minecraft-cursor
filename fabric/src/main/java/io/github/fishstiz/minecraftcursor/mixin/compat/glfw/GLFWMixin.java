@@ -22,8 +22,8 @@ import static org.lwjgl.glfw.GLFW.*;
 @Mixin(value = GLFW.class, remap = false)
 public abstract class GLFWMixin {
     @WrapMethod(method = "nglfwCreateCursor")
-    private static long ntrackCustomCursor(long image, int xhot, int yhot, Operation<Long> original) {
-        if (ExternalCursorTracker.get().unclaimAddress(image)) {
+    private static long trackCustomCursor(long image, int xhot, int yhot, Operation<Long> original) {
+        if (ExternalCursorTracker.consumeInternalCursor(image)) {
             return original.call(image, xhot, yhot);
         }
 
@@ -107,10 +107,10 @@ public abstract class GLFWMixin {
         ExternalCursor trackedCursor = tracker.getTrackedCursor(cursor);
 
         if (trackedCursor == null
-            || trackedCursor.getCursorType().isKey(ExternalCursor.PLACEHOLDER_CUSTOM)
+            || trackedCursor.getCursorType().isKey(ExternalCursor.CUSTOM)
             || !CursorManager.INSTANCE.isEnabled(trackedCursor.getCursorType())) {
             original.call(window, cursor);
-            tracker.updateCursor(trackedCursor == null ? 0 : trackedCursor.getCaller(), ExternalCursor.PLACEHOLDER_CUSTOM);
+            tracker.updateCursor(trackedCursor == null ? 0 : trackedCursor.getCaller(), ExternalCursor.CUSTOM);
             return;
         }
 
