@@ -25,6 +25,7 @@ public class Config extends AbstractConfig<Config.Settings> {
     private boolean serverIconEnabled = true;
     private boolean remapCursorsEnabled = true;
     private boolean deferredLoading = false;
+    private boolean inactiveWidgetsEnabled = true;
     private final GlobalSettings global = new GlobalSettings();
     transient File file;
 
@@ -191,6 +192,14 @@ public class Config extends AbstractConfig<Config.Settings> {
         this.deferredLoading = deferredLoading;
     }
 
+    public boolean isInactiveWidgetsEnabled() {
+        return inactiveWidgetsEnabled;
+    }
+
+    public void setInactiveWidgetsEnabled(boolean inactiveWidgetsEnabled) {
+        this.inactiveWidgetsEnabled = inactiveWidgetsEnabled;
+    }
+
     private static String generateHash(Map<String, Settings> settings) {
         long hash = 0;
         long prime = 31;
@@ -215,14 +224,6 @@ public class Config extends AbstractConfig<Config.Settings> {
         protected Boolean animated;
 
         Settings() {
-        }
-
-        public void update(Cursor cursor, double scale, int xhot, int yhot, boolean enabled) {
-            Objects.requireNonNull(cursor);
-            this.scale = sanitizeScale(scale);
-            this.xhot = sanitizeHotspot(xhot, cursor);
-            this.yhot = sanitizeHotspot(yhot, cursor);
-            this.enabled = enabled;
         }
 
         public void setScale(double scale) {
