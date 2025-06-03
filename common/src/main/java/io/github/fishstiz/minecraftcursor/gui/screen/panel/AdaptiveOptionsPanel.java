@@ -1,6 +1,6 @@
 package io.github.fishstiz.minecraftcursor.gui.screen.panel;
 
-import io.github.fishstiz.minecraftcursor.CursorManager;
+import io.github.fishstiz.minecraftcursor.cursor.CursorManager;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
 import io.github.fishstiz.minecraftcursor.gui.CursorAnimationHelper;

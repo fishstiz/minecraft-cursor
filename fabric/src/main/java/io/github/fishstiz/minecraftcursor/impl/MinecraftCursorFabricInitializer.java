@@ -4,8 +4,8 @@ import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.api.CursorTypeRegistrar;
 import io.github.fishstiz.minecraftcursor.api.ElementRegistrar;
 import io.github.fishstiz.minecraftcursor.api.MinecraftCursorInitializer;
-import io.github.fishstiz.minecraftcursor.cursorhandler.ingame.TradeOfferButtonCursorHandler;
-import io.github.fishstiz.minecraftcursor.cursorhandler.modmenu.ModScreenCursorHandler;
+import io.github.fishstiz.minecraftcursor.cursor.handler.ingame.TradeOfferButtonCursorHandler;
+import io.github.fishstiz.minecraftcursor.compat.modmenu.ModScreenCursorHandler;
 import net.fabricmc.loader.api.FabricLoader;
 
 public class MinecraftCursorFabricInitializer implements MinecraftCursorInitializer {
@@ -14,7 +14,6 @@ public class MinecraftCursorFabricInitializer implements MinecraftCursorInitiali
         elementRegistrar.register(new TradeOfferButtonCursorHandler("net.minecraft.class_492$class_493"));
         
         try {
-
             if (FabricLoader.getInstance().isModLoaded("modmenu")) {
                 elementRegistrar.register(new ModScreenCursorHandler());
                 elementRegistrar.register("com.terraformersmc.modmenu.gui.widget.DescriptionListWidget$MojangCreditsEntry", ElementRegistrar::elementToPointer);
