@@ -21,27 +21,17 @@ public class DefaultCursorTracker implements CursorTracker {
 
     @Override
     public void untrackCursor(long cursor) {
-        // unsupported
+        // no-op
     }
 
     @Override
     public void updateCursor(int caller, CursorType cursorType) {
-        // unsupported
+        // no-op
     }
 
     @Override
     public boolean isTracking(long cursor) {
         return false;
-    }
-
-    @Override
-    public void claimAddress(long address) {
-        // unsupported
-    }
-
-    @Override
-    public boolean unclaimAddress(long address) {
-        return true; // consume address if null
     }
 
     @Override

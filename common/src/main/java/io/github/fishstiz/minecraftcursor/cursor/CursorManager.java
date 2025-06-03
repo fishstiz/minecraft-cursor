@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.NativeImage;
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.api.CursorTypeRegistrar;
+import io.github.fishstiz.minecraftcursor.compat.ExternalCursorTracker;
 import io.github.fishstiz.minecraftcursor.config.AnimationData;
 import io.github.fishstiz.minecraftcursor.config.Config;
 import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
@@ -112,7 +113,7 @@ public final class CursorManager implements CursorTypeRegistrar {
     }
 
     private void updateCursor(Cursor cursor) {
-        if (cursor == null || cursor.getId() == currentCursor.getId()) {
+        if (cursor == null || cursor.getId() == currentCursor.getId() || ExternalCursorTracker.get().isCustom()) {
             return;
         }
 
@@ -121,7 +122,9 @@ public final class CursorManager implements CursorTypeRegistrar {
     }
 
     public void reapplyCursor() {
-        GLFW.glfwSetCursor(CursorTypeUtil.WINDOW, getAppliedCursor().getId());
+        if (!ExternalCursorTracker.get().isCustom()) {
+            GLFW.glfwSetCursor(CursorTypeUtil.WINDOW, getAppliedCursor().getId());
+        }
     }
 
     public void overrideCurrentCursor(CursorType type, int index) {

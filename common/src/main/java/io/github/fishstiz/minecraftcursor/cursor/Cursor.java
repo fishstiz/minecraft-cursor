@@ -106,7 +106,7 @@ public class Cursor {
             glfwImage.set(scaledWidth, scaledHeight, pixels);
 
             glfwImageAddress = glfwImage.address();
-            ExternalCursorTracker.get().claimAddress(glfwImageAddress);
+            ExternalCursorTracker.trackInternalCursor(glfwImageAddress);
             this.id = GLFW.glfwCreateCursor(glfwImage, scaledXHot, scaledYHot);
 
             if (this.id == MemoryUtil.NULL) {
@@ -130,7 +130,7 @@ public class Cursor {
                 GLFW.glfwDestroyCursor(previousId);
             }
             if (glfwImageAddress != MemoryUtil.NULL) {
-                ExternalCursorTracker.get().unclaimAddress(glfwImageAddress);
+                ExternalCursorTracker.consumeInternalCursor(glfwImageAddress);
             }
         }
     }
