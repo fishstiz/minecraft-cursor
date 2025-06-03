@@ -1,14 +1,25 @@
 package io.github.fishstiz.minecraftcursor.gui.screen.panel;
 
 import io.github.fishstiz.minecraftcursor.cursor.resolver.CursorTypeResolver;
+import io.github.fishstiz.minecraftcursor.gui.widget.ButtonWidget;
 import io.github.fishstiz.minecraftcursor.gui.widget.OptionsListWidget;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class DebugOptionsPanel extends AbstractOptionsPanel {
+    private static final String CLEAR_CACHE_KEY = "minecraft-cursor.options.debug.cache.clear";
+    private static final String ISSUES_LINK = "https://github.com/fishstiz/minecraft-cursor/issues";
+    private static final String WIKI_LINK = "https://fishstiz.github.io/minecraft-cursor-wiki/resource-pack/getting-started";
     private static final Component INSPECT_TEXT = Component.translatable("minecraft-cursor.options.debug.inspect");
+    private static final Component CACHE_TEXT = Component.literal(Component.translatable(CLEAR_CACHE_KEY).getString().replace(": %1\\$s", ""));
+    private static final Component REPORT_ISSUES_TEXT = Component.translatable("minecraft-cursor.options.debug.report_issues");
+    private static final Component OPEN_WIKI_TEXT = Component.translatable("minecraft-cursor.options.debug.open_wiki");
     private OptionsListWidget optionsList;
+    private ButtonWidget cacheButton;
+    private int previousCacheSize = CursorTypeResolver.INSTANCE.cacheSize();
 
     public DebugOptionsPanel(Component title) {
         super(title);
@@ -26,6 +37,19 @@ public class DebugOptionsPanel extends AbstractOptionsPanel {
                 true
         );
 
+        this.previousCacheSize = 0;
+        this.cacheButton = new ButtonWidget(this.index(CACHE_TEXT), CursorTypeResolver.INSTANCE::clearCache);
+        this.optionsList.addWidget(this.cacheButton);
+
+        this.optionsList.addWidget(new ButtonWidget(
+                this.index(OPEN_WIKI_TEXT),
+                ConfirmLinkScreen.confirmLink(WIKI_LINK, this.getScreen(), true)
+        ));
+        this.optionsList.addWidget(new ButtonWidget(
+                this.index(REPORT_ISSUES_TEXT),
+                ConfirmLinkScreen.confirmLink(ISSUES_LINK, this.getScreen(), true)
+        ));
+
         this.addRenderableWidget(this.optionsList);
     }
 
@@ -42,5 +66,19 @@ public class DebugOptionsPanel extends AbstractOptionsPanel {
         if (this.optionsList != null) {
             this.optionsList.search(search);
         }
+    }
+
+    @Override
+    public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        if (this.cacheButton != null && CursorTypeResolver.INSTANCE.cacheSize() != this.previousCacheSize) {
+            this.previousCacheSize = CursorTypeResolver.INSTANCE.cacheSize();
+            this.cacheButton.setMessage(createCacheText());
+        }
+
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+    }
+
+    private static Component createCacheText() {
+        return Component.translatable(CLEAR_CACHE_KEY, CursorTypeResolver.INSTANCE.cacheSize());
     }
 }
