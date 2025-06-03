@@ -7,6 +7,7 @@ import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.compat.ExternalCursorTracker;
 import io.github.fishstiz.minecraftcursor.config.Config;
 import io.github.fishstiz.minecraftcursor.util.NativeImageUtil;
+import io.github.fishstiz.minecraftcursor.util.SettingsUtil;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
@@ -44,31 +45,34 @@ public class Cursor {
     }
 
     public void loadImage(@NotNull NativeImage image, Config.Settings settings) throws IOException {
-        this.textureWidth = image.getWidth();
-        this.textureHeight = image.getHeight();
-
-        if (!SUPPORTED_SIZES.contains(textureWidth) || textureHeight % textureWidth != 0) {
-            throw new IOException("Invalid cursor size. Width must be one of " + SUPPORTED_SIZES + ", and height must be a multiple of width.");
-        }
-
-        boolean cropped = false;
-        NativeImage croppedImage = image;
-
         try {
-            int size = this.textureWidth;
-            if (image.getHeight() > size) {
-                croppedImage = NativeImageUtil.cropImage(image, 0, 0, size, size);
-                cropped = true;
-            }
+            int imageWidth = image.getWidth();
+            int imageHeight = image.getHeight();
+            SettingsUtil.assertImageSize(imageWidth, imageHeight);
 
-            this.base64Image = NativeImageUtil.toBase64String(croppedImage);
-            this.enabled = settings.isEnabled();
+            NativeImage croppedImage = null;
+            try {
+                if (image.getHeight() > imageWidth) {
+                    // noinspection SuspiciousNameCombination
+                    croppedImage = NativeImageUtil.cropImage(image, 0, 0, imageWidth, imageWidth);
+                }
 
-            create(croppedImage, settings.getScale(), settings.getXHot(), settings.getYHot());
-        } finally {
-            if (cropped) {
-                croppedImage.close();
+                NativeImage validImage = croppedImage != null ? croppedImage : image;
+                this.base64Image = NativeImageUtil.toBase64String(validImage);
+                this.enabled = settings.isEnabled();
+                this.textureWidth = imageWidth;
+                this.textureHeight = imageHeight;
+
+                create(validImage, settings.getScale(), settings.getXHot(), settings.getYHot());
+            } finally {
+                if (croppedImage != null) {
+                    croppedImage.close();
+                }
             }
+        } catch (Exception e) {
+            this.loaded = false;
+            this.destroy();
+            throw e;
         }
     }
 
@@ -86,8 +90,8 @@ public class Cursor {
 
     private void create(NativeImage image, double scale, int xhot, int yhot) {
         scale = sanitizeScale(scale);
-        xhot = sanitizeHotspot(xhot, this);
-        yhot = sanitizeHotspot(yhot, this);
+        xhot = sanitizeHotspot(xhot, image.getWidth());
+        yhot = sanitizeHotspot(yhot, image.getWidth());
 
         long glfwImageAddress = MemoryUtil.NULL;
         long previousId = this.id;

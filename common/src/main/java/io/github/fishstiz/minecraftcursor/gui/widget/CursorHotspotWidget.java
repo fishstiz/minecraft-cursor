@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
 
 public class CursorHotspotWidget extends CursorWidget {
-    private static final ResourceLocation BACKGROUND_64 = MinecraftCursor.loc("textures/gui/background_64.png");
+    private static final ResourceLocation BACKGROUND_64 = MinecraftCursor.loc("textures/gui/background_128.png");
     private static final int BACKGROUND_DISABLED = 0xAF000000; // 70% black
     private static final int RULER_COLOR = 0xFFFF0000; // red
     private static final int OVERRIDE_RULER_COLOR = 0xFF00FF00; // green
@@ -25,6 +25,7 @@ public class CursorHotspotWidget extends CursorWidget {
     private final SliderWidget xhotSlider;
     private final SliderWidget yhotSlider;
     private final @Nullable MouseEventListener mouseEventListener;
+    private final int maxHotspot;
     private boolean renderRuler = true;
     private boolean dragging = false;
 
@@ -41,6 +42,7 @@ public class CursorHotspotWidget extends CursorWidget {
         this.xhotSlider = xhotSlider;
         this.yhotSlider = yhotSlider;
         this.mouseEventListener = mouseEventListener;
+        this.maxHotspot = SettingsUtil.getMaxHotspot(cursor);
     }
 
     @Override
@@ -79,9 +81,9 @@ public class CursorHotspotWidget extends CursorWidget {
         int yhot = this.clampHotspot(isGlobalY ? this.global.getYHot() : (int) this.yhotSlider.getMappedValue());
 
         float rulerSize = this.getCellSize();
-        int xhotX1 = (int) (getX() + xhot * rulerSize);
+        int xhotX1 = (int) ((getX() + xhot * rulerSize) - (rulerSize > 1 || xhot != this.maxHotspot ? 0 : 1));
         int xhotX2 = (int) ((getX() + xhot * rulerSize) + (xhot > 0 ? rulerSize : Math.max(rulerSize, 2)));
-        int yhotY1 = (int) (getY() + yhot * rulerSize);
+        int yhotY1 = (int) ((getY() + yhot * rulerSize) - (rulerSize > 1 || yhot != this.maxHotspot ? 0 : 1));
         int yhotY2 = (int) ((getY() + yhot * rulerSize) + (yhot > 0 ? rulerSize : Math.max(rulerSize, 2)));
 
 
@@ -137,7 +139,7 @@ public class CursorHotspotWidget extends CursorWidget {
     }
 
     private int clampHotspot(int hotspot) {
-        return SettingsUtil.sanitizeHotspot(hotspot, this.getCursor());
+        return SettingsUtil.clamp(hotspot, SettingsUtil.HOT_MIN, this.maxHotspot);
     }
 
     @Override

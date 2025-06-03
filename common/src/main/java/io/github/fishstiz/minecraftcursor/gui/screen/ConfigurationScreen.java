@@ -58,7 +58,7 @@ public class ConfigurationScreen extends CatalogBrowserScreen {
     }
 
     private void addGlobalItems() {
-        this.addCategoryOnly(GLOBAL_CATEGORY, new GlobalOptionsPanel());
+        this.addCategoryOnly(GLOBAL_CATEGORY, new GlobalOptionsPanel(this::refreshCursors));
     }
 
     private void addAdaptiveItems() {
