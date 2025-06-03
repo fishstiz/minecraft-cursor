@@ -6,6 +6,7 @@ import io.github.fishstiz.minecraftcursor.config.Config;
 import io.github.fishstiz.minecraftcursor.config.ConfigLoader;
 import io.github.fishstiz.minecraftcursor.cursor.CursorManager;
 import io.github.fishstiz.minecraftcursor.cursor.resolver.CursorTypeResolver;
+import io.github.fishstiz.minecraftcursor.cursor.resolver.ElementWalker;
 import io.github.fishstiz.minecraftcursor.impl.CursorControllerImpl;
 import io.github.fishstiz.minecraftcursor.impl.MinecraftCursorInitializerImpl;
 import io.github.fishstiz.minecraftcursor.provider.CursorControllerProvider;
@@ -19,8 +20,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Optional;
 
 public final class MinecraftCursor {
     public static final String MOD_ID = "minecraft-cursor";
@@ -105,10 +104,9 @@ public final class MinecraftCursor {
             return cursorType;
         }
 
-        Optional<GuiEventListener> child = screen.getChildAt(mouseX, mouseY);
-
-        if (child.isPresent()) {
-            return CursorTypeResolver.INSTANCE.resolve(child.get(), mouseX, mouseY);
+        GuiEventListener child = ElementWalker.findDeepest(screen, mouseX, mouseY);
+        if (child != null) {
+            return CursorTypeResolver.INSTANCE.resolve(child, mouseX, mouseY);
         }
 
         return CursorType.DEFAULT;

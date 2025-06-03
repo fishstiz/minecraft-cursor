@@ -55,6 +55,7 @@
   "minecraft-cursor.options.adapt.advancements": "Advancements Tabs",
   "minecraft-cursor.options.adapt.world": "World Icon Play Button",
   "minecraft-cursor.options.adapt.server": "Server Icon Play Button",
+  "minecraft-cursor.options.adapt.inactive_widgets": "Disabled Widgets",
 
   "minecraft-cursor.options.resource_pack.reset": "Reset Cursor Settings",
   "minecraft-cursor.options.resource_pack.reset.tooltip": "Resets personal cursor settings to match the settings provided by resource packs (or the built-in default).",
