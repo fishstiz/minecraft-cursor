@@ -4,9 +4,9 @@ import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.api.CursorTypeRegistrar;
 import io.github.fishstiz.minecraftcursor.api.ElementRegistrar;
 import io.github.fishstiz.minecraftcursor.api.MinecraftCursorInitializer;
-import io.github.fishstiz.minecraftcursor.cursorhandler.ingame.*;
-import io.github.fishstiz.minecraftcursor.cursorhandler.multiplayer.MultiplayerServerListWidgetCursorHandler;
-import io.github.fishstiz.minecraftcursor.cursorhandler.world.WorldListWidgetCursorHandler;
+import io.github.fishstiz.minecraftcursor.cursor.handler.ingame.*;
+import io.github.fishstiz.minecraftcursor.cursor.handler.multiplayer.MultiplayerServerListWidgetCursorHandler;
+import io.github.fishstiz.minecraftcursor.cursor.handler.world.WorldListWidgetCursorHandler;
 import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -14,7 +14,7 @@ import net.minecraft.client.gui.screens.LevelLoadingScreen;
 import net.minecraft.client.gui.screens.ProgressScreen;
 import net.minecraft.client.gui.screens.ReceivingLevelScreen;
 
-public class MinecraftCursorInitializerImpl implements MinecraftCursorInitializer {
+public final class MinecraftCursorInitializerImpl implements MinecraftCursorInitializer {
     @Override
     public void init(CursorTypeRegistrar cursorRegistrar, ElementRegistrar elementRegistrar) {
         cursorRegistrar.register(

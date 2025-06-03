@@ -43,12 +43,12 @@ public class FabricMixinConfigPlugin implements IMixinConfigPlugin {
         }
 
         if (FabricLauncherBase.getLauncher().isClassLoaded("org.lwjgl.glfw.GLFW")) {
-            LOGGER.warn("[minecraft-cursor] Could not enable cursor tracking as GLFW has been loaded early (possibly by another mod). May break functionality.");
+            LOGGER.warn("[minecraft-cursor] GLFWMixin could not be applied as it has been loaded early. Fabric compatibility features have been disabled.");
             Flag.REMAP.disable();
             return null;
         }
 
-        return List.of("compat.glfw.GlfwMixin");
+        return List.of("compat.glfw.GLFWMixin");
     }
 
     @Override

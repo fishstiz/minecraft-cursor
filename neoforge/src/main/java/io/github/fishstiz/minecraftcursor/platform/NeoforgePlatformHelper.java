@@ -1,7 +1,6 @@
 package io.github.fishstiz.minecraftcursor.platform;
 
 import io.github.fishstiz.minecraftcursor.api.MinecraftCursorInitializer;
-import io.github.fishstiz.minecraftcursor.impl.MinecraftCursorInitializerImpl;
 import io.github.fishstiz.minecraftcursor.platform.services.PlatformHelper;
 import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.fml.loading.FMLPaths;
@@ -24,10 +23,6 @@ public class NeoforgePlatformHelper implements PlatformHelper {
 
     @Override
     public List<MinecraftCursorInitializer> getEntrypoints() {
-        ServiceLoader<MinecraftCursorInitializer> loader = ServiceLoader.load(MinecraftCursorInitializer.class);
-
-        return StreamSupport.stream(loader.spliterator(), false)
-                .filter(service -> !(service instanceof MinecraftCursorInitializerImpl))
-                .toList();
+        return StreamSupport.stream(ServiceLoader.load(MinecraftCursorInitializer.class).spliterator(), false).toList();
     }
 }

@@ -23,7 +23,7 @@
       "io.github.fishstiz.minecraftcursor.MinecraftCursorFabric"
     ],
     "modmenu": [
-      "io.github.fishstiz.minecraftcursor.impl.MinecraftCursorModMenuApiImpl"
+      "io.github.fishstiz.minecraftcursor.compat.modmenu.MinecraftCursorModMenu"
     ],
     "minecraft-cursor": [
       "io.github.fishstiz.minecraftcursor.impl.MinecraftCursorFabricInitializer"
