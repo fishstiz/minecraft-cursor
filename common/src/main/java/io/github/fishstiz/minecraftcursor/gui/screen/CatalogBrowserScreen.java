@@ -1,11 +1,13 @@
 package io.github.fishstiz.minecraftcursor.gui.screen;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.gui.widget.AbstractListWidget;
 import io.github.fishstiz.minecraftcursor.gui.widget.ButtonWidget;
 import io.github.fishstiz.minecraftcursor.gui.widget.ElementSlidingBackground;
 import io.github.fishstiz.minecraftcursor.util.DrawUtil;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
@@ -276,6 +278,49 @@ public abstract class CatalogBrowserScreen extends Screen {
                 this.spacing
         );
         return panel;
+    }
+
+    protected void focusPath(GuiEventListener child) {
+        ComponentPath componentpath = this.getCurrentFocusPath();
+        if (componentpath != null) {
+            componentpath.applyFocus(false);
+        }
+        ComponentPath.path(child, this).applyFocus(true);
+    }
+
+    protected boolean autoFocusSearch() {
+        return true;
+    }
+
+    @Override
+    public boolean charTyped(char codePoint, int modifiers) {
+        if (super.charTyped(codePoint, modifiers)) {
+            return true;
+        }
+        if (this.autoFocusSearch()
+            && codePoint != InputConstants.KEY_SPACE
+            && this.searchField != null
+            && !this.searchField.isFocused()) {
+            this.focusPath(this.searchField);
+            return this.searchField.charTyped(codePoint, modifiers);
+        }
+        return false;
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (super.keyPressed(keyCode, scanCode, modifiers)) {
+            return true;
+        }
+        if (this.autoFocusSearch()
+            && keyCode == InputConstants.KEY_BACKSPACE
+            && this.searchField != null
+            && !this.searchField.isFocused()
+            && !this.searchField.getValue().isEmpty()) {
+            this.focusPath(this.searchField);
+            return this.searchField.keyPressed(keyCode, scanCode, modifiers);
+        }
+        return false;
     }
 
     private void clearSearch() {
