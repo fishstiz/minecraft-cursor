@@ -14,7 +14,7 @@ public interface ElementInspector {
         // no-op
     }
 
-    default boolean setFocused(GuiEventListener hovered, boolean cached) {
+    default boolean setProcessed(GuiEventListener hovered, boolean cached) {
         return false;
     }
 

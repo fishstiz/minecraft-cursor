@@ -1,6 +1,7 @@
 package io.github.fishstiz.minecraftcursor.inspect;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.github.fishstiz.minecraftcursor.cursor.resolver.ElementWalker;
 import io.github.fishstiz.minecraftcursor.platform.Services;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -15,18 +16,18 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
-import java.util.Optional;
+import java.util.Objects;
 
 public final class ElementInspectorImpl implements ElementInspector {
     private static final Component SCREEN_LABEL = Component.literal("S: ").withColor(0xFF339BFF); // blue
     private static final Component CACHE_LABEL = Component.literal("Cache: ").withColor(0xFFFFFFFF); // white
     private static final Component DEEPEST_LABEL = Component.literal("D: ").withColor(0xFF00FF00); // green
-    private static final Component FOCUSED_LABEL = Component.literal("F: ").withColor(0xFFFF0000); // red
+    private static final Component PROCESSED_LABEL = Component.literal("P: ").withColor(0xFFFF0000); // red
     private static final float Z = 2000f;
     private static final float TEXT_SCALE = 0.75f;
     private HashSet<String> cache = new HashSet<>();
-    private GuiEventListener focused;
-    private String focusedName;
+    private GuiEventListener processed;
+    private String processedName;
     private boolean enabled = true;
 
     @Override
@@ -34,16 +35,16 @@ public final class ElementInspectorImpl implements ElementInspector {
         this.enabled = false;
         this.cache.clear();
         this.cache = null;
-        this.focused = null;
-        this.focusedName = null;
+        this.processed = null;
+        this.processedName = null;
     }
 
     @Override
-    public boolean setFocused(GuiEventListener focused, boolean cached) {
-        this.focused = focused;
-        this.focusedName = getClassName(focused);
+    public boolean setProcessed(GuiEventListener processed, boolean cached) {
+        this.processed = processed;
+        this.processedName = getClassName(processed);
         if (cached) {
-            this.cache.add(focusedName);
+            this.cache.add(processedName);
         }
         return true;
     }
@@ -54,7 +55,7 @@ public final class ElementInspectorImpl implements ElementInspector {
             ScreenRectangle screenRectangle = getBounds(screen);
             renderScreenName(minecraft, screen, screenRectangle, guiGraphics);
             renderCacheSize(minecraft, screenRectangle, guiGraphics);
-            renderFocused(minecraft, renderDeepest(minecraft, screen, guiGraphics, mouseX, mouseY), guiGraphics);
+            renderProcessed(minecraft, renderDeepest(minecraft, screen, guiGraphics, mouseX, mouseY), guiGraphics);
         }
     }
 
@@ -67,10 +68,10 @@ public final class ElementInspectorImpl implements ElementInspector {
         return bounds;
     }
 
-    private void renderFocused(Minecraft minecraft, ScreenRectangle container, GuiGraphics guiGraphics) {
-        if (focused != null) {
-            Component label = FOCUSED_LABEL.copy().append(focusedName);
-            ScreenRectangle bounds = getBounds(focused);
+    private void renderProcessed(Minecraft minecraft, ScreenRectangle container, GuiGraphics guiGraphics) {
+        if (processed != null) {
+            Component label = PROCESSED_LABEL.copy().append(processedName);
+            ScreenRectangle bounds = getBounds(processed);
             int offsetY = bounds.top() != container.top() ? 0 : minecraft.font.lineHeight;
 
             renderInfo(minecraft, guiGraphics, bounds, label, Position.TOP_LEFT, offsetY, true);
@@ -130,16 +131,7 @@ public final class ElementInspectorImpl implements ElementInspector {
     }
 
     private @Nullable GuiEventListener findDeepestChild(ContainerEventHandler parent, double mouseX, double mouseY) {
-        Optional<GuiEventListener> child = parent.getChildAt(mouseX, mouseY);
-        if (child.isPresent()) {
-            GuiEventListener hoveredElement = child.get();
-            if (hoveredElement instanceof ContainerEventHandler nestedParent) {
-                GuiEventListener deepChild = findDeepestChild(nestedParent, mouseX, mouseY);
-                return (deepChild != null) ? deepChild : hoveredElement;
-            }
-            return hoveredElement;
-        }
-        return null;
+        return ElementWalker.walk(parent, mouseX, mouseY, (child, x, y) -> child, Objects::nonNull, null);
     }
 
     public enum Position {
