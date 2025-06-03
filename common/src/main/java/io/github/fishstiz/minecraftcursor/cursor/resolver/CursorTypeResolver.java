@@ -124,6 +124,14 @@ public final class CursorTypeResolver implements ElementRegistrar {
         return resolve(child, mouseX, mouseY);
     }
 
+    public int cacheSize() {
+        return this.cache.size();
+    }
+
+    public void clearCache() {
+        this.cache.clear();
+    }
+
     public ElementInspector getInspector() {
         return inspector;
     }

@@ -69,5 +69,8 @@
   "minecraft-cursor.options.compat.aggressive_cursor.info": "Aggressively updates the cursor instead of only when it changes.\n\nDisabled by default.",
 
   "minecraft-cursor.options.debug": "Debug",
-  "minecraft-cursor.options.debug.inspect": "Inspect Element"
+  "minecraft-cursor.options.debug.inspect": "Inspect Element",
+  "minecraft-cursor.options.debug.cache.clear": "Clear Cache: %1$s",
+  "minecraft-cursor.options.debug.report_issues": "Report Issues",
+  "minecraft-cursor.options.debug.open_wiki": "Open Wiki"
 }
