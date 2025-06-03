@@ -14,9 +14,10 @@ import org.jetbrains.annotations.NotNull;
 public abstract class CursorWidget extends AbstractWidget implements CursorProvider {
     public static final int DEFAULT_HEIGHT = 32;
     public static final int DEFAULT_WIDTH = 32;
+    private static final int BACKGROUND_SIZE = 128;
     private static final int BORDER_COLOR = 0xFF000000; // black
     private static final int FOCUSED_BORDER_COLOR = 0xFFFFFFFF; // white
-    private final ResourceLocation background64;
+    private final ResourceLocation background128;
     private final Cursor cursor;
 
     protected CursorWidget(
@@ -26,16 +27,16 @@ public abstract class CursorWidget extends AbstractWidget implements CursorProvi
             int height,
             @NotNull Component message,
             @NotNull Cursor cursor,
-            @NotNull ResourceLocation background64
+            @NotNull ResourceLocation background128
     ) {
         super(x, y, width, height, message);
 
         this.cursor = cursor;
-        this.background64 = background64;
+        this.background128 = background128;
     }
 
-    protected CursorWidget(@NotNull Component message, @NotNull Cursor cursor, @NotNull ResourceLocation background64) {
-        this(0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT, message, cursor, background64);
+    protected CursorWidget(@NotNull Component message, @NotNull Cursor cursor, @NotNull ResourceLocation background128) {
+        this(0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT, message, cursor, background128);
     }
 
     protected void renderCursor(@NotNull GuiGraphics guiGraphics, @NotNull Cursor cursor) {
@@ -51,8 +52,8 @@ public abstract class CursorWidget extends AbstractWidget implements CursorProvi
                 this.getWidth(),
                 this.getHeight(),
                 this.getCellSize(),
-                this.background64,
-                64
+                this.background128,
+                BACKGROUND_SIZE
         );
     }
 

@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class CursorPreviewWidget extends CursorWidget {
-    private static final ResourceLocation BACKGROUND_64 = MinecraftCursor.loc("textures/gui/background_dark_64.png");
+    private static final ResourceLocation BACKGROUND_128 = MinecraftCursor.loc("textures/gui/background_dark_128.png");
     private static final Component PREVIEW_TEXT = Component.translatable("minecraft-cursor.options.preview");
     private static final int PREVIEW_TEXT_OFFSET = 4;
     private static final int PREVIEW_TEXT_COLOR = 0x7FFFFFFF; // 50% white
@@ -25,7 +25,7 @@ public class CursorPreviewWidget extends CursorWidget {
     private final Font font;
 
     public CursorPreviewWidget(@NotNull Cursor cursor, @NotNull Font font, @Nullable Button button) {
-        super(CommonComponents.EMPTY, cursor, BACKGROUND_64);
+        super(CommonComponents.EMPTY, cursor, BACKGROUND_128);
 
         this.active = false;
         this.font = font;

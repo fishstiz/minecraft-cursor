@@ -8,13 +8,14 @@ import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Objects;
-import java.util.Set;
 
 public class SettingsUtil {
-    public static final Set<Integer> SUPPORTED_SIZES = Set.of(8, 16, 32, 48, 64);
+    public static final int IMAGE_SIZE_MIN = 8;
+    public static final int IMAGE_SIZE_MAX = 128;
+    public static final int IMAGE_SIZE_STEP = 8;
     public static final double SCALE_AUTO_PREFERRED = 0;
     public static final double SCALE_AUTO_THRESHOLD_MAX = 0.49;
     public static final double SCALE = 1.0;
@@ -25,10 +26,19 @@ public class SettingsUtil {
     public static final int Y_HOT = 0;
     public static final int HOT_MIN = 0;
     public static final int HOT_STEP = 1;
-    public static final int GLOBAL_HOT_MAX = Collections.max(SUPPORTED_SIZES) - 1;
+    public static final int GLOBAL_HOT_MAX = IMAGE_SIZE_MAX - 1;
     public static final boolean ENABLED = true;
 
     private SettingsUtil() {
+    }
+
+    public static void assertImageSize(int imageWidth, int imageHeight) throws IOException {
+        if (imageWidth < IMAGE_SIZE_MIN || imageWidth > IMAGE_SIZE_MAX || imageWidth % IMAGE_SIZE_STEP != 0) {
+            throw new IOException("Unsupported image width: " + imageWidth);
+        }
+        if (imageHeight % imageWidth != 0) {
+            throw new IOException("Image height must be divisible by width: " + imageHeight + " % " + imageWidth);
+        }
     }
 
     public static boolean isAutoScale(double scale) {
@@ -54,8 +64,12 @@ public class SettingsUtil {
         return (double) Math.round(mappedScale * 100) / 100;
     }
 
+    public static int sanitizeHotspot(int hotspot, int imageWidth) {
+        return clamp(hotspot, HOT_MIN, imageWidth - 1);
+    }
+
     public static int sanitizeHotspot(int hotspot, @NotNull Cursor cursor) {
-        return clamp(hotspot, HOT_MIN, cursor.isLoaded() ? Objects.requireNonNull(cursor).getTextureWidth() - 1 : GLOBAL_HOT_MAX);
+        return sanitizeHotspot(hotspot, cursor.isLoaded() ? cursor.getTextureWidth() : IMAGE_SIZE_MAX);
     }
 
     public static int sanitizeHotspot(double hotspot, @NotNull Cursor cursor) {
@@ -82,16 +96,16 @@ public class SettingsUtil {
     }
 
     public static int getMaxHotspot(Collection<Cursor> cursors) {
-        int max = SUPPORTED_SIZES.iterator().next();
+        int max = -1;
         for (Cursor cursor : cursors) {
             if (cursor.isLoaded()) {
-                int textureWidth = cursor.getTextureWidth();
-                if (textureWidth > max) {
-                    max = textureWidth;
+                int maxHotspot = getMaxHotspot(cursor);
+                if (maxHotspot > max) {
+                    max = maxHotspot;
                 }
             }
         }
-        return max - 1;
+        return max != -1 ? max : GLOBAL_HOT_MAX;
     }
 
     public static boolean equalSettings(@Nullable Config.Settings a, @Nullable Config.Settings b, boolean excludeGlobal) {

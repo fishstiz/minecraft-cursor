@@ -40,13 +40,16 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
     private static final Tooltip RESET_INFO = Tooltip.create(Component.translatable("minecraft-cursor.options.resource_pack.reset.tooltip"));
     private static final int PREVIEW_BUTTON_SIZE = 20;
     private static final int SCALE_OVERRIDE = -1;
+    private final Runnable refreshCursors;
     private @NotNull Iterator<Cursor> cursors = cursorIterator();
     private @NotNull Cursor currentCursor = getDefaultCursor();
     private OptionsListWidget optionList;
     private GlobalPreviewWidget previewWidget;
 
-    public GlobalOptionsPanel() {
+    public GlobalOptionsPanel(Runnable refreshCursors) {
         super(TITLE);
+
+        this.refreshCursors = refreshCursors;
     }
 
     @Override
@@ -213,6 +216,7 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
 
     private void resetCursorSettings() {
         CursorResourceLoader.restoreResourceSettings();
+        this.refreshCursors.run();
         this.refreshWidgets();
         this.repositionElements();
     }
