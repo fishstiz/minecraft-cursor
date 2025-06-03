@@ -82,12 +82,12 @@ public class CursorResourceLoader {
     }
 
     public static boolean retoreActiveResourceSettings(@NotNull Cursor cursor) {
-        if (resourceConfig != null) {
+        if (cursor.isLoaded() && resourceConfig != null) {
             CONFIG.replaceActiveSettings(resourceConfig, cursor);
             cursor.apply(CONFIG.getGlobal().apply(CONFIG.getOrCreateSettings(cursor)));
             return true;
         } else {
-            LOGGER.error("Failed to apply resource settings: Not Found");
+            LOGGER.error("Failed to apply resource settings for '{}'", cursor.getTypeKey());
         }
         return false;
     }
@@ -136,7 +136,7 @@ public class CursorResourceLoader {
             CursorManager.INSTANCE.loadCursor(cursor, image, CONFIG.getGlobal().apply(settings), animation);
             return true;
         } catch (IOException e) {
-            LOGGER.error("[minecraft-cursor] Failed to load cursor at '{}'", location);
+            LOGGER.error("[minecraft-cursor] Failed to load cursor at '{}': {}", location, e.getMessage());
             return false;
         }
     }
