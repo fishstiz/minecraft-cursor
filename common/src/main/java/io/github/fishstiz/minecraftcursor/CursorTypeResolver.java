@@ -5,6 +5,7 @@ import io.github.fishstiz.minecraftcursor.api.CursorProvider;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.api.ElementRegistrar;
 import io.github.fishstiz.minecraftcursor.cursor.InternalCursorProvider;
+import io.github.fishstiz.minecraftcursor.cursor.resolver.ElementWalker;
 import io.github.fishstiz.minecraftcursor.inspect.ElementInspector;
 import io.github.fishstiz.minecraftcursor.platform.Services;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
@@ -13,7 +14,6 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 class CursorTypeResolver implements ElementRegistrar {
     private final List<ElementEntry<? extends GuiEventListener>> registry = new ArrayList<>();
@@ -75,7 +75,7 @@ class CursorTypeResolver implements ElementRegistrar {
             CursorTypeFunction<T> mapper = (CursorTypeFunction<T>) cache.get(elementName);
             if (mapper == null) {
                 mapper = (CursorTypeFunction<T>) resolveMapper(element);
-                if (!inspector.setFocused(element, true)) {
+                if (!inspector.setProcessed(element, true)) {
                     cache.put(elementName, mapper);
                 }
             }
@@ -105,28 +105,23 @@ class CursorTypeResolver implements ElementRegistrar {
     private CursorTypeFunction<? extends GuiEventListener> resolveMapper(GuiEventListener element) {
         for (int i = registry.size() - 1; i >= 0; i--) {
             if (registry.get(i).element.isInstance(element)) {
-                inspector.setFocused(element, true);
+                inspector.setProcessed(element, true);
                 return registry.get(i).mapper;
             }
         }
         if (element instanceof ContainerEventHandler) {
-            return (CursorTypeFunction<ContainerEventHandler>) this::resolveChild;
+            return (CursorTypeFunction<ContainerEventHandler>) this::resolveParent;
         }
         return ElementRegistrar::elementToDefault;
     }
 
-    private <T extends ContainerEventHandler> CursorType resolveChild(T parent, double mouseX, double mouseY) {
-        Optional<GuiEventListener> child = parent.getChildAt(mouseX, mouseY);
-        if (child.isPresent()) {
-            GuiEventListener hoveredElement = child.get();
-            if (hoveredElement instanceof ContainerEventHandler nestedParent) {
-                CursorType cursorType = resolveChild(nestedParent, mouseX, mouseY);
-                if (!cursorType.isDefault()) return cursorType;
-            }
-            inspector.setFocused(hoveredElement, false);
-            return resolve(hoveredElement, mouseX, mouseY);
-        }
-        return CursorType.DEFAULT;
+    private <T extends ContainerEventHandler> CursorType resolveParent(T parent, double mouseX, double mouseY) {
+        return ElementWalker.walk(parent, mouseX, mouseY, this::resolveChild, type -> !type.isDefault(), CursorType.DEFAULT);
+    }
+
+    private CursorType resolveChild(GuiEventListener child, double mouseX, double mouseY) {
+        this.inspector.setProcessed(child, false);
+        return resolve(child, mouseX, mouseY);
     }
 
     public ElementInspector getInspector() {
