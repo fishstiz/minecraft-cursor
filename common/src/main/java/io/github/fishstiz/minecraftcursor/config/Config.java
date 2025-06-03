@@ -48,7 +48,7 @@ public class Config extends AbstractConfig<Config.Settings> {
     }
 
     public void save() {
-        ConfigLoader.saveConfig(Objects.requireNonNull(file), this);
+        ConfigLoader.save(Objects.requireNonNull(file), this);
     }
 
     public GlobalSettings getGlobal() {

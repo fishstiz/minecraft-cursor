@@ -1,7 +1,7 @@
 package io.github.fishstiz.minecraftcursor.cursor;
 
 import com.mojang.blaze3d.platform.NativeImage;
-import io.github.fishstiz.minecraftcursor.CursorLoader;
+import io.github.fishstiz.minecraftcursor.CursorResourceLoader;
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.compat.ExternalCursorTracker;
@@ -10,6 +10,7 @@ import io.github.fishstiz.minecraftcursor.util.NativeImageUtil;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.system.MemoryUtil;
@@ -22,7 +23,7 @@ import static io.github.fishstiz.minecraftcursor.util.SettingsUtil.*;
 
 public class Cursor {
     private static final String IMG_TYPE = ".png";
-    protected final Consumer<Cursor> onLoad;
+    protected final @Nullable Consumer<Cursor> onLoad;
     private final CursorType type;
     private final ResourceLocation location;
     private Component text;
@@ -36,10 +37,10 @@ public class Cursor {
     private int textureHeight;
     private long id = MemoryUtil.NULL;
 
-    public Cursor(CursorType type, Consumer<Cursor> onLoad) {
+    public Cursor(CursorType type, @Nullable Consumer<Cursor> onLoad) {
         this.type = type;
         this.onLoad = onLoad;
-        this.location = CursorLoader.getDirectory().withSuffix(type.getKey() + IMG_TYPE);
+        this.location = CursorResourceLoader.getDirectory().withSuffix(type.getKey() + IMG_TYPE);
     }
 
     public void loadImage(@NotNull NativeImage image, Config.Settings settings) throws IOException {
@@ -214,10 +215,6 @@ public class Cursor {
 
     public void setYHot(int yhot) {
         updateImage(this.scale, this.xhot, yhot);
-    }
-
-    public void setHotspots(int xhot, int yhot) {
-        updateImage(this.scale, xhot, yhot);
     }
 
     public boolean isEnabled() {

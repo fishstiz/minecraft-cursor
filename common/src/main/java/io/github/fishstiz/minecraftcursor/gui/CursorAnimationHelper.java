@@ -13,7 +13,10 @@ public class CursorAnimationHelper {
     private final Map<String, AnimationState> cursorStates = new HashMap<>();
 
     public void reset(AnimatedCursor cursor) {
-        cursorStates.computeIfAbsent(cursor.getType().getKey(), t -> new AnimationState()).reset();
+        AnimationState cursorState = cursorStates.get(cursor.getTypeKey());
+        if (cursorState != null) {
+            cursorState.reset();
+        }
     }
 
     public void drawSprite(GuiGraphics context, Cursor cursor, int x, int y, int size) {

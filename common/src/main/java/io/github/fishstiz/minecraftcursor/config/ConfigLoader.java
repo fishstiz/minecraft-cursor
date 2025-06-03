@@ -17,7 +17,7 @@ public class ConfigLoader {
     private ConfigLoader() {
     }
 
-    public static AnimationData getAnimationConfig(InputStream stream) throws IOException {
+    public static AnimationData loadAnimationData(InputStream stream) throws IOException {
         try (InputStreamReader reader = new InputStreamReader(stream)) {
             return GSON.fromJson(reader, AnimationData.class);
         }
@@ -36,7 +36,7 @@ public class ConfigLoader {
             config = GSON.fromJson(reader, Config.class);
         } catch (FileNotFoundException e) {
             MinecraftCursor.LOGGER.info("[minecraft-cursor] Creating config file at '{}'...", file.getPath());
-            saveConfig(file, config);
+            save(file, config);
         } catch (IOException e) {
             MinecraftCursor.LOGGER.error("[minecraft-cursor] Failed to load config at '{}'", file.getPath());
         }
@@ -45,7 +45,7 @@ public class ConfigLoader {
         return config;
     }
 
-    public static void saveConfig(File file, Config config) {
+    public static void save(File file, Config config) {
         try (FileWriter writer = new FileWriter(file)) {
             GSON.toJson(config, writer);
         } catch (IOException e) {
