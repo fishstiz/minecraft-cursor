@@ -23,7 +23,6 @@ public class AdaptiveOptionsPanel extends AbstractOptionsPanel {
     private static final Component CREATIVE_TABS = Component.translatable("minecraft-cursor.options.adapt.creative_tabs");
     private static final Component ENCHANTMENTS = Component.translatable("minecraft-cursor.options.adapt.enchantments");
     private static final Component STONECUTTER = Component.translatable("minecraft-cursor.options.adapt.stonecutter");
-    private static final Component BOOK_EDIT = Component.translatable("minecraft-cursor.options.adapt.book_edit");
     private static final Component LOOM = Component.translatable("minecraft-cursor.options.adapt.loom");
     private static final Component ADVANCEMENTS = Component.translatable("minecraft-cursor.options.adapt.advancements");
     private static final Component WORLD = Component.translatable("minecraft-cursor.options.adapt.world");
@@ -49,7 +48,6 @@ public class AdaptiveOptionsPanel extends AbstractOptionsPanel {
         this.optionsList.addToggle(adaptive, this::toggleAdaptive, ENABLE_TEXT, ADAPTIVE_INFO, true);
         this.addOption(CONFIG.isItemSlotEnabled(), CONFIG::setItemSlotEnabled, ITEM_SLOT, CursorType.POINTER, adaptive);
         this.addOption(CONFIG.isItemGrabbingEnabled(), CONFIG::setItemGrabbingEnabled, ITEM_GRAB, CursorType.GRABBING, adaptive);
-        this.addOption(CONFIG.isBookEditEnabled(), CONFIG::setBookEditEnabled, BOOK_EDIT, CursorType.TEXT, adaptive);
         this.addOption(CONFIG.isInactiveWidgetsEnabled(), CONFIG::setInactiveWidgetsEnabled, INACTIVE_WIDGETS, CursorType.NOT_ALLOWED, adaptive);
         this.addOption(CONFIG.isCreativeTabsEnabled(), CONFIG::setCreativeTabsEnabled, CREATIVE_TABS, CursorType.POINTER, adaptive);
         this.addOption(CONFIG.isEnchantmentsEnabled(), CONFIG::setEnchantmentsEnabled, ENCHANTMENTS, CursorType.POINTER, adaptive);

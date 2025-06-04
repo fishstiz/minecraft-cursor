@@ -1,10 +1,9 @@
 package io.github.fishstiz.minecraftcursor.gui.widget;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
@@ -43,24 +42,18 @@ public class InactiveInfoWidget extends ButtonWidget {
         this.refreshVisibility();
 
         if (this.active) {
-            PoseStack poseStack = guiGraphics.pose();
-            poseStack.pushPose();
-            poseStack.translate(0, 0, 1);
-
             super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
 
             int iconX = this.getX() + (this.getWidth() - ICON_SIZE) / 2;
             int iconY = this.getY() + (this.getHeight() - ICON_SIZE) / 2;
             guiGraphics.blit(
-                    RenderType::guiTextured,
+                    RenderPipelines.GUI_TEXTURED,
                     ICON,
                     iconX, iconY,
                     0, 0,
                     ICON_SIZE, ICON_SIZE,
                     ICON_SIZE, ICON_SIZE
             );
-
-            poseStack.popPose();
         } else {
             this.isHovered = false;
         }

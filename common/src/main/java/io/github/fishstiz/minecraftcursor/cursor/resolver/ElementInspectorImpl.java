@@ -1,6 +1,5 @@
 package io.github.fishstiz.minecraftcursor.cursor.resolver;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.fishstiz.minecraftcursor.platform.Services;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -12,6 +11,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix3x2fStack;
 
 import java.util.HashSet;
 
@@ -20,7 +20,6 @@ final class ElementInspectorImpl implements ElementInspector {
     private static final Component CACHE_LABEL = Component.literal("Cache: ").withColor(0xFFFFFFFF); // white
     private static final Component DEEPEST_LABEL = Component.literal("D: ").withColor(0xFF00FF00); // green
     private static final Component PROCESSED_LABEL = Component.literal("P: ").withColor(0xFFFF0000); // red
-    private static final float Z = 2000f;
     private static final float TEXT_SCALE = 0.75f;
     private HashSet<String> cache = new HashSet<>();
     private GuiEventListener processed;
@@ -94,25 +93,24 @@ final class ElementInspectorImpl implements ElementInspector {
 
     private void renderInfo(Minecraft minecraft, GuiGraphics guiGraphics, ScreenRectangle bounds, Component label, Position pos, int offsetY, boolean outline) {
         TextColor textColor = label.getStyle().getColor();
-        int color = textColor != null ? textColor.getValue() : 0xFFFFFFFF;
+        int color = 0xFF000000 | (textColor != null ? textColor.getValue() : 0xFFFFFFFF);
 
         int textWidth = minecraft.font.width(label);
         int textHeight = minecraft.font.lineHeight;
         int textX = pos.getX(bounds, textWidth, TEXT_SCALE, minecraft.getWindow().getGuiScaledWidth());
         int textY = pos.getY(bounds, offsetY, textHeight, TEXT_SCALE, minecraft.getWindow().getGuiScaledHeight());
 
-        PoseStack poseStack = guiGraphics.pose();
-        poseStack.pushPose();
-        poseStack.translate(0, 0, Z);
+        Matrix3x2fStack matrix3x2fStack = guiGraphics.pose();
+        matrix3x2fStack.pushMatrix();
 
         if (outline) {
-            guiGraphics.renderOutline(bounds.left(), bounds.top(), bounds.width(), bounds.height(), 0xFF000000 | color);
+            guiGraphics.renderOutline(bounds.left(), bounds.top(), bounds.width(), bounds.height(), color);
         }
 
-        poseStack.scale(TEXT_SCALE, TEXT_SCALE, 0);
+        matrix3x2fStack.scale(TEXT_SCALE, TEXT_SCALE);
         guiGraphics.drawString(minecraft.font, label, (int) (textX / TEXT_SCALE), (int) (textY / TEXT_SCALE), color);
 
-        poseStack.popPose();
+        matrix3x2fStack.popMatrix();
     }
 
     private ScreenRectangle getBounds(@Nullable GuiEventListener element) {

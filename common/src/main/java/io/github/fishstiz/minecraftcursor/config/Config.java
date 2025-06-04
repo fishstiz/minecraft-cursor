@@ -18,7 +18,6 @@ public class Config extends AbstractConfig<Config.Settings> {
     private boolean creativeTabsEnabled = true;
     private boolean enchantmentsEnabled = true;
     private boolean stonecutterRecipesEnabled = true;
-    private boolean bookEditEnabled = true;
     private boolean loomPatternsEnabled = true;
     private boolean advancementTabsEnabled = true;
     private boolean worldIconEnabled = true;
@@ -119,14 +118,6 @@ public class Config extends AbstractConfig<Config.Settings> {
 
     public void setStonecutterRecipesEnabled(boolean stonecutterRecipesEnabled) {
         this.stonecutterRecipesEnabled = stonecutterRecipesEnabled;
-    }
-
-    public boolean isBookEditEnabled() {
-        return bookEditEnabled;
-    }
-
-    public void setBookEditEnabled(boolean bookEditEnabled) {
-        this.bookEditEnabled = bookEditEnabled;
     }
 
     public boolean isLoomPatternsEnabled() {

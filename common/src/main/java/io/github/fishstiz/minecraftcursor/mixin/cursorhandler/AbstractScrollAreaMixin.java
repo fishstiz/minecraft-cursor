@@ -17,7 +17,7 @@ public abstract class AbstractScrollAreaMixin {
 
     @Inject(method = "renderScrollbar", at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Ljava/util/function/Function;Lnet/minecraft/resources/ResourceLocation;IIII)V"
+            target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/ResourceLocation;IIII)V"
     ))
     public void forceDefaultCursor(GuiGraphics guiGraphics, CallbackInfo ci) {
         if (this.scrolling) {

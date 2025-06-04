@@ -65,7 +65,6 @@ public class CursorPreviewWidget extends CursorWidget {
         int startX = endX - width;
         int startY = endY - this.font.lineHeight;
         DrawUtil.drawScrollableTextLeftAlign(guiGraphics, this.font, PREVIEW_TEXT, startX, startY, endX, endY, PREVIEW_TEXT_COLOR, false);
-        guiGraphics.flush();
     }
 
     protected void renderButton(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {

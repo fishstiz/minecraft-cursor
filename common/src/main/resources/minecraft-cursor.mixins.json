@@ -9,7 +9,6 @@
     "MouseOptionsScreenMixin",
     "NativeImageAccess",
     "cursorhandler.access.AdvancementsScreenAccessor",
-    "cursorhandler.access.BookEditScreenAccessor",
     "cursorhandler.access.CreativeInventoryScreenAccessor",
     "cursorhandler.access.HandledScreenAccessor",
     "cursorhandler.access.LoomScreenAccessor",

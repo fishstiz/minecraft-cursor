@@ -4,7 +4,7 @@ import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
 import io.github.fishstiz.minecraftcursor.cursor.AnimationState;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +32,7 @@ public class CursorAnimationHelper {
         int vOffset = cursorSize * frameIndex;
 
         context.blit(
-                RenderType::guiTextured,
+                RenderPipelines.GUI_TEXTURED,
                 cursor.getLocation(),
                 x, y,
                 0, vOffset,
