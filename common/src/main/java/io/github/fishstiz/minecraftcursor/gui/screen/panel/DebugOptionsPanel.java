@@ -14,7 +14,7 @@ public class DebugOptionsPanel extends AbstractOptionsPanel {
     private static final String ISSUES_LINK = "https://github.com/fishstiz/minecraft-cursor/issues";
     private static final String WIKI_LINK = "https://fishstiz.github.io/minecraft-cursor-wiki/resource-pack/getting-started";
     private static final Component INSPECT_TEXT = Component.translatable("minecraft-cursor.options.debug.inspect");
-    private static final Component CACHE_TEXT = Component.literal(Component.translatable(CLEAR_CACHE_KEY).getString().replace(": %1\\$s", ""));
+    private static final Component CACHE_TEXT = Component.literal(Component.translatable(CLEAR_CACHE_KEY).getString().replace("\\:.*", ""));
     private static final Component REPORT_ISSUES_TEXT = Component.translatable("minecraft-cursor.options.debug.report_issues");
     private static final Component OPEN_WIKI_TEXT = Component.translatable("minecraft-cursor.options.debug.open_wiki");
     private OptionsListWidget optionsList;
@@ -37,9 +37,10 @@ public class DebugOptionsPanel extends AbstractOptionsPanel {
                 true
         );
 
-        this.previousCacheSize = 0;
-        this.cacheButton = new ButtonWidget(this.index(CACHE_TEXT), CursorTypeResolver.INSTANCE::clearCache);
+        this.previousCacheSize = -1;
+        this.cacheButton = new ButtonWidget(createCacheText(), CursorTypeResolver.INSTANCE::clearCache);
         this.optionsList.addWidget(this.cacheButton);
+        this.index(CACHE_TEXT);
 
         this.optionsList.addWidget(new ButtonWidget(
                 this.index(OPEN_WIKI_TEXT),
