@@ -133,6 +133,8 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
                 ).withTooltip(RESET_INFO)
         );
 
+        this.optionList.search(this.getSearch());
+
         this.addRenderableWidget(this.previewWidget);
         this.addRenderableWidget(this.optionList);
     }

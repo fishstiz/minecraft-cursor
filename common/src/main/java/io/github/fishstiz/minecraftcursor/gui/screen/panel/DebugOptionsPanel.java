@@ -51,6 +51,8 @@ public class DebugOptionsPanel extends AbstractOptionsPanel {
                 ConfirmLinkScreen.confirmLink(this.getScreen(), ISSUES_LINK, true)
         ));
 
+        this.optionsList.search(this.getSearch());
+
         this.addRenderableWidget(this.optionsList);
     }
 
