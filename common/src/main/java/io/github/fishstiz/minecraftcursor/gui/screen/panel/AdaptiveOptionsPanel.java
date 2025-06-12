@@ -59,6 +59,8 @@ public class AdaptiveOptionsPanel extends AbstractOptionsPanel {
         this.addOption(CONFIG.isWorldIconEnabled(), CONFIG::setWorldIconEnabled, WORLD, CursorType.POINTER, adaptive);
         this.addOption(CONFIG.isServerIconEnabled(), CONFIG::setServerIconEnabled, SERVER, CursorType.POINTER, adaptive);
 
+        this.optionsList.search(this.getSearch());
+
         this.addRenderableWidget(this.optionsList);
     }
 

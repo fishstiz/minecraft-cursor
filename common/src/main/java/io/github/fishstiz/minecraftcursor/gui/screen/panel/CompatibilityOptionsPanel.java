@@ -41,7 +41,9 @@ public class CompatibilityOptionsPanel extends AbstractOptionsPanel {
                 ExternalCursorTracker.isTracking()
         );
 
-        this.addRenderableWidget(optionsList);
+        this.optionsList.search(this.getSearch());
+
+        this.addRenderableWidget(this.optionsList);
     }
 
     @Override
