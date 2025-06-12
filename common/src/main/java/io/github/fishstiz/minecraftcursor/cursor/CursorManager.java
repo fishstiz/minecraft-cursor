@@ -222,8 +222,4 @@ public final class CursorManager implements CursorTypeRegistrar {
         }
         return false;
     }
-
-    public void reloadCursors() {
-        this.cursors.values().forEach(Cursor::reload);
-    }
 }
