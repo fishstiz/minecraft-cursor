@@ -17,14 +17,6 @@ public interface CursorController {
 
     /**
      * Changes the current cursor to the specified type for a single render/tick cycle.
-     * After the cycle, the cursor will revert to its default behavior.
-     * <ul>
-     *  <li>Render is used if there {@code currentScreen} is not {@code null}</li>
-     *  <li>Tick is used if {@code currentScreen} is {@code null}, a {@code Screen} is initialized,
-     *  and if cursor is not locked</li>
-     * </ul>
-     *
-     * <p><b>Note:</b> This is overridden by the {@link #overrideCursor(CursorType, int)} method.</p>
      *
      * @param cursorType the {@link CursorType} to apply for the current cycle
      */

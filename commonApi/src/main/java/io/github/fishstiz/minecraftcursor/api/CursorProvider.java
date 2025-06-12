@@ -1,5 +1,8 @@
 package io.github.fishstiz.minecraftcursor.api;
 
+import net.minecraft.client.gui.components.events.ContainerEventHandler;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+
 /**
  * An alternative to the {@link ElementRegistrar} approach to determine the cursor type directly from the implementing {@link net.minecraft.client.gui.components.events.GuiEventListener}
  * <p>
@@ -7,17 +10,15 @@ package io.github.fishstiz.minecraftcursor.api;
  * </p>
  *
  * <p>
- * <b>Note:</b> The {@link net.minecraft.client.gui.components.events.GuiEventListener} must either be the current screen or be accessible from the current screen or
- * from its parent element through {@link net.minecraft.client.gui.components.events.ContainerEventHandler#children()}.
+ * <b>Note:</b> The {@link GuiEventListener} must either be the current screen or be accessible recursively from the
+ * current screen through {@link ContainerEventHandler#children()}.
  * </p>
  */
 public interface CursorProvider {
     /**
      * Returns the cursor type to be applied when the mouse is over the element.
      * <p>
-     * This method is invoked after screen render and when
-     * {@link net.minecraft.client.gui.components.events.GuiEventListener#isMouseOver(double mouseX, double mouseY)}
-     * returns {@code true}
+     * This method is invoked when the implementing element is detected.
      * </p>
      *
      * @param mouseX the X coordinate of the mouse
