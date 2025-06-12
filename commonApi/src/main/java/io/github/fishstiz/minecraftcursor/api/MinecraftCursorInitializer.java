@@ -1,5 +1,8 @@
 package io.github.fishstiz.minecraftcursor.api;
 
+import io.github.fishstiz.minecraftcursor.api.ElementRegistrar.CursorTypeFunction;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+
 /**
  * The entrypoint for Minecraft Cursor on initialization.
  *
@@ -11,10 +14,10 @@ package io.github.fishstiz.minecraftcursor.api;
 public interface MinecraftCursorInitializer {
     /**
      * The {@link CursorTypeRegistrar} and {@link ElementRegistrar} instances are injected here
-     * where you can register custom cursor types and elements.
+     * where you can register custom {@link CursorType}s and {@link GuiEventListener}s.
      *
-     * @param cursorRegistrar  the registrar used to register {@link CursorType} objects.
-     * @param elementRegistrar the registrar used to associate element classes with cursor type functions.
+     * @param cursorRegistrar  used to register {@link CursorType}s.
+     * @param elementRegistrar used to register {@link GuiEventListener}s with a corresponding {@link CursorTypeFunction}.
      */
     void init(CursorTypeRegistrar cursorRegistrar, ElementRegistrar elementRegistrar);
 }
