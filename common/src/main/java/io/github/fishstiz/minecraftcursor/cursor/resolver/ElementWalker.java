@@ -52,7 +52,7 @@ public final class ElementWalker {
      */
     private static boolean containsPoint(GuiEventListener guiEventListener, double mouseX, double mouseY) {
         if (guiEventListener instanceof AbstractWidget widget) {
-            return widget.visible && widget.isHovered();
+            return widget.visible && (widget.isHovered() || widget.isMouseOver(mouseX, mouseY));
         }
         return guiEventListener.isMouseOver(mouseX, mouseY);
     }
