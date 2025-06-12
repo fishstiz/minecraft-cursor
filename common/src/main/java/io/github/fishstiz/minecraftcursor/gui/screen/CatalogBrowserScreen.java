@@ -189,11 +189,11 @@ public abstract class CatalogBrowserScreen extends Screen {
             }
 
             this.contents = contentPanel;
-            this.contents.changedItem(itemContext.category(), item);
+            this.contents.changedItem(this.previousSearch, itemContext.category(), item);
             this.addRenderableWidget(this.contents);
-            this.contents.added();
+            this.contents.added(this.previousSearch);
         } else {
-            this.contents.changedItem(itemContext.category(), item);
+            this.contents.changedItem(this.previousSearch, itemContext.category(), item);
         }
 
         this.repositionElements();
@@ -245,12 +245,12 @@ public abstract class CatalogBrowserScreen extends Screen {
                 this.contents = context.contents();
                 if (isFocused) this.setFocused(this.contents);
 
-                this.contents.changedItem(context.category(), item);
+                this.contents.changedItem(this.previousSearch, context.category(), item);
 
                 this.addRenderableWidget(this.contents);
-                this.contents.added();
+                this.contents.added(this.previousSearch);
             } else {
-                this.contents.changedItem(context.category(), item);
+                this.contents.changedItem(this.previousSearch, context.category(), item);
             }
             this.repositionElements();
         }
@@ -788,6 +788,7 @@ public abstract class CatalogBrowserScreen extends Screen {
         private Minecraft minecraft;
         private Font font;
         private CatalogBrowserScreen catalog;
+        private @NotNull String search = "";
 
         protected void added() {
         }
@@ -819,9 +820,15 @@ public abstract class CatalogBrowserScreen extends Screen {
             }
         }
 
-        private void changedItem(@NotNull CatalogItem category, @NotNull CatalogItem item) {
+        private void added(@NotNull String search) {
+            this.search = search;
+            this.added();
+        }
+
+        private void changedItem(@NotNull String search, @NotNull CatalogItem category, @NotNull CatalogItem item) {
             this.category = Objects.requireNonNull(category);
             this.item = Objects.requireNonNull(item);
+            this.search = search;
             this.changed(this.category, this.item);
         }
 
@@ -870,6 +877,10 @@ public abstract class CatalogBrowserScreen extends Screen {
 
         public CatalogItem getCategory() {
             return this.category;
+        }
+
+        public @NotNull String getSearch() {
+            return this.search;
         }
 
         @Override
