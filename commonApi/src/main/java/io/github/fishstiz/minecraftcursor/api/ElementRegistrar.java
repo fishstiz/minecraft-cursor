@@ -1,26 +1,14 @@
 package io.github.fishstiz.minecraftcursor.api;
 
-import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 
 /**
- * The registrar used to map {@link GuiEventListener} classes with {@link CursorTypeFunction} methods.
- *
- * <p>
- * <b>Note:</b> The {@link GuiEventListener} must either be the current screen or be accessible from the current screen or
- * from its parent element through {@link ContainerEventHandler#children()}.
- * </p>
- * Any container or nested container must be an instance of {@link ContainerEventHandler}
- * and be accessible via the {@link ContainerEventHandler#children()} method.
- * <p>
- * This accessibility must be maintained throughout the entire element hierarchy, starting from
- * the current screen down to the deepest nested parent element.
- * </p>
+ * The registrar used to map {@link GuiEventListener}s with a {@link CursorTypeFunction}.
  */
 public interface ElementRegistrar {
     /**
-     * Registers an {@link GuiEventListener} class as specified by the {@link CursorHandler#getTargetElement()} method
-     * with the {@link CursorHandler#getCursorType(GuiEventListener, double, double)} method to determine its {@link CursorType}.
+     * Registers the {@link GuiEventListener} class specified by {@link CursorHandler#getTargetElement()}
+     * with the {@link CursorHandler#getCursorType(GuiEventListener, double, double)} callback function.
      *
      * <p><strong>Example usage:</strong></p>
      * <pre>{@code
@@ -34,31 +22,30 @@ public interface ElementRegistrar {
      *
      * @param <T>           The type of the {@link GuiEventListener} to register
      * @param cursorHandler The {@link CursorHandler} implementation that provides the target {@link GuiEventListener}
-     *                      and the {@link CursorTypeFunction} method.
+     *                      and the {@link CursorTypeFunction}.
      */
     <T extends GuiEventListener> void register(CursorHandler<T> cursorHandler);
 
     /**
-     * Registers an {@link GuiEventListener} class specified by the fully qualified class name (FQCN) {@link String}
-     * with a function that determines its {@link CursorType}.
+     * Registers the {@link GuiEventListener} class inferred from the binary name with a {@link CursorTypeFunction}.
      *
-     * <p>Use the intermediary mappings when registering native Minecraft elements.</p>
+     * <p>Fabric note: Use the intermediary mappings when registering a native {@link GuiEventListener}.</p>
      *
      * <p><strong>Example usage:</strong></p>
      * <pre>
      * {@code register("net.minecraft.class_4264", (pressableWidget, mouseX, mouseY) -> CursorType.POINTER); }
      * </pre>
      *
-     * @param <T>                     The type of the {@link GuiEventListener} to register
-     * @param fullyQualifiedClassName The fully qualified class name of the {@link GuiEventListener} to register.
-     *                                Use the intermediary name when registering native Minecraft elements.
-     * @param elementToCursorType     A function that takes an instance of the element, mouse X, and mouse Y positions,
-     *                                and returns the corresponding {@link CursorType}.
+     * @param <T>                The type of the {@link GuiEventListener} to register
+     * @param className          The binary name of the {@link GuiEventListener} to register.
+     *                           Use the intermediary name when registering a native {@link GuiEventListener}.
+     * @param cursorTypeFunction A function that takes an instance of the {@link GuiEventListener}, mouse X, and mouse Y positions,
+     *                           and returns the corresponding {@link CursorType}.
      */
-    <T extends GuiEventListener> void register(String fullyQualifiedClassName, CursorTypeFunction<T> elementToCursorType);
+    <T extends GuiEventListener> void register(String className, CursorTypeFunction<T> cursorTypeFunction);
 
     /**
-     * Registers an {@link GuiEventListener} class with a function that determines its {@link CursorType}.
+     * Registers the {@link GuiEventListener} class with a {@link CursorTypeFunction} that determines its {@link CursorType}.
      *
      * <p><strong>Example usage:</strong></p>
      * <pre>{@code
@@ -67,12 +54,12 @@ public interface ElementRegistrar {
      *      register(MyOtherButton.class, ElementRegistrar::elementToPointer);
      * }</pre>
      *
-     * @param <T>                 The type of the {@link GuiEventListener} to register
-     * @param elementClass        The {@link Class} of the {@link GuiEventListener} to register
-     * @param elementToCursorType A function that takes an instance of the element, mouse X, and mouse Y positions,
-     *                            and returns the corresponding {@link CursorType}.
+     * @param <T>                The type of the {@link GuiEventListener} to register
+     * @param elementClass       The {@link Class} of the {@link GuiEventListener} to register
+     * @param cursorTypeFunction A function that takes an instance of the element, mouse X, and mouse Y positions,
+     *                           and returns the corresponding {@link CursorType}.
      */
-    <T extends GuiEventListener> void register(Class<T> elementClass, CursorTypeFunction<T> elementToCursorType);
+    <T extends GuiEventListener> void register(Class<T> elementClass, CursorTypeFunction<T> cursorTypeFunction);
 
     /**
      * A built-in {@link CursorTypeFunction} static method that always returns {@link CursorType#DEFAULT}.

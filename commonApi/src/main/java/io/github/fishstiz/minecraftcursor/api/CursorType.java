@@ -2,6 +2,7 @@ package io.github.fishstiz.minecraftcursor.api;
 
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.AbstractSliderButton;
+import net.minecraft.client.gui.components.EditBox;
 
 import java.util.Objects;
 
@@ -13,46 +14,6 @@ import java.util.Objects;
  * </p>
  */
 public interface CursorType {
-    /**
-     * Returns the key of the {@link CursorType} object which acts as its identifier.
-     *
-     * @return The key that corresponds with the cursor's file name, its entry in {@code cursors.json},
-     * and the suffix of the cursor type translation key.
-     */
-    String getKey();
-
-    /**
-     * Binds a {@link CursorType} object to a key that serves as its identifier.
-     * <p>
-     * You must register your {@link CursorType} in
-     * {@link MinecraftCursorInitializer#init(CursorTypeRegistrar, ElementRegistrar)}
-     * so its resource is loaded when Minecraft first loads.
-     *
-     * @param key The identifier of the cursor type
-     * @return {@link CursorType}
-     */
-    static CursorType of(String key) {
-        return new CursorType() {
-            @Override
-            public String getKey() {
-                return key;
-            }
-
-            @Override
-            public String toString() {
-                return "CursorType{key='" + key + "'}";
-            }
-        };
-    }
-
-    default boolean isKey(CursorType cursorType) {
-        return Objects.equals(this.getKey(), cursorType.getKey());
-    }
-
-    default boolean isDefault() {
-        return this == CursorType.DEFAULT;
-    }
-
     /**
      * The fallback cursor type
      * <p>
@@ -73,7 +34,7 @@ public interface CursorType {
     CursorType DEFAULT_FORCE = CursorType.of("");
 
     /**
-     * The cursor type that is applied when the mouse is over {@link net.minecraft.client.gui.components.AbstractButton}
+     * The cursor type that is applied when the mouse is over {@link AbstractButton}
      * elements and on other certain elements that can be clicked.
      *
      * <p>
@@ -82,7 +43,7 @@ public interface CursorType {
     CursorType POINTER = CursorType.of("pointer");
 
     /**
-     * The cursor type that is applied when grabbing the slider of {@link net.minecraft.client.gui.components.AbstractSliderButton}
+     * The cursor type that is applied when grabbing the slider of {@link AbstractSliderButton}
      * elements and when grabbing items in the inventory.
      *
      * <p>
@@ -91,7 +52,7 @@ public interface CursorType {
     CursorType GRABBING = CursorType.of("grabbing");
 
     /**
-     * The cursor type that is applied when the mouse is over {@link net.minecraft.client.gui.components.EditBox} elements
+     * The cursor type that is applied when the mouse is over {@link EditBox} elements
      *
      * <p>
      * Replaces {@code GLFW_IBEAM_CURSOR} standard cursor.
@@ -141,4 +102,44 @@ public interface CursorType {
      * Replaces {@code GLFW_NOT_ALLOWED_CURSOR} standard cursor.
      */
     CursorType NOT_ALLOWED = CursorType.of("not_allowed");
+
+    /**
+     * Returns the key of the {@link CursorType} object which acts as its identifier.
+     *
+     * @return The key that corresponds with the cursor's file name, its entry in {@code cursors.json},
+     * and the suffix of the cursor type translation key.
+     */
+    String getKey();
+
+    /**
+     * Binds a {@link CursorType} object to a key that serves as its identifier.
+     * <p>
+     * You must register your {@link CursorType} in
+     * {@link MinecraftCursorInitializer#init(CursorTypeRegistrar, ElementRegistrar)}
+     * so its resource is loaded when Minecraft first loads.
+     *
+     * @param key The identifier of the cursor type
+     * @return {@link CursorType}
+     */
+    static CursorType of(String key) {
+        return new CursorType() {
+            @Override
+            public String getKey() {
+                return key;
+            }
+
+            @Override
+            public String toString() {
+                return "CursorType{key='" + key + "'}";
+            }
+        };
+    }
+
+    default boolean isKey(CursorType cursorType) {
+        return Objects.equals(this.getKey(), cursorType.getKey());
+    }
+
+    default boolean isDefault() {
+        return this == CursorType.DEFAULT;
+    }
 }

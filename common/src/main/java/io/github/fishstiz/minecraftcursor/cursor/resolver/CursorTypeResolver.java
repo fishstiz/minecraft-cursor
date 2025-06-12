@@ -13,6 +13,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public final class CursorTypeResolver implements ElementRegistrar {
     public static final CursorTypeResolver INSTANCE = new CursorTypeResolver();
@@ -26,42 +27,34 @@ public final class CursorTypeResolver implements ElementRegistrar {
 
     @Override
     public <T extends GuiEventListener> void register(CursorHandler<T> cursorHandler) {
-        CursorHandler.TargetElement<T> targetElement = cursorHandler.getTargetElement();
-
-        if (targetElement.elementClass().isPresent()) {
-            register(targetElement.elementClass().get(), cursorHandler::getCursorType);
-        } else if (targetElement.fullyQualifiedClassName().isPresent()) {
-            register(targetElement.fullyQualifiedClassName().get(), cursorHandler::getCursorType);
-        } else {
-            throw new NullPointerException("Could not register cursor handler: "
-                                           + cursorHandler.getClass().getName()
-                                           + " - Target ElementView Class and FQCN not present");
+        switch (cursorHandler.getTargetElement()) {
+            case CursorHandler.TargetElement.ClassRef(Class<T> elementClass) -> register(elementClass, cursorHandler);
+            case CursorHandler.TargetElement.NameRef(String className) -> register(className, cursorHandler);
         }
     }
 
     @Override
-    public <T extends GuiEventListener> void register(String binaryName, CursorTypeFunction<T> elementToCursorType) {
+    public <T extends GuiEventListener> void register(String className, CursorTypeFunction<T> cursorTypeFunction) {
         try {
             @SuppressWarnings("unchecked")
-            Class<T> elementClass = (Class<T>) Class.forName(Services.PLATFORM.mapClassName("intermediary", binaryName));
+            Class<T> elementClass = (Class<T>) Class.forName(Services.PLATFORM.mapClassName("intermediary", className));
             if (!GuiEventListener.class.isAssignableFrom(elementClass)) {
-                throw new ClassCastException(binaryName + " is not a subclass of ElementView");
+                throw new ClassCastException(className + " is not a subclass of ElementView");
             }
-            register(elementClass, elementToCursorType);
+            register(elementClass, cursorTypeFunction);
         } catch (ClassNotFoundException e) {
-            MinecraftCursor.LOGGER.error("[minecraft-cursor] Error registering element. Class not found: {}", binaryName);
+            MinecraftCursor.LOGGER.error("[minecraft-cursor] Error registering element. Class not found: {}", className);
         } catch (ClassCastException e) {
             MinecraftCursor.LOGGER.error("[minecraft-cursor] Error registering element. Invalid class: {}", e.getMessage());
         }
     }
 
     @Override
-    public <T extends GuiEventListener> void register(Class<T> elementClass, CursorTypeFunction<T> elementToCursorType) {
-        registry.add(new ElementEntry<>(elementClass, elementToCursorType));
+    public <T extends GuiEventListener> void register(Class<T> elementClass, CursorTypeFunction<T> cursorTypeFunction) {
+        registry.add(new ElementEntry<>(Objects.requireNonNull(elementClass), Objects.requireNonNull(cursorTypeFunction)));
     }
 
-    @SuppressWarnings("unchecked")
-    public <T extends GuiEventListener> CursorType resolve(T element, double mouseX, double mouseY) {
+    public CursorType resolve(GuiEventListener element, double mouseX, double mouseY) {
         String elementName = element.getClass().getName();
 
         try {
@@ -72,15 +65,16 @@ public final class CursorTypeResolver implements ElementRegistrar {
                 }
             }
 
-            CursorTypeFunction<T> mapper = (CursorTypeFunction<T>) cache.get(elementName);
+            CursorTypeFunction<?> mapper = cache.get(elementName);
             if (mapper == null) {
-                mapper = (CursorTypeFunction<T>) resolveMapper(element);
+                mapper = resolveMapper(element);
                 if (!inspector.setProcessed(element, true)) {
                     cache.put(elementName, mapper);
                 }
             }
 
-            CursorType mapped = mapper.getCursorType(element, mouseX, mouseY);
+            @SuppressWarnings("unchecked")
+            CursorType mapped = ((CursorTypeFunction<GuiEventListener>) mapper).getCursorType(element, mouseX, mouseY);
             if (mapped != null && !mapped.isDefault()) {
                 return mapped;
             }
