@@ -50,6 +50,6 @@ public class CursorAnimationHelper {
             return cursor.getFallbackFrame().spriteIndex();
         }
 
-        return cursor.getFrame(state.next(cursor)).spriteIndex();
+        return cursor.nextFrame(state).spriteIndex();
     }
 }

@@ -108,7 +108,7 @@ public final class CursorManager implements CursorTypeRegistrar {
             animationState.reset();
         }
 
-        Cursor currentFrameCursor = cursor.getFrame(animationState.next(cursor)).cursor();
+        Cursor currentFrameCursor = cursor.nextFrame(animationState).cursor();
         updateCursor(currentFrameCursor.getId() != 0 ? currentFrameCursor : cursor);
     }
 
