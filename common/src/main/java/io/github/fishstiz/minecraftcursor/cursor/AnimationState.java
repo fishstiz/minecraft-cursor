@@ -2,9 +2,6 @@ package io.github.fishstiz.minecraftcursor.cursor;
 
 import net.minecraft.Util;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Random;
 
 public class AnimationState {
@@ -13,7 +10,7 @@ public class AnimationState {
     private long lastFrameTime = 0;
     private int currentFrame = 0;
     private boolean oscillateReversed = false;
-    private List<Integer> shuffledFrames;
+    private int[] shuffledFrames;
     private int shuffledIndex = 0;
 
     private boolean isNext(AnimatedCursor cursor, long currentTime) {
@@ -35,21 +32,30 @@ public class AnimationState {
                 yield oscillateReversed ? currentFrame - 1 : currentFrame + 1;
             }
             case RANDOM -> {
-                int newFrame;
-                do newFrame = RANDOM.nextInt(cursor.getFrameCount());
-                while (newFrame == currentFrame);
-                yield newFrame;
+                if (cursor.getFrameCount() > 1) {
+                    int newFrame;
+                    do newFrame = RANDOM.nextInt(cursor.getFrameCount());
+                    while (newFrame == currentFrame);
+                    yield newFrame;
+                }
+                yield currentFrame;
             }
             case RANDOM_CYCLE -> {
-                if (shuffledFrames == null || shuffledIndex >= shuffledFrames.size()) {
-                    shuffledFrames = new ArrayList<>(cursor.getFrameCount());
-                    for (int i = 0; i < cursor.getFrameCount(); i++) {
-                        shuffledFrames.add(i);
+                if (shuffledFrames == null || shuffledIndex >= shuffledFrames.length) {
+                    int count = cursor.getFrameCount();
+                    shuffledFrames = new int[count];
+                    for (int i = 0; i < count; i++) {
+                        shuffledFrames[i] = i;
                     }
-                    Collections.shuffle(shuffledFrames, RANDOM);
+                    for (int i = count - 1; i > 0; i--) {
+                        int j = RANDOM.nextInt(i + 1);
+                        int tmp = shuffledFrames[i];
+                        shuffledFrames[i] = shuffledFrames[j];
+                        shuffledFrames[j] = tmp;
+                    }
                     shuffledIndex = 0;
                 }
-                yield shuffledFrames.get(shuffledIndex++);
+                yield shuffledFrames[shuffledIndex++];
             }
         };
         return currentFrame;
