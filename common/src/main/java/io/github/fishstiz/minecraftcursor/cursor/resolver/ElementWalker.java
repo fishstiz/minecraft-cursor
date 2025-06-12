@@ -51,11 +51,10 @@ public final class ElementWalker {
      * returns false if {@link AbstractWidget#active} is {@code false}.
      */
     private static boolean containsPoint(GuiEventListener guiEventListener, double mouseX, double mouseY) {
-        return isHoveredWidget(guiEventListener) || guiEventListener.isMouseOver(mouseX, mouseY);
-    }
-
-    private static boolean isHoveredWidget(GuiEventListener guiEventListener) {
-        return guiEventListener instanceof AbstractWidget widget && widget.visible && widget.isHovered();
+        if (guiEventListener instanceof AbstractWidget widget) {
+            return widget.visible && (widget.isHovered() || widget.isMouseOver(mouseX, mouseY));
+        }
+        return guiEventListener.isMouseOver(mouseX, mouseY);
     }
 
     @FunctionalInterface
