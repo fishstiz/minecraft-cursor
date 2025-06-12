@@ -130,6 +130,10 @@ public class AnimatedCursor extends Cursor {
         }
     }
 
+    public Frame nextFrame(AnimationState state) {
+        return this.getFrame(state.next(this));
+    }
+
     public boolean isAnimated() {
         return this.animated;
     }
