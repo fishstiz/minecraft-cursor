@@ -20,7 +20,7 @@ public final class ElementWalker {
             Predicate<T> shouldReturn,
             T defaultValue
     ) {
-        if (containsPoint(parent, mouseX, mouseY)) {
+        if (hovered(parent, mouseX, mouseY)) {
             for (GuiEventListener child : parent.children()) {
                 if (child instanceof ContainerEventHandler nestedParent) {
                     T result = walk(nestedParent, mouseX, mouseY, processor, shouldReturn, defaultValue);
@@ -28,7 +28,7 @@ public final class ElementWalker {
                         return result;
                     }
                 }
-                if (containsPoint(child, mouseX, mouseY)) {
+                if (hovered(child, mouseX, mouseY)) {
                     T result = processor.processNode(child, mouseX, mouseY);
                     if (shouldReturn.test(result)) {
                         return result;
@@ -43,6 +43,17 @@ public final class ElementWalker {
         return ElementWalker.walk(parent, mouseX, mouseY, (child, x, y) -> child, Objects::nonNull, null);
     }
 
+    public static @Nullable GuiEventListener findFirst(ContainerEventHandler parent, double mouseX, double mouseY) {
+        if (hovered(parent, mouseX, mouseY)) {
+            for (GuiEventListener child : parent.children()) {
+                if (hovered(child, mouseX, mouseY)) {
+                    return child;
+                }
+            }
+        }
+        return null;
+    }
+
     /**
      * Include inactive widgets.
      *
@@ -50,7 +61,7 @@ public final class ElementWalker {
      * Default implementation of {@link AbstractWidget#isMouseOver(double, double)}
      * returns false if {@link AbstractWidget#active} is {@code false}.
      */
-    private static boolean containsPoint(GuiEventListener guiEventListener, double mouseX, double mouseY) {
+    private static boolean hovered(GuiEventListener guiEventListener, double mouseX, double mouseY) {
         if (guiEventListener instanceof AbstractWidget widget) {
             return widget.visible && (widget.isHovered() || widget.isMouseOver(mouseX, mouseY));
         }

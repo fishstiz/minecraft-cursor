@@ -104,7 +104,7 @@ public final class MinecraftCursor {
             return cursorType;
         }
 
-        GuiEventListener child = ElementWalker.findDeepest(screen, mouseX, mouseY);
+        GuiEventListener child = ElementWalker.findFirst(screen, mouseX, mouseY);
         if (child != null) {
             return CursorTypeResolver.INSTANCE.resolve(child, mouseX, mouseY);
         }
