@@ -1,10 +1,12 @@
 package io.github.fishstiz.minecraftcursor.api;
 
 import io.github.fishstiz.minecraftcursor.provider.CursorControllerProvider;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Provides methods that allow direct control of the cursor.
  */
+@ApiStatus.NonExtendable
 public interface CursorController {
     /**
      * Returns the {@link CursorController} instance.

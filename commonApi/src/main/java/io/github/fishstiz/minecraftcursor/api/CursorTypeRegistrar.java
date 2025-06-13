@@ -1,8 +1,11 @@
 package io.github.fishstiz.minecraftcursor.api;
 
+import org.jetbrains.annotations.ApiStatus;
+
 /**
  * Used for registering {@link CursorType} objects to load its resources.
  */
+@ApiStatus.NonExtendable
 public interface CursorTypeRegistrar {
     /**
      * Registers a variable number of {@link CursorType} objects to be loaded.
