@@ -9,6 +9,7 @@ import io.github.fishstiz.minecraftcursor.compat.ExternalCursor;
 import io.github.fishstiz.minecraftcursor.compat.ExternalCursorTracker;
 import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.system.MemoryUtil;
 import org.spongepowered.asm.mixin.Mixin;
 
 
@@ -86,12 +87,12 @@ public abstract class GLFWMixin {
         }
 
         CursorTracker tracker = ExternalCursorTracker.get();
-        if (!tracker.isTracking(cursor) && cursor != 0) {
+        if (!tracker.isTracking(cursor) && cursor != MemoryUtil.NULL) {
             original.call(window, cursor);
             return;
         }
 
-        if (cursor == 0) {
+        if (cursor == MemoryUtil.NULL) {
             String packageName = getWalker().walk(ExternalCursorTracker::getCallerPackage);
             if (isInternalPackage(packageName)) {
                 original.call(window, cursor);
@@ -107,7 +108,7 @@ public abstract class GLFWMixin {
         ExternalCursor trackedCursor = tracker.getTrackedCursor(cursor);
 
         if (trackedCursor == null
-            || trackedCursor.getCursorType().isKey(ExternalCursor.CUSTOM)
+            || trackedCursor.getCursorType() == ExternalCursor.CUSTOM
             || !CursorManager.INSTANCE.isEnabled(trackedCursor.getCursorType())) {
             original.call(window, cursor);
             tracker.updateCursor(trackedCursor == null ? 0 : trackedCursor.getCaller(), ExternalCursor.CUSTOM);

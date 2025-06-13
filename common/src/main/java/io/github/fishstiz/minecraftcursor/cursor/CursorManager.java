@@ -20,7 +20,7 @@ public final class CursorManager implements CursorTypeRegistrar {
     private final LinkedHashMap<String, Cursor> cursors = new LinkedHashMap<>();
     private final TreeMap<Integer, String> overrides = new TreeMap<>();
     private final AnimationState animationState = new AnimationState();
-    private @NotNull Cursor currentCursor = new Cursor(CursorType.of(""), null);
+    private @NotNull Cursor currentCursor = Cursor.createDummy();
 
     private CursorManager() {
     }
@@ -82,7 +82,7 @@ public final class CursorManager implements CursorTypeRegistrar {
 
     private void onLoad(Cursor cursor) {
         Cursor appliedCursor = getAppliedCursor();
-        if (appliedCursor.isLoaded() && appliedCursor.getId() == cursor.getId()) {
+        if (appliedCursor.isLoaded() && appliedCursor.getType().isKey(cursor.getType()) && appliedCursor.getId() == cursor.getId()) {
             reapplyCursor();
         }
     }
@@ -169,15 +169,11 @@ public final class CursorManager implements CursorTypeRegistrar {
     }
 
     public boolean isEnabled(@NotNull CursorType type) {
-        Cursor cursor = cursors.get(type.getKey());
-        if (cursor == null) {
-            return false;
-        }
-        return cursor.isEnabled();
+        return isEnabled(cursors.get(type.getKey()));
     }
 
     public boolean isEnabled(@Nullable Cursor cursor) {
-        return cursor != null && this.isEnabled(cursor.getType());
+        return cursor != null && cursor.isEnabled();
     }
 
     public @Nullable Cursor getCursor(CursorType type) {

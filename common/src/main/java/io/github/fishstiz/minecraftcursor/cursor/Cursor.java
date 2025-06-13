@@ -24,7 +24,7 @@ import static io.github.fishstiz.minecraftcursor.util.SettingsUtil.*;
 
 public class Cursor {
     private static final String IMG_TYPE = ".png";
-    protected final @Nullable Consumer<Cursor> onLoad;
+    private final @Nullable Consumer<Cursor> onLoad;
     private final CursorType type;
     private final ResourceLocation location;
     private Component text;
@@ -38,13 +38,13 @@ public class Cursor {
     private int textureHeight;
     private long id = MemoryUtil.NULL;
 
-    public Cursor(CursorType type, @Nullable Consumer<Cursor> onLoad) {
+    Cursor(CursorType type, @Nullable Consumer<Cursor> onLoad) {
         this.type = type;
         this.onLoad = onLoad;
         this.location = CursorResourceLoader.getDirectory().withSuffix(type.getKey() + IMG_TYPE);
     }
 
-    public void loadImage(@NotNull NativeImage image, Config.Settings settings) throws IOException {
+    void loadImage(@NotNull NativeImage image, Config.Settings settings) throws IOException {
         try {
             int imageWidth = image.getWidth();
             int imageHeight = image.getHeight();
@@ -52,7 +52,7 @@ public class Cursor {
 
             NativeImage croppedImage = null;
             try {
-                if (image.getHeight() > imageWidth) {
+                if (imageHeight > imageWidth) {
                     // noinspection SuspiciousNameCombination
                     croppedImage = NativeImageUtil.cropImage(image, 0, 0, imageWidth, imageWidth);
                 }
@@ -243,5 +243,13 @@ public class Cursor {
         if (!this.isLoaded()) {
             throw new IllegalStateException("Cursor has not been loaded");
         }
+    }
+
+    protected Cursor unloadedCopy() {
+        return new Cursor(this.type, this.onLoad);
+    }
+
+    static Cursor createDummy() {
+        return new Cursor(CursorType.of(""), null);
     }
 }
