@@ -1,10 +1,12 @@
 package io.github.fishstiz.minecraftcursor.api;
 
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * The registrar used to map {@link GuiEventListener}s with a {@link CursorTypeFunction}.
  */
+@ApiStatus.NonExtendable
 public interface ElementRegistrar {
     /**
      * Registers the {@link GuiEventListener} class specified by {@link CursorHandler#getTargetElement()}
