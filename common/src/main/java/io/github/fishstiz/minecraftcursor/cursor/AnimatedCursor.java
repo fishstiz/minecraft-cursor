@@ -20,11 +20,11 @@ public class AnimatedCursor extends Cursor {
     private boolean animated = true;
     private Frame fallbackFrame;
 
-    public AnimatedCursor(CursorType type, Consumer<Cursor> onLoad) {
+    AnimatedCursor(CursorType type, Consumer<Cursor> onLoad) {
         super(type, onLoad);
     }
 
-    public void loadImage(
+    void loadImage(
             NativeImage image,
             Config.Settings settings,
             AnimationData animation
@@ -78,7 +78,7 @@ public class AnimatedCursor extends Cursor {
             Config.Settings settings,
             int index
     ) throws IOException {
-        Cursor cursor = new Cursor(this.getType(), this.onLoad);
+        Cursor cursor = this.unloadedCopy();
         int size = this.getTextureWidth();
         try (NativeImage cropped = NativeImageUtil.cropImage(image, 0, index * size, size, size)) {
             cursor.loadImage(cropped, settings);
