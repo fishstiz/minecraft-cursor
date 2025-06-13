@@ -3,6 +3,8 @@ package io.github.fishstiz.minecraftcursor.api;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.EditBox;
+import org.jetbrains.annotations.Nullable;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.Objects;
 
@@ -17,9 +19,9 @@ public interface CursorType {
     /**
      * The fallback cursor type
      * <p>
-     * Replaces {@code GLFW_ARROW_CURSOR} standard cursor.
+     * Maps to {@link GLFW#GLFW_ARROW_CURSOR} standard cursor.
      */
-    CursorType DEFAULT = CursorType.of("default");
+    CursorType DEFAULT = of("default");
 
     /**
      * The cursor type is determined in two passes:
@@ -31,77 +33,77 @@ public interface CursorType {
      * This cursor type ensures that the second pass is skipped
      * and forces the cursor type to fall back to {@link CursorType#DEFAULT} since it is not a real cursor type.
      */
-    CursorType DEFAULT_FORCE = CursorType.of("");
+    CursorType DEFAULT_FORCE = of("");
 
     /**
      * The cursor type that is applied when the mouse is over {@link AbstractButton}
      * elements and on other certain elements that can be clicked.
      *
      * <p>
-     * Replaces {@code GLFW_POINTING_HAND_CURSOR} standard cursor.
+     * Maps to {@link GLFW#GLFW_POINTING_HAND_CURSOR} standard cursor.
      */
-    CursorType POINTER = CursorType.of("pointer");
+    CursorType POINTER = of("pointer");
 
     /**
      * The cursor type that is applied when grabbing the slider of {@link AbstractSliderButton}
      * elements and when grabbing items in the inventory.
      *
      * <p>
-     * Replaces {@code GLFW_RESIZE_ALL_CURSOR} standard cursor.
+     * Maps to {@link GLFW#GLFW_RESIZE_ALL_CURSOR} standard cursor.
      */
-    CursorType GRABBING = CursorType.of("grabbing");
+    CursorType GRABBING = of("grabbing");
 
     /**
      * The cursor type that is applied when the mouse is over {@link EditBox} elements
      *
      * <p>
-     * Replaces {@code GLFW_IBEAM_CURSOR} standard cursor.
+     * Maps to {@link GLFW#GLFW_IBEAM_CURSOR} standard cursor.
      */
-    CursorType TEXT = CursorType.of("text");
+    CursorType TEXT = of("text");
 
     /**
      * The cursor type that is applied when shift is held and the mouse is over elements with special shift actions.
      */
-    CursorType SHIFT = CursorType.of("shift");
+    CursorType SHIFT = of("shift");
 
     /**
      * The cursor type that is applied when loading.
      */
-    CursorType BUSY = CursorType.of("busy");
+    CursorType BUSY = of("busy");
 
     /**
-     * Replaces {@code GLFW_CROSSHAIR_CURSOR} standard cursor.
+     * Maps to {@link GLFW#GLFW_CROSSHAIR_CURSOR} standard cursor.
      */
-    CursorType CROSSHAIR = CursorType.of("crosshair");
+    CursorType CROSSHAIR = of("crosshair");
 
     /**
-     * Replaces {@code GLFW_RESIZE_EW_CURSOR} standard cursor.
+     * Maps to {@link GLFW#GLFW_RESIZE_EW_CURSOR} standard cursor.
      */
-    CursorType RESIZE_EW = CursorType.of("resize_ew");
+    CursorType RESIZE_EW = of("resize_ew");
 
     /**
-     * Replaces {@code GLFW_RESIZE_NS_CURSOR} standard cursor.
+     * Maps to {@link GLFW#GLFW_RESIZE_NS_CURSOR} standard cursor.
      */
-    CursorType RESIZE_NS = CursorType.of("resize_ns");
+    CursorType RESIZE_NS = of("resize_ns");
 
     /**
-     * Replaces {@code GLFW_RESIZE_NWSE_CURSOR} standard cursor.
+     * Maps to {@link GLFW#GLFW_RESIZE_NWSE_CURSOR} standard cursor.
      */
-    CursorType RESIZE_NWSE = CursorType.of("resize_nwse");
+    CursorType RESIZE_NWSE = of("resize_nwse");
 
     /**
-     * Replaces {@code GLFW_RESIZE_NESW_CURSOR} standard cursor.
+     * Maps to {@link GLFW#GLFW_RESIZE_NESW_CURSOR} standard cursor.
      */
-    CursorType RESIZE_NESW = CursorType.of("resize_nesw");
+    CursorType RESIZE_NESW = of("resize_nesw");
 
     /**
      * The cursor type that is applied when the mouse is over disabled
      * {@link AbstractButton} and {@link AbstractSliderButton} widgets.
      *
      * <p>
-     * Replaces {@code GLFW_NOT_ALLOWED_CURSOR} standard cursor.
+     * Maps to {@link GLFW#GLFW_NOT_ALLOWED_CURSOR} standard cursor.
      */
-    CursorType NOT_ALLOWED = CursorType.of("not_allowed");
+    CursorType NOT_ALLOWED = of("not_allowed");
 
     /**
      * Returns the key of the {@link CursorType} object which acts as its identifier.
@@ -135,8 +137,8 @@ public interface CursorType {
         };
     }
 
-    default boolean isKey(CursorType cursorType) {
-        return Objects.equals(this.getKey(), cursorType.getKey());
+    default boolean isKey(@Nullable CursorType cursorType) {
+        return cursorType != null && Objects.equals(this.getKey(), cursorType.getKey());
     }
 
     default boolean isDefault() {
