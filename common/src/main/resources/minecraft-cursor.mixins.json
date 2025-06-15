@@ -13,6 +13,7 @@
     "cursorhandler.access.CreativeInventoryScreenAccessor",
     "cursorhandler.access.HandledScreenAccessor",
     "cursorhandler.access.LoomScreenAccessor",
+    "cursorhandler.access.OnlineServerEntryAccessor",
     "cursorhandler.access.RecipeAlternativesWidgetAccessor",
     "cursorhandler.access.RecipeBookResultsAccessor",
     "cursorhandler.access.RecipeBookScreenAccessor",
