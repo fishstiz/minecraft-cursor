@@ -49,7 +49,7 @@ public final class MinecraftCursor {
         }
     }
 
-    static void onScreenInit(Minecraft minecraft, Screen screen) {
+    static void beforeScreenInit(Minecraft minecraft, Screen screen) {
         if (minecraft.screen == null) {
             CursorManager.INSTANCE.setCurrentCursor(CursorType.DEFAULT);
             visibleHudScreen = screen;
@@ -58,26 +58,35 @@ public final class MinecraftCursor {
         visibleHudScreen = null;
     }
 
-    static void onScreenRender(Minecraft minecraft, Screen screen, GuiGraphics guiGraphics, int mouseX, int mouseY) {
+    static void afterScreenRender(Minecraft minecraft, Screen screen, GuiGraphics guiGraphics, int mouseX, int mouseY) {
         visibleHudScreen = null;
 
         CursorTypeResolver.INSTANCE.getInspector().render(minecraft, screen, guiGraphics, mouseX, mouseY);
 
-        if (ExternalCursorTracker.get().isCustom()) return;
-
-        CursorManager.INSTANCE.setCurrentCursor(resolveCursorType(screen, mouseX, mouseY));
+        if (!ExternalCursorTracker.get().isCustom()) {
+            CursorManager.INSTANCE.setCurrentCursor(resolveCursorType(screen, mouseX, mouseY));
+        }
     }
 
-    static void onClientTick(Minecraft minecraft) {
-        if (ExternalCursorTracker.get().isCustom()) return;
+    static void afterClientTick(Minecraft minecraft) {
+        if (!ExternalCursorTracker.get().isCustom()) {
+            if (minecraft.screen == null && visibleHudScreen != null && !minecraft.mouseHandler.isMouseGrabbed()) {
+                var window = minecraft.getWindow();
+                double mouseX = minecraft.mouseHandler.xpos() * window.getGuiScaledWidth() / window.getScreenWidth();
+                double mouseY = minecraft.mouseHandler.ypos() * window.getGuiScaledHeight() / window.getScreenHeight();
+                CursorManager.INSTANCE.setCurrentCursor(resolveCursorType(visibleHudScreen, mouseX, mouseY));
+            } else if (minecraft.screen == null && visibleHudScreen == null) {
+                CursorManager.INSTANCE.setCurrentCursor(ExternalCursorTracker.get().getCursorOrDefault());
+            }
+        }
+    }
 
-        if (minecraft.screen == null && visibleHudScreen != null && !minecraft.mouseHandler.isMouseGrabbed()) {
-            double scale = minecraft.getWindow().getGuiScale();
-            double mouseX = minecraft.mouseHandler.xpos() / scale;
-            double mouseY = minecraft.mouseHandler.ypos() / scale;
-            CursorManager.INSTANCE.setCurrentCursor(resolveCursorType(visibleHudScreen, mouseX, mouseY));
-        } else if (minecraft.screen == null && visibleHudScreen == null) {
-            CursorManager.INSTANCE.setCurrentCursor(ExternalCursorTracker.get().getCursorOrDefault());
+    static void renderInspector(Minecraft minecraft, GuiGraphics guiGraphics) {
+        if (CursorTypeResolver.INSTANCE.getInspector().isInspecting() && !minecraft.mouseHandler.isMouseGrabbed() && visibleHudScreen != null) {
+            var window = minecraft.getWindow();
+            double mouseX = minecraft.mouseHandler.xpos() * window.getGuiScaledWidth() / window.getScreenWidth();
+            double mouseY = minecraft.mouseHandler.ypos() * window.getGuiScaledHeight() / window.getScreenHeight();
+            CursorTypeResolver.INSTANCE.getInspector().render(minecraft, visibleHudScreen, guiGraphics, mouseX, mouseY);
         }
     }
 

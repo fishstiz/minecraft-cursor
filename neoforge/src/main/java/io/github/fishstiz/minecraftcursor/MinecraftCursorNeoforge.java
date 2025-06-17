@@ -24,31 +24,28 @@ public class MinecraftCursorNeoforge {
                 new ConfigurationScreen(screen)
         );
 
-        modEventBus.addListener(RegisterClientReloadListenersEvent.class, event ->
-                event.registerReloadListener(new CursorResourceReloadListener()));
+        modEventBus.addListener(RegisterClientReloadListenersEvent.class, event -> {
+            MinecraftCursor.init();
+            event.registerReloadListener(new CursorResourceReloadListener());
+        });
 
-        MinecraftCursor.init();
         NeoForge.EVENT_BUS.register(this);
     }
 
     @SubscribeEvent
     public void onScreenInit(ScreenEvent.Init.Pre event) {
         Screen screen = event.getScreen();
-        MinecraftCursor.onScreenInit(screen.getMinecraft(), screen);
+        MinecraftCursor.beforeScreenInit(screen.getMinecraft(), screen);
     }
 
     @SubscribeEvent
     public void onScreenRender(ScreenEvent.Render.Post event) {
         Screen screen = event.getScreen();
-        MinecraftCursor.onScreenRender(screen.getMinecraft(), screen, event.getGuiGraphics(), event.getMouseX(), event.getMouseY());
+        MinecraftCursor.afterScreenRender(screen.getMinecraft(), screen, event.getGuiGraphics(), event.getMouseX(), event.getMouseY());
     }
 
     @SubscribeEvent
     public void onClientTick(ClientTickEvent.Post event) {
-        MinecraftCursor.onClientTick(MinecraftHolder.INSTANCE);
-    }
-
-    private static class MinecraftHolder {
-        private static final Minecraft INSTANCE = Minecraft.getInstance();
+        MinecraftCursor.afterClientTick(Minecraft.getInstance());
     }
 }
