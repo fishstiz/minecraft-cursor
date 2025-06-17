@@ -21,14 +21,13 @@ public class MinecraftCursorForge {
         ModLoadingContext.get().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class, () ->
                 new ConfigScreenHandler.ConfigScreenFactory((mc, screen) -> new ConfigurationScreen(screen))
         );
-
-        MinecraftCursor.init();
     }
 
     @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
     public static class ClientModEvents {
         @SubscribeEvent
         public static void registerReloadListeners(RegisterClientReloadListenersEvent event) {
+            MinecraftCursor.init();
             event.registerReloadListener(new CursorResourceReloadListener());
         }
     }
@@ -37,23 +36,19 @@ public class MinecraftCursorForge {
     public static class ClientForgeEvents {
         @SubscribeEvent
         public static void onScreenInit(ScreenEvent.Init.Pre event) {
-            MinecraftCursor.onScreenInit(MinecraftHolder.INSTANCE, event.getScreen());
+            MinecraftCursor.beforeScreenInit(Minecraft.getInstance(), event.getScreen());
         }
 
         @SubscribeEvent
         public static void onScreenRender(ScreenEvent.Render.Post event) {
-            MinecraftCursor.onScreenRender(MinecraftHolder.INSTANCE, event.getScreen(), event.getGuiGraphics(), event.getMouseX(), event.getMouseY());
+            MinecraftCursor.afterScreenRender(Minecraft.getInstance(), event.getScreen(), event.getGuiGraphics(), event.getMouseX(), event.getMouseY());
         }
 
         @SubscribeEvent
         public static void onClientTick(TickEvent.ClientTickEvent event) {
             if (event.phase == TickEvent.Phase.END) {
-                MinecraftCursor.onClientTick(MinecraftHolder.INSTANCE);
+                MinecraftCursor.afterClientTick(Minecraft.getInstance());
             }
         }
-    }
-
-    private static class MinecraftHolder {
-        private static final Minecraft INSTANCE = Minecraft.getInstance();
     }
 }

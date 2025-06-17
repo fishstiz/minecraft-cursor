@@ -133,7 +133,8 @@ public final class CursorTypeResolver implements ElementRegistrar {
     }
 
     public void toggleInspector() {
-        inspector = ElementInspector.toggle(inspector);
+        inspector.destroy();
+        inspector = this.inspector == ElementInspector.NO_OP ? new ElementInspectorImpl() : ElementInspector.NO_OP;
         cache.clear();
     }
 
