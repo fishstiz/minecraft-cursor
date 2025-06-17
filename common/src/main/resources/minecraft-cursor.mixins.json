@@ -8,6 +8,7 @@
     "MinecraftMixin",
     "MouseOptionsScreenMixin",
     "NativeImageAccess",
+    "ScreenMixin",
     "cursorhandler.AbstractContainerScreenMixin",
     "cursorhandler.AbstractScrollWidgetMixin",
     "cursorhandler.AbstractSelectionListMixin",

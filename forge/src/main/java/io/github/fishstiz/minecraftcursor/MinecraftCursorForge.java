@@ -1,5 +1,6 @@
 package io.github.fishstiz.minecraftcursor;
 
+import io.github.fishstiz.minecraftcursor.config.Flag;
 import io.github.fishstiz.minecraftcursor.gui.screen.ConfigurationScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
@@ -18,6 +19,8 @@ public class MinecraftCursorForge {
 
     @SuppressWarnings("removal")
     public MinecraftCursorForge() {
+        Flag.REMAP.disable();
+
         ModLoadingContext.get().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class, () ->
                 new ConfigScreenHandler.ConfigScreenFactory((mc, screen) -> new ConfigurationScreen(screen))
         );
@@ -35,20 +38,15 @@ public class MinecraftCursorForge {
     @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
     public static class ClientForgeEvents {
         @SubscribeEvent
-        public static void onScreenInit(ScreenEvent.Init.Pre event) {
-            MinecraftCursor.beforeScreenInit(Minecraft.getInstance(), event.getScreen());
-        }
-
-        @SubscribeEvent
-        public static void onScreenRender(ScreenEvent.Render.Post event) {
-            MinecraftCursor.afterScreenRender(Minecraft.getInstance(), event.getScreen(), event.getGuiGraphics(), event.getMouseX(), event.getMouseY());
-        }
-
-        @SubscribeEvent
-        public static void onClientTick(TickEvent.ClientTickEvent event) {
+        public static void afterClientTick(TickEvent.ClientTickEvent event) {
             if (event.phase == TickEvent.Phase.END) {
                 MinecraftCursor.afterClientTick(Minecraft.getInstance());
             }
+        }
+
+        @SubscribeEvent
+        public static void afterScreenRender(ScreenEvent.Render.Post event) {
+            MinecraftCursor.afterCurrentScreenRender(Minecraft.getInstance(), event.getScreen(), event.getGuiGraphics(), event.getMouseX(), event.getMouseY());
         }
     }
 }
