@@ -1,5 +1,6 @@
 package io.github.fishstiz.minecraftcursor;
 
+import io.github.fishstiz.minecraftcursor.config.Flag;
 import io.github.fishstiz.minecraftcursor.gui.screen.ConfigurationScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -20,6 +21,8 @@ public class MinecraftCursorNeoforge {
     public static final String MOD_ID = "minecraft_cursor";
 
     public MinecraftCursorNeoforge(ModContainer container, IEventBus modEventBus) {
+        Flag.REMAP.disable();
+
         container.registerExtensionPoint(IConfigScreenFactory.class, (c, screen) ->
                 new ConfigurationScreen(screen)
         );
@@ -33,19 +36,13 @@ public class MinecraftCursorNeoforge {
     }
 
     @SubscribeEvent
-    public void onScreenInit(ScreenEvent.Init.Pre event) {
-        Screen screen = event.getScreen();
-        MinecraftCursor.beforeScreenInit(screen.getMinecraft(), screen);
-    }
-
-    @SubscribeEvent
-    public void onScreenRender(ScreenEvent.Render.Post event) {
-        Screen screen = event.getScreen();
-        MinecraftCursor.afterScreenRender(screen.getMinecraft(), screen, event.getGuiGraphics(), event.getMouseX(), event.getMouseY());
-    }
-
-    @SubscribeEvent
-    public void onClientTick(ClientTickEvent.Post event) {
+    private void afterClientTick(ClientTickEvent.Post event) {
         MinecraftCursor.afterClientTick(Minecraft.getInstance());
+    }
+
+    @SubscribeEvent
+    private void afterScreenRender(ScreenEvent.Render.Post event) {
+        Screen screen = event.getScreen();
+        MinecraftCursor.afterCurrentScreenRender(screen.getMinecraft(), screen, event.getGuiGraphics(), event.getMouseX(), event.getMouseY());
     }
 }
