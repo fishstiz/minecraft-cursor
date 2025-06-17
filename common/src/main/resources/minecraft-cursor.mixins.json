@@ -8,6 +8,9 @@
     "MinecraftMixin",
     "MouseOptionsScreenMixin",
     "NativeImageAccess",
+    "ScreenMixin",
+    "cursorhandler.AbstractContainerScreenMixin",
+    "cursorhandler.AbstractScrollAreaMixin",
     "cursorhandler.access.AdvancementsScreenAccessor",
     "cursorhandler.access.BookEditScreenAccessor",
     "cursorhandler.access.CreativeInventoryScreenAccessor",
@@ -18,9 +21,7 @@
     "cursorhandler.access.RecipeBookResultsAccessor",
     "cursorhandler.access.RecipeBookScreenAccessor",
     "cursorhandler.access.RecipeBookWidgetAccessor",
-    "cursorhandler.access.StonecutterScreenAccessor",
-    "cursorhandler.AbstractContainerScreenMixin",
-    "cursorhandler.AbstractScrollAreaMixin"
+    "cursorhandler.access.StonecutterScreenAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
