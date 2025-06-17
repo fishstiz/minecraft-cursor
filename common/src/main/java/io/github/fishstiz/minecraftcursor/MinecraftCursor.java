@@ -12,12 +12,12 @@ import io.github.fishstiz.minecraftcursor.impl.MinecraftCursorInitializerImpl;
 import io.github.fishstiz.minecraftcursor.provider.CursorControllerProvider;
 import io.github.fishstiz.minecraftcursor.platform.Services;
 import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
-import io.github.fishstiz.minecraftcursor.config.Flag;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +26,7 @@ public final class MinecraftCursor {
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     public static final Config CONFIG = ConfigLoader.load(Services.PLATFORM.getConfigDir().resolve(MOD_ID + ".json").toFile());
     private static final CursorControllerImpl CONTROLLER = new CursorControllerImpl();
-    private static Screen visibleHudScreen;
+    private static @Nullable CursorType deferredCursorType;
 
     private MinecraftCursor() {
     }
@@ -38,56 +38,54 @@ public final class MinecraftCursor {
             try {
                 entrypoint.init(CursorManager.INSTANCE, CursorTypeResolver.INSTANCE);
             } catch (LinkageError | Exception e) {
-                LOGGER.error("[minecraft-cursor] Skipping invalid implementation of MinecraftCursorInitializer");
+                LOGGER.error("[minecraft-cursor] Skipping invalid implementation of MinecraftCursorInitializer", e);
             }
         });
 
         CursorControllerProvider.init(CONTROLLER);
-
-        if (!Services.PLATFORM.isFabric()) {
-            Flag.REMAP.disable(); // Unsupported in Forge/NeoForge
-        }
     }
 
-    static void beforeScreenInit(Minecraft minecraft, Screen screen) {
-        if (minecraft.screen == null) {
-            CursorManager.INSTANCE.setCurrentCursor(CursorType.DEFAULT);
-            visibleHudScreen = screen;
-            return;
-        }
-        visibleHudScreen = null;
-    }
-
-    static void afterScreenRender(Minecraft minecraft, Screen screen, GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        visibleHudScreen = null;
-
-        CursorTypeResolver.INSTANCE.getInspector().render(minecraft, screen, guiGraphics, mouseX, mouseY);
-
-        if (!ExternalCursorTracker.get().isCustom()) {
-            CursorManager.INSTANCE.setCurrentCursor(resolveCursorType(screen, mouseX, mouseY));
-        }
-    }
-
+    /**
+     * Execute before any screen render.
+     */
     static void afterClientTick(Minecraft minecraft) {
         if (!ExternalCursorTracker.get().isCustom()) {
-            if (minecraft.screen == null && visibleHudScreen != null && !minecraft.mouseHandler.isMouseGrabbed()) {
-                var window = minecraft.getWindow();
-                double mouseX = minecraft.mouseHandler.xpos() * window.getGuiScaledWidth() / window.getScreenWidth();
-                double mouseY = minecraft.mouseHandler.ypos() * window.getGuiScaledHeight() / window.getScreenHeight();
-                CursorManager.INSTANCE.setCurrentCursor(resolveCursorType(visibleHudScreen, mouseX, mouseY));
-            } else if (minecraft.screen == null && visibleHudScreen == null) {
+            if (minecraft.screen == null && deferredCursorType == null) {
                 CursorManager.INSTANCE.setCurrentCursor(ExternalCursorTracker.get().getCursorOrDefault());
+            } else if (deferredCursorType != null && shouldApplyDeferredCursorType(minecraft)) {
+                CursorManager.INSTANCE.setCurrentCursor(deferredCursorType);
+            }
+            deferredCursorType = null;
+        }
+    }
+
+    /**
+     * Execute after {@link Screen#render(GuiGraphics, int, int, float)} and before {@link Screen#renderWithTooltip(GuiGraphics, int, int, float)} ends.
+     */
+    public static void afterScreenRender(Minecraft minecraft, Screen screen, GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        if (shouldApplyDeferredCursorType(minecraft)) {
+            CursorTypeResolver.INSTANCE.getInspector().render(minecraft, screen, guiGraphics, mouseX, mouseY);
+            if (!ExternalCursorTracker.get().isCustom()) {
+                deferredCursorType = resolveCursorType(screen, mouseX, mouseY);
             }
         }
     }
 
-    static void renderInspector(Minecraft minecraft, GuiGraphics guiGraphics) {
-        if (CursorTypeResolver.INSTANCE.getInspector().isInspecting() && !minecraft.mouseHandler.isMouseGrabbed() && visibleHudScreen != null) {
-            var window = minecraft.getWindow();
-            double mouseX = minecraft.mouseHandler.xpos() * window.getGuiScaledWidth() / window.getScreenWidth();
-            double mouseY = minecraft.mouseHandler.ypos() * window.getGuiScaledHeight() / window.getScreenHeight();
-            CursorTypeResolver.INSTANCE.getInspector().render(minecraft, visibleHudScreen, guiGraphics, mouseX, mouseY);
+    /**
+     * Execute after {@link Screen#renderWithTooltip(GuiGraphics, int, int, float)}.
+     */
+    static void afterCurrentScreenRender(Minecraft minecraft, Screen currentScreen, GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        CursorTypeResolver.INSTANCE.getInspector().render(minecraft, currentScreen, guiGraphics, mouseX, mouseY);
+
+        if (!ExternalCursorTracker.get().isCustom()) {
+            CursorManager.INSTANCE.setCurrentCursor(resolveCursorType(currentScreen, mouseX, mouseY));
         }
+
+        deferredCursorType = null;
+    }
+
+    private static boolean shouldApplyDeferredCursorType(Minecraft minecraft) {
+        return minecraft.screen == null && !minecraft.mouseHandler.isMouseGrabbed();
     }
 
     private static CursorType resolveCursorType(Screen screen, double mouseX, double mouseY) {
