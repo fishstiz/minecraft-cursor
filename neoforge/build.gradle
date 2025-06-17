@@ -3,17 +3,6 @@ plugins {
     id 'net.neoforged.moddev'
 }
 
-repositories {
-    maven {
-        name 'Maven for PR #2297' // https://github.com/neoforged/NeoForge/pull/2297
-        url 'https://prmaven.neoforged.net/NeoForge/pr2297'
-        content {
-            includeModule('net.neoforged', 'neoforge')
-            includeModule('net.neoforged', 'testframework')
-        }
-    }
-}
-
 dependencies {
     jarJar(api project(":commonApi"))
 }
