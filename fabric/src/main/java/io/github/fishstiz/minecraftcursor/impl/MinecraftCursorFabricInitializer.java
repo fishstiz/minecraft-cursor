@@ -4,7 +4,7 @@ import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.api.CursorTypeRegistrar;
 import io.github.fishstiz.minecraftcursor.api.ElementRegistrar;
 import io.github.fishstiz.minecraftcursor.api.MinecraftCursorInitializer;
-import io.github.fishstiz.minecraftcursor.cursor.handler.ingame.TradeOfferButtonCursorHandler;
+import io.github.fishstiz.minecraftcursor.cursor.handler.TradeOfferButtonCursorHandler;
 import io.github.fishstiz.minecraftcursor.compat.modmenu.ModScreenCursorHandler;
 import net.fabricmc.loader.api.FabricLoader;
 

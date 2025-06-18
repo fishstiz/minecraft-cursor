@@ -1,4 +1,4 @@
-package io.github.fishstiz.minecraftcursor.cursor.handler.ingame;
+package io.github.fishstiz.minecraftcursor.cursor.handler;
 
 import io.github.fishstiz.minecraftcursor.api.CursorHandler;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
@@ -7,15 +7,15 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class TradeOfferButtonCursorHandler implements CursorHandler<GuiEventListener> {
-    private final String fullyQualifiedClassName;
+    private final String className;
 
-    public TradeOfferButtonCursorHandler(String fullyQualifiedClassName) {
-        this.fullyQualifiedClassName = fullyQualifiedClassName;
+    public TradeOfferButtonCursorHandler(String className) {
+        this.className = className;
     }
 
     @Override
     public @NotNull TargetElement<GuiEventListener> getTargetElement() {
-        return TargetElement.fromClassName(fullyQualifiedClassName);
+        return TargetElement.fromClassName(this.className);
     }
 
     @Override

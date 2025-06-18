@@ -5,9 +5,6 @@ import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.api.CursorTypeRegistrar;
 import io.github.fishstiz.minecraftcursor.api.ElementRegistrar;
 import io.github.fishstiz.minecraftcursor.api.MinecraftCursorInitializer;
-import io.github.fishstiz.minecraftcursor.cursor.handler.ingame.*;
-import io.github.fishstiz.minecraftcursor.cursor.handler.multiplayer.MultiplayerServerListWidgetCursorHandler;
-import io.github.fishstiz.minecraftcursor.cursor.handler.world.WorldListWidgetCursorHandler;
 import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -41,16 +38,6 @@ public final class MinecraftCursorInitializerImpl implements MinecraftCursorInit
         elementRegistrar.register(AbstractSliderButton.class, this::sliderWidgetCursor);
         elementRegistrar.register(EditBox.class, this::textFieldWidgetCursor);
         elementRegistrar.register(MultiLineEditBox.class, this::textFieldWidgetCursor);
-        elementRegistrar.register(new WorldListWidgetCursorHandler());
-        elementRegistrar.register(new MultiplayerServerListWidgetCursorHandler());
-        elementRegistrar.register(new RecipeBookScreenCursorHandler());
-        elementRegistrar.register(new CreativeInventoryScreenCursorHandler());
-        elementRegistrar.register(new BookEditScreenCursorHandler());
-        elementRegistrar.register(new EnchantmentScreenCursorHandler());
-        elementRegistrar.register(new StonecutterScreenCursorHandler());
-        elementRegistrar.register(new LoomScreenCursorHandler());
-        elementRegistrar.register(new CrafterScreenCursorHandler());
-        elementRegistrar.register(new AdvancementsScreenCursorHandler());
     }
 
     private CursorType elementToBusy(GuiEventListener ignoreElement, double ignoreMouseX, double ignoreMouseY) {

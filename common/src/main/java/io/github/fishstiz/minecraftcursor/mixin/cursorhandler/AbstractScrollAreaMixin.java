@@ -2,6 +2,7 @@ package io.github.fishstiz.minecraftcursor.mixin.cursorhandler;
 
 import io.github.fishstiz.minecraftcursor.api.CursorController;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
+import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractScrollArea;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,7 +21,7 @@ public abstract class AbstractScrollAreaMixin {
             target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Ljava/util/function/Function;Lnet/minecraft/resources/ResourceLocation;IIII)V"
     ))
     public void forceDefaultCursor(GuiGraphics guiGraphics, CallbackInfo ci) {
-        if (this.scrolling) {
+        if (this.scrolling && CursorTypeUtil.isLeftClickHeld()) {
             CursorController.getInstance().setSingleCycleCursor(CursorType.DEFAULT_FORCE);
         }
     }
