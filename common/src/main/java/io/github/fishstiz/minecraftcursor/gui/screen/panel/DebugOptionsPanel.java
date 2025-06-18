@@ -39,14 +39,14 @@ public class DebugOptionsPanel extends AbstractOptionsPanel {
 
         this.previousCacheSize = -1;
         this.cacheButton = new ButtonWidget(createCacheText(), CursorTypeResolver.INSTANCE::clearCache);
-        this.optionsList.addWidget(this.cacheButton);
+        this.optionsList.addButton(this.cacheButton);
         this.index(CACHE_TEXT);
 
-        this.optionsList.addWidget(new ButtonWidget(
+        this.optionsList.addButton(new ButtonWidget(
                 this.index(OPEN_WIKI_TEXT),
                 ConfirmLinkScreen.confirmLink(WIKI_LINK, this.getScreen(), true)
         ));
-        this.optionsList.addWidget(new ButtonWidget(
+        this.optionsList.addButton(new ButtonWidget(
                 this.index(REPORT_ISSUES_TEXT),
                 ConfirmLinkScreen.confirmLink(ISSUES_LINK, this.getScreen(), true)
         ));

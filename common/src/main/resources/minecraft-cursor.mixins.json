@@ -10,24 +10,26 @@
     "NativeImageAccess",
     "ScreenMixin",
     "cursorhandler.AbstractContainerScreenMixin",
+    "cursorhandler.AbstractRecipeBookScreenMixin",
     "cursorhandler.AbstractScrollWidgetMixin",
     "cursorhandler.AbstractSelectionListMixin",
-    "cursorhandler.access.AbstractFurnaceScreenAccessor",
-    "cursorhandler.access.AbstractSelectionListAccessor",
-    "cursorhandler.access.AdvancementsScreenAccessor",
-    "cursorhandler.access.BookEditScreenAccessor",
-    "cursorhandler.access.CraftingScreenAccessor",
-    "cursorhandler.access.CreativeInventoryScreenAccessor",
-    "cursorhandler.access.HandledScreenAccessor",
-    "cursorhandler.access.InventoryScreenAccessor",
-    "cursorhandler.access.LoomScreenAccessor",
+    "cursorhandler.access.AdvancementScreenAccess",
+    "cursorhandler.AdvancementTabMixin",
+    "cursorhandler.BookEditScreenMixin",
+    "cursorhandler.CreativeModeInventoryScreenMixin",
+    "cursorhandler.EnchantmentScreenMixin",
+    "cursorhandler.LoomScreenMixin",
+    "cursorhandler.ServerSelectionListMixin",
+    "cursorhandler.StonecutterScreenMixin",
+    "cursorhandler.WorldSelectionListMixin",
     "cursorhandler.access.OnlineServerEntryAccessor",
     "cursorhandler.access.RecipeAlternativesWidgetAccessor",
     "cursorhandler.access.RecipeBookResultsAccessor",
-    "cursorhandler.access.RecipeBookWidgetAccessor",
-    "cursorhandler.access.StonecutterScreenAccessor"
+    "cursorhandler.access.RecipeBookWidgetAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "mixins": [
+  ]
 }

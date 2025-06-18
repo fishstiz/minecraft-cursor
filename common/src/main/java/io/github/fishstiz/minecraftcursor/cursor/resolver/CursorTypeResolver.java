@@ -79,6 +79,7 @@ public final class CursorTypeResolver implements ElementRegistrar {
             }
 
             if (element instanceof InternalCursorProvider internalCursorProvider) {
+                inspector.setProcessed(element, false);
                 return internalCursorProvider.minecraft_cursor$getCursorType(mouseX, mouseY);
             }
 

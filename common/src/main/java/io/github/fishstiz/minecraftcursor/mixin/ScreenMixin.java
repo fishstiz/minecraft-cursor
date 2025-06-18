@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Screen.class)
-public class ScreenMixin {
+public abstract class ScreenMixin {
     @Shadow
     @Nullable
     protected Minecraft minecraft;

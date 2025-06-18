@@ -126,7 +126,7 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
                 DEFERRED_LOADING_INFO,
                 true
         );
-        this.optionList.addWidget(
+        this.optionList.addButton(
                 new ButtonWidget(
                         this.index(RESET_TEXT),
                         this::resetCursorSettings

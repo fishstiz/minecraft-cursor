@@ -36,8 +36,8 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
         this(minecraft, font, Button.DEFAULT_HEIGHT, spacing);
     }
 
-    public void addWidget(AbstractWidget widget) {
-        this.addEntry(new WidgetEntry(widget));
+    public void addButton(ButtonWidget button) {
+        this.addEntry(new ButtonEntry(button));
     }
 
     public void addToggle(
@@ -176,10 +176,10 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
         }
     }
 
-    private class WidgetEntry extends AbstractEntry {
-        private final AbstractWidget widget;
+    private class ButtonEntry extends AbstractEntry {
+        private final ButtonWidget widget;
 
-        private WidgetEntry(@NotNull AbstractWidget widget) {
+        private ButtonEntry(@NotNull ButtonWidget widget) {
             super(widget.getMessage());
 
             this.widget = this.addChild(widget);
@@ -188,7 +188,7 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
         @Override
         public void render(@NotNull GuiGraphics guiGraphics, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean hovering, float partialTick) {
             this.widget.setWidth(width);
-            this.widget.height = height - OptionsListWidget.this.rowGap;
+            this.widget.setHeight(height - OptionsListWidget.this.rowGap);
             this.widget.setPosition(left, top);
             super.render(guiGraphics, index, top, left, width, height, mouseX, mouseY, hovering, partialTick);
         }

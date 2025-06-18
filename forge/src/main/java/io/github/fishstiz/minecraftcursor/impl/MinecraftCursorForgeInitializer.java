@@ -3,7 +3,7 @@ package io.github.fishstiz.minecraftcursor.impl;
 import io.github.fishstiz.minecraftcursor.api.CursorTypeRegistrar;
 import io.github.fishstiz.minecraftcursor.api.ElementRegistrar;
 import io.github.fishstiz.minecraftcursor.api.MinecraftCursorInitializer;
-import io.github.fishstiz.minecraftcursor.cursor.handler.ingame.TradeOfferButtonCursorHandler;
+import io.github.fishstiz.minecraftcursor.cursor.handler.TradeOfferButtonCursorHandler;
 
 public class MinecraftCursorForgeInitializer implements MinecraftCursorInitializer {
     @Override
