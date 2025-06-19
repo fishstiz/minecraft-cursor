@@ -5,6 +5,8 @@ import io.github.fishstiz.minecraftcursor.util.SettingsUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -26,6 +28,7 @@ public class Config extends AbstractConfig<Config.Settings> {
     private boolean deferredLoading = false;
     private boolean inactiveWidgetsEnabled = true;
     private boolean aggressiveCursor = false;
+    private final List<String> blacklist = new ArrayList<>();
     private final GlobalSettings global = new GlobalSettings();
     transient File file;
 
@@ -56,6 +59,9 @@ public class Config extends AbstractConfig<Config.Settings> {
         return global;
     }
 
+    public List<String> getBlacklist() {
+        return this.blacklist;
+    }
 
     private Settings validateSettings(String key, Settings settings) {
         Settings old = this.settings.computeIfAbsent(key, k -> new Settings());
