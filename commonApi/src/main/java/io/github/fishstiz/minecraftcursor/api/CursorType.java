@@ -3,6 +3,7 @@ package io.github.fishstiz.minecraftcursor.api;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.EditBox;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
@@ -135,6 +136,24 @@ public interface CursorType {
                 return "CursorType{key='" + key + "'}";
             }
         };
+    }
+
+    /**
+     * Returns the first non-default {@link CursorType} from the given list.
+     * If all are null or default, returns {@link CursorType#DEFAULT}.
+     *
+     * @param types vararg list of cursor types to evaluate
+     * @return the first non-default cursor type, or {@code CursorType.DEFAULT} if none found
+     */
+    static @NotNull CursorType firstNonDefault(@Nullable CursorType... types) {
+        if (types != null) {
+            for (CursorType type : types) {
+                if (type != null && !type.isDefault()) {
+                    return type;
+                }
+            }
+        }
+        return CursorType.DEFAULT;
     }
 
     default boolean isKey(@Nullable CursorType cursorType) {
