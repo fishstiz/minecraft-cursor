@@ -125,17 +125,7 @@ public interface CursorType {
      * @return {@link CursorType}
      */
     static CursorType of(String key) {
-        return new CursorType() {
-            @Override
-            public String getKey() {
-                return key;
-            }
-
-            @Override
-            public String toString() {
-                return "CursorType{key='" + key + "'}";
-            }
-        };
+        return new CursorTypeImpl(key);
     }
 
     /**
