@@ -3,34 +3,30 @@ package io.github.fishstiz.minecraftcursor.impl;
 import io.github.fishstiz.minecraftcursor.cursor.CursorManager;
 import io.github.fishstiz.minecraftcursor.api.CursorController;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
+import net.minecraft.SharedConstants;
 import net.minecraft.Util;
 import org.jetbrains.annotations.Nullable;
 
 public final class CursorControllerImpl implements CursorController {
-    private static final long TRANSIENT_EXPIRE_MS = 100; // 5 ticks
-    private CursorType singleCycleCursor;
-    private long timestamp = 0;
-
-    public boolean hasTransientCursor() {
-        if (singleCycleCursor != null) {
-            if (Util.getMillis() - timestamp < TRANSIENT_EXPIRE_MS) {
-                return true;
-            }
-            singleCycleCursor = null;
-        }
-        return false;
-    }
+    private final TransientCursor singleCycleCursor = new TransientCursor();
+    private final TransientCursor singleCycleFallbackCursor = new TransientCursor();
 
     public @Nullable CursorType consumeTransientCursor() {
-        CursorType cursorType = singleCycleCursor;
-        singleCycleCursor = null;
-        return cursorType;
+        return this.singleCycleCursor.consume();
+    }
+
+    public @Nullable CursorType consumeTransientFallbackCursor() {
+        return this.singleCycleFallbackCursor.consume();
     }
 
     @Override
     public void setSingleCycleCursor(CursorType cursorType) {
-        this.singleCycleCursor = cursorType;
-        this.timestamp = Util.getMillis();
+        this.singleCycleCursor.set(cursorType);
+    }
+
+    @Override
+    public void setSingleCycleFallbackCursor(CursorType cursorType) {
+        this.singleCycleFallbackCursor.set(cursorType);
     }
 
     @Override
@@ -41,5 +37,26 @@ public final class CursorControllerImpl implements CursorController {
     @Override
     public void removeOverride(int index) {
         CursorManager.INSTANCE.removeOverride(index);
+    }
+
+    private static class TransientCursor {
+        private static final long EXPIRE_MS = SharedConstants.MILLIS_PER_TICK * 2L; // 2 ticks
+        private @Nullable CursorType cursorType;
+        private long timestamp = 0;
+
+        private boolean isValid() {
+            return this.cursorType != null && Util.getMillis() - this.timestamp < EXPIRE_MS;
+        }
+
+        private @Nullable CursorType consume() {
+            CursorType consumed = this.isValid() ? this.cursorType : null;
+            this.cursorType = null;
+            return consumed;
+        }
+
+        private void set(CursorType cursorType) {
+            this.cursorType = cursorType;
+            this.timestamp = Util.getMillis();
+        }
     }
 }
