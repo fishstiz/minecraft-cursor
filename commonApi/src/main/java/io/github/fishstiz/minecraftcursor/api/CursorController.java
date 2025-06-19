@@ -25,6 +25,14 @@ public interface CursorController {
     void setSingleCycleCursor(CursorType cursorType);
 
     /**
+     * Sets a fallback cursor type to be used for a single render/tick cycle,
+     * if a non-default cursor type could not be resolved on the current screen.
+     *
+     * @param cursorType the {@link CursorType} to use as a fallback for the current cycle
+     */
+    void setSingleCycleFallbackCursor(CursorType cursorType);
+
+    /**
      * Override the current cursor with a specified type and index.
      * If multiple overrides exist, the one with the highest index takes precedence.
      *

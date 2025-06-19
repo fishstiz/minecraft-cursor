@@ -1,5 +1,6 @@
 package io.github.fishstiz.minecraftcursor;
 
+import io.github.fishstiz.minecraftcursor.api.CursorController;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.compat.ExternalCursorTracker;
 import io.github.fishstiz.minecraftcursor.config.Config;
@@ -17,10 +18,21 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * <p><b>{@link CursorType} Priority:</b></p>
+ * <ol>
+ *   <li><b>External override:</b> {@link ExternalCursorTracker#isCustom()}</li>
+ *   <li><b>Manual override:</b> {@link CursorController#overrideCursor}</li>
+ *   <li><b>Transient cursor:</b> {@link CursorController#setSingleCycleCursor}</li>
+ *   <li><b>Contextual resolution:</b> {@link CursorTypeResolver#resolve} based on screen or element</li>
+ *   <li><b>Fallback cursor:</b> {@link CursorType#DEFAULT} if all else fails</li>
+ * </ol>
+ */
 public final class MinecraftCursor {
     public static final String MOD_ID = "minecraft-cursor";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
@@ -51,7 +63,11 @@ public final class MinecraftCursor {
     static void afterClientTick(Minecraft minecraft) {
         if (!ExternalCursorTracker.get().isCustom()) {
             if (minecraft.screen == null && deferredCursorType == null) {
-                CursorManager.INSTANCE.setCurrentCursor(ExternalCursorTracker.get().getCursorOrDefault());
+                CursorManager.INSTANCE.setCurrentCursor(CursorType.firstNonDefault(
+                        ExternalCursorTracker.get().getCursorOrDefault(),
+                        CONTROLLER.consumeTransientCursor(),
+                        CONTROLLER.consumeTransientFallbackCursor()
+                ));
             } else if (deferredCursorType != null && shouldApplyDeferredCursorType(minecraft)) {
                 CursorManager.INSTANCE.setCurrentCursor(deferredCursorType);
             }
@@ -66,7 +82,7 @@ public final class MinecraftCursor {
         if (shouldApplyDeferredCursorType(minecraft)) {
             CursorTypeResolver.INSTANCE.getInspector().render(minecraft, screen, guiGraphics, mouseX, mouseY);
             if (!ExternalCursorTracker.get().isCustom()) {
-                deferredCursorType = resolveCursorType(screen, mouseX, mouseY);
+                deferredCursorType = resolveWithFallback(screen, mouseX, mouseY);
             }
         }
     }
@@ -78,7 +94,7 @@ public final class MinecraftCursor {
         CursorTypeResolver.INSTANCE.getInspector().render(minecraft, currentScreen, guiGraphics, mouseX, mouseY);
 
         if (!ExternalCursorTracker.get().isCustom()) {
-            CursorManager.INSTANCE.setCurrentCursor(resolveCursorType(currentScreen, mouseX, mouseY));
+            CursorManager.INSTANCE.setCurrentCursor(resolveWithFallback(currentScreen, mouseX, mouseY));
         }
 
         deferredCursorType = null;
@@ -88,27 +104,27 @@ public final class MinecraftCursor {
         return minecraft.screen == null && !minecraft.mouseHandler.isMouseGrabbed();
     }
 
+    private static @NotNull CursorType resolveWithFallback(Screen screen, double mouseX, double mouseY) {
+        return CursorType.firstNonDefault(resolveCursorType(screen, mouseX, mouseY), CONTROLLER.consumeTransientFallbackCursor());
+    }
+
     private static CursorType resolveCursorType(Screen screen, double mouseX, double mouseY) {
         if (!CursorManager.INSTANCE.isAdaptive()) {
             return CursorType.DEFAULT;
         }
 
-        if (CONTROLLER.hasTransientCursor()) {
-            return CONTROLLER.consumeTransientCursor();
-        }
-
-        CursorType externalCursor = ExternalCursorTracker.get().getCursorOrDefault();
-        if (!externalCursor.isDefault()) {
-            return externalCursor;
+        CursorType cursorType = CursorType.firstNonDefault(ExternalCursorTracker.get().getCursorOrDefault(), CONTROLLER.consumeTransientCursor());
+        if (!cursorType.isDefault()) {
+            return cursorType;
         }
 
         if (CursorTypeUtil.isGrabbing()) {
             return CursorType.GRABBING;
         }
 
-        CursorType cursorType = CursorTypeResolver.INSTANCE.resolve(screen, mouseX, mouseY);
-        if (!cursorType.isDefault()) {
-            return cursorType;
+        CursorType resolved = CursorTypeResolver.INSTANCE.resolve(screen, mouseX, mouseY);
+        if (!resolved.isDefault()) {
+            return resolved;
         }
 
         GuiEventListener child = ElementWalker.findFirst(screen, mouseX, mouseY);
