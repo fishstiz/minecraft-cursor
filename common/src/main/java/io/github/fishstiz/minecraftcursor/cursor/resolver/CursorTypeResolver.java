@@ -39,7 +39,7 @@ public final class CursorTypeResolver implements ElementRegistrar {
             @SuppressWarnings("unchecked")
             Class<T> elementClass = (Class<T>) Class.forName(Services.PLATFORM.mapClassName("intermediary", className));
             if (!GuiEventListener.class.isAssignableFrom(elementClass)) {
-                throw new ClassCastException(className + " is not a subclass of ElementView");
+                throw new ClassCastException(className + " is not a subclass of Element");
             }
             register(elementClass, cursorTypeFunction);
         } catch (ClassNotFoundException e) {
