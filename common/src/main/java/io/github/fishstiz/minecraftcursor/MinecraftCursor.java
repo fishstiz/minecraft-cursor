@@ -54,6 +54,10 @@ public final class MinecraftCursor {
             }
         });
 
+        for (String blacklisted : CONFIG.getBlacklist()) {
+            CursorTypeResolver.INSTANCE.register(blacklisted, (e, x, y) -> CursorType.DEFAULT_FORCE);
+        }
+
         CursorControllerProvider.init(CONTROLLER);
     }
 
