@@ -1,6 +1,7 @@
 package io.github.fishstiz.minecraftcursor.cursor.resolver;
 
 import io.github.fishstiz.minecraftcursor.platform.Services;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -13,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2fStack;
 
-import java.util.HashSet;
+import java.util.Set;
 
 final class ElementInspectorImpl implements ElementInspector {
     private static final float TEXT_SCALE = 0.75f;
@@ -21,7 +22,7 @@ final class ElementInspectorImpl implements ElementInspector {
     private final Component cacheLabel = Component.literal("Cache: ").withColor(0xFFFFFFFF); // white
     private final Component deepestLabel = Component.literal("D: ").withColor(0xFF00FF00); // green
     private final Component processedLabel = Component.literal("P: ").withColor(0xFFFF0000); // red
-    private HashSet<String> cache = new HashSet<>();
+    private Set<Class<?>> cache = new ObjectOpenHashSet<>();
     private Component cacheText = Component.empty();
     private GuiEventListener processed;
     private String processedName;
@@ -47,7 +48,7 @@ final class ElementInspectorImpl implements ElementInspector {
         this.processed = processed;
         this.processedName = getClassName(processed);
         if (cached) {
-            this.cache.add(processedName);
+            this.cache.add(processed.getClass());
             this.cacheText = cacheLabel.copy().append(String.valueOf(cache.size()));
         }
         return true;
