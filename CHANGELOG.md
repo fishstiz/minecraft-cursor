@@ -1,10 +1,7 @@
-- Added Russian Translation ([#33](https://github.com/fishstiz/minecraft-cursor/pull/33) by mpustovoi)
-- Improved detection for `AbstractWidget`/`ClickableWidget`. Now also checks for `isMouseOver(double, double)` in case `isHovered()` is `false`.
-- Improved detection for server icon buttons. Now checks for each sprite bounds instead of the icon only.
-- Fixed in-between parent elements not being processed within the element hierarchy if the current screen is a registered element.
-- Fixed search highlights not preserving when changing panels in the configuration screen.
-- Fixed crash when hovered over icon bounds of world list if worlds have not loaded and world list icon adaptive option is enabled.
-- Fixed cursor not reverting to default after closing a non-active rendered screen and mouse is unlocked without a screen open.
-
-Added 1.21.6 Support:
-- Removed option to toggle the **Book Edit Book** adaptive cursor. It's no longer needed since the book now uses a `MultilineEditBox` component.
+- Added Turkish Translation ([#35](https://github.com/fishstiz/minecraft-cursor/pull/35) by ZeyMer1309)
+- Added Blacklist (experimental):
+  - Blacklist certain screens or elements from the adaptive cursor. 
+  - Add the name of the screen/element to the `blacklist` array in the config file (requires restart). Names can be found using inspect element in debug options.
+- Optimized cursor computation on the static GUIs with adaptive cursor (seen in Adaptive Cursor options).
+  - Improved stability of cursor computation on said GUIs so they're less affected by other mods that shift their positions and sizes.
+- Significantly reduced memory usage of cache (~5-6x less).
