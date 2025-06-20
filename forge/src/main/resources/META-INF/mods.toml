@@ -2,6 +2,7 @@ modLoader = "javafml" #mandatory
 loaderVersion = "${forge_loader_version_range}" #mandatory
 license = "${license}" # Review your options at https://choosealicense.com/.
 issueTrackerURL = "${issues}" #optional
+clientSideOnly = true
 
 [[mods]] #mandatory
 modId = "${forge_mod_id}" #mandatory
@@ -12,6 +13,7 @@ logoFile = "icon.png" #optional
 credits = "${credits}" #optional
 authors = "${mod_author}" #optional
 description = '''${mod_description}''' #mandatory (Supports multiline text)
+displayTest = "IGNORE_ALL_VERSION"
 
 [[dependencies.${forge_mod_id}]] #optional
 modId = "forge" #mandatory

@@ -4,26 +4,25 @@ import io.github.fishstiz.minecraftcursor.config.Flag;
 import io.github.fishstiz.minecraftcursor.gui.screen.ConfigurationScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.client.event.ScreenEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 
 @Mod(MinecraftCursorForge.MOD_ID)
 public class MinecraftCursorForge {
     // Forge does not support dashes in mod id
     public static final String MOD_ID = "minecraft_cursor";
 
-    @SuppressWarnings("removal")
     public MinecraftCursorForge() {
-        Flag.REMAP.disable();
+        if (FMLEnvironment.dist.isClient()) {
+            Flag.REMAP.disable();
 
-        ModLoadingContext.get().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class, () ->
-                new ConfigScreenHandler.ConfigScreenFactory((mc, screen) -> new ConfigurationScreen(screen))
-        );
+            MinecraftForge.registerConfigScreen(ConfigurationScreen::new);
+        }
     }
 
     @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
