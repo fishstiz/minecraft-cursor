@@ -5,15 +5,13 @@ import io.github.fishstiz.minecraftcursor.util.SettingsUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.io.Serializable;
+import java.util.*;
 
 import static io.github.fishstiz.minecraftcursor.util.SettingsUtil.sanitizeHotspot;
 import static io.github.fishstiz.minecraftcursor.util.SettingsUtil.sanitizeScale;
 
-public class Config extends AbstractConfig<Config.Settings> {
+public class Config implements Serializable {
     private String _hash;
     private boolean itemSlotEnabled = true;
     private boolean itemGrabbingEnabled = true;
@@ -31,6 +29,7 @@ public class Config extends AbstractConfig<Config.Settings> {
     private boolean aggressiveCursor = false;
     private final List<String> blacklist = new ArrayList<>();
     private final GlobalSettings global = new GlobalSettings();
+    private final Map<String, Config.Settings> settings = new HashMap<>();
     transient File file;
 
     Config() {
@@ -40,7 +39,6 @@ public class Config extends AbstractConfig<Config.Settings> {
         return settings.computeIfAbsent(cursor.getTypeKey(), k -> new Settings());
     }
 
-    @Override
     public @NotNull String getHash() {
         if (this._hash == null) {
             this._hash = generateHash(this.settings);
@@ -234,7 +232,7 @@ public class Config extends AbstractConfig<Config.Settings> {
         return Long.toHexString(hash);
     }
 
-    public static class Settings extends AbstractConfig.Settings<Settings> {
+    public static class Settings extends AbstractSettings<Settings> {
         protected boolean enabled = SettingsUtil.ENABLED;
         protected Boolean animated;
 
@@ -281,7 +279,7 @@ public class Config extends AbstractConfig<Config.Settings> {
         }
     }
 
-    public static class GlobalSettings extends AbstractConfig.Settings<GlobalSettings> {
+    public static class GlobalSettings extends AbstractSettings<GlobalSettings> {
         private boolean scaleActive = false;
         private boolean xhotActive = false;
         private boolean yhotActive = false;
@@ -358,7 +356,7 @@ public class Config extends AbstractConfig<Config.Settings> {
             return globalSettings;
         }
 
-        public <T extends AbstractConfig.Settings<T>> T apply(T settings) {
+        public <T extends AbstractSettings<T>> T apply(T settings) {
             T copied = settings.copy();
             copied.scale = this.isScaleActive() ? this.getScale() : copied.getScale();
             copied.xhot = this.isXHotActive() ? this.getXHot() : copied.getXHot();
@@ -367,12 +365,21 @@ public class Config extends AbstractConfig<Config.Settings> {
         }
     }
 
-    public static class Resource extends AbstractConfig<Settings> {
+    public static class Resource implements Serializable {
+        private final Map<String, Config.Settings> settings = new HashMap<>();
+
         public Config.Settings getOrCreateSettings(Cursor cursor) {
             return settings.computeIfAbsent(cursor.getTypeKey(), k -> new Config.Settings());
         }
 
-        @Override
+        public boolean isDifferent(Config config) {
+            return !this.getHash().equals(config.getHash());
+        }
+
+        public Map<String, Config.Settings> getAllSettings() {
+            return this.settings;
+        }
+
         public @NotNull String getHash() {
             return Config.generateHash(this.settings);
         }
