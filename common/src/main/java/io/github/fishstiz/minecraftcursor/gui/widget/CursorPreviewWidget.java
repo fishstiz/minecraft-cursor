@@ -47,7 +47,7 @@ public class CursorPreviewWidget extends CursorWidget {
             this.renderBackground(guiGraphics);
             if (cursor.isEnabled()) {
                 this.renderPreviewText(guiGraphics);
-                this.renderButton(guiGraphics, mouseX, mouseY, partialTick);
+                this.renderTestButton(guiGraphics, mouseX, mouseY, partialTick);
                 this.renderRuler(guiGraphics, mouseX, mouseY);
             }
         }
@@ -68,7 +68,7 @@ public class CursorPreviewWidget extends CursorWidget {
         guiGraphics.flush();
     }
 
-    protected void renderButton(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderTestButton(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         if (this.button != null) {
             int buttonX = this.getX() + (this.getWidth() / 2 - this.button.getWidth() / 2);
             int buttonY = this.getY() + (this.getHeight() / 2 - this.button.getHeight() / 2);

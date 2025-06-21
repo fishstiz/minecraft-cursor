@@ -274,7 +274,7 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
         protected void renderWidget(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
             this.renderBackground(guiGraphics);
             this.renderPreviewText(guiGraphics);
-            this.renderButton(guiGraphics, mouseX, mouseY, partialTick);
+            this.renderTestButton(guiGraphics, mouseX, mouseY, partialTick);
             this.renderRuler(guiGraphics, mouseX, mouseY);
             this.renderBorder(guiGraphics);
         }
