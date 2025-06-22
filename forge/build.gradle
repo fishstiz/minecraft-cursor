@@ -6,6 +6,22 @@ plugins {
 
 tasks.build.dependsOn tasks.jarJar
 
+repositories {
+    exclusiveContent {
+        forRepository {
+            maven {
+                url = "https://maven.ftb.dev/releases"
+            }
+        }
+        filter {
+            includeGroup "dev.ftb.mods"
+        }
+    }
+    maven {
+        url "https://maven.architectury.dev/"
+    }
+}
+
 dependencies {
     api project(":commonApi")
     jarJar(project(":commonApi"))
@@ -13,6 +29,12 @@ dependencies {
     annotationProcessor 'org.spongepowered:mixin:0.8.7:processor'
 
     implementation 'org.jetbrains:annotations:26.0.2'
+
+    modCompileOnly "dev.ftb.mods:ftb-library-forge:$ftb_library_version"
+    modRuntimeOnly "dev.ftb.mods:ftb-library-forge:$ftb_library_version"
+    modRuntimeOnly "dev.ftb.mods:ftb-quests-forge:$ftb_quests_version"
+    modRuntimeOnly "dev.ftb.mods:ftb-teams-forge:$ftb_teams_version"
+    modRuntimeOnly "dev.architectury:architectury-forge:$architectury_version"
 }
 
 legacyForge {
@@ -45,11 +67,12 @@ legacyForge {
 mixin {
     add sourceSets.main, "${mod_id}.refmap.json"
     config("${mod_id}.mixins.json")
+    config("${mod_id}.forge.mixins.json")
 }
 
 jar {
     finalizedBy("reobfJar")
     manifest.attributes([
-            "MixinConfigs": "${mod_id}.mixins.json"
+            "MixinConfigs": "${mod_id}.mixins.json,${mod_id}.forge.mixins.json"
     ])
 }

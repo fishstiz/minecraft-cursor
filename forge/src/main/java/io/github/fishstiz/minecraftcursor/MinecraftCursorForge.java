@@ -1,6 +1,5 @@
 package io.github.fishstiz.minecraftcursor;
 
-import io.github.fishstiz.minecraftcursor.config.Flag;
 import io.github.fishstiz.minecraftcursor.gui.screen.ConfigurationScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
@@ -19,8 +18,6 @@ public class MinecraftCursorForge {
 
     public MinecraftCursorForge() {
         if (FMLEnvironment.dist.isClient()) {
-            Flag.REMAP.disable();
-
             MinecraftForge.registerConfigScreen(ConfigurationScreen::new);
         }
     }
