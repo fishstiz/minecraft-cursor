@@ -1,6 +1,5 @@
 package io.github.fishstiz.minecraftcursor;
 
-import io.github.fishstiz.minecraftcursor.config.Flag;
 import io.github.fishstiz.minecraftcursor.gui.screen.ConfigurationScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -21,8 +20,6 @@ public class MinecraftCursorNeoforge {
     public static final String MOD_ID = "minecraft_cursor";
 
     public MinecraftCursorNeoforge(ModContainer container, IEventBus modEventBus) {
-        Flag.REMAP.disable();
-
         container.registerExtensionPoint(IConfigScreenFactory.class, (c, screen) ->
                 new ConfigurationScreen(screen)
         );
