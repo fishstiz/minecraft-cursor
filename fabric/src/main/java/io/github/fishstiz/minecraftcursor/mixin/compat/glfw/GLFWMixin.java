@@ -17,8 +17,6 @@ import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
 import static io.github.fishstiz.minecraftcursor.MinecraftCursor.LOGGER;
 import static io.github.fishstiz.minecraftcursor.compat.ExternalCursorTracker.*;
 
-import static org.lwjgl.glfw.GLFW.*;
-
 // only works on Fabric, NeoForge doesn't allow mixin of library
 @Mixin(value = GLFW.class, remap = false)
 public abstract class GLFWMixin {
@@ -45,20 +43,7 @@ public abstract class GLFWMixin {
     private static long mapStandardCursor(int shape, Operation<Long> original) {
         long id = original.call(shape);
 
-        CursorType cursorType = switch (shape) {
-            case GLFW_ARROW_CURSOR -> CursorType.DEFAULT;
-            case GLFW_POINTING_HAND_CURSOR -> CursorType.POINTER;
-            case GLFW_IBEAM_CURSOR -> CursorType.TEXT;
-            case GLFW_CROSSHAIR_CURSOR -> CursorType.CROSSHAIR;
-            case GLFW_RESIZE_EW_CURSOR -> CursorType.RESIZE_EW;
-            case GLFW_RESIZE_NS_CURSOR -> CursorType.RESIZE_NS;
-            case GLFW_RESIZE_NWSE_CURSOR -> CursorType.RESIZE_NWSE;
-            case GLFW_RESIZE_NESW_CURSOR -> CursorType.RESIZE_NESW;
-            case GLFW_RESIZE_ALL_CURSOR -> CursorType.GRABBING;
-            case GLFW_NOT_ALLOWED_CURSOR -> CursorType.NOT_ALLOWED;
-            default -> null;
-        };
-
+        CursorType cursorType = CursorTypeUtil.mapGLFWCursor(shape);
         if (cursorType != null) {
             ExternalCursor externalCursor = ExternalCursorTracker.get().getTrackedCursor(id);
             if (externalCursor == null) {

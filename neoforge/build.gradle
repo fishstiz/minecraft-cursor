@@ -3,8 +3,20 @@ plugins {
     id 'net.neoforged.moddev'
 }
 
-dependencies {
-    jarJar(api project(":commonApi"))
+repositories {
+    exclusiveContent {
+        forRepository {
+            maven {
+                url = "https://maven.ftb.dev/releases"
+            }
+        }
+        filter {
+            includeGroup "dev.ftb.mods"
+        }
+    }
+    maven {
+        url "https://maven.architectury.dev/"
+    }
 }
 
 neoForge {
@@ -30,4 +42,14 @@ neoForge {
             sourceSet project(":commonApi").sourceSets.main
         }
     }
+}
+
+dependencies {
+    jarJar(api project(":commonApi"))
+
+    compileOnly "dev.ftb.mods:ftb-library-neoforge:$ftb_library_version"
+    runtimeOnly "dev.ftb.mods:ftb-library-neoforge:$ftb_library_version"
+    runtimeOnly "dev.ftb.mods:ftb-quests-neoforge:$ftb_quests_version"
+    runtimeOnly "dev.ftb.mods:ftb-teams-neoforge:$ftb_teams_version"
+    runtimeOnly "dev.architectury:architectury-neoforge:$architectury_version"
 }

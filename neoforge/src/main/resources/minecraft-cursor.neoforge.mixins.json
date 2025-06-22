@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "io.github.fishstiz.minecraftcursor.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+    "compat.ftblibrary.CursorTypeAccess",
+    "compat.ftblibrary.CursorTypeMixin"
+  ],
+  "plugin": "io.github.fishstiz.minecraftcursor.NeoForgeMixinConfigPlugin",
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
