@@ -37,13 +37,6 @@ public class CompatibilityOptionsPanel extends AbstractOptionsPanel {
                 true
         );
         this.optionsList.addToggle(
-                Flag.REMAP.isEnabled() && CONFIG.isRemapCursorsEnabled(),
-                CONFIG::setRemapCursorsEnabled,
-                this.index(REMAP_TEXT),
-                !Flag.REMAP.isEnabled() || ExternalCursorTracker.isTracking() ? REMAP_INFO : REMAP_EMPTY_INFO,
-                ExternalCursorTracker.isTracking()
-        );
-        this.optionsList.addToggle(
                 CursorManager.INSTANCE.isVirtual(),
                 value -> {
                     CursorManager.INSTANCE.toggleVirtual();
@@ -52,6 +45,13 @@ public class CompatibilityOptionsPanel extends AbstractOptionsPanel {
                 this.index(VIRTUAL_TEXT),
                 VIRTUAL_INFO,
                 true
+        );
+        this.optionsList.addToggle(
+                Flag.REMAP.isEnabled() && CONFIG.isRemapCursorsEnabled(),
+                CONFIG::setRemapCursorsEnabled,
+                this.index(REMAP_TEXT),
+                !Flag.REMAP.isEnabled() || ExternalCursorTracker.isTracking() ? REMAP_INFO : REMAP_EMPTY_INFO,
+                Flag.REMAP.isEnabled()
         );
 
         this.optionsList.search(this.getSearch());
