@@ -3,8 +3,18 @@ plugins {
     id 'net.neoforged.moddev'
 }
 
-dependencies {
-    jarJar(api project(":commonApi"))
+repositories {
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
 }
 
 neoForge {
@@ -41,4 +51,10 @@ neoForge {
             sourceSet = sourceSets.testmod
         }
     }
+}
+
+dependencies {
+    jarJar(api project(":commonApi"))
+
+    compileOnly "maven.modrinth:owo-lib:$owo_version"
 }
