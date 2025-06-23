@@ -18,6 +18,12 @@ public class MinecraftCursorForge {
 
     public MinecraftCursorForge() {
         if (FMLEnvironment.dist.isClient()) {
+            ConfigScreenHolder.register();
+        }
+    }
+
+    private static class ConfigScreenHolder {
+        private static void register() {
             MinecraftForge.registerConfigScreen(ConfigurationScreen::new);
         }
     }
