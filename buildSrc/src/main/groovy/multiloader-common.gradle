@@ -28,13 +28,20 @@ repositories {
     }
 }
 
+sourceSets {
+    testmod {
+        compileClasspath += main.compileClasspath
+        runtimeClasspath += main.runtimeClasspath
+    }
+}
+
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(java_version.toInteger())
     withSourcesJar()
 }
 
-processResources {
-    var expandProps = [
+def configureResourceExpansion = { CopySpec spec ->
+    def expandProps = [
             'version'                       : version,
             'mod_id'                        : mod_id,
             'mod_name'                      : mod_name,
@@ -58,15 +65,23 @@ processResources {
         key, value -> [(key): value instanceof String ? value.replace("\n", "\\\\n") : value]
     }
 
-    filesMatching(['META-INF/mods.toml', 'META-INF/neoforge.mods.toml']) {
+    spec.filesMatching(['META-INF/mods.toml', 'META-INF/neoforge.mods.toml']) {
         expand expandProps
     }
 
-    filesMatching(['pack.mcmeta', 'fabric.mod.json', '*.mixins.json']) {
+    spec.filesMatching(['pack.mcmeta', 'fabric.mod.json', '*.mixins.json']) {
         expand jsonExpandProps
     }
 
-    inputs.properties(expandProps)
+    spec.inputs.properties(expandProps)
+}
+
+processResources { delegate ->
+    configureResourceExpansion(delegate)
+}
+
+processTestmodResources { delegate ->
+    configureResourceExpansion(delegate)
 }
 
 configurations {
@@ -76,6 +91,12 @@ configurations {
     commonResources {
         canBeResolved = true
     }
+    testmodJava {
+        canBeResolved = true
+    }
+    testmodResources {
+        canBeResolved = true
+    }
 }
 
 tasks.named('compileJava', JavaCompile) {
@@ -83,11 +104,20 @@ tasks.named('compileJava', JavaCompile) {
     source(configurations.commonJava)
 }
 
+tasks.named('compileTestmodJava', JavaCompile) {
+    dependsOn(configurations.testmodJava)
+    source(configurations.testmodJava)
+}
+
 processResources {
     dependsOn(configurations.commonResources)
     from(configurations.commonResources)
 }
 
+processTestmodResources {
+    dependsOn(configurations.testmodResources)
+    from(configurations.testmodResources)
+}
 
 tasks.named('sourcesJar', Jar) {
     dependsOn(configurations.commonJava)

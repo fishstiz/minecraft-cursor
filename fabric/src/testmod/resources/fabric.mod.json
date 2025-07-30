@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "testmod",
+  "version": "0.0.1",
+  "name": "Minecraft Cursor-TestMod",
+  "environment": "client",
+  "entrypoints": {
+    "minecraft-cursor": [
+      "io.github.fishstiz.testmod.compat.minecraftcursor.TestmodMinecraftCursorInitializer"
+    ]
+  },
+  "mixins": [
+    {
+      "config": "testmod.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${fabric_loader_version}",
+    "minecraft": "${minecraft_version_range_semver}",
+    "java": ">=${java_version}",
+    "fabric-api": "*",
+    "minecraft-cursor": "${version}"
+  }
+}
