@@ -29,4 +29,6 @@ dependencies {
 artifacts {
     commonJava sourceSets.main.java.sourceDirectories.singleFile
     commonResources sourceSets.main.resources.sourceDirectories.singleFile
+    testmodJava sourceSets.testmod.java.sourceDirectories.singleFile
+    testmodResources sourceSets.testmod.resources.sourceDirectories.singleFile
 }

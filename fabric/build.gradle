@@ -38,12 +38,28 @@ loom {
         accessWidenerPath.set(aw)
     }
 
+    mods {
+        "minecraft-cursor" {
+            sourceSet sourceSets.main
+        }
+        testmod {
+            sourceSet sourceSets.testmod
+        }
+    }
+
     runs {
         client {
             client()
             setConfigName('Fabric Client')
             ideConfigGenerated(true)
             runDir('run/client')
+        }
+        testmodClient {
+            client()
+            setConfigName('Fabric Client Test')
+            ideConfigGenerated(true)
+            runDir('run/testmod')
+            source sourceSets.testmod
         }
     }
 }

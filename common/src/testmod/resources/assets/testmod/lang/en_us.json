@@ -1,0 +1,22 @@
+{
+  "minecraft-cursor.options.cursor-type.test_red": "TEST_RED",
+  "minecraft-cursor.options.cursor-type.test_green": "TEST_GREEN",
+  "minecraft-cursor.options.cursor-type.test_blue": "TEST_BLUE",
+  "minecraft-cursor.options.cursor-type.test_rgb_loop": "TEST_RGB_LOOP",
+  "minecraft-cursor.options.cursor-type.test_rgb_loop_reverse": "TEST_RGB_LOOP_REVERSE",
+  "minecraft-cursor.options.cursor-type.test_rgb_forwards": "TEST_RGB_FORWARDS",
+  "minecraft-cursor.options.cursor-type.test_rgb_reverse": "TEST_RGB_reverse",
+  "minecraft-cursor.options.cursor-type.test_rgb_oscillate": "TEST_RGB_OSCILLATE",
+  "minecraft-cursor.options.cursor-type.test_rgb_random": "TEST_RGB_RANDOM",
+  "minecraft-cursor.options.cursor-type.test_rgb_random_cycle": "TEST_RGB_RANDOM_CYCLE",
+  "minecraft-cursor.options.cursor-type.test_not_found": "TEST_NOT_FOUND",
+  "minecraft-cursor.options.cursor-type.test_8": "TEST_8",
+  "minecraft-cursor.options.cursor-type.test_16": "TEST_16",
+  "minecraft-cursor.options.cursor-type.test_24": "TEST_24",
+  "minecraft-cursor.options.cursor-type.test_32": "TEST_32",
+  "minecraft-cursor.options.cursor-type.test_48": "TEST_48",
+  "minecraft-cursor.options.cursor-type.test_64": "TEST_64",
+  "minecraft-cursor.options.cursor-type.test_128": "TEST_128",
+  "minecraft-cursor.options.cursor-type.test_auto": "TEST_AUTO",
+  "minecraft-cursor.options.cursor-type.bad_apple": "BAD_APPLE"
+}

@@ -18,16 +18,27 @@ neoForge {
         minecraftVersion = parchment_minecraft
         mappingsVersion = parchment_version
     }
-    runs {
-        client {
-            client()
-            setIdeName("Neoforge Client (${project.path})")
-        }
-    }
     mods {
         "${mod_id}" {
             sourceSet sourceSets.main
             sourceSet project(":commonApi").sourceSets.main
+        }
+        testmod {
+            sourceSet sourceSets.testmod
+        }
+    }
+    runs {
+        client {
+            client()
+            gameDirectory = project.file('run/client')
+            setIdeName("NeoForge Client (${project.path})")
+            loadedMods = [mods."${mod_id}"]
+        }
+        testmodClient {
+            client()
+            gameDirectory = project.file('run/testmod')
+            setIdeName("NeoForge Client Test (${project.path})")
+            sourceSet = sourceSets.testmod
         }
     }
 }
