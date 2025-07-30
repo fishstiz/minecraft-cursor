@@ -22,21 +22,6 @@ repositories {
     }
 }
 
-dependencies {
-    api project(":commonApi")
-    jarJar(project(":commonApi"))
-
-    annotationProcessor 'org.spongepowered:mixin:0.8.7:processor'
-
-    implementation 'org.jetbrains:annotations:26.0.2'
-
-    modCompileOnly "dev.ftb.mods:ftb-library-forge:$ftb_library_version"
-    modRuntimeOnly "dev.ftb.mods:ftb-library-forge:$ftb_library_version"
-    modRuntimeOnly "dev.ftb.mods:ftb-quests-forge:$ftb_quests_version"
-    modRuntimeOnly "dev.ftb.mods:ftb-teams-forge:$ftb_teams_version"
-    modRuntimeOnly "dev.architectury:architectury-forge:$architectury_version"
-}
-
 legacyForge {
     version = "${minecraft_version}-${forge_version}"
 
@@ -50,18 +35,46 @@ legacyForge {
         mappingsVersion = parchment_version
     }
 
-    runs {
-        client {
-            client()
-            setIdeName("Forge Client (${project.path})")
-        }
-    }
     mods {
         "${mod_id}" {
             sourceSet sourceSets.main
             sourceSet project(":commonApi").sourceSets.main
         }
+        testmod {
+            sourceSet sourceSets.testmod
+        }
     }
+
+    runs {
+        client {
+            client()
+            gameDirectory = project.file('run/client')
+            setIdeName("Forge Client (${project.path})")
+            loadedMods = [mods."${mod_id}"]
+        }
+        testmodClient {
+            client()
+            gameDirectory = project.file('run/testmod')
+            setIdeName("Forge Client Test (${project.path})")
+            sourceSet = sourceSets.testmod
+            programArgument("--mixin.config=testmod.mixins.json")
+        }
+    }
+}
+
+dependencies {
+    api project(":commonApi")
+    jarJar(project(":commonApi"))
+
+    annotationProcessor 'org.spongepowered:mixin:0.8.7:processor'
+
+    implementation 'org.jetbrains:annotations:26.0.2'
+
+    modCompileOnly "dev.ftb.mods:ftb-library-forge:$ftb_library_version"
+    modRuntimeOnly "dev.ftb.mods:ftb-library-forge:$ftb_library_version"
+    modRuntimeOnly "dev.ftb.mods:ftb-quests-forge:$ftb_quests_version"
+    modRuntimeOnly "dev.ftb.mods:ftb-teams-forge:$ftb_teams_version"
+    modRuntimeOnly "dev.architectury:architectury-forge:$architectury_version"
 }
 
 mixin {

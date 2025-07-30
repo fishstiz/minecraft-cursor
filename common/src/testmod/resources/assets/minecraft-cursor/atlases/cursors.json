@@ -1,0 +1,50 @@
+{
+  "settings": {
+    "test_red": {
+      "xhot": 15,
+      "yhot": 15
+    },
+    "test_green": {
+      "xhot": 15,
+      "yhot": 15
+    },
+    "test_blue": {
+      "xhot": 15,
+      "yhot": 15
+    },
+    "test_rgb_loop": {
+      "xhot": 15,
+      "yhot": 15
+    },
+    "test_rgb_loop_reverse": {
+      "xhot": 15,
+      "yhot": 15
+    },
+    "test_rgb_forwards": {
+      "xhot": 15,
+      "yhot": 15
+    },
+    "test_rgb_reverse": {
+      "xhot": 15,
+      "yhot": 15
+    },
+    "test_rgb_oscillate": {
+      "xhot": 15,
+      "yhot": 15
+    },
+    "test_rgb_random": {
+      "xhot": 15,
+      "yhot": 15
+    },
+    "test_rgb_random_cycle": {
+      "xhot": 15,
+      "yhot": 15
+    },
+    "test_auto": {
+      "scale": 0.0
+    },
+    "bad_apple": {
+      "scale": 8.0
+    }
+  }
+}
