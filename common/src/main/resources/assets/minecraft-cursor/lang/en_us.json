@@ -16,6 +16,7 @@
 
   "minecraft-cursor.options.search": "Search",
   "minecraft-cursor.options.search.clear": "Clear Search",
+  "minecraft-cursor.options.refresh.info": "Refresh cursors from resource packs.",
 
   "minecraft-cursor.options.cursor-types": "Cursors",
   "minecraft-cursor.options.cursor-type": "%1$s Cursor",
