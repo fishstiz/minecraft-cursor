@@ -7,6 +7,7 @@ import io.github.fishstiz.testmod.compat.minecraftcursor.TestCursorUnsafe;
 import io.github.fishstiz.testmod.gui.components.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
@@ -51,44 +52,45 @@ public class TestScreen extends Screen {
         this.addOverlapTests();
     }
 
-    // cursor of green should take precedence when both red and green are hovered
+
+    /**
+     * Widgets that are added first (green) consume the cursor type
+     * as they are also the first to consume clicks in the default impl of {@link GuiEventListener#mouseClicked},
+     * the order of {@link Screen#renderables} are not calculated.
+     */
     private void addOverlapTests() {
         ScreenRectangle rectangle = this.getRectangle();
         final int red = 0xFFFF0000;
         final int green = 0xFF00FF00;
-        
-        // Hovering over SHIFT should not change cursor when DEFAULT is also hovered
+
         this.addRenderableWidget(new RectangleElement(Component.literal("SHIFT").withStyle(ChatFormatting.WHITE)))
                 .apply(btn -> btn.pos(rectangle.right() - btn.getWidth() - 20, rectangle.bottom() - btn.getHeight() - 20))
                 .cursorType(CursorType.SHIFT)
-                .color(red);
+                .color(green);
         this.addRenderableWidget(new RectangleElement(Component.literal("DEFAULT").withStyle(ChatFormatting.WHITE)))
                 .apply(btn -> btn.pos(rectangle.right() - btn.getWidth() - 30, rectangle.bottom() - btn.getHeight() - 30))
-                .color(green);
+                .cursorType(CursorType.DEFAULT)
+                .color(red);
 
-        // GRABBING should change cursor when hovered
         this.addRenderableWidget(new RectangleElement(Component.literal("DEFAULT").withStyle(ChatFormatting.WHITE)))
                 .apply(btn -> btn.pos(rectangle.right() - btn.getWidth() - 20, rectangle.bottom() - btn.getHeight() - 70))
-                .color(red);
+                .color(green);
         this.addRenderableWidget(new RectangleElement(Component.literal("GRABBING").withStyle(ChatFormatting.WHITE)))
                 .apply(btn -> btn.pos(rectangle.right() - btn.getWidth() - 30, rectangle.bottom() - btn.getHeight() - 80))
                 .cursorType(CursorType.GRABBING)
-                .color(green);
+                .color(red);
 
-        // Ideally, NOT_ALLOWED should take precedence as it is rendered over CROSSHAIR,
-        // but the first child (CROSSHAIR) consumes the click because of the default implementation of mouseClicked,
-        // despite being covered by the next sibling, so the cursor of CROSSHAIR should take precedence
         this.addRenderableWidget(new RectangleElement(Component.literal("CROSSHAIR").withStyle(ChatFormatting.WHITE)))
                 .apply(btn -> btn.pos(rectangle.right() - btn.getWidth() - 20, rectangle.bottom() - btn.getHeight() - 120))
                 .cursorType(CursorType.CROSSHAIR)
-                .color(green);
+                .color(green); // first element takes precedence
         this.addRenderableWidget(new RectangleElement(Component.literal("NOT_ALLOWED").withStyle(ChatFormatting.WHITE)))
                 .apply(btn -> btn.pos(rectangle.right() - btn.getWidth() - 30, rectangle.bottom() - btn.getHeight() - 130))
                 .cursorType(CursorType.NOT_ALLOWED)
                 .color(red);
 
-        // Add TEXT (not as a renderable) first so it consumes the mouse click first,
-        // then add to renderables later so it renders on top of BUSY
+        // Add TEXT as a widget only first so it consumes the mouse click and the cursor type,
+        // then add to renderables later so it renders above BUSY.
         var overlap8 = this.addWidget(new RectangleElement(Component.literal("TEXT").withStyle(ChatFormatting.WHITE)))
                 .apply(btn -> btn.pos(rectangle.right() - btn.getWidth() - 30, rectangle.bottom() - btn.getHeight() - 180))
                 .cursorType(CursorType.TEXT)
