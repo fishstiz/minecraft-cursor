@@ -126,18 +126,23 @@ public class CursorResourceLoader {
         ResourceLocation location = cursor.getLocation();
         Optional<Resource> cursorResource = manager.getResource(location);
 
-        if (cursorResource.isEmpty()) {
-            LOGGER.error("[minecraft-cursor] Cursor Type: '{}' not found", cursor.getTypeKey());
-            return false;
-        }
+        try {
+            if (cursorResource.isEmpty()) {
+                LOGGER.error("[minecraft-cursor] Cursor Type: '{}' not found", cursor.getTypeKey());
+                cursor.destroy();
+                return false;
+            }
 
-        try (InputStream cursorStream = cursorResource.get().open(); NativeImage image = NativeImage.read(cursorStream)) {
-            AnimationData animation = loadAnimation(manager, location, cursorResource.get());
-            CursorManager.INSTANCE.loadCursor(cursor, image, CONFIG.getGlobal().apply(settings), animation);
-            return true;
-        } catch (IOException e) {
-            LOGGER.error("[minecraft-cursor] Failed to load cursor at '{}': {}", location, e.getMessage());
-            return false;
+            try (InputStream cursorStream = cursorResource.get().open(); NativeImage image = NativeImage.read(cursorStream)) {
+                AnimationData animation = loadAnimation(manager, location, cursorResource.get());
+                CursorManager.INSTANCE.loadCursor(cursor, image, CONFIG.getGlobal().apply(settings), animation);
+                return true;
+            } catch (IOException e) {
+                LOGGER.error("[minecraft-cursor] Failed to load cursor at '{}': {}", location, e.getMessage());
+                return false;
+            }
+        } finally {
+            Minecraft.getInstance().execute(() -> Minecraft.getInstance().getTextureManager().release(location));
         }
     }
 

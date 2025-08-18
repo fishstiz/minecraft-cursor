@@ -74,7 +74,6 @@ public class Cursor {
                 }
             }
         } catch (Exception e) {
-            this.loaded = false;
             this.destroy();
             throw e;
         }
@@ -230,7 +229,7 @@ public class Cursor {
     }
 
     public boolean isLoaded() {
-        return loaded;
+        return this.loaded && this.id != MemoryUtil.NULL;
     }
 
     public int getTextureIndex() {

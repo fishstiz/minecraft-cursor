@@ -41,7 +41,7 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
     private static final Tooltip GLOBAL_XHOT_TOOLTIP = createGlobalTooltip(XHOT_TEXT);
     private static final Tooltip GLOBAL_YHOT_TOOLTIP = createGlobalTooltip(YHOT_TEXT);
     private static final int CELL_SIZE_STEP = 32;
-    private static final int SCALE_CURSOR_OVERRIDE = -1;
+    private static final int SCALE_CURSOR_OVERRIDE = -20;
     private final CursorAnimationHelper animationHelper;
     private final Runnable refreshCursors;
     private final CatalogItem globalOptions;
