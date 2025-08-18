@@ -31,9 +31,11 @@ import java.util.function.UnaryOperator;
 public abstract class CatalogBrowserScreen extends Screen {
     private static final Component SEARCH_TEXT = Component.translatable("minecraft-cursor.options.search");
     private static final Tooltip CLEAR_SEARCH_INFO = Tooltip.create(Component.translatable("minecraft-cursor.options.search.clear"));
-    private static final ResourceLocation EXIT_SPRITE = MinecraftCursor.loc("textures/gui/sprites/icon/exit.png");
+    private static final Tooltip REFRESH_INFO = Tooltip.create(Component.translatable("minecraft-cursor.options.refresh.info"));
+    private static final ResourceLocation EXIT_SPRITE = MinecraftCursor.loc("textures/gui/sprites/icon/caret_right.png");
     private static final ResourceLocation CLEAR_SPRITE = MinecraftCursor.loc("textures/gui/sprites/icon/cross.png");
     private static final ResourceLocation CLEAR_INACTIVE_SPRITE = MinecraftCursor.loc("textures/gui/sprites/icon/cross_inactive.png");
+    private static final ResourceLocation REFRESH_SPRITE = MinecraftCursor.loc("textures/gui/sprites/icon/arrow_clockwise.png");
     private final Screen previous;
     private final int headerHeight;
     private final int sidebarWidth;
@@ -44,6 +46,7 @@ public abstract class CatalogBrowserScreen extends Screen {
     private ButtonWidget clearButton;
     private ItemList catalog;
     private ButtonWidget doneButton;
+    private ButtonWidget refreshButton;
     private ContentPanel contents;
     private String previousSearch = "";
 
@@ -96,6 +99,12 @@ public abstract class CatalogBrowserScreen extends Screen {
                 this::onItemChange
         ));
 
+        this.refreshButton = this.addRenderableWidget(new ButtonWidget(CommonComponents.EMPTY, this::refreshItemsAndPanel)
+                .withSize(Button.DEFAULT_HEIGHT)
+                .withTooltip(REFRESH_INFO)
+                .spriteOnly(REFRESH_SPRITE)
+        );
+
         this.initItems();
         this.refreshItems();
         this.repositionElements();
@@ -125,8 +134,9 @@ public abstract class CatalogBrowserScreen extends Screen {
         int leftColumnX = Math.max(this.spacing, Math.min((this.width - usableWidth) / 2, maxOffsetX));
         int rightColumnX = leftColumnX + this.sidebarWidth + this.spacing;
 
-        if (this.doneButton != null) {
+        if (this.doneButton != null && this.refreshButton != null) {
             this.doneButton.setPosition(rightColumnX + contentsWidth - this.doneButton.getWidth(), this.spacing);
+            this.refreshButton.setPosition(this.doneButton.getX() - this.refreshButton.getWidth() - this.spacing, this.spacing);
         }
         if (this.searchField != null && this.clearButton != null) {
             this.searchField.setPosition(leftColumnX, this.spacing);
@@ -260,13 +270,26 @@ public abstract class CatalogBrowserScreen extends Screen {
         this.catalog.refreshEntries();
     }
 
+    protected void refreshItemsAndPanel() {
+        this.refreshItems();
+        if (this.contents != null) {
+            this.contents.removed();
+            this.contents.added();
+        }
+        this.repositionElements();
+    }
+
+    protected Button getRefreshButton() {
+        return this.refreshButton;
+    }
+
     private ContentPanel initPanel(ContentPanel panel) {
         panel.init(
                 this.minecraft,
                 this.font,
                 this,
                 this.headerHeight,
-                this.getContentWidth() - this.doneButton.getWidth() - this.spacing,
+                this.getContentWidth() - this.doneButton.getWidth() - this.refreshButton.getWidth() - this.spacing * 2,
                 this.spacing
         );
         return panel;
