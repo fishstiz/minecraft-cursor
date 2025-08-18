@@ -2,6 +2,7 @@ package io.github.fishstiz.minecraftcursor.mixin.compat.owo;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.compat.ExternalCursor;
 import io.github.fishstiz.minecraftcursor.compat.ExternalCursorTracker;
@@ -54,7 +55,7 @@ public abstract class CursorAdapterMixin {
         boolean nullCursor = cursor == MemoryUtil.NULL;
         ExternalCursor trackedCursor = ExternalCursorTracker.get().getTrackedCursor(cursor);
 
-        if (window != CursorTypeUtil.WINDOW || (!nullCursor && trackedCursor == null)) {
+        if (!MinecraftCursor.CONFIG.isRemapCursorsEnabled() || window != CursorTypeUtil.WINDOW || (!nullCursor && trackedCursor == null)) {
             original.call(window, cursor);
             return;
         }

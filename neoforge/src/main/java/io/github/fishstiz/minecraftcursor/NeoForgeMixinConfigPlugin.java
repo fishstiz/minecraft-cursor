@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Set;
 
 public class NeoForgeMixinConfigPlugin implements IMixinConfigPlugin {
+    private boolean applyCursorRemapping;
+
     @Override
     public void onLoad(String mixinPackage) {
         // do nothing
@@ -30,13 +32,13 @@ public class NeoForgeMixinConfigPlugin implements IMixinConfigPlugin {
         final String mixinPackage = "io.github.fishstiz.minecraftcursor.mixin";
 
         if (mixinClassName.startsWith(mixinPackage + ".compat.ftblibrary") && this.isModLoaded("ftblibrary")) {
+            this.applyCursorRemapping = true;
             return true;
         }
         if (mixinClassName.startsWith(mixinPackage + ".compat.owo") && this.isModLoaded("owo")) {
+            this.applyCursorRemapping = true;
             return true;
         }
-
-        Flag.REMAP.disable();
 
         return false;
     }
@@ -48,6 +50,10 @@ public class NeoForgeMixinConfigPlugin implements IMixinConfigPlugin {
 
     @Override
     public List<String> getMixins() {
+        if (!this.applyCursorRemapping) {
+            Flag.REMAP.disable();
+        }
+
         return null;
     }
 
