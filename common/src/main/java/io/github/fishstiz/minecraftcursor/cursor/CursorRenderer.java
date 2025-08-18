@@ -20,6 +20,9 @@ sealed interface CursorRenderer permits CursorRenderer.Native, CursorRenderer.Vi
     void render(Minecraft minecraft, GuiGraphics guiGraphics, int mouseX, int mouseY);
 
     final class Native implements CursorRenderer {
+        Native() {
+        }
+
         @Override
         public void setCursor(@NotNull Cursor cursor) {
             glfwSetCursor(CursorTypeUtil.WINDOW, cursor.getId());
@@ -42,8 +45,8 @@ sealed interface CursorRenderer permits CursorRenderer.Native, CursorRenderer.Vi
         private int textureWidth;
         private int textureHeight;
         private int vOffset;
-        private int xhot;
-        private int yhot;
+        private double xhot;
+        private double yhot;
         private double size;
 
         Virtual() {
@@ -55,9 +58,11 @@ sealed interface CursorRenderer permits CursorRenderer.Native, CursorRenderer.Vi
             this.textureWidth = cursor.getTextureWidth();
             this.textureHeight = cursor.getTextureHeight();
             this.vOffset = this.textureWidth * cursor.getTextureIndex();
-            this.xhot = Math.round((float) cursor.getScale() * cursor.getXHot());
-            this.yhot = Math.round((float) cursor.getScale() * cursor.getYHot());
-            this.size = this.textureWidth * SettingsUtil.getAutoScale(cursor.getScale());
+
+            double scale = SettingsUtil.getAutoScale(cursor.getScale());
+            this.xhot = cursor.getXHot() * scale;
+            this.yhot = cursor.getYHot() * scale;
+            this.size = this.textureWidth * scale;
         }
 
         @Override
@@ -71,8 +76,8 @@ sealed interface CursorRenderer permits CursorRenderer.Native, CursorRenderer.Vi
             if (!minecraft.mouseHandler.isMouseGrabbed() && this.textureLocation != null) {
                 int guiScale = (int) minecraft.getWindow().getGuiScale();
                 int scaledSize = (int) Math.round(this.size / guiScale);
-                int x = mouseX - (this.xhot / guiScale);
-                int y = mouseY - (this.yhot / guiScale);
+                int x = mouseX - (int) Math.round(this.xhot / guiScale);
+                int y = mouseY - (int) Math.round(this.yhot / guiScale);
 
                 glfwSetInputMode(CursorTypeUtil.WINDOW, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
