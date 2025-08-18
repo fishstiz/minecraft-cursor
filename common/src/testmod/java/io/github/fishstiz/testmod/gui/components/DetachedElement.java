@@ -4,25 +4,15 @@ import io.github.fishstiz.minecraftcursor.api.CursorController;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.testmod.compat.minecraftcursor.MinecraftCursorUtil;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
 // CursorController can be used if the element is not part of the screen's element tree.
-public class DetachedElement extends Button {
+public class DetachedElement extends Buttons.Stub {
     private final CursorType cursorType;
 
     public DetachedElement(CursorType cursorType) {
-        super(
-                0,
-                0,
-                DEFAULT_WIDTH,
-                DEFAULT_HEIGHT,
-                Component.literal("Detached ").append(MinecraftCursorUtil.getTranslation(cursorType)),
-                Buttons::stub,
-                DEFAULT_NARRATION
-        );
-
+        super(Component.literal("Detached ").append(MinecraftCursorUtil.getTranslation(cursorType)));
         this.cursorType = cursorType;
     }
 

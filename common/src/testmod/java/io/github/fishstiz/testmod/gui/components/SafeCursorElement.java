@@ -2,15 +2,13 @@ package io.github.fishstiz.testmod.gui.components;
 
 import io.github.fishstiz.testmod.compat.minecraftcursor.MinecraftCursorUtil;
 import io.github.fishstiz.testmod.compat.minecraftcursor.TestCursorSafe;
-import net.minecraft.client.gui.components.Button;
 
 // Safe to use regardless if minecraft-cursor is loaded or not, but requires additional setup
-public class SafeCursorElement extends Button {
+public class SafeCursorElement extends Buttons.Stub {
     private final TestCursorSafe safeCursor;
 
     public SafeCursorElement(TestCursorSafe cursor) {
-        super(0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT, MinecraftCursorUtil.getTranslation(cursor.getKey()), Buttons::stub, DEFAULT_NARRATION);
-
+        super(MinecraftCursorUtil.getTranslation(cursor.getKey()));
         this.safeCursor = cursor;
     }
 
