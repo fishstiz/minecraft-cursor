@@ -103,7 +103,7 @@ public class AnimatedCursor extends Cursor {
     }
 
     public int getFrameCount() {
-        return frames.size();
+        return Math.max(frames.size(), 1);
     }
 
     public FrameData getFrame(int index) {
