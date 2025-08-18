@@ -23,13 +23,18 @@ public class ForgeMixinConfigPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        if (FMLEnvironment.dist.isClient()
-            && mixinClassName.startsWith("io.github.fishstiz.minecraftcursor.mixin.compat.ftblibrary")
-            && LoadingModList.get().getModFileById("ftblibrary") != null) {
+        if (!FMLEnvironment.dist.isClient()) {
+            return false;
+        }
+
+        final String mixinPackage = "io.github.fishstiz.minecraftcursor.mixin";
+
+        if (mixinClassName.startsWith(mixinPackage + ".compat.ftblibrary") && this.isModLoaded("ftblibrary")) {
             return true;
         }
 
         Flag.REMAP.disable();
+
         return false;
     }
 
@@ -51,5 +56,9 @@ public class ForgeMixinConfigPlugin implements IMixinConfigPlugin {
     @Override
     public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
         // do nothing
+    }
+
+    private boolean isModLoaded(String modId) {
+        return LoadingModList.get().getModFileById(modId) != null;
     }
 }
