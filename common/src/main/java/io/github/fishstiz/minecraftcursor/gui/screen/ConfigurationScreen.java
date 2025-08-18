@@ -1,5 +1,7 @@
 package io.github.fishstiz.minecraftcursor.gui.screen;
 
+import io.github.fishstiz.minecraftcursor.CursorResourceLoader;
+import io.github.fishstiz.minecraftcursor.api.CursorController;
 import io.github.fishstiz.minecraftcursor.cursor.CursorManager;
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
@@ -16,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 public class ConfigurationScreen extends CatalogBrowserScreen {
     private static final Component GLOBAL_TEXT = Component.translatable("minecraft-cursor.options.global");
@@ -28,10 +31,12 @@ public class ConfigurationScreen extends CatalogBrowserScreen {
     private static final int SIDEBAR_WIDTH = 140;
     private static final int MAX_CONTENT_WIDTH = 128 * 2 + SPACING;
     private static final int LIST_CURSOR_SIZE = 16;
+    private static final int BUSY_OVERRIDE = -10;
     private static final CatalogItem GLOBAL_CATEGORY = new CatalogItem("global", GLOBAL_TEXT);
     private static final CatalogItem CURSORS_CATEGORY = new CatalogItem("cursors", CURSORS_TEXT);
     private final CursorAnimationHelper animationHelper = new CursorAnimationHelper();
     private CatalogItem defaultItem;
+    private CompletableFuture<Void> refreshFuture;
 
     public ConfigurationScreen(Screen previous) {
         super(Component.translatable("minecraft-cursor.options"), HEADER_HEIGHT, SIDEBAR_WIDTH, MAX_CONTENT_WIDTH, SPACING, previous);
@@ -39,6 +44,7 @@ public class ConfigurationScreen extends CatalogBrowserScreen {
 
     @Override
     public void onClose() {
+        CursorController.getInstance().removeOverride(BUSY_OVERRIDE);
         MinecraftCursor.CONFIG.save();
         super.onClose();
     }
@@ -55,6 +61,26 @@ public class ConfigurationScreen extends CatalogBrowserScreen {
     @Override
     protected void postInit() {
         this.selectItem(this.defaultItem);
+    }
+
+    @Override
+    protected void refreshItemsAndPanel() {
+        if (this.refreshFuture != null && !this.refreshFuture.isDone()) {
+            return;
+        }
+
+        this.getRefreshButton().active = false;
+        CursorController.getInstance().overrideCursor(CursorType.BUSY, BUSY_OVERRIDE);
+        this.refreshFuture = CompletableFuture.runAsync(() -> CursorResourceLoader.reload(Objects.requireNonNull(this.minecraft).getResourceManager()))
+                .thenRunAsync(
+                        () -> {
+                            this.addCursorItems();
+                            super.refreshItemsAndPanel();
+                            this.getRefreshButton().active = true;
+                            CursorController.getInstance().removeOverride(BUSY_OVERRIDE);
+                        },
+                        this.minecraft
+                );
     }
 
     private void addGlobalItems() {
