@@ -113,11 +113,11 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
                 YHOT_TOOLTIP
         );
         this.optionList.addToggle(
-                CursorManager.INSTANCE.isAnimated(),
+                this.isAnimatedAny(),
                 this::toggleCursorAnimations,
                 this.index(ANIMATIONS_TEXT),
                 ANIMATIONS_INFO,
-                CursorManager.INSTANCE.hasAnimations()
+                this.hasAnimationAny()
         );
         this.optionList.addToggle(
                 CONFIG.isDeferredLoading(),
@@ -234,6 +234,25 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
             this.optionList.search(search);
         }
     }
+
+    public boolean hasAnimationAny() {
+        for (Cursor cursor : CursorManager.INSTANCE.getCursors()) {
+            if (cursor instanceof AnimatedCursor) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isAnimatedAny() {
+        for (Cursor cursor : CursorManager.INSTANCE.getCursors()) {
+            if (cursor instanceof AnimatedCursor animatedCursor && animatedCursor.isAnimated()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     private static Consumer<Boolean> applyGlobalOnToggle(Consumer<Boolean> onToggle) {
         return value -> {

@@ -1,13 +1,16 @@
 package io.github.fishstiz.minecraftcursor.cursor.resolver;
 
+import io.github.fishstiz.minecraftcursor.cursor.CursorManager;
 import io.github.fishstiz.minecraftcursor.platform.Services;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
 import org.jetbrains.annotations.NotNull;
@@ -22,6 +25,7 @@ final class ElementInspectorImpl implements ElementInspector {
     private final Component cacheLabel = Component.literal("Cache: ").withColor(0xFFFFFFFF); // white
     private final Component deepestLabel = Component.literal("D: ").withColor(0xFF00FF00); // green
     private final Component processedLabel = Component.literal("P: ").withColor(0xFFFF0000); // red
+    private final Component virtualModeLabel = Component.literal("Virtual Mode: ").withStyle(ChatFormatting.GOLD);
     private Set<Class<?>> cache = new ObjectOpenHashSet<>();
     private Component cacheText = Component.empty();
     private GuiEventListener processed;
@@ -61,6 +65,7 @@ final class ElementInspectorImpl implements ElementInspector {
             renderScreenName(minecraft, screen, screenRectangle, guiGraphics);
             renderCacheSize(minecraft, screenRectangle, guiGraphics);
             renderProcessed(minecraft, renderDeepest(minecraft, screen, guiGraphics, mouseX, mouseY), guiGraphics);
+            renderVirtualInfo(minecraft, screenRectangle, guiGraphics);
         }
     }
 
@@ -89,6 +94,11 @@ final class ElementInspectorImpl implements ElementInspector {
 
     private void renderCacheSize(Minecraft minecraft, ScreenRectangle screenBounds, GuiGraphics guiGraphics) {
         this.renderInfo(minecraft, guiGraphics, screenBounds, cacheText, Position.BOTTOM_RIGHT, -1, false);
+    }
+
+    private void renderVirtualInfo(Minecraft minecraft, ScreenRectangle screenBounds, GuiGraphics guiGraphics) {
+        Component virtualMode = virtualModeLabel.copy().append(CursorManager.INSTANCE.isVirtual() ? CommonComponents.OPTION_ON : CommonComponents.OPTION_OFF);
+        renderInfo(minecraft, guiGraphics, screenBounds, virtualMode, Position.TOP_RIGHT, false);
     }
 
     private void renderInfo(Minecraft minecraft, GuiGraphics guiGraphics, ScreenRectangle bounds, Component label, Position pos, boolean outline) {
