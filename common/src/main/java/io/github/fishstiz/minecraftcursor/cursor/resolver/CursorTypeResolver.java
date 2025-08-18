@@ -52,6 +52,11 @@ public final class CursorTypeResolver implements ElementRegistrar {
         registry.add(new ElementEntry<>(Objects.requireNonNull(elementClass), Objects.requireNonNull(cursorTypeFunction)));
     }
 
+    @Override
+    public <T extends GuiEventListener> void register(Class<T> elementClass, CursorType cursorType) {
+        this.register(elementClass, (element, mouseX, mouseY) -> cursorType);
+    }
+
     public CursorType resolve(GuiEventListener element, double mouseX, double mouseY) {
         Class<?> elementClass = element.getClass();
         try {
