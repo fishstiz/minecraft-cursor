@@ -7,10 +7,10 @@ import io.github.fishstiz.minecraftcursor.api.CursorTypeRegistrar;
 import io.github.fishstiz.minecraftcursor.compat.ExternalCursorTracker;
 import io.github.fishstiz.minecraftcursor.config.AnimationData;
 import io.github.fishstiz.minecraftcursor.config.Config;
-import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
 
 import java.io.IOException;
 import java.util.*;
@@ -21,6 +21,7 @@ public final class CursorManager implements CursorTypeRegistrar {
     private final TreeMap<Integer, String> overrides = new TreeMap<>();
     private final AnimationState animationState = new AnimationState();
     private @NotNull Cursor currentCursor = Cursor.createDummy();
+    private @NotNull CursorRenderer renderer = MinecraftCursor.CONFIG.isVirtualMode() ? new CursorRenderer.Virtual() : new CursorRenderer.Native();
 
     private CursorManager() {
     }
@@ -119,13 +120,13 @@ public final class CursorManager implements CursorTypeRegistrar {
             return;
         }
 
-        currentCursor = cursor;
-        GLFW.glfwSetCursor(CursorTypeUtil.WINDOW, currentCursor.getId());
+        this.currentCursor = cursor;
+        this.renderer.setCursor(this.currentCursor);
     }
 
     public void reapplyCursor() {
         if (!ExternalCursorTracker.get().isCustom()) {
-            GLFW.glfwSetCursor(CursorTypeUtil.WINDOW, getAppliedCursor().getId());
+            this.renderer.setCursor(this.getAppliedCursor());
         }
     }
 
@@ -200,22 +201,18 @@ public final class CursorManager implements CursorTypeRegistrar {
         }
         return false;
     }
-
-    public boolean hasAnimations() {
-        for (Cursor cursor : cursors.values()) {
-            if (cursor instanceof AnimatedCursor) {
-                return true;
-            }
-        }
-        return false;
+    
+    public boolean isVirtual() {
+        return this.renderer instanceof CursorRenderer.Virtual;
     }
 
-    public boolean isAnimated() {
-        for (Cursor cursor : cursors.values()) {
-            if (cursor instanceof AnimatedCursor animatedCursor && animatedCursor.isAnimated()) {
-                return true;
-            }
-        }
-        return false;
+    public void toggleVirtual() {
+        this.renderer.resetCursor();
+        this.renderer = this.isVirtual() ? new CursorRenderer.Native() : new CursorRenderer.Virtual();
+        this.reapplyCursor();
+    }
+
+    public void renderCursor(Minecraft minecraft, GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        this.renderer.render(minecraft, guiGraphics, mouseX, mouseY);
     }
 }

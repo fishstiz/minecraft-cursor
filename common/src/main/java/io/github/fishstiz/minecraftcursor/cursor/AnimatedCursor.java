@@ -11,53 +11,46 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class AnimatedCursor extends Cursor {
     private AnimationMode mode = AnimationMode.LOOP;
-    private HashMap<Integer, Cursor> cursors = new HashMap<>();
-    private List<Frame> frames = new ArrayList<>();
+    private Map<Integer, FrameCursor> cursors = new HashMap<>();
+    private List<FrameData> frames = new ArrayList<>();
     private boolean animated = true;
-    private Frame fallbackFrame;
+    private FrameData fallbackFrame;
 
     AnimatedCursor(CursorType type, Consumer<Cursor> onLoad) {
         super(type, onLoad);
     }
 
-    void loadImage(
-            NativeImage image,
-            Config.Settings settings,
-            AnimationData animation
-    ) throws IOException {
+    void loadImage(NativeImage image, Config.Settings settings, AnimationData animation) throws IOException {
         super.loadImage(image, settings);
 
         int availableFrames = image.getHeight() / this.getTextureWidth();
 
-        HashMap<Integer, Cursor> newCursors = createCursors(image, settings, availableFrames);
-        List<Frame> newFrames = createFrames(animation, newCursors, availableFrames);
+        Map<Integer, FrameCursor> newCursors = createCursors(image, settings, availableFrames);
+        List<FrameData> newFrames = createFrames(animation, newCursors, availableFrames);
 
         updateState(settings.isAnimated(), animation, newCursors, newFrames);
     }
 
-    private HashMap<Integer, Cursor> createCursors(
-            NativeImage image,
-            Config.Settings settings,
-            int availableFrames
-    ) throws IOException {
-        HashMap<Integer, Cursor> newCursors = new HashMap<>();
+    private HashMap<Integer, FrameCursor> createCursors(NativeImage image, Config.Settings settings, int availableFrames) throws IOException {
+        HashMap<Integer, FrameCursor> newCursors = new HashMap<>();
         for (int i = 1; i < availableFrames; i++) {
             newCursors.put(i, createCursor(image, settings, i));
         }
         return newCursors;
     }
 
-    private List<Frame> createFrames(AnimationData animation, HashMap<Integer, Cursor> cursors, int availableFrames) {
-        List<Frame> newFrames = new ArrayList<>();
+    private List<FrameData> createFrames(AnimationData animation, Map<Integer, FrameCursor> cursors, int availableFrames) {
+        List<FrameData> newFrames = new ArrayList<>();
 
         if (animation.getFrames().isEmpty()) {
-            newFrames.add(new Frame(this, animation.getFrametime(), 0));
+            newFrames.add(new FrameData(this, animation.getFrametime()));
             for (int i = 1; i < availableFrames; i++) {
-                newFrames.add(new Frame(cursors.get(i), animation.getFrametime(), i));
+                newFrames.add(new FrameData(cursors.get(i), animation.getFrametime()));
             }
             return newFrames;
         }
@@ -68,17 +61,13 @@ public class AnimatedCursor extends Cursor {
                 MinecraftCursor.LOGGER.warn("[minecraft-cursor] Sprite does not exist on index {} for cursor type '{}', skipping frame.", index, getType());
                 continue;
             }
-            newFrames.add(new Frame(index == 0 ? this : cursors.get(index), frame.getTime(animation), index));
+            newFrames.add(new FrameData(index == 0 ? this : cursors.get(index), frame.getTime(animation)));
         }
         return newFrames;
     }
 
-    private Cursor createCursor(
-            NativeImage image,
-            Config.Settings settings,
-            int index
-    ) throws IOException {
-        Cursor cursor = this.unloadedCopy();
+    private FrameCursor createCursor(NativeImage image, Config.Settings settings, int index) throws IOException {
+        FrameCursor cursor = new FrameCursor(index);
         int size = this.getTextureWidth();
         try (NativeImage cropped = NativeImageUtil.cropImage(image, 0, index * size, size, size)) {
             cursor.loadImage(cropped, settings);
@@ -86,14 +75,9 @@ public class AnimatedCursor extends Cursor {
         return cursor;
     }
 
-    private void updateState(
-            Boolean animated,
-            AnimationData animation,
-            HashMap<Integer, Cursor> newCursors,
-            List<Frame> newFrames
-    ) {
+    private void updateState(Boolean animated, AnimationData animation, Map<Integer, FrameCursor> newCursors, List<FrameData> newFrames) {
         this.setAnimated(animated);
-        this.fallbackFrame = new Frame(this, 1, 0);
+        this.fallbackFrame = new FrameData(this, 1);
         this.mode = animation.mode;
         this.frames = this.mode.isReversed() ? newFrames.reversed() : newFrames;
 
@@ -118,9 +102,9 @@ public class AnimatedCursor extends Cursor {
         return frames.size();
     }
 
-    public Frame getFrame(int index) {
+    public FrameData getFrame(int index) {
         try {
-            Frame frame = frames.get(index);
+            FrameData frame = frames.get(index);
             if (!isAnimated() || frame.cursor() == null || !frame.cursor().isEnabled()) {
                 return getFallbackFrame();
             }
@@ -130,7 +114,7 @@ public class AnimatedCursor extends Cursor {
         }
     }
 
-    public Frame nextFrame(AnimationState state) {
+    public FrameData nextFrame(AnimationState state) {
         return this.getFrame(state.next(this));
     }
 
@@ -170,13 +154,37 @@ public class AnimatedCursor extends Cursor {
         applyToFrames(Cursor::reload);
     }
 
-    public Frame getFallbackFrame() {
+    public FrameData getFallbackFrame() {
         if (this.fallbackFrame == null) {
-            this.fallbackFrame = new Frame(this, 1, 0);
+            this.fallbackFrame = new FrameData(this, 1);
         }
         return this.fallbackFrame;
     }
 
-    public record Frame(Cursor cursor, int time, int spriteIndex) {
+    public record FrameData(Cursor cursor, int time) {
+    }
+
+    private class FrameCursor extends Cursor {
+        private final int textureIndex;
+
+        private FrameCursor(int textureIndex) {
+            super(AnimatedCursor.this);
+            this.textureIndex = textureIndex;
+        }
+
+        @Override
+        public int getTextureIndex() {
+            return this.textureIndex;
+        }
+
+        @Override
+        public int getTextureWidth() throws IllegalStateException {
+            return AnimatedCursor.this.getTextureWidth();
+        }
+
+        @Override
+        public int getTextureHeight() throws IllegalStateException {
+            return AnimatedCursor.this.getTextureHeight();
+        }
     }
 }
