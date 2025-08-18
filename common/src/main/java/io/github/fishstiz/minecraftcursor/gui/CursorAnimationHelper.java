@@ -18,26 +18,20 @@ public class CursorAnimationHelper {
         }
     }
 
-    public void drawSprite(GuiGraphics context, Cursor cursor, int x, int y, int size) {
-        if (!cursor.isLoaded()) return;
+    public void drawSprite(GuiGraphics guiGraphics, Cursor cursor, int x, int y, int size) {
+        if (cursor.isLoaded()) {
+            int cursorSize = cursor.getTextureWidth();
+            float spriteIndex = cursor instanceof AnimatedCursor animatedCursor ? this.getCurrentSpriteIndex(animatedCursor) : 0;
 
-        int frameIndex = 0;
-
-        if (cursor instanceof AnimatedCursor animatedCursor) {
-            frameIndex = getCurrentSpriteIndex(animatedCursor);
+            guiGraphics.blit(
+                    cursor.getLocation(),
+                    x, y,
+                    size, size,
+                    0, cursorSize * spriteIndex,
+                    cursorSize, cursorSize,
+                    cursor.getTextureWidth(), cursor.getTextureHeight()
+            );
         }
-
-        int cursorSize = cursor.getTextureWidth();
-        int vOffset = cursorSize * frameIndex;
-
-        context.blit(
-                cursor.getLocation(),
-                x, y,
-                size, size,
-                0, vOffset,
-                cursorSize, cursorSize,
-                cursor.getTextureWidth(), cursor.getTextureHeight()
-        );
     }
 
     private int getCurrentSpriteIndex(AnimatedCursor cursor) {
@@ -45,9 +39,9 @@ public class CursorAnimationHelper {
 
         if (!cursor.isAnimated() || !cursor.isEnabled()) {
             state.reset();
-            return cursor.getFallbackFrame().spriteIndex();
+            return cursor.getFallbackFrame().cursor().getTextureIndex();
         }
 
-        return cursor.nextFrame(state).spriteIndex();
+        return cursor.nextFrame(state).cursor().getTextureIndex();
     }
 }

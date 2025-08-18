@@ -27,6 +27,7 @@ public class Config implements Serializable {
     private boolean deferredLoading = false;
     private boolean inactiveWidgetsEnabled = true;
     private boolean aggressiveCursor = false;
+    private boolean virtualMode = false;
     private final List<String> blacklist = new ArrayList<>();
     private final GlobalSettings global = new GlobalSettings();
     private final Map<String, Config.Settings> settings = new HashMap<>();
@@ -211,6 +212,14 @@ public class Config implements Serializable {
 
     public void setAggressiveCursor(boolean aggressiveCursor) {
         this.aggressiveCursor = aggressiveCursor;
+    }
+
+    public boolean isVirtualMode() {
+        return virtualMode;
+    }
+
+    public void setVirtualMode(boolean virtualMode) {
+        this.virtualMode = virtualMode;
     }
 
     private static String generateHash(Map<String, Settings> settings) {
