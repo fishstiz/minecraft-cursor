@@ -67,8 +67,8 @@
   "minecraft-cursor.options.compat.remap_cursors.empty": "No detected cursors to remap.",
   "minecraft-cursor.options.compat.aggressive_cursor": "Aggressive cursor updates",
   "minecraft-cursor.options.compat.aggressive_cursor.info": "Aggressively updates the cursor instead of only when it changes.\n\nDisabled by default.",
-  "minecraft-cursor.options.compat.virtual_mode": "Virtual mode",
-  "minecraft-cursor.options.compat.virtual_mode.info": "Render the cursor manually instead of changing the system cursor\n\nWARNING: May fix some compatibility issues but cause others",
+  "minecraft-cursor.options.compat.virtual_mode": "Virtual Mode",
+  "minecraft-cursor.options.compat.virtual_mode.info": "Renders the cursor manually instead of using GLFW.\n\nWARNING: May fix some issues but also cause others.",
 
   "minecraft-cursor.options.debug": "Debug",
   "minecraft-cursor.options.debug.inspect": "Inspect Element",
