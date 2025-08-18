@@ -64,6 +64,22 @@ public interface ElementRegistrar {
     <T extends GuiEventListener> void register(Class<T> elementClass, CursorTypeFunction<T> cursorTypeFunction);
 
     /**
+     * Registers the {@link GuiEventListener} class with a {@link CursorType}
+     *
+     * <p><strong>Example usage:</strong></p>
+     * <pre>{@code
+     *      register(MyButton.class, (myButton, mouseX, mouseY) -> CursorType.POINTER);
+     *      // you can use the existing static methods in ElementRegistrar
+     *      register(MyOtherButton.class, ElementRegistrar::elementToPointer);
+     * }</pre>
+     *
+     * @param <T>          The type of the {@link GuiEventListener} to register
+     * @param elementClass The {@link Class} of the {@link GuiEventListener} to register
+     * @param cursorType   The {@link CursorType} of the registered element
+     */
+    <T extends GuiEventListener> void register(Class<T> elementClass, CursorType cursorType);
+
+    /**
      * A built-in {@link CursorTypeFunction} static method that always returns {@link CursorType#DEFAULT}.
      * <p>
      * Use this static method when no additional logic is needed to determine the cursor type for the element.

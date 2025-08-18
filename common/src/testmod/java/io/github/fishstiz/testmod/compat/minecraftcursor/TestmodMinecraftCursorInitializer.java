@@ -4,6 +4,7 @@ import io.github.fishstiz.minecraftcursor.api.*;
 import io.github.fishstiz.testmod.gui.components.HandledCursorElement;
 import io.github.fishstiz.testmod.gui.components.SafeCursorElement;
 import io.github.fishstiz.testmod.gui.components.StatefulCursorElement;
+import io.github.fishstiz.testmod.gui.screens.TestScreenCursor;
 import net.minecraft.network.chat.Component;
 
 public class TestmodMinecraftCursorInitializer implements MinecraftCursorInitializer {
@@ -42,6 +43,9 @@ public class TestmodMinecraftCursorInitializer implements MinecraftCursorInitial
 
         // Register StatefulCursorElement
         elementRegistrar.register(new StatefulCursorElementHandler());
+
+        // Register whole Screen with a cursor type
+        elementRegistrar.register(TestScreenCursor.class, getCursorType(TestCursorSafe.TEST_RGB_LOOP));
     }
 
     private static CursorType getCursorType(TestCursorSafe safeCursor) {
