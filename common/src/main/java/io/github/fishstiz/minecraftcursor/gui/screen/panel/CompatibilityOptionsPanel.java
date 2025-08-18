@@ -1,6 +1,7 @@
 package io.github.fishstiz.minecraftcursor.gui.screen.panel;
 
 import io.github.fishstiz.minecraftcursor.compat.ExternalCursorTracker;
+import io.github.fishstiz.minecraftcursor.cursor.CursorManager;
 import io.github.fishstiz.minecraftcursor.gui.widget.OptionsListWidget;
 import io.github.fishstiz.minecraftcursor.config.Flag;
 import net.minecraft.client.gui.components.Tooltip;
@@ -16,6 +17,8 @@ public class CompatibilityOptionsPanel extends AbstractOptionsPanel {
     private static final Component REMAP_TEXT = Component.translatable("minecraft-cursor.options.compat.remap_cursors");
     private static final Tooltip REMAP_INFO = Tooltip.create(Component.translatable(Flag.REMAP.getInfoKey()));
     private static final Tooltip REMAP_EMPTY_INFO = Tooltip.create(Component.translatable("minecraft-cursor.options.compat.remap_cursors.empty"));
+    private static final Component VIRTUAL_TEXT = Component.translatable("minecraft-cursor.options.compat.virtual_mode");
+    private static final Tooltip VIRTUAL_INFO = Tooltip.create(Component.translatable("minecraft-cursor.options.compat.virtual_mode.info"));
     private OptionsListWidget optionsList;
 
     public CompatibilityOptionsPanel(Component title) {
@@ -39,6 +42,16 @@ public class CompatibilityOptionsPanel extends AbstractOptionsPanel {
                 this.index(REMAP_TEXT),
                 !Flag.REMAP.isEnabled() || ExternalCursorTracker.isTracking() ? REMAP_INFO : REMAP_EMPTY_INFO,
                 ExternalCursorTracker.isTracking()
+        );
+        this.optionsList.addToggle(
+                CursorManager.INSTANCE.isVirtual(),
+                value -> {
+                    CursorManager.INSTANCE.toggleVirtual();
+                    CONFIG.setVirtualMode(CursorManager.INSTANCE.isVirtual());
+                },
+                this.index(VIRTUAL_TEXT),
+                VIRTUAL_INFO,
+                true
         );
 
         this.optionsList.search(this.getSearch());

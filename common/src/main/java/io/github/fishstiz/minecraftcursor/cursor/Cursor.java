@@ -44,6 +44,10 @@ public class Cursor {
         this.location = CursorResourceLoader.getDirectory().withSuffix(type.getKey() + IMG_TYPE);
     }
 
+    Cursor(Cursor cursor) {
+        this(cursor.type, cursor.onLoad);
+    }
+
     void loadImage(@NotNull NativeImage image, Config.Settings settings) throws IOException {
         try {
             int imageWidth = image.getWidth();
@@ -229,6 +233,10 @@ public class Cursor {
         return loaded;
     }
 
+    public int getTextureIndex() {
+        return 0;
+    }
+
     public int getTextureWidth() throws IllegalStateException {
         assertLoaded();
         return textureWidth;
@@ -243,10 +251,6 @@ public class Cursor {
         if (!this.isLoaded()) {
             throw new IllegalStateException("Cursor has not been loaded");
         }
-    }
-
-    protected Cursor unloadedCopy() {
-        return new Cursor(this.type, this.onLoad);
     }
 
     static Cursor createDummy() {
