@@ -1,6 +1,7 @@
 package io.github.fishstiz.testmod.mixin;
 
 import io.github.fishstiz.testmod.gui.screens.TestScreen;
+import io.github.fishstiz.testmod.gui.screens.TestScreenCursor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
@@ -18,6 +19,7 @@ public abstract class TitleScreenMixin extends Screen {
 
     @Inject(method = "init", at = @At("TAIL"))
     private void addTestScreenButton(CallbackInfo ci) {
-        this.addRenderableWidget(Button.builder(Component.literal("Open Test Screen"), btn -> TestScreen.open()).build());
+        var btn1 = this.addRenderableWidget(Button.builder(Component.literal("Open Test Screen"), btn -> TestScreen.open()).build());
+        this.addRenderableWidget(Button.builder(Component.literal("Open Test Screen 2"), btn -> TestScreenCursor.open()).build()).setY(btn1.getY() + btn1.getHeight());
     }
 }

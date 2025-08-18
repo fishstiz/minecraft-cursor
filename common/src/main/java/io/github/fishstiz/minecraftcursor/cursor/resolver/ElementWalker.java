@@ -29,10 +29,7 @@ public final class ElementWalker {
                     }
                 }
                 if (hovered(child, mouseX, mouseY)) {
-                    T result = processor.processNode(child, mouseX, mouseY);
-                    if (shouldReturn.test(result)) {
-                        return result;
-                    }
+                    return processor.processNode(child, mouseX, mouseY);
                 }
             }
         }
