@@ -1,6 +1,5 @@
 package io.github.fishstiz.minecraftcursor;
 
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -19,7 +18,7 @@ class CursorResourceReloadListener implements PreparableReloadListener {
             @NotNull Executor backgroundExecutor,
             @NotNull Executor gameExecutor
     ) {
-        return CompletableFuture.runAsync(() -> CursorResourceLoader.reload(manager))
+        return CompletableFuture.runAsync(() -> CursorResourceLoader.reload(manager), backgroundExecutor)
                 .thenCompose(barrier::wait)
                 .thenRunAsync(CursorResourceLoader::onReload, gameExecutor);
     }
