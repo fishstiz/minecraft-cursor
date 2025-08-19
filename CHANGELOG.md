@@ -1,7 +1,13 @@
-- Added Turkish Translation ([#35](https://github.com/fishstiz/minecraft-cursor/pull/35) by ZeyMer1309)
-- Added Blacklist (experimental):
-  - Blacklist certain screens or elements from the adaptive cursor. 
-  - Add the name of the screen/element to the `blacklist` array in the config file (requires restart). Names can be found using inspect element in debug options.
-- Optimized cursor computation on the static GUIs with adaptive cursor (seen in Adaptive Cursor options).
-  - Improved stability of cursor computation on said GUIs so they're less affected by other mods that shift their positions and sizes.
-- Significantly reduced memory usage of cache (~5-6x less).
+- Added **Refresh Button** to Configuration Screen to quickly reload cursor textures without reloading all resources.
+- Added **Virtual Mode** option under **Mod Compatibility** to toggle virtual cursor mode. Support for this will be
+  limited.
+  It is only intended to work around issues you may have with native cursor mode and could introduce other issues.
+  Results may vary.
+- Reduced false positives on adaptive cursor computation with overlapping elements.
+- Made option **Remap System Cursors** always available to toggle unless disabled by another mod (Fabric) or unavailable
+  by default (Forge/NeoForge).
+
+#### NeoForge
+- Added compatibility with **owo-lib**. Cursors from owo-lib will be remapped to the Minecraft Cursor equivalents.
+  Can be toggled with the **Remap System Cursors** option under **Mod Compatibility**.
+  Fixes ([#38](https://github.com/fishstiz/minecraft-cursor/issues/38))
