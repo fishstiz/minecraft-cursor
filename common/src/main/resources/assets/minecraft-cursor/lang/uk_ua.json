@@ -51,7 +51,6 @@
   "minecraft-cursor.options.adapt.creative_tabs": "Вкладки творчого інвентарю",
   "minecraft-cursor.options.adapt.enchantments": "Кнопка зачарування",
   "minecraft-cursor.options.adapt.stonecutter": "Кнопка рецепту каменеріза",
-  "minecraft-cursor.options.adapt.book_edit": "Книга й перо",
   "minecraft-cursor.options.adapt.loom": "Слот візерунка ткацького верстата",
   "minecraft-cursor.options.adapt.advancements": "Вкладки досягнень",
   "minecraft-cursor.options.adapt.world": "Кнопка гри на значку світу",
@@ -70,7 +69,6 @@
   "minecraft-cursor.options.compat.aggressive_cursor.info": "Агресивно оновлює курсор, а не лише коли він змінюється.\n\nВимкнено усталено.",
   "minecraft-cursor.options.compat.virtual_mode": "Віртуальний режим",
   "minecraft-cursor.options.compat.virtual_mode.info": "Промальовує курсор вручну замість використання GLFW.\n\nПОПЕРЕДЖЕННЯ: може вирішити деякі проблеми, але також викликати інші.",
-
 
   "minecraft-cursor.options.debug": "Налагодження",
   "minecraft-cursor.options.debug.inspect": "Перевірити елемент",
