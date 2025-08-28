@@ -3,7 +3,7 @@
 Replaces the boring old default system cursor with Minecraft-themed cursors.
 
 ## 📌 Requirements
-- Minecraft 1.20.1 or 1.21.1+
+- Minecraft 1.20.1 or 1.21.1 - 1.21.8 (Click [here](https://github.com/fishstiz/cursors_extended) for newer versions)
 - When on Fabric: Fabric API
 
 ## ✨ Adaptive Cursor
@@ -67,9 +67,11 @@ Note that some mods are unknowingly conflicting with **Minecraft Cursor** due to
 - When another mod sets a custom cursor through GLFW, the adaptive cursor will be disabled to let it do its thing.
 - Standard system cursors from GLFW will be remapped to their Minecraft Cursor equivalents.
 
-This is not supported by **Forge** and **NeoForge**, and even if they were, the early loading screen will break these features. 
+This is not supported by **Forge** and **NeoForge**, and even if they were, the early loading screen will break these features. One way around this is to hook into these conflicting mods specifically, which is done for the following:
+- FTB Library
+- owo-lib
 
-Likewise, Fabric mods that initialize GLFW early, such as some early loading screen mods, will also disable these features.
+Likewise, Fabric mods that load GLFW early, such as some early loading screen mods, will also disable these features.
 
 ---
 <sup>
