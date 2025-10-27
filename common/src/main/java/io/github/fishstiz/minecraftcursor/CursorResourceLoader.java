@@ -39,7 +39,10 @@ public class CursorResourceLoader {
     static void reloadSettings(ResourceManager manager) {
         onReload();
         loadResourceSettings(manager);
-        Minecraft.getInstance().execute(CursorResourceLoader::onReload);
+        Minecraft.getInstance().execute(() -> {
+            onReload();
+            CursorManager.INSTANCE.reapplyCursor();
+        });
     }
 
     public static void reload() {
@@ -54,6 +57,7 @@ public class CursorResourceLoader {
         }
 
         onReload();
+        CursorManager.INSTANCE.reapplyCursor();
     }
 
     static void onReload() {

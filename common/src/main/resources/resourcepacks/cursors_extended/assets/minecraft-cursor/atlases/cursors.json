@@ -1,0 +1,64 @@
+{
+  "settings": {
+    "not_allowed": {
+      "scale": 1.0,
+      "xhot": 11,
+      "yhot": 11
+    },
+    "resize_ns": {
+      "scale": 1.0,
+      "xhot": 16,
+      "yhot": 16
+    },
+    "crosshair": {
+      "scale": 1.0,
+      "xhot": 13,
+      "yhot": 13
+    },
+    "default": {
+      "scale": 1.0,
+      "xhot": 0,
+      "yhot": 0
+    },
+    "pointer": {
+      "scale": 1.0,
+      "xhot": 7,
+      "yhot": 0
+    },
+    "grabbing": {
+      "scale": 1.0,
+      "xhot": 10,
+      "yhot": 2
+    },
+    "shift": {
+      "scale": 1.0,
+      "xhot": 10,
+      "yhot": 0
+    },
+    "busy": {
+      "scale": 1.0,
+      "xhot": 0,
+      "yhot": 6
+    },
+    "resize_nesw": {
+      "scale": 1.0,
+      "xhot": 16,
+      "yhot": 16
+    },
+    "resize_nwse": {
+      "scale": 1.0,
+      "xhot": 16,
+      "yhot": 16
+    },
+    "resize_ew": {
+      "scale": 1.0,
+      "xhot": 16,
+      "yhot": 16
+    },
+    "text": {
+      "scale": 1.0,
+      "xhot": 10,
+      "yhot": 12
+    }
+  }
+}
