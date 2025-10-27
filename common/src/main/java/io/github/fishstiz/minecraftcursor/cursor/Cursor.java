@@ -110,6 +110,7 @@ public class Cursor {
 
         long glfwImageAddress = MemoryUtil.NULL;
         long previousId = this.id;
+        long newId = MemoryUtil.NULL;
         ByteBuffer pixels = null;
         NativeImage scaledImage = null;
 
@@ -132,14 +133,15 @@ public class Cursor {
 
             glfwImageAddress = glfwImage.address();
             ExternalCursorTracker.trackInternalCursor(glfwImageAddress);
-            this.id = GLFW.glfwCreateCursor(glfwImage, scaledXHot, scaledYHot);
+            newId = GLFW.glfwCreateCursor(glfwImage, scaledXHot, scaledYHot);
 
-            if (this.id == MemoryUtil.NULL) {
+            if (newId == MemoryUtil.NULL) {
                 MinecraftCursor.LOGGER.error("[minecraft-cursor] Error creating cursor '{}'. ", this.type.getKey());
                 return;
             }
 
             loaded = true;
+            this.id = newId;
             this.scale = scale;
             this.xhot = xhot;
             this.yhot = yhot;
@@ -152,7 +154,7 @@ public class Cursor {
             if (pixels != null) {
                 MemoryUtil.memFree(pixels);
             }
-            if (previousId != MemoryUtil.NULL && this.id != previousId) {
+            if (previousId != MemoryUtil.NULL && newId != MemoryUtil.NULL && newId != previousId) {
                 GLFW.glfwDestroyCursor(previousId);
             }
             if (glfwImageAddress != MemoryUtil.NULL) {
