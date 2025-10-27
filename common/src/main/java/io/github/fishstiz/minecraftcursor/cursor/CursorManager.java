@@ -88,10 +88,15 @@ public final class CursorManager implements CursorTypeRegistrar {
     }
 
     private void onLoad(Cursor cursor) {
-        Cursor appliedCursor = getAppliedCursor();
-        if (appliedCursor.isLoaded() && appliedCursor.getType().isKey(cursor.getType()) && appliedCursor.getId() == cursor.getId()) {
-            reapplyCursor();
-        }
+        final CursorType cursorType = cursor.getType();
+        final long id = cursor.getId();
+
+        Minecraft.getInstance().execute(() -> {
+            Cursor appliedCursor = getAppliedCursor();
+            if (appliedCursor.isLoaded() && appliedCursor.getType().isKey(cursorType) && appliedCursor.getId() == id) {
+                reapplyCursor();
+            }
+        });
     }
 
     public void setCurrentCursor(@NotNull CursorType type) {
