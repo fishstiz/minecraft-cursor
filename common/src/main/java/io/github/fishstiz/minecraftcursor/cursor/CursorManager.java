@@ -1,12 +1,14 @@
 package io.github.fishstiz.minecraftcursor.cursor;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import io.github.fishstiz.minecraftcursor.CursorResourceLoader;
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.api.CursorTypeRegistrar;
 import io.github.fishstiz.minecraftcursor.compat.ExternalCursorTracker;
 import io.github.fishstiz.minecraftcursor.config.AnimationData;
 import io.github.fishstiz.minecraftcursor.config.Config;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import org.jetbrains.annotations.NotNull;
@@ -15,13 +17,15 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.*;
 
+import static io.github.fishstiz.minecraftcursor.MinecraftCursor.CONFIG;
+
 public final class CursorManager implements CursorTypeRegistrar {
     public static final CursorManager INSTANCE = new CursorManager();
-    private final LinkedHashMap<String, Cursor> cursors = new LinkedHashMap<>();
+    private final Map<String, Cursor> cursors = new Object2ObjectLinkedOpenHashMap<>();
     private final TreeMap<Integer, String> overrides = new TreeMap<>();
     private final AnimationState animationState = new AnimationState();
     private @NotNull Cursor currentCursor = Cursor.createDummy();
-    private @NotNull CursorRenderer renderer = MinecraftCursor.CONFIG.isVirtualMode() ? new CursorRenderer.Virtual() : new CursorRenderer.Native();
+    private @NotNull CursorRenderer renderer = CONFIG.isVirtualMode() ? new CursorRenderer.Virtual() : new CursorRenderer.Native();
 
     private CursorManager() {
     }
@@ -55,7 +59,7 @@ public final class CursorManager implements CursorTypeRegistrar {
         return cursorType;
     }
 
-    public void loadCursor(
+    public Cursor loadCursor(
             Cursor cursor,
             NativeImage image,
             Config.Settings settings,
@@ -79,6 +83,8 @@ public final class CursorManager implements CursorTypeRegistrar {
         } else {
             cursor.loadImage(image, settings);
         }
+
+        return cursor;
     }
 
     private void onLoad(Cursor cursor) {
@@ -91,6 +97,10 @@ public final class CursorManager implements CursorTypeRegistrar {
     public void setCurrentCursor(@NotNull CursorType type) {
         Cursor override = getOverride();
         Cursor cursor = override != null ? override : this.cursors.get(type.getKey());
+
+        if (cursor != null && cursor.isLazy() && CONFIG.getOrCreateSettings(cursor).isEnabled()) {
+            CursorResourceLoader.loadCursorTexture(cursor);
+        }
 
         if (cursor instanceof AnimatedCursor animatedCursor && cursor.getId() != 0) {
             handleCursorAnimation(animatedCursor);
@@ -115,7 +125,7 @@ public final class CursorManager implements CursorTypeRegistrar {
 
     private void updateCursor(Cursor cursor) {
         if (cursor == null
-            || (!MinecraftCursor.CONFIG.isAggressiveCursor() && cursor.getId() == currentCursor.getId())
+            || (!CONFIG.isAggressiveCursor() && cursor.getId() == currentCursor.getId())
             || ExternalCursorTracker.get().isCustom()) {
             return;
         }
@@ -174,7 +184,7 @@ public final class CursorManager implements CursorTypeRegistrar {
     }
 
     public boolean isEnabled(@Nullable Cursor cursor) {
-        return cursor != null && cursor.isEnabled();
+        return cursor != null && ((cursor.isLazy() && CONFIG.getOrCreateSettings(cursor).isEnabled()) || cursor.isEnabled());
     }
 
     public @Nullable Cursor getCursor(CursorType type) {
@@ -195,13 +205,13 @@ public final class CursorManager implements CursorTypeRegistrar {
 
     public boolean isAdaptive() {
         for (Cursor cursor : cursors.values()) {
-            if (cursor.isEnabled() && !cursor.getType().isDefault()) {
+            if (!cursor.getType().isDefault() && ((cursor.isLazy() || cursor.isEnabled()) && CONFIG.getOrCreateSettings(cursor).isEnabled())) {
                 return true;
             }
         }
         return false;
     }
-    
+
     public boolean isVirtual() {
         return this.renderer instanceof CursorRenderer.Virtual;
     }
