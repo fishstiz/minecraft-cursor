@@ -25,7 +25,6 @@ public class Config extends AbstractConfig<Config.Settings> {
     private boolean worldIconEnabled = true;
     private boolean serverIconEnabled = true;
     private boolean remapCursorsEnabled = true;
-    private boolean deferredLoading = false;
     private boolean inactiveWidgetsEnabled = true;
     private boolean aggressiveCursor = false;
     private boolean virtualMode = false;
@@ -181,14 +180,6 @@ public class Config extends AbstractConfig<Config.Settings> {
 
     public void setRemapCursorsEnabled(boolean remapCursorsEnabled) {
         this.remapCursorsEnabled = remapCursorsEnabled;
-    }
-
-    public boolean isDeferredLoading() {
-        return deferredLoading;
-    }
-
-    public void setDeferredLoading(boolean deferredLoading) {
-        this.deferredLoading = deferredLoading;
     }
 
     public boolean isInactiveWidgetsEnabled() {
