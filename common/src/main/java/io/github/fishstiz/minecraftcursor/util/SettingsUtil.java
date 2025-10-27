@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 public class SettingsUtil {
     public static final int IMAGE_SIZE_MIN = 8;
@@ -141,5 +142,11 @@ public class SettingsUtil {
             return equal;
         }
         return false;
+    }
+
+    public static <E> void forEach(E[] arr, Consumer<E> action) {
+        for (E e : arr) {
+            action.accept(e);
+        }
     }
 }

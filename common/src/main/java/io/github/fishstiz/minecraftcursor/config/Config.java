@@ -238,7 +238,15 @@ public class Config extends AbstractConfig<Config.Settings> {
         protected boolean enabled = SettingsUtil.ENABLED;
         protected Boolean animated;
 
-        Settings() {
+        public Settings() {
+        }
+
+        public Settings(double scale, int xhot, int yhot, boolean enabled, Boolean animated) {
+            this.scale = scale;
+            this.xhot = xhot;
+            this.yhot = yhot;
+            this.enabled = enabled;
+            this.animated = animated;
         }
 
         public void setScale(double scale) {
@@ -271,13 +279,7 @@ public class Config extends AbstractConfig<Config.Settings> {
 
         @Override
         public Settings copy() {
-            Settings settings = new Settings();
-            settings.scale = this.scale;
-            settings.xhot = this.xhot;
-            settings.yhot = this.yhot;
-            settings.enabled = this.enabled;
-            settings.animated = this.animated;
-            return settings;
+            return new Settings(this.scale, this.xhot, this.yhot, this.enabled, this.animated);
         }
     }
 
