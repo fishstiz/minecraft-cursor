@@ -6,24 +6,24 @@ import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.config.AnimationData;
 import io.github.fishstiz.minecraftcursor.config.Config;
 import io.github.fishstiz.minecraftcursor.util.NativeImageUtil;
+import io.github.fishstiz.minecraftcursor.util.SettingsUtil;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class AnimatedCursor extends Cursor {
     private AnimationMode mode = AnimationMode.LOOP;
-    private Map<Integer, FrameCursor> cursors = new HashMap<>();
-    private List<FrameData> frames = new ArrayList<>();
+    private FrameCursor[] cursors = new FrameCursor[0];
+    private FrameData[] frames = new FrameData[0];
     private boolean animated = true;
     private FrameData fallbackFrame;
+    private AnimationData animation;
+    private byte[] pixels;
 
     AnimatedCursor(CursorType type, Consumer<Cursor> onLoad) {
-        super(type, onLoad);
+        super(type, onLoad, false);
     }
 
     void loadImage(NativeImage image, Config.Settings settings, AnimationData animation) throws IOException {
@@ -32,26 +32,43 @@ public class AnimatedCursor extends Cursor {
         int availableFrames = image.getHeight() / this.getTextureWidth();
 
         Map<Integer, FrameCursor> newCursors = createCursors(image, settings, availableFrames);
-        List<FrameData> newFrames = createFrames(animation, newCursors, availableFrames);
 
-        updateState(settings.isAnimated(), animation, newCursors, newFrames);
+        this.setAnimated(settings.isAnimated());
+        this.fallbackFrame = new FrameData(this, 1);
+        this.mode = animation.mode;
+        this.frames = createFrames(animation, newCursors, availableFrames).toArray(FrameData[]::new);
+
+        FrameCursor[] oldCursors = this.cursors;
+        this.cursors = newCursors.values().toArray(FrameCursor[]::new);
+        SettingsUtil.forEach(oldCursors, Cursor::destroy);
+
+        this.animation = animation;
+        this.pixels = NativeImageUtil.getBytes(image);
     }
 
-    private HashMap<Integer, FrameCursor> createCursors(NativeImage image, Config.Settings settings, int availableFrames) throws IOException {
-        HashMap<Integer, FrameCursor> newCursors = new HashMap<>();
-        for (int i = 1; i < availableFrames; i++) {
-            newCursors.put(i, createCursor(image, settings, i));
+    private Map<Integer, FrameCursor> createCursors(NativeImage image, Config.Settings settings, int availableFrames) throws IOException {
+        Map<Integer, FrameCursor> newCursors = new Int2ObjectOpenHashMap<>(availableFrames - 1);
+        try {
+            for (int i = 1; i < availableFrames; i++) {
+                newCursors.put(i, createCursor(image, settings, i));
+            }
+        } catch (IOException e) {
+            newCursors.values().forEach(Cursor::destroy);
+            throw e;
         }
         return newCursors;
     }
 
     private List<FrameData> createFrames(AnimationData animation, Map<Integer, FrameCursor> cursors, int availableFrames) {
-        List<FrameData> newFrames = new ArrayList<>();
+        List<FrameData> newFrames = new ArrayList<>(animation.getFrames().size());
 
         if (animation.getFrames().isEmpty()) {
             newFrames.add(new FrameData(this, animation.getFrametime()));
             for (int i = 1; i < availableFrames; i++) {
                 newFrames.add(new FrameData(cursors.get(i), animation.getFrametime()));
+            }
+            if (animation.mode.isReversed()) {
+                Collections.reverse(newFrames);
             }
             return newFrames;
         }
@@ -63,6 +80,9 @@ public class AnimatedCursor extends Cursor {
                 continue;
             }
             newFrames.add(new FrameData(index == 0 ? this : cursors.get(index), frame.getTime(animation)));
+        }
+        if (animation.mode.isReversed()) {
+            Collections.reverse(newFrames);
         }
         return newFrames;
     }
@@ -76,46 +96,52 @@ public class AnimatedCursor extends Cursor {
         return cursor;
     }
 
-    private void updateState(Boolean animated, AnimationData animation, Map<Integer, FrameCursor> newCursors, List<FrameData> newFrames) {
-        this.setAnimated(animated);
-        this.fallbackFrame = new FrameData(this, 1);
-        this.mode = animation.mode;
-
-        if (this.mode.isReversed()) Collections.reverse(newFrames);
-        this.frames = newFrames;
-
-
-        List<Cursor> oldCursors = List.copyOf(this.cursors.values());
-        this.cursors = newCursors;
-        oldCursors.forEach(Cursor::destroy);
-    }
-
     @Override
     protected void updateImage(double scale, int xhot, int yhot) {
-        super.updateImage(scale, xhot, yhot);
-        applyToFrames(cursor -> cursor.updateImage(scale, xhot, yhot));
+        if (!this.isLoaded() || pixels == null) {
+            return;
+        }
+
+        try (NativeImage image = NativeImage.read(this.pixels)) {
+            Config.Settings settings = new Config.Settings(scale, xhot, yhot, this.isEnabled(), this.isAnimated());
+            int availableFrames = image.getHeight() / this.getTextureWidth();
+
+            Map<Integer, FrameCursor> newCursors = createCursors(image, settings, availableFrames);
+            FrameData[] newFrames = createFrames(this.animation, newCursors, availableFrames).toArray(FrameData[]::new);
+
+            super.loadImage(image, settings);
+
+            this.frames = newFrames;
+            FrameCursor[] oldCursors = this.cursors;
+            this.cursors = newCursors.values().toArray(FrameCursor[]::new);
+
+            for (int i = 0; i < oldCursors.length; i++) {
+                if (i < this.cursors.length) this.cursors[i].notifyOnLoad();
+                oldCursors[i].destroy();
+            }
+        } catch (IOException e) {
+            MinecraftCursor.LOGGER.error("[minecraft-cursor] Failed to update animated cursor image. ", e);
+        }
     }
 
     private void applyToFrames(Consumer<Cursor> action) {
-        for (Cursor cursor : cursors.values()) {
-            action.accept(cursor);
-        }
+        SettingsUtil.forEach(this.cursors, action);
     }
 
     public int getFrameCount() {
-        return Math.max(frames.size(), 1);
+        return Math.max(frames.length, 1);
     }
 
     public FrameData getFrame(int index) {
-        try {
-            FrameData frame = frames.get(index);
-            if (!isAnimated() || frame.cursor() == null || !frame.cursor().isEnabled()) {
-                return getFallbackFrame();
-            }
-            return frame;
-        } catch (IndexOutOfBoundsException e) {
+        if (!isAnimated() || index < 0 || index >= frames.length) {
             return getFallbackFrame();
         }
+
+        FrameData frame = frames[index];
+        if (frame.cursor() == null || !frame.cursor().isEnabled()) {
+            return getFallbackFrame();
+        }
+        return frame;
     }
 
     public FrameData nextFrame(AnimationState state) {
@@ -172,7 +198,7 @@ public class AnimatedCursor extends Cursor {
         private final int textureIndex;
 
         private FrameCursor(int textureIndex) {
-            super(AnimatedCursor.this);
+            super(AnimatedCursor.this, false);
             this.textureIndex = textureIndex;
         }
 
