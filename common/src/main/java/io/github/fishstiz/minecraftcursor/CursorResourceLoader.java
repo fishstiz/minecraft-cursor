@@ -27,7 +27,7 @@ public class CursorResourceLoader {
     private static final String ANIMATION_TYPE = ".mcmeta";
     private static final ResourceLocation SETTINGS_LOCATION = MinecraftCursor.loc("atlases/cursors.json");
     private static final ResourceLocation DIR = MinecraftCursor.loc("textures/cursors/");
-    private static Config.Resource resourceConfig;
+    private static volatile Config.Resource resourceConfig;
 
     private CursorResourceLoader() {
     }
@@ -36,15 +36,24 @@ public class CursorResourceLoader {
         return DIR;
     }
 
-    static void reload(ResourceManager manager) {
+    static void reloadSettings(ResourceManager manager) {
         onReload();
         loadResourceSettings(manager);
-        loadCursorTextures(manager);
         Minecraft.getInstance().execute(CursorResourceLoader::onReload);
     }
 
     public static void reload() {
-        reload(Minecraft.getInstance().getResourceManager());
+        ResourceManager manager = Minecraft.getInstance().getResourceManager();
+
+        onReload();
+        loadResourceSettings(manager);
+
+        for (Cursor cursor : CursorManager.INSTANCE.getCursors()) {
+            Config.Settings settings = CONFIG.getOrCreateSettings(cursor);
+            loadCursorTexture(manager, cursor, settings);
+        }
+
+        onReload();
     }
 
     static void onReload() {
@@ -62,6 +71,8 @@ public class CursorResourceLoader {
             }
             resourceConfig = config;
         });
+
+        CursorManager.INSTANCE.getCursors().forEach(cursor -> cursor.setLazy(true));
     }
 
     private static Optional<Config.Resource> getLayeredSettings(List<Resource> configResources) {
@@ -108,23 +119,17 @@ public class CursorResourceLoader {
         }
     }
 
-    private static void loadCursorTextures(ResourceManager manager) {
-        for (Cursor cursor : CursorManager.INSTANCE.getCursors()) {
-            Config.Settings settings = CONFIG.getOrCreateSettings(cursor);
-
-            if (!CONFIG.isDeferredLoading() || settings.isEnabled()) {
-                loadCursorTexture(manager, cursor, settings);
-            } else {
-                LOGGER.info("[minecraft-cursor] Skipped loading of disabled cursor '{}'.", cursor.getTypeKey());
-            }
-        }
-    }
-
     public static boolean loadCursorTexture(ResourceManager manager, Cursor cursor) {
         return loadCursorTexture(manager, cursor, CONFIG.getOrCreateSettings(cursor));
     }
 
+    public static boolean loadCursorTexture(Cursor cursor) {
+        return loadCursorTexture(Minecraft.getInstance().getResourceManager(), cursor);
+    }
+
     private static boolean loadCursorTexture(ResourceManager manager, Cursor cursor, Config.Settings settings) {
+        LOGGER.info("[minecraft-cursor] Loading {} cursor...", cursor.getTypeKey());
+
         ResourceLocation location = cursor.getLocation();
         Optional<Resource> cursorResource = manager.getResource(location);
 
@@ -137,7 +142,7 @@ public class CursorResourceLoader {
 
             try (InputStream cursorStream = cursorResource.get().open(); NativeImage image = NativeImage.read(cursorStream)) {
                 AnimationData animation = loadAnimation(manager, location, cursorResource.get());
-                CursorManager.INSTANCE.loadCursor(cursor, image, CONFIG.getGlobal().apply(settings), animation);
+                cursor = CursorManager.INSTANCE.loadCursor(cursor, image, CONFIG.getGlobal().apply(settings), animation);
                 return true;
             } catch (IOException e) {
                 LOGGER.error("[minecraft-cursor] Failed to load cursor at '{}': {}", location, e.getMessage());
@@ -145,6 +150,7 @@ public class CursorResourceLoader {
             }
         } finally {
             Minecraft.getInstance().execute(() -> Minecraft.getInstance().getTextureManager().release(location));
+            cursor.setLazy(false);
         }
     }
 

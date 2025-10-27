@@ -34,8 +34,6 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
     private static final Tooltip YHOT_TOOLTIP = createGlobalTooltip(YHOT_TEXT);
     private static final Component ANIMATIONS_TEXT = Component.translatable("minecraft-cursor.options.global.animation");
     private static final Tooltip ANIMATIONS_INFO = Tooltip.create(Component.translatable("minecraft-cursor.options.global.animation.tooltip"));
-    private static final Component DEFERRED_LOADING_TEXT = Component.translatable("minecraft-cursor.options.global.deferred_loading");
-    private static final Tooltip DEFERRED_LOADING_INFO = Tooltip.create(Component.translatable("minecraft-cursor.options.global.deferred_loading.tooltip"));
     private static final Component RESET_TEXT = Component.translatable("minecraft-cursor.options.resource_pack.reset");
     private static final Tooltip RESET_INFO = Tooltip.create(Component.translatable("minecraft-cursor.options.resource_pack.reset.tooltip"));
     private static final int PREVIEW_BUTTON_SIZE = 20;
@@ -118,13 +116,6 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
                 this.index(ANIMATIONS_TEXT),
                 ANIMATIONS_INFO,
                 this.hasAnimationAny()
-        );
-        this.optionList.addToggle(
-                CONFIG.isDeferredLoading(),
-                CONFIG::setDeferredLoading,
-                this.index(DEFERRED_LOADING_TEXT),
-                DEFERRED_LOADING_INFO,
-                true
         );
         this.optionList.addWidget(
                 new ButtonWidget(
