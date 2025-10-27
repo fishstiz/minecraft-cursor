@@ -27,6 +27,7 @@ public class Cursor {
     private final @Nullable Consumer<Cursor> onLoad;
     private final CursorType type;
     private final ResourceLocation location;
+    private final boolean editable; // band-aid field. Cursor should've been an interface, see v4 CursorTexture.
     private Component text;
     private byte[] pixels;
     private double scale;
@@ -38,14 +39,19 @@ public class Cursor {
     private int textureHeight;
     private long id = MemoryUtil.NULL;
 
-    Cursor(CursorType type, @Nullable Consumer<Cursor> onLoad) {
+    Cursor(CursorType type, @Nullable Consumer<Cursor> onLoad, boolean editable) {
         this.type = type;
         this.onLoad = onLoad;
         this.location = CursorResourceLoader.getDirectory().withSuffix(type.getKey() + IMG_TYPE);
+        this.editable = editable;
     }
 
-    Cursor(Cursor cursor) {
-        this(cursor.type, cursor.onLoad);
+    Cursor(CursorType type, @Nullable Consumer<Cursor> onLoad) {
+        this(type, onLoad, true);
+    }
+
+    protected Cursor(Cursor cursor, boolean editable) {
+        this(cursor.type, cursor.onLoad, editable);
     }
 
     void loadImage(@NotNull NativeImage image, Config.Settings settings) throws IOException {
@@ -62,12 +68,16 @@ public class Cursor {
                 }
 
                 NativeImage validImage = croppedImage != null ? croppedImage : image;
-                this.pixels = NativeImageUtil.getBytes(validImage);
+
+                create(validImage, settings.getScale(), settings.getXHot(), settings.getYHot());
+
                 this.enabled = settings.isEnabled();
                 this.textureWidth = imageWidth;
                 this.textureHeight = imageHeight;
 
-                create(validImage, settings.getScale(), settings.getXHot(), settings.getYHot());
+                if (this.editable) {
+                    this.pixels = NativeImageUtil.getBytes(validImage);
+                }
             } finally {
                 if (croppedImage != null) {
                     croppedImage.close();
@@ -80,11 +90,11 @@ public class Cursor {
     }
 
     protected void updateImage(double scale, int xhot, int yhot) {
-        if (!this.isLoaded() || this.pixels == null) {
+        if (!this.editable || !this.isLoaded() || pixels == null) {
             return;
         }
 
-        try (NativeImage image = NativeImage.read(this.pixels)) {
+        try (NativeImage image = NativeImage.read(pixels)) {
             create(image, scale, xhot, yhot);
         } catch (IOException e) {
             MinecraftCursor.LOGGER.error("Error updating image of {}: {}", type, e);
@@ -95,21 +105,28 @@ public class Cursor {
         scale = sanitizeScale(scale);
         xhot = sanitizeHotspot(xhot, image.getWidth());
         yhot = sanitizeHotspot(yhot, image.getWidth());
+        double autoScaled = getAutoScale(scale);
 
         long glfwImageAddress = MemoryUtil.NULL;
         long previousId = this.id;
         ByteBuffer pixels = null;
+        NativeImage scaledImage = null;
 
-        double autoScaled = getAutoScale(scale);
-        try (NativeImage scaledImage = scale == 1 ? image : NativeImageUtil.scaleImage(image, autoScaled)) {
+        try {
+            NativeImage validImage = image;
+            if (scale != 1) {
+                scaledImage = NativeImageUtil.scaleImage(image, autoScaled);
+                validImage = scaledImage;
+            }
+
             int scaledXHot = scale == 1 ? xhot : (int) Math.round(xhot * autoScaled);
             int scaledYHot = scale == 1 ? yhot : (int) Math.round(yhot * autoScaled);
-            int scaledWidth = scaledImage.getWidth();
-            int scaledHeight = scaledImage.getHeight();
+            int scaledWidth = validImage.getWidth();
+            int scaledHeight = validImage.getHeight();
 
             GLFWImage glfwImage = GLFWImage.create();
             pixels = MemoryUtil.memAlloc(scaledWidth * scaledHeight * 4);
-            NativeImageUtil.writePixelsRGBA(scaledImage, pixels);
+            NativeImageUtil.writePixelsRGBA(validImage, pixels);
             glfwImage.set(scaledWidth, scaledHeight, pixels);
 
             glfwImageAddress = glfwImage.address();
@@ -126,10 +143,11 @@ public class Cursor {
             this.xhot = xhot;
             this.yhot = yhot;
 
-            if (this.onLoad != null) {
-                this.onLoad.accept(this);
-            }
+            this.notifyOnLoad();
         } finally {
+            if (scaledImage != null) {
+                scaledImage.close();
+            }
             if (pixels != null) {
                 MemoryUtil.memFree(pixels);
             }
@@ -152,6 +170,12 @@ public class Cursor {
         }
     }
 
+    protected void notifyOnLoad() {
+        if (this.onLoad != null) {
+            this.onLoad.accept(this);
+        }
+    }
+
     public void reload() {
         if (this.isLoaded()) {
             this.updateImage(this.getScale(), this.getXHot(), this.getYHot());
@@ -167,8 +191,8 @@ public class Cursor {
         boolean previous = this.enabled;
         this.enabled = enabled;
 
-        if (previous != this.enabled && this.isLoaded() && this.onLoad != null) {
-            this.onLoad.accept(this);
+        if (previous != this.enabled && this.isLoaded()) {
+            this.notifyOnLoad();
         }
     }
 
