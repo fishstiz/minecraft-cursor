@@ -38,6 +38,7 @@ public class Cursor {
     private int textureWidth;
     private int textureHeight;
     private long id = MemoryUtil.NULL;
+    private volatile boolean lazy;
 
     Cursor(CursorType type, @Nullable Consumer<Cursor> onLoad, boolean editable) {
         this.type = type;
@@ -257,6 +258,14 @@ public class Cursor {
 
     public boolean isLoaded() {
         return this.loaded && this.id != MemoryUtil.NULL;
+    }
+
+    public boolean isLazy() {
+        return this.lazy;
+    }
+
+    public void setLazy(boolean lazy) {
+        this.lazy = lazy;
     }
 
     public int getTextureIndex() {

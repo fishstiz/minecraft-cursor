@@ -203,6 +203,11 @@ public class AnimatedCursor extends Cursor {
         }
 
         @Override
+        public boolean isLazy() {
+            return false;
+        }
+
+        @Override
         public int getTextureIndex() {
             return this.textureIndex;
         }
