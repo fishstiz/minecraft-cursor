@@ -121,8 +121,6 @@ public class CursorResourceLoader {
     }
 
     private static boolean loadCursorTexture(ResourceManager manager, Cursor cursor, Config.Settings settings) {
-        LOGGER.info("[minecraft-cursor] Loading cursor '{}'...", cursor.getTypeKey());
-
         ResourceLocation location = cursor.getLocation();
         Optional<Resource> cursorResource = manager.getResource(location);
 
