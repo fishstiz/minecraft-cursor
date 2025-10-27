@@ -39,6 +39,7 @@ public class CursorResourceLoader {
     static void reloadSettings(ResourceManager manager) {
         onReload();
         loadResourceSettings(manager);
+        CursorManager.INSTANCE.getCursors().forEach(cursor -> cursor.setLazy(true));
         Minecraft.getInstance().execute(() -> {
             onReload();
             CursorManager.INSTANCE.reapplyCursor();
@@ -47,17 +48,12 @@ public class CursorResourceLoader {
 
     public static void reload() {
         ResourceManager manager = Minecraft.getInstance().getResourceManager();
-
-        onReload();
         loadResourceSettings(manager);
-
         for (Cursor cursor : CursorManager.INSTANCE.getCursors()) {
             Config.Settings settings = CONFIG.getOrCreateSettings(cursor);
             loadCursorTexture(manager, cursor, settings);
         }
-
-        onReload();
-        CursorManager.INSTANCE.reapplyCursor();
+        Minecraft.getInstance().execute(CursorManager.INSTANCE::reapplyCursor);
     }
 
     static void onReload() {
@@ -75,8 +71,6 @@ public class CursorResourceLoader {
             }
             resourceConfig = config;
         });
-
-        CursorManager.INSTANCE.getCursors().forEach(cursor -> cursor.setLazy(true));
     }
 
     private static Optional<Config.Resource> getLayeredSettings(List<Resource> configResources) {
