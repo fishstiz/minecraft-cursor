@@ -92,17 +92,3 @@ jar {
             "MixinConfigs": "${mod_id}.mixins.json,${mod_id}.forge.mixins.json"
     ])
 }
-
-processResources {
-    doLast {
-        def mixinConfigFile = file("${sourceSets.main.output.resourcesDir}/${mod_id}.mixins.json")
-        if (mixinConfigFile.exists()) {
-            def jsonSlurper = new JsonSlurper()
-            def mixinConfig = jsonSlurper.parse(mixinConfigFile)
-
-            mixinConfig.remove("refmap")
-
-            mixinConfigFile.text = JsonOutput.prettyPrint(JsonOutput.toJson(mixinConfig))
-        }
-    }
-}
