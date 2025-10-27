@@ -36,11 +36,15 @@ public class CursorResourceLoader {
         return DIR;
     }
 
-    public static void reload(ResourceManager manager) {
+    static void reload(ResourceManager manager) {
         onReload();
         loadResourceSettings(manager);
         loadCursorTextures(manager);
         Minecraft.getInstance().execute(CursorResourceLoader::onReload);
+    }
+
+    public static void reload() {
+        reload(Minecraft.getInstance().getResourceManager());
     }
 
     static void onReload() {
