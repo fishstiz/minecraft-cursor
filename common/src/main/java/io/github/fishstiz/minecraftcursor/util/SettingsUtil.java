@@ -4,6 +4,7 @@ import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.config.Config;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.OptionInstance;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -50,7 +51,18 @@ public class SettingsUtil {
     }
 
     public static double getAutoScale(double scale) {
-        return isAutoScale(scale) ? Minecraft.getInstance().getWindow().getGuiScale() : scale;
+        if (isAutoScale(scale)) {
+            OptionInstance<Integer> guiScale = Minecraft.getInstance().options.guiScale();
+            int max = Integer.MAX_VALUE;
+            int guiScaleValue = guiScale.get();
+
+            if (guiScale.values() instanceof OptionInstance.ClampingLazyMaxIntRange range) {
+                max = range.maxInclusive();
+            }
+
+            return guiScaleValue != 0 ? Math.min(max, guiScaleValue) : Minecraft.getInstance().getWindow().getGuiScale();
+        }
+        return scale;
     }
 
     public static double sanitizeScale(double scale) {
