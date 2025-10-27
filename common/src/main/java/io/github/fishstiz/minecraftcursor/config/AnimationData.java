@@ -5,13 +5,14 @@ import io.github.fishstiz.minecraftcursor.cursor.AnimationMode;
 
 import java.io.Serializable;
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.List;
 
 public class AnimationData implements Serializable {
     private static final int MIN_TIME = 1;
     public final AnimationMode mode;
     private final int frametime;
-    private final List<Frame> frames = List.of();
+    private final List<Frame> frames = Collections.emptyList();
 
     public AnimationData() {
         this.mode = AnimationMode.LOOP;
