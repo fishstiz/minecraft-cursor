@@ -60,7 +60,7 @@ public final class ElementWalker {
      */
     private static boolean hovered(GuiEventListener guiEventListener, double mouseX, double mouseY) {
         if (guiEventListener instanceof AbstractWidget widget) {
-            return widget.visible && widget.isHovered();
+            return widget.visible && widget.isHovered() && widget.isMouseOver(mouseX, mouseY);
         }
         return guiEventListener.isMouseOver(mouseX, mouseY);
     }
