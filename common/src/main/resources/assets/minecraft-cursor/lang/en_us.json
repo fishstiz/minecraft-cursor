@@ -40,6 +40,7 @@
 
   "minecraft-cursor.options.global.animation": "Cursor Animations",
   "minecraft-cursor.options.global.animation.tooltip": "Simply updates the animated setting on all animated cursors.",
+  "cursors_extended.options.global.deferred_loading.fail": "Failed to load cursor '%1$s'",
 
   "minecraft-cursor.options.adapt": "Adaptive Cursor",
   "minecraft-cursor.options.adapt.tooltip": "Simply updates the enabled setting on all cursors except for the Default cursor.",
