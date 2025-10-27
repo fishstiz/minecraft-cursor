@@ -10,6 +10,7 @@ import io.github.fishstiz.minecraftcursor.gui.CursorAnimationHelper;
 import io.github.fishstiz.minecraftcursor.gui.screen.panel.*;
 import io.github.fishstiz.minecraftcursor.gui.widget.ContainerEventHandlerPatch;
 import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.layouts.LayoutElement;
@@ -72,7 +73,7 @@ public class ConfigurationScreen extends CatalogBrowserScreen implements Contain
 
         this.getRefreshButton().active = false;
         CursorController.getInstance().overrideCursor(CursorType.BUSY, BUSY_OVERRIDE);
-        this.refreshFuture = CompletableFuture.runAsync(() -> CursorResourceLoader.reload(Objects.requireNonNull(this.minecraft).getResourceManager()))
+        this.refreshFuture = CompletableFuture.runAsync(CursorResourceLoader::reload, Util.backgroundExecutor())
                 .thenRunAsync(
                         () -> {
                             this.addCursorItems();
