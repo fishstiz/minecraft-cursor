@@ -28,7 +28,7 @@ public class Cursor {
     private final CursorType type;
     private final ResourceLocation location;
     private Component text;
-    private String base64Image;
+    private byte[] pixels;
     private double scale;
     private int xhot;
     private int yhot;
@@ -62,7 +62,7 @@ public class Cursor {
                 }
 
                 NativeImage validImage = croppedImage != null ? croppedImage : image;
-                this.base64Image = NativeImageUtil.toBase64String(validImage);
+                this.pixels = NativeImageUtil.getBytes(validImage);
                 this.enabled = settings.isEnabled();
                 this.textureWidth = imageWidth;
                 this.textureHeight = imageHeight;
@@ -80,11 +80,11 @@ public class Cursor {
     }
 
     protected void updateImage(double scale, int xhot, int yhot) {
-        if (!this.isLoaded()) {
+        if (!this.isLoaded() || this.pixels == null) {
             return;
         }
 
-        try (NativeImage image = NativeImageUtil.fromBase64String(base64Image)) {
+        try (NativeImage image = NativeImage.read(this.pixels)) {
             create(image, scale, xhot, yhot);
         } catch (IOException e) {
             MinecraftCursor.LOGGER.error("Error updating image of {}: {}", type, e);
@@ -146,6 +146,9 @@ public class Cursor {
         if (this.id != MemoryUtil.NULL) {
             GLFW.glfwDestroyCursor(this.id);
             this.id = MemoryUtil.NULL;
+        }
+        if (this.pixels != null) {
+            this.pixels = null;
         }
     }
 
