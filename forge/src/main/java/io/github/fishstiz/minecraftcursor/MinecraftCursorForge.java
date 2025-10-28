@@ -44,7 +44,8 @@ public class MinecraftCursorForge {
     public static class ClientModEvents {
         @SubscribeEvent
         public static void addPackFinder(AddPackFindersEvent event) {
-            ResourceLocation location = ResourceLocation.fromNamespaceAndPath(MOD_ID, "resourcepacks/cursors_extended");
+            @SuppressWarnings("removal")
+            ResourceLocation location = new ResourceLocation(MOD_ID, "resourcepacks/cursors_extended");
             String packId = "mod/" + location;
 
             IModInfo modInfo = ModList.get().getModContainerById(MOD_ID).map(ModContainer::getModInfo).orElseThrow();
