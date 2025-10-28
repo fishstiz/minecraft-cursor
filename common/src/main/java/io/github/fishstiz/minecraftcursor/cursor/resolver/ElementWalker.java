@@ -59,10 +59,19 @@ public final class ElementWalker {
      * returns false if {@link AbstractWidget#active} is {@code false}.
      */
     private static boolean hovered(GuiEventListener guiEventListener, double mouseX, double mouseY) {
-        if (guiEventListener instanceof AbstractWidget widget) {
-            return widget.visible && widget.isHovered() && widget.isMouseOver(mouseX, mouseY);
-        }
-        return guiEventListener.isMouseOver(mouseX, mouseY);
+        return guiEventListener instanceof AbstractWidget widget
+                ? widgetHovered(widget, mouseX, mouseY)
+                : guiEventListener.isMouseOver(mouseX, mouseY);
+    }
+
+    private static boolean widgetHovered(AbstractWidget widget, double mouseX, double mouseY) {
+        return widget.visible &&
+               widget.isHovered() &&
+               mouseX >= widget.getX() &&
+               mouseY >= widget.getY() &&
+               mouseX < (widget.getX() + widget.getWidth()) &&
+               mouseY < (widget.getY() + widget.getHeight());
+
     }
 
     @FunctionalInterface
