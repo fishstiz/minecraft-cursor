@@ -17,8 +17,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -46,7 +44,20 @@ public class ConfigurationScreen extends CatalogBrowserScreen {
     }
 
     @Override
+    public void added() {
+        for (Cursor cursor : CursorManager.INSTANCE.getCursors()) {
+            if (cursor.isLazy()) {
+                CursorResourceLoader.loadCursorTexture(cursor);
+            }
+        }
+    }
+
+    @Override
     public void onClose() {
+        if (this.refreshFuture != null) {
+            this.refreshFuture.join();
+        }
+
         CursorController.getInstance().removeOverride(BUSY_OVERRIDE);
         MinecraftCursor.CONFIG.save();
         super.onClose();
@@ -54,15 +65,6 @@ public class ConfigurationScreen extends CatalogBrowserScreen {
 
     @Override
     protected void initItems() {
-        Collection<Cursor> cursors = CursorManager.INSTANCE.getCursors();
-        List<CompletableFuture<Void>> futures = new ArrayList<>(cursors.size());
-        for (Cursor cursor : cursors) {
-            if (cursor.isLazy()) {
-                futures.add(CompletableFuture.runAsync(() -> CursorResourceLoader.loadCursorTexture(cursor), Util.backgroundExecutor()));
-            }
-        }
-        CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new)).join();
-
         this.addGlobalItems();
         this.addAdaptiveItems();
         this.addCursorItems();
