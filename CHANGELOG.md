@@ -1,7 +1,1 @@
-- Reduced hovered element false positives
-- Reduced memory usage of cursors
-- Removed refmap warning on NeoForge
-- Backported changes:
-  - Added built-in resource pack with the Cursors Extended textures ([#42](https://github.com/fishstiz/minecraft-cursor/issues/42)).
-  - Cursors are now loaded lazily (removed deferred loading option)
-  - Added Ukrainian Translation ([#39](https://github.com/fishstiz/minecraft-cursor/pull/39) by StarmanMine142)
+- Hotfix: Fixed disabled widgets no longer being detected.
