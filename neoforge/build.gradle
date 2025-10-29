@@ -69,14 +69,18 @@ neoForge {
     }
 }
 
+configurations {
+    runtimeClasspath.extendsFrom localRuntime
+}
+
 dependencies {
     jarJar(api project(":commonApi"))
 
     compileOnly "dev.ftb.mods:ftb-library-neoforge:$ftb_library_version"
-    runtimeOnly "dev.ftb.mods:ftb-library-neoforge:$ftb_library_version"
-    runtimeOnly "dev.ftb.mods:ftb-quests-neoforge:$ftb_quests_version"
-    runtimeOnly "dev.ftb.mods:ftb-teams-neoforge:$ftb_teams_version"
-    runtimeOnly "dev.architectury:architectury-neoforge:$architectury_version"
+    localRuntime "dev.ftb.mods:ftb-library-neoforge:$ftb_library_version"
+    localRuntime "dev.ftb.mods:ftb-quests-neoforge:$ftb_quests_version"
+    localRuntime "dev.ftb.mods:ftb-teams-neoforge:$ftb_teams_version"
+    localRuntime "dev.architectury:architectury-neoforge:$architectury_version"
 
     compileOnly "maven.modrinth:owo-lib:$owo_version"
 }
