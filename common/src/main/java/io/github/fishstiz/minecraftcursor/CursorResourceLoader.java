@@ -39,7 +39,10 @@ public class CursorResourceLoader {
     static void reloadSettings(ResourceManager manager) {
         onReload();
         loadResourceSettings(manager);
-        CursorManager.INSTANCE.getCursors().forEach(cursor -> cursor.setLazy(true));
+        CursorManager.INSTANCE.getCursors().forEach(cursor -> {
+            cursor.destroy();
+            cursor.setLazy(true);
+        });
         Minecraft.getInstance().execute(() -> {
             onReload();
             CursorManager.INSTANCE.reapplyCursor();
