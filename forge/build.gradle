@@ -65,6 +65,14 @@ legacyForge {
     }
 }
 
+configurations {
+    runtimeClasspath.extendsFrom localRuntime
+}
+
+obfuscation {
+    createRemappingConfiguration(configurations.localRuntime)
+}
+
 dependencies {
     api project(":commonApi")
     jarJar(project(":commonApi"))
@@ -74,10 +82,10 @@ dependencies {
     implementation 'org.jetbrains:annotations:26.0.2'
 
     modCompileOnly "dev.ftb.mods:ftb-library-forge:$ftb_library_version"
-    modRuntimeOnly "dev.ftb.mods:ftb-library-forge:$ftb_library_version"
-    modRuntimeOnly "dev.ftb.mods:ftb-quests-forge:$ftb_quests_version"
-    modRuntimeOnly "dev.ftb.mods:ftb-teams-forge:$ftb_teams_version"
-    modRuntimeOnly "dev.architectury:architectury-forge:$architectury_version"
+    modLocalRuntime "dev.ftb.mods:ftb-library-forge:$ftb_library_version"
+    modLocalRuntime "dev.ftb.mods:ftb-quests-forge:$ftb_quests_version"
+    modLocalRuntime "dev.ftb.mods:ftb-teams-forge:$ftb_teams_version"
+    modLocalRuntime "dev.architectury:architectury-forge:$architectury_version"
 }
 
 mixin {
