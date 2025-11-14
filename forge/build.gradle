@@ -79,7 +79,7 @@ dependencies {
 
     annotationProcessor 'org.spongepowered:mixin:0.8.7:processor'
 
-    implementation 'org.jetbrains:annotations:26.0.2'
+    compileOnly 'org.jetbrains:annotations:26.0.2'
 
     modCompileOnly "dev.ftb.mods:ftb-library-forge:$ftb_library_version"
     modLocalRuntime "dev.ftb.mods:ftb-library-forge:$ftb_library_version"
