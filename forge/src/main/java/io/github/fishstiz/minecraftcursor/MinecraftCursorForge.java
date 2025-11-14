@@ -44,6 +44,10 @@ public class MinecraftCursorForge {
     public static class ClientModEvents {
         @SubscribeEvent
         public static void addPackFinder(AddPackFindersEvent event) {
+            if (event.getPackType() != PackType.CLIENT_RESOURCES) {
+                return;
+            }
+
             @SuppressWarnings("removal")
             ResourceLocation location = new ResourceLocation(MOD_ID, "resourcepacks/cursors_extended");
             String packId = "mod/" + location;
