@@ -29,21 +29,30 @@ public class AnimatedCursor extends Cursor {
     void loadImage(NativeImage image, Config.Settings settings, AnimationData animation) throws IOException {
         super.loadImage(image, settings);
 
-        int availableFrames = image.getHeight() / this.getTextureWidth();
+        Map<Integer, FrameCursor> newCursors = null;
+        try {
+            int availableFrames = image.getHeight() / this.getTextureWidth();
 
-        Map<Integer, FrameCursor> newCursors = createCursors(image, settings, availableFrames);
+            newCursors = createCursors(image, settings, availableFrames);
 
-        this.setAnimated(settings.isAnimated());
-        this.fallbackFrame = new FrameData(this, 1);
-        this.mode = animation.mode;
-        this.frames = createFrames(animation, newCursors, availableFrames).toArray(FrameData[]::new);
+            this.setAnimated(settings.isAnimated());
+            this.fallbackFrame = new FrameData(this, 1);
+            this.mode = animation.mode;
+            this.frames = createFrames(animation, newCursors, availableFrames).toArray(FrameData[]::new);
 
-        FrameCursor[] oldCursors = this.cursors;
-        this.cursors = newCursors.values().toArray(FrameCursor[]::new);
-        SettingsUtil.forEach(oldCursors, Cursor::destroy);
+            FrameCursor[] oldCursors = this.cursors;
+            this.cursors = newCursors.values().toArray(FrameCursor[]::new);
+            SettingsUtil.forEach(oldCursors, Cursor::destroy);
 
-        this.animation = animation;
-        this.pixels = NativeImageUtil.getBytes(image);
+            this.animation = animation;
+            this.pixels = NativeImageUtil.getBytes(image);
+        } catch (Exception e) {
+            if (newCursors != null) {
+                newCursors.values().forEach(Cursor::destroy);
+            }
+            this.destroy();
+            throw e;
+        }
     }
 
     private Map<Integer, FrameCursor> createCursors(NativeImage image, Config.Settings settings, int availableFrames) throws IOException {
@@ -109,10 +118,8 @@ public class AnimatedCursor extends Cursor {
             FrameCursor[] oldCursors = this.cursors;
             this.cursors = newCursors.values().toArray(FrameCursor[]::new);
 
-            for (int i = 0; i < oldCursors.length; i++) {
-                if (i < this.cursors.length) this.cursors[i].notifyOnLoad();
-                oldCursors[i].destroy();
-            }
+            SettingsUtil.forEach(this.cursors, Cursor::notifyOnLoad);
+            SettingsUtil.forEach(oldCursors, Cursor::destroy);
         } catch (IOException e) {
             MinecraftCursor.LOGGER.error("[minecraft-cursor] Failed to update animated cursor image. ", e);
         }
@@ -170,6 +177,7 @@ public class AnimatedCursor extends Cursor {
     public void destroy() {
         super.destroy();
         applyToFrames(Cursor::destroy);
+        this.pixels = null;
     }
 
     @Override
