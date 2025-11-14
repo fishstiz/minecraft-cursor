@@ -95,6 +95,7 @@ public final class CursorTypeResolver implements ElementRegistrar {
                         "Could not get cursor type for element: {}",
                         Services.PLATFORM.unmapClassName("intermediary", elementName)
                 );
+                cache.put(elementClass, (_e, _x, _y) -> CursorType.DEFAULT_FORCE);
             }
         }
         return CursorType.DEFAULT;
