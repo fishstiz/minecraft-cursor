@@ -54,6 +54,7 @@ public class CursorResourceLoader {
         loadResourceSettings(manager);
         for (Cursor cursor : CursorManager.INSTANCE.getCursors()) {
             Config.Settings settings = CONFIG.getOrCreateSettings(cursor);
+            cursor.destroy();
             loadCursorTexture(manager, cursor, settings);
         }
         Minecraft.getInstance().execute(CursorManager.INSTANCE::reapplyCursor);
