@@ -142,8 +142,9 @@ public class CursorResourceLoader {
                 AnimationData animation = loadAnimation(manager, location, cursorResource.get());
                 cursor = CursorManager.INSTANCE.loadCursor(cursor, image, CONFIG.getGlobal().apply(settings), animation);
                 return true;
-            } catch (IOException e) {
+            } catch (Exception e) {
                 LOGGER.error("[minecraft-cursor] Failed to load cursor at '{}': {}", location, e.getMessage());
+                cursor.destroy();
                 return false;
             }
         } finally {
