@@ -95,7 +95,7 @@ public class Cursor {
             return;
         }
 
-        try (NativeImage image = NativeImage.read(pixels)) {
+        try (NativeImage image = NativeImageUtil.readLarge(pixels)) {
             create(image, scale, xhot, yhot);
         } catch (IOException e) {
             MinecraftCursor.LOGGER.error("Error updating image of {}: {}", type, e);

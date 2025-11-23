@@ -111,7 +111,7 @@ public class AnimatedCursor extends Cursor {
             return;
         }
 
-        try (NativeImage image = NativeImage.read(this.pixels)) {
+        try (NativeImage image = NativeImageUtil.readLarge(this.pixels)) {
             Config.Settings settings = new Config.Settings(scale, xhot, yhot, this.isEnabled(), this.isAnimated());
             int availableFrames = image.getHeight() / this.getTextureWidth();
 
