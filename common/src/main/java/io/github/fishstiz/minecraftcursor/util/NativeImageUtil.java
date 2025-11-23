@@ -3,6 +3,7 @@ package io.github.fishstiz.minecraftcursor.util;
 import com.mojang.blaze3d.platform.NativeImage;
 import io.github.fishstiz.minecraftcursor.MinecraftCursor;
 import io.github.fishstiz.minecraftcursor.mixin.NativeImageAccess;
+import org.lwjgl.system.MemoryUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -68,6 +69,20 @@ public class NativeImageUtil {
         }
 
         buffer.flip();
+    }
+
+    public static NativeImage readLarge(byte[] bytes) throws IOException {
+        ByteBuffer buffer = null;
+        try {
+            buffer = MemoryUtil.memAlloc(bytes.length);
+            buffer.put(bytes);
+            buffer.rewind();
+            return NativeImage.read(buffer);
+        } finally {
+            if (buffer != null) {
+                MemoryUtil.memFree(buffer);
+            }
+        }
     }
 
     public static byte[] getBytes(NativeImage image) throws IOException {
