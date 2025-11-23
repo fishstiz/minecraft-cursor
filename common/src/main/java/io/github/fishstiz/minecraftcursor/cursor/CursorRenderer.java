@@ -1,5 +1,6 @@
 package io.github.fishstiz.minecraftcursor.cursor;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.fishstiz.minecraftcursor.util.CursorTypeUtil;
 import io.github.fishstiz.minecraftcursor.util.SettingsUtil;
@@ -84,6 +85,7 @@ sealed interface CursorRenderer permits CursorRenderer.Native, CursorRenderer.Vi
 
                 poseStack.pushPose();
                 poseStack.translate(0f,0f, Z);
+                RenderSystem.enableBlend();
                 guiGraphics.blit(
                         this.textureLocation,
                         x, y,
@@ -92,6 +94,7 @@ sealed interface CursorRenderer permits CursorRenderer.Native, CursorRenderer.Vi
                         this.textureWidth, this.textureWidth,
                         this.textureWidth, this.textureHeight
                 );
+                RenderSystem.disableBlend();
                 poseStack.popPose();
             }
         }

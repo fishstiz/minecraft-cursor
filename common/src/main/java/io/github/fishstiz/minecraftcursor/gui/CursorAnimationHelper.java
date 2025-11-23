@@ -1,5 +1,6 @@
 package io.github.fishstiz.minecraftcursor.gui;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.fishstiz.minecraftcursor.cursor.AnimatedCursor;
 import io.github.fishstiz.minecraftcursor.cursor.AnimationState;
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
@@ -23,6 +24,7 @@ public class CursorAnimationHelper {
             int cursorSize = cursor.getTextureWidth();
             float spriteIndex = cursor instanceof AnimatedCursor animatedCursor ? this.getCurrentSpriteIndex(animatedCursor) : 0;
 
+            RenderSystem.enableBlend();
             guiGraphics.blit(
                     cursor.getLocation(),
                     x, y,
@@ -31,6 +33,7 @@ public class CursorAnimationHelper {
                     cursorSize, cursorSize,
                     cursor.getTextureWidth(), cursor.getTextureHeight()
             );
+            RenderSystem.disableBlend();
         }
     }
 
