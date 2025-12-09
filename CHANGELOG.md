@@ -1,10 +1,2 @@
-- No longer crashes the game when an animated cursor fails to load in some cases.
-- Broader exception handling to minimize crashes when a cursor fails to load.
-- Forces the default cursor for an element if an error occurs while traversing the `GuiEventListener` tree.
-- Cleans up all cursor resources when reloading resources instead of only on lazy loading.
-
-For Forge version:
-
-- Fixed Cursors Extended resource pack appearing in the data pack selection screen.
-
-Please report any issues you encounter, especially crashes, to help improve this mod.
+- Fixed crash when updating the settings of larger cursor textures ([#44](https://github.com/fishstiz/minecraft-cursor/issues/44))
+- Fixed transparent pixels not rendering correctly in the settings screen or when in virtual mode
