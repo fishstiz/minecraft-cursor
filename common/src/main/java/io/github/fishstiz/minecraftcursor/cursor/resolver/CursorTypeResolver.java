@@ -7,16 +7,22 @@ import io.github.fishstiz.minecraftcursor.api.CursorType;
 import io.github.fishstiz.minecraftcursor.api.ElementRegistrar;
 import io.github.fishstiz.minecraftcursor.cursor.handler.InternalCursorProvider;
 import io.github.fishstiz.minecraftcursor.platform.Services;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 public final class CursorTypeResolver implements ElementRegistrar {
     public static final CursorTypeResolver INSTANCE = new CursorTypeResolver();
+    private static final CursorTypeFunction<?> ERROR_FALLBACK = (_e, _x, _y) -> CursorType.DEFAULT_FORCE;
+    private static final CursorTypeFunction<GuiEventListener> DEFAULT_MAPPER = ElementRegistrar::elementToDefault;
+    private static final Predicate<CursorType> NON_DEFAULT = type -> type != CursorType.DEFAULT;
+    private final CursorTypeFunction<ContainerEventHandler> parentResolver = this::resolveParent;
+    private final ElementWalker.Processor<CursorType> childResolver = this::resolveChild;
     private final List<ElementEntry<?>> registry = new ArrayList<>();
-    private final Map<Class<?>, CursorTypeFunction<?>> cache = new Object2ObjectOpenHashMap<>();
+    private final Map<Class<?>, CursorTypeFunction<?>> cache = new Reference2ReferenceOpenHashMap<>();
     private ElementInspector inspector = ElementInspector.NO_OP;
     private String lastFailedElement;
 
@@ -36,7 +42,6 @@ public final class CursorTypeResolver implements ElementRegistrar {
     @Override
     public <T extends GuiEventListener> void register(String className, CursorTypeFunction<T> cursorTypeFunction) {
         try {
-            @SuppressWarnings("unchecked")
             Class<T> elementClass = (Class<T>) Class.forName(Services.PLATFORM.mapClassName("intermediary", className));
             if (!GuiEventListener.class.isAssignableFrom(elementClass)) {
                 throw new ClassCastException(className + " is not a subclass of Element");
@@ -77,7 +82,6 @@ public final class CursorTypeResolver implements ElementRegistrar {
                 }
             }
 
-            @SuppressWarnings("unchecked")
             CursorType mapped = ((CursorTypeFunction<GuiEventListener>) mapper).getCursorType(element, mouseX, mouseY);
             if (mapped != null && !mapped.isDefault()) {
                 return mapped;
@@ -97,7 +101,7 @@ public final class CursorTypeResolver implements ElementRegistrar {
                         "Could not get cursor type for element: {}",
                         Services.PLATFORM.unmapClassName("intermediary", elementName)
                 );
-                cache.put(elementClass, (_e, _x, _y) -> CursorType.DEFAULT_FORCE);
+                cache.put(elementClass, ERROR_FALLBACK);
             }
         }
         return CursorType.DEFAULT;
@@ -111,13 +115,13 @@ public final class CursorTypeResolver implements ElementRegistrar {
             }
         }
         if (element instanceof ContainerEventHandler) {
-            return (CursorTypeFunction<ContainerEventHandler>) this::resolveParent;
+            return parentResolver;
         }
-        return ElementRegistrar::elementToDefault;
+        return DEFAULT_MAPPER;
     }
 
     private CursorType resolveParent(ContainerEventHandler parent, double mouseX, double mouseY) {
-        return ElementWalker.walk(parent, mouseX, mouseY, this::resolveChild, type -> !type.isDefault(), CursorType.DEFAULT);
+        return ElementWalker.walk(parent, mouseX, mouseY, childResolver, NON_DEFAULT, CursorType.DEFAULT);
     }
 
     private CursorType resolveChild(GuiEventListener child, double mouseX, double mouseY) {
