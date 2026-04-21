@@ -6,6 +6,10 @@ import java.nio.file.Path;
 import java.util.List;
 
 public interface PlatformHelper {
+    String getPlatform();
+
+    boolean isModLoaded(String id);
+
     boolean isDevelopmentEnvironment();
 
     Path getConfigDir();

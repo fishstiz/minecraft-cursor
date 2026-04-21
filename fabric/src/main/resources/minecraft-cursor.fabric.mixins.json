@@ -4,6 +4,9 @@
   "package": "io.github.fishstiz.minecraftcursor.mixin",
   "refmap": "${mod_id}.refmap.json",
   "compatibilityLevel": "JAVA_21",
+  "client": [
+    "compat.veil.VeilImGuiImplGlfwMixin"
+  ],
   "plugin": "io.github.fishstiz.minecraftcursor.FabricMixinConfigPlugin",
   "injectors": {
     "defaultRequire": 1

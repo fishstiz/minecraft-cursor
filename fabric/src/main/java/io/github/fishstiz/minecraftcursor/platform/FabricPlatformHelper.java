@@ -11,6 +11,16 @@ import static io.github.fishstiz.minecraftcursor.MinecraftCursor.MOD_ID;
 
 public class FabricPlatformHelper implements PlatformHelper {
     @Override
+    public String getPlatform() {
+        return "fabric";
+    }
+
+    @Override
+    public boolean isModLoaded(String id) {
+        return FabricLoader.getInstance().isModLoaded(id);
+    }
+
+    @Override
     public boolean isDevelopmentEnvironment() {
         return FabricLoader.getInstance().isDevelopmentEnvironment();
     }

@@ -31,13 +31,18 @@ public class NeoForgeMixinConfigPlugin implements IMixinConfigPlugin {
 
         final String mixinPackage = "io.github.fishstiz.minecraftcursor.mixin";
 
-        if (mixinClassName.startsWith(mixinPackage + ".compat.ftblibrary") && this.isModLoaded("ftblibrary")) {
-            this.applyCursorRemapping = true;
-            return true;
+        if (mixinClassName.startsWith(mixinPackage + ".compat.ftblibrary")) {
+            boolean loaded = isModLoaded("ftblibrary");
+            if (loaded) this.applyCursorRemapping = true;
+            return loaded;
         }
-        if (mixinClassName.startsWith(mixinPackage + ".compat.owo") && this.isModLoaded("owo")) {
-            this.applyCursorRemapping = true;
-            return true;
+        if (mixinClassName.startsWith(mixinPackage + ".compat.owo")) {
+            boolean loaded = isModLoaded("owo");
+            if (loaded) this.applyCursorRemapping = true;
+            return loaded;
+        }
+        if (mixinClassName.startsWith(mixinPackage + ".compat.veil")) {
+            return isModLoaded("veil");
         }
 
         return false;
@@ -67,7 +72,7 @@ public class NeoForgeMixinConfigPlugin implements IMixinConfigPlugin {
         // do nothing
     }
 
-    private boolean isModLoaded(String modId) {
+    private static boolean isModLoaded(String modId) {
         return LoadingModList.get().getModFileById(modId) != null;
     }
 }

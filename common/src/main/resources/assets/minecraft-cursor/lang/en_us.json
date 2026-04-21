@@ -59,6 +59,7 @@
   "minecraft-cursor.options.resource_pack.reset": "Reset Cursor Settings",
   "minecraft-cursor.options.resource_pack.reset.tooltip": "Resets personal cursor settings to match the settings provided by resource packs (or the built-in default).",
 
+  "minecraft-cursor.options.restart_to_apply": "Requires restart to apply",
   "minecraft-cursor.options.compat": "Mod Compatibility",
   "minecraft-cursor.options.compat.remap_cursors": "Remap System Cursors (GLFW)",
   "minecraft-cursor.options.compat.remap_cursors.info": "Remaps system cursors to the equivalent Minecraft Cursor.\n\nWARNING: Disabling may cause compatibility issues with certain mods.",
@@ -68,6 +69,10 @@
   "minecraft-cursor.options.compat.aggressive_cursor.info": "Aggressively updates the cursor instead of only when it changes.\n\nDisabled by default.",
   "minecraft-cursor.options.compat.virtual_mode": "Virtual Mode",
   "minecraft-cursor.options.compat.virtual_mode.info": "Renders the cursor manually instead of using GLFW.\n\nWARNING: May fix some issues but also cause others.",
+  "minecraft-cursor.options.compat.mod_loaded": "%1$s is loaded",
+  "minecraft-cursor.options.compat.mod_not_loaded": "%1$s is not loaded",
+  "minecraft-cursor.options.compat.imgui.disable_cursor_changes": "Disable ImGui cursor changes",
+  "minecraft-cursor.options.compat.veil": "Veil",
 
   "minecraft-cursor.options.debug": "Debug",
   "minecraft-cursor.options.debug.inspect": "Inspect Element",

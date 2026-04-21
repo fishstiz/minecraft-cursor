@@ -28,6 +28,10 @@ public class FabricMixinConfigPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
+        if (mixinClassName.startsWith("io.github.fishstiz.minecraftcursor.mixin.compat.veil")) {
+            return FabricLoader.getInstance().isModLoaded("veil");
+        }
+
         return true;
     }
 

@@ -6,7 +6,8 @@
   "client": [
     "compat.ftblibrary.CursorTypeAccess",
     "compat.ftblibrary.CursorTypeMixin",
-    "compat.owo.CursorAdapterMixin"
+    "compat.owo.CursorAdapterMixin",
+    "compat.veil.VeilImGuiImplGlfwMixin"
   ],
   "plugin": "io.github.fishstiz.minecraftcursor.NeoForgeMixinConfigPlugin",
   "injectors": {

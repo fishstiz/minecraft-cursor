@@ -1,6 +1,7 @@
 package io.github.fishstiz.minecraftcursor.config;
 
 import io.github.fishstiz.minecraftcursor.cursor.Cursor;
+import io.github.fishstiz.minecraftcursor.platform.Services;
 import io.github.fishstiz.minecraftcursor.util.SettingsUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,6 +30,7 @@ public class Config extends AbstractConfig<Config.Settings> {
     private boolean inactiveWidgetsEnabled = true;
     private boolean aggressiveCursor = false;
     private boolean virtualMode = false;
+    private boolean veilImGuiDisableCursorChanges = !Services.PLATFORM.getPlatform().equals("fabric") || !Flag.REMAP.isEnabled();
     private final List<String> blacklist = new ArrayList<>();
     private final GlobalSettings global = new GlobalSettings();
     transient File file;
@@ -213,6 +215,14 @@ public class Config extends AbstractConfig<Config.Settings> {
 
     public void setVirtualMode(boolean virtualMode) {
         this.virtualMode = virtualMode;
+    }
+
+    public boolean isVeilCursorChangesDisabled() {
+        return veilImGuiDisableCursorChanges;
+    }
+
+    public void setVeilCursorChangesDisabled(boolean disabled) {
+        this.veilImGuiDisableCursorChanges = disabled;
     }
 
     private static String generateHash(Map<String, Settings> settings) {

@@ -31,6 +31,10 @@ repositories {
     maven {
         url "https://maven.architectury.dev/"
     }
+    maven {
+        name = 'BlameJared Maven (CrT / Bookshelf)'
+        url = 'https://maven.blamejared.com'
+    }
 }
 
 neoForge {
@@ -83,6 +87,11 @@ dependencies {
     localRuntime "dev.architectury:architectury-neoforge:$architectury_version"
 
     compileOnly "maven.modrinth:owo-lib:$owo_version"
+
+    compileOnly("foundry.veil:veil-neoforge-${project.minecraft_version}:${project.veil_version}") {
+        exclude group: "maven.modrinth"
+        exclude group: "me.fallenbreath"
+    }
 }
 
 processResources {

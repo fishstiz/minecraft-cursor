@@ -2,6 +2,7 @@ package io.github.fishstiz.minecraftcursor.platform;
 
 import io.github.fishstiz.minecraftcursor.api.MinecraftCursorInitializer;
 import io.github.fishstiz.minecraftcursor.platform.services.PlatformHelper;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.fml.loading.FMLPaths;
 
@@ -11,6 +12,16 @@ import java.util.ServiceLoader;
 import java.util.stream.StreamSupport;
 
 public class NeoforgePlatformHelper implements PlatformHelper {
+    @Override
+    public String getPlatform() {
+        return "neoforge";
+    }
+
+    @Override
+    public boolean isModLoaded(String id) {
+        return ModList.get().isLoaded(id);
+    }
+
     @Override
     public boolean isDevelopmentEnvironment() {
         return !FMLLoader.isProduction();
