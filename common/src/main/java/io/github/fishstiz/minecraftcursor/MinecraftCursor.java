@@ -67,11 +67,19 @@ public final class MinecraftCursor {
     static void afterClientTick(Minecraft minecraft) {
         if (!ExternalCursorTracker.get().isCustom()) {
             if (minecraft.screen == null && deferredCursorType == null) {
-                CursorManager.INSTANCE.setCurrentCursor(CursorType.firstNonDefault(
-                        ExternalCursorTracker.get().getCursorOrDefault(),
-                        CONTROLLER.consumeTransientCursor(),
-                        CONTROLLER.consumeTransientFallbackCursor()
-                ));
+                CursorType externalCursor = ExternalCursorTracker.get().getCursorOrDefault();
+                CursorType transientCursor = CONTROLLER.consumeTransientCursor();
+                CursorType fallbackCursor = CONTROLLER.consumeTransientFallbackCursor();
+
+                if (!externalCursor.isDefault()) {
+                    CursorManager.INSTANCE.setCurrentCursor(externalCursor);
+                } else if (transientCursor != null && !transientCursor.isDefault()) {
+                    CursorManager.INSTANCE.setCurrentCursor(transientCursor);
+                } else if (fallbackCursor != null && !fallbackCursor.isDefault()) {
+                    CursorManager.INSTANCE.setCurrentCursor(fallbackCursor);
+                } else {
+                    CursorManager.INSTANCE.setCurrentCursor(CursorType.DEFAULT);
+                }
             } else if (deferredCursorType != null && shouldApplyDeferredCursorType(minecraft)) {
                 CursorManager.INSTANCE.setCurrentCursor(deferredCursorType);
             }
@@ -109,7 +117,16 @@ public final class MinecraftCursor {
     }
 
     private static @NotNull CursorType resolveWithFallback(Screen screen, double mouseX, double mouseY) {
-        return CursorType.firstNonDefault(resolveCursorType(screen, mouseX, mouseY), CONTROLLER.consumeTransientFallbackCursor());
+        CursorType resolved = resolveCursorType(screen, mouseX, mouseY);
+        CursorType fallback = CONTROLLER.consumeTransientFallbackCursor();
+
+        if (!resolved.isDefault()) {
+            return resolved;
+        }
+        if (fallback != null && !fallback.isDefault()) {
+            return fallback;
+        }
+        return CursorType.DEFAULT;
     }
 
     private static CursorType resolveCursorType(Screen screen, double mouseX, double mouseY) {
@@ -117,9 +134,15 @@ public final class MinecraftCursor {
             return CursorType.DEFAULT;
         }
 
-        CursorType cursorType = CursorType.firstNonDefault(ExternalCursorTracker.get().getCursorOrDefault(), CONTROLLER.consumeTransientCursor());
-        if (!cursorType.isDefault()) {
-            return cursorType;
+        CursorType externalCursor = ExternalCursorTracker.get().getCursorOrDefault();
+        CursorType transientCursor = CONTROLLER.consumeTransientCursor();
+
+        if (!externalCursor.isDefault()) {
+            return externalCursor;
+        }
+
+        if (transientCursor != null && !transientCursor.isDefault()) {
+            return transientCursor;
         }
 
         if (CursorTypeUtil.isGrabbing()) {
