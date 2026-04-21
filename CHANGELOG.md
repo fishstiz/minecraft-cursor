@@ -1,4 +1,5 @@
 - 1.21.1: Added option to disable ImGui cursor changes for Veil ImGui context (fixes Sable and Create Aeronautics incompatibility when enabled [#49](https://github.com/fishstiz/minecraft-cursor/issues/49))
   - Enabled by default when not on Fabric or when remap GLFW standard cursors cannot be enabled.
 - Added Simplified Chinese Translation ([#47](https://github.com/fishstiz/minecraft-cursor/pull/47) by [Alan070727](https://github.com/Alan070727))
+- Fixed possible crash when launching the game with Virtual Mode enabled
 - Minor optimizations

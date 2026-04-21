@@ -52,6 +52,10 @@ sealed interface CursorRenderer permits CursorRenderer.Native, CursorRenderer.Vi
 
         @Override
         public void setCursor(@NotNull Cursor cursor) {
+            if (!cursor.isLoaded()) {
+                this.textureLocation = null;
+            }
+
             this.textureLocation = cursor.getLocation();
             this.textureWidth = cursor.getTextureWidth();
             this.textureHeight = cursor.getTextureHeight();
