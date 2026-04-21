@@ -30,13 +30,6 @@ static String convertToKebabCase(String input) {
     return input.replaceAll(/([a-z])([A-Z])/, '$1-$2').toLowerCase()
 }
 
-Properties secrets = new Properties()
-File secretsFile = project.rootProject.file('local.properties')
-
-if (secretsFile.exists()) {
-    secrets.load(secretsFile.newDataInputStream())
-}
-
 publishMods {
     changelog = file("CHANGELOG.md").text
     type = STABLE
@@ -59,7 +52,7 @@ publishMods {
     }
 
     def githubOptions = githubOptions {
-        accessToken = secrets.getProperty("GITHUB_TOKEN")
+        accessToken = findProperty("GITHUB_TOKEN") ?: ''
         repository = "fishstiz/minecraft-cursor"
         commitish = "mc/${minecraft_version}"
         tagName = "v${mod_version}"
@@ -77,12 +70,12 @@ publishMods {
         ))
     }
     def modrinthOptions = modrinthOptions {
-        accessToken = secrets.getProperty("MODRINTH_TOKEN")
+        accessToken = findProperty("MODRINTH_TOKEN") ?: ''
         projectId = "o5fhgLeQ"
         minecraftVersions.add(minecraft_version)
     }
     def curseforgeOptions = curseforgeOptions {
-        accessToken = secrets.getProperty("CURSEFORGE_TOKEN")
+        accessToken = findProperty("CURSEFORGE_TOKEN") ?: ''
         projectId = "1184736"
         minecraftVersions.add(minecraft_version)
         clientRequired = true
