@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.Mixin;
 
 import static imgui.flag.ImGuiConfigFlags.NoMouseCursorChange;
 
-@Mixin(VeilImGuiImplGlfw.class)
+@Mixin(value = VeilImGuiImplGlfw.class, remap = false)
 public class VeilImGuiImplGlfwMixin extends ImGuiImplGlfw {
     @Override
     public boolean init(long window, boolean installCallbacks) {
