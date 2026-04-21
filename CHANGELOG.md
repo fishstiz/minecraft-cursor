@@ -1,10 +1,4 @@
-- No longer crashes the game when an animated cursor fails to load in some cases.
-- Broader exception handling to minimize crashes when a cursor fails to load.
-- Forces the default cursor for an element if an error occurs while traversing the `GuiEventListener` tree.
-- Cleans up all cursor resources when reloading resources instead of only on lazy loading.
-
-For Forge version:
-
-- Fixed Cursors Extended resource pack appearing in the data pack selection screen.
-
-Please report any issues you encounter, especially crashes, to help improve this mod.
+- 1.21.1: Added option to disable ImGui cursor changes for Veil ImGui context (fixes Sable and Create Aeronautics incompatibility when enabled [#49](https://github.com/fishstiz/minecraft-cursor/issues/49))
+  - Enabled by default when not on Fabric or when remap GLFW standard cursors cannot be enabled.
+- Added Simplified Chinese Translation ([#47](https://github.com/fishstiz/minecraft-cursor/pull/47) by [Alan070727](https://github.com/Alan070727))
+- Minor optimizations
